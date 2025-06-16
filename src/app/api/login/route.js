@@ -1,7 +1,6 @@
-// src/app/api/login/route.js
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken'; // Import jsonwebtoken
+import jwt from 'jsonwebtoken';
 import initializeDbAndModels from '@/lib/db';
 
 export async function POST(req) {
@@ -31,7 +30,7 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    // --- JWT GENERATION ---
+    //check if JWT_SECRET exists or is defined
     if (!process.env.JWT_SECRET) {
         console.error("JWT_SECRET is not defined in environment variables!");
         return NextResponse.json(
@@ -39,38 +38,32 @@ export async function POST(req) {
             { status: 500 }
         );
     }
-
+    //create JWT token
     const token = jwt.sign(
-      { userId: user.id, email: user.email, tier: user.tier }, // Payload
-      process.env.JWT_SECRET, // Secret key
-      { expiresIn: '1h' } // Token expiration
+      { userId: user.id, email: user.email, tier: user.tier }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '1h' } 
     );
-    // --- END JWT GENERATION ---
 
     const { password: _, ...userWithoutPassword } = user.toJSON();
 
-    // Create a response object
     const response = NextResponse.json(
       {
         message: 'Login successful',
         user: userWithoutPassword,
-        // Do NOT send the token in the JSON body if it's in an httpOnly cookie
-        // token: token, // <-- Remove this line
       },
       { status: 200 }
     );
 
-    // --- Set JWT as HTTP-ONLY cookie ---
     response.cookies.set('jwt_token', token, {
-      httpOnly: true, // IMPORTANT: Makes cookie inaccessible to client-side JavaScript
-      secure: process.env.NODE_ENV === 'production', // Use secure in production (HTTPS)
-      sameSite: 'strict', // Protects against CSRF
-      maxAge: 60 * 60 * 1, // 1 hour (matches token expiration)
-      path: '/', // Accessible across the whole site
+      httpOnly: true, 
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: 'strict', 
+      maxAge: 60 * 60 * 1, // 1 hour
+      path: '/', 
     });
-    // --- END Set JWT as HTTP-ONLY cookie ---
 
-    return response; // Return the response with the cookie
+    return response; 
 
   } catch (err) {
     console.error('Error in /api/login POST request:', err);
