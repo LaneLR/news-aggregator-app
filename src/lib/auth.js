@@ -1,16 +1,11 @@
-// src/lib/auth.js
 import jwt from 'jsonwebtoken';
-// Removed 'cookies' import as it's not used here anymore
-// import { cookies } from 'next/headers';
 
 /**
- * Verifies the JWT token string.
- *
  * @param {string | undefined | null} token The JWT token string.
  * @returns {Promise<{status: string, user: object|null, message: string|null, token: string|null}>}
- * An object indicating authentication status, user payload (if authenticated), and message.
  */
-export async function verifyAuthToken(token) { // <-- NOW ACCEPTS THE TOKEN STRING
+
+export async function verifyAuthToken(token) { 
   try {
     if (!token) {
       return { status: 'unauthenticated', message: 'No token found', user: null, token: null };
