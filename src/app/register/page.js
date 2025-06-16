@@ -58,8 +58,6 @@ export default function RegisterPage() {
         return;
       }
 
-      console.log("User created:", data);
-      // Optionally redirect or show success
     } catch (err) {
       setError("Something went wrong");
       console.error(err);
@@ -75,8 +73,18 @@ export default function RegisterPage() {
         <FormWrapper onSubmit={handleCreateUser}>
           <h1>Create an account!</h1>
 
-          <LoginFormInput name="email" type="email" placeholder="Email" required />
-          <LoginFormInput name="password" type="password" placeholder="Password" required />
+          <LoginFormInput
+            name="email"
+            type="email"
+            placeholder="Email"
+            required
+          />
+          <LoginFormInput
+            name="password"
+            type="password"
+            placeholder="Password"
+            required
+          />
           <LoginFormInput
             name="confirmPassword"
             type="password"
