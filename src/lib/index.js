@@ -7,10 +7,10 @@ if (!global.sequelize) {
     dialect: "postgres",
     logging: false,
     pool: {
-      max: 10,
-      min: 0,
-      acquire: 30000,
-      idle: 10000,
+      max: 10, //max number of connections in the pool
+      min: 0, //min number of connections in the pool
+      acquire: 30000, //max wait time for a connection
+      idle: 10000, //max idle time before a connection is released
     },
   });
   global.sequelize = sequelize;
