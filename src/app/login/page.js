@@ -1,7 +1,10 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
+import { loginUser } from "@/app/slices/manageLoggedIn";
 
 const Wrapper = styled.div`
   display: flex;
@@ -30,20 +33,30 @@ const LoginFormInput = styled.input`
 `;
 
 export default function LoginPage() {
+  const [user, setUser] = useState({
+    email: "",
+    password: "",
+  });
   const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+   const handleChange = (e) => {
+    setUser({
+      ...user,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   async function handleLoginUser(e) {
     e.preventDefault();
-
-    const formData = new FormData(e.target);
-    const email = formData.get("email");
-    const password = formData.get("password");
+    setError(null); 
 
     try {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(user),
       });
 
       const data = await res.json();
@@ -52,9 +65,11 @@ export default function LoginPage() {
         setError(data.error || "Login failed");
         return;
       }
+      dispatch(loginUser({ user: data.user, status: "active" }));
+      setUser({ email: "", password: "" }); 
 
-      console.log("Login successful:", data);
-      // You can redirect or update auth state here
+      router.push("/");
+
     } catch (err) {
       setError("Something went wrong");
       console.error(err);
@@ -64,24 +79,38 @@ export default function LoginPage() {
   return (
     <>
       <Link href="/">
-        <button>home page</button>
+        <button>Home page</button>
       </Link>
       <Wrapper>
         <FormWrapper onSubmit={handleLoginUser}>
           <h1>Login!</h1>
 
-          <LoginFormInput name="email" type="email" placeholder="Email" required />
-          <LoginFormInput name="password" type="password" placeholder="Password" required />
+          <LoginFormInput
+            name="email"
+            type="email"
+            placeholder="Email"
+            required
+            value={user.email}
+            onChange={handleChange}
+          />
+          <LoginFormInput
+            name="password"
+            type="password"
+            placeholder="Password"
+            required
+            value={user.password}
+            onChange={handleChange}
+          />
 
           <button type="submit">Login</button>
-
+          <br />
           {error && <p style={{ color: "red" }}>{error}</p>}
 
           <br />
           <h4>
-            Don't have an account?{" "}
+            Don't have an account?
             <Link href="/register">
-              <u>Create one!</u>
+              {' '}<u>Create one!</u>
             </Link>
           </h4>
         </FormWrapper>
