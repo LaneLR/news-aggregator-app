@@ -1,22 +1,17 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-// Correct: Import the central database and models initializer
+import jwt from 'jsonwebtoken';
 import initializeDbAndModels from '@/lib/db';
 
 export async function POST(req) {
-  let db; // Declare db variable here
+  let db;
   try {
-    // CRITICAL: Ensure database and models are initialized before proceeding
-    // This function will handle connecting to DB and syncing models (if configured)
     db = await initializeDbAndModels();
-
-    // CRITICAL: Get the initialized User model from the db object
     const User = db.User;
 
     const body = await req.json();
     const { email, password } = body;
 
-    // Basic validation
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
@@ -24,39 +19,55 @@ export async function POST(req) {
       );
     }
 
-    // Find the user by email using the PROPERLY INITIALIZED User model
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Use the validatePassword method on the user instance (from your model)
     const isPasswordValid = await user.validatePassword(password);
     if (!isPasswordValid) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    // Omit password from response for security
+    //check if JWT_SECRET exists or is defined
+    if (!process.env.JWT_SECRET) {
+        console.error("JWT_SECRET is not defined in environment variables!");
+        return NextResponse.json(
+            { error: 'Server configuration error: JWT secret missing' },
+            { status: 500 }
+        );
+    }
+    //create JWT token
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, tier: user.tier }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '1h' } 
+    );
+
     const { password: _, ...userWithoutPassword } = user.toJSON();
 
-    // In a real application, you would generate and return a JWT here
-    // Example (requires 'jsonwebtoken' installed and JWT_SECRET in .env):
-    // const jwt = require('jsonwebtoken');
-    // const token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         message: 'Login successful',
         user: userWithoutPassword,
-        // token: token // If you implement JWT
       },
       { status: 200 }
     );
+
+    response.cookies.set('jwt_token', token, {
+      httpOnly: true, 
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: 'strict', 
+      maxAge: 60 * 60 * 1, // 1 hour
+      path: '/', 
+    });
+
+    return response; 
+
   } catch (err) {
     console.error('Error in /api/login POST request:', err);
 
-    // Handle specific Sequelize errors or general errors for better client feedback
     if (err.name === 'SequelizeValidationError') {
       const errors = err.errors ? err.errors.map(e => e.message) : ['Validation error'];
       return NextResponse.json(

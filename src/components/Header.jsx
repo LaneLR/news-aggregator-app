@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useSelector } from "react-redux";
 import { logoutUser } from "@/app/slices/manageLoggedIn";
 import { useDispatch } from "react-redux";
+import LogoutComponent from "./Logout";
 import Link from "next/link";
 
 const Wrapper = styled.div`
@@ -66,7 +67,7 @@ export default function Header() {
           </LeftContainer>
           <RightContainer>
             <nav style={{display: "flex", columnGap: "10px"}}>
-              <button onClick={handleLogout}>Logout</button>
+              <LogoutComponent onClick={handleLogout}>Logout</LogoutComponent>
               <UserAccountIcon>
                 <p>User</p>
               </UserAccountIcon>

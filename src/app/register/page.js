@@ -33,7 +33,7 @@ export default function RegisterPage() {
   const [error, setError] = useState(null);
 
   async function handleCreateUser(e) {
-    e.preventDefault();
+
     const formData = new FormData(e.target);
     const email = formData.get("email");
     const password = formData.get("password");
