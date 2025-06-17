@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import initializeDbAndModels from '@/lib/db';
+import { authRateLimitMiddleware } from '@/lib/rate-limiter'; // <-- Import the specific middleware
+
+export const dynamic = 'force-dynamic'; // Ensures dynamic execution for rate limiting
 
 export async function POST(req) {
   let db;
   try {
+    await authRateLimitMiddleware(req, NextResponse); // <-- CORRECT USAGE
+    // --- End Rate Limiting ---
+
     db = await initializeDbAndModels();
     const User = db.User;
 
@@ -30,19 +35,18 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    //check if JWT_SECRET exists or is defined
-    if (!process.env.JWT_SECRET) {
-        console.error("JWT_SECRET is not defined in environment variables!");
+    if (!process.env.JWT_TOKEN_SECRET) {
+        console.error("JWT_TOKEN_SECRET is not defined in environment variables!");
         return NextResponse.json(
             { error: 'Server configuration error: JWT secret missing' },
             { status: 500 }
         );
     }
-    //create JWT token
+
     const token = jwt.sign(
-      { userId: user.id, email: user.email, tier: user.tier }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: '1h' } 
+      { userId: user.id, email: user.email, tier: user.tier },
+      process.env.JWT_TOKEN_SECRET,
+      { expiresIn: '1h' }
     );
 
     const { password: _, ...userWithoutPassword } = user.toJSON();
@@ -56,16 +60,24 @@ export async function POST(req) {
     );
 
     response.cookies.set('jwt_token', token, {
-      httpOnly: true, 
-      secure: process.env.NODE_ENV === 'production', 
-      sameSite: 'strict', 
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
       maxAge: 60 * 60 * 1, // 1 hour
-      path: '/', 
+      path: '/',
     });
 
-    return response; 
+    return response;
 
   } catch (err) {
+    if (err && err.status === 429) {
+        console.warn("Rate limit exceeded for login attempt from IP:", req.ip || req.headers['x-forwarded-for']);
+        return NextResponse.json(
+            { error: 'Too many login attempts. Please try again after some time.' },
+            { status: 429 }
+        );
+    }
+
     console.error('Error in /api/login POST request:', err);
 
     if (err.name === 'SequelizeValidationError') {
