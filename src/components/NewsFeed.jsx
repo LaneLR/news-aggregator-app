@@ -1,5 +1,8 @@
 import NewsCard from "./NewsCard";
 
+//it's safer to use server components for fetching data
+//as it prevents exposing API keys to the client side and exposing secrets
+
 async function fetchNews() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/news`, {
     cache: 'force-cache',
