@@ -1,20 +1,13 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals = config.externals || [];
-      config.externals.push("sequelize", "pg");
-    }
-    return config;
-  },
+module.exports = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "**", //WARNING: This is highly insecure for production.
+        protocol: 'https',
+        //hostname: '**' is very unsecure!
+        //replace with list of all hostnames you want to allow
+        hostname: '**', // This wildcard matches any hostname
+        // You can potentially add pathname if ALL your API image URLs share a common root path, e.g., '/images/**'
       },
     ],
   },
 };
-
-module.exports = nextConfig;
