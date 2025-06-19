@@ -108,7 +108,7 @@ export default function LoginPage() {
 
           <br />
           <h4>
-            <p>Don't have an account?</p>
+            <p>Don&apos;t forget to log in!</p>
             <Link href="/register">
               <u>Create one!</u>
             </Link>
