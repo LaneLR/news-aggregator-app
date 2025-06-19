@@ -160,15 +160,15 @@ async function initializeDbAndModels() {
       global.db.sequelize = sequelize;
       global.db.User = User;
 
-    //   await sequelize.sync();
-    //   console.log('All models were synchronized successfully.');
+      await sequelize.sync();
+      console.log('All models were synchronized successfully.');
 
     } catch (error) {
       console.error('----------------------------------------------------');
       console.error('FATAL: Error initializing database or models during build:');
       console.error('Error Message:', error.message || 'No specific error message provided.');
       console.error('Error Name:', error.name || 'N/A');
-      console.error('Error Code:', error.code || 'N/A'); // Network errors often have a code
+      console.error('Error Code:', error.code || 'N/A'); 
       console.error('Stack Trace:', error.stack);
       console.error('----------------------------------------------------');
       throw error
