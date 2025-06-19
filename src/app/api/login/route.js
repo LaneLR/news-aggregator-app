@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import initializeDbAndModels from '@/lib/db';
-import { authRateLimitMiddleware } from '@/lib/rate-limiter'; // <-- Import the specific middleware
+import { authRateLimitMiddleware } from '@/lib/rate-limiter'; 
 
-export const dynamic = 'force-dynamic'; // Ensures dynamic execution for rate limiting
+export const dynamic = 'force-dynamic'; 
 
 export async function POST(req) {
   let db;
   try {
-    await authRateLimitMiddleware(req, NextResponse); // <-- CORRECT USAGE
-    // --- End Rate Limiting ---
+    await authRateLimitMiddleware(req, NextResponse); 
 
     db = await initializeDbAndModels();
     const User = db.User;
@@ -35,7 +34,7 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    if (!process.env.JWT_TOKEN_SECRET) {
+    if (!process.env.JWT_SECRET) {
         console.error("JWT_TOKEN_SECRET is not defined in environment variables!");
         return NextResponse.json(
             { error: 'Server configuration error: JWT secret missing' },
@@ -45,7 +44,7 @@ export async function POST(req) {
 
     const token = jwt.sign(
       { userId: user.id, email: user.email, tier: user.tier },
-      process.env.JWT_TOKEN_SECRET,
+      process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
