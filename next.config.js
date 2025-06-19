@@ -2,13 +2,15 @@
 const nextConfig = {
   webpack: (config, { isServer }) => {
     if (isServer) {
+      const currentExternals =
+        typeof config.externals === "object" && config.externals !== null
+          ? config.externals
+          : {};
+
       config.externals = {
-        ...config.externals,
-        "sequelize/lib/dialects": "commonjs sequelize/lib/dialects",
-        mysql: "commonjs mysql",
+        ...currentExternals,
+        sequelize: "commonjs sequelize",
         pg: "commonjs pg",
-        sqlite3: "commonjs sqlite3",
-        tedious: "commonjs tedious",
       };
     }
     return config;
@@ -17,7 +19,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**", // This wildcard matches any hostname
+        hostname: "**", //Be aware: '**' for hostname is not recommended for production
       },
     ],
   },
