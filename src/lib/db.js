@@ -1,8 +1,8 @@
 // src/lib/db.js
-import getSequelizeInstance from './sequelize';
-import User from './models/User';
-import { DataTypes, Op } from "sequelize"; 
-import bcrypt from 'bcryptjs';
+import getSequelizeInstance from "./sequelize";
+import User from "./models/User";
+import { DataTypes, Op } from "sequelize";
+import bcrypt from "bcryptjs";
 
 if (!global.db) {
   global.db = {};
@@ -11,9 +11,11 @@ if (!global.db) {
 async function initializeDbAndModels() {
   if (!global.db.sequelize || !global.db.User) {
     try {
-      console.log('Attempting to get Sequelize instance and initialize models...');
+      console.log(
+        "Attempting to get Sequelize instance and initialize models..."
+      );
       const sequelize = await getSequelizeInstance();
-      console.log('Sequelize instance obtained, initializing User model...');
+      console.log("Sequelize instance obtained, initializing User model...");
 
       User.init(
         {
@@ -137,14 +139,18 @@ async function initializeDbAndModels() {
               unique: true,
               fields: ["providerCustomerId"],
               where: {
-                [Op.ne]: null, 
+                providerCustomerId: {
+                  [Op.ne]: null,
+                },
               },
             },
             {
               unique: true,
               fields: ["subscriptionId"],
               where: {
-                [Op.ne]: null, // <--- And here
+                providerCustomerId: {
+                  [Op.ne]: null,
+                },
               },
             },
             {
@@ -161,18 +167,22 @@ async function initializeDbAndModels() {
       global.db.User = User;
 
       //DO NOT REMOVE COMMENTS FROM BELOW LINE
-      // await sequelize.sync();
-      // console.log('All models were synchronized successfully.');
-
+      await sequelize.sync();
+      console.log("All models were synchronized successfully.");
     } catch (error) {
-      console.error('----------------------------------------------------');
-      console.error('FATAL: Error initializing database or models during build:');
-      console.error('Error Message:', error.message || 'No specific error message provided.');
-      console.error('Error Name:', error.name || 'N/A');
-      console.error('Error Code:', error.code || 'N/A'); 
-      console.error('Stack Trace:', error.stack);
-      console.error('----------------------------------------------------');
-      throw error
+      console.error("----------------------------------------------------");
+      console.error(
+        "FATAL: Error initializing database or models during build:"
+      );
+      console.error(
+        "Error Message:",
+        error.message || "No specific error message provided."
+      );
+      console.error("Error Name:", error.name || "N/A");
+      console.error("Error Code:", error.code || "N/A");
+      console.error("Stack Trace:", error.stack);
+      console.error("----------------------------------------------------");
+      throw error;
     }
   }
   return global.db;
