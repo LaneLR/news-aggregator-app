@@ -160,8 +160,9 @@ async function initializeDbAndModels() {
       global.db.sequelize = sequelize;
       global.db.User = User;
 
-      await sequelize.sync();
-      console.log('All models were synchronized successfully.');
+      //DO NOT REMOVE COMMENTS FROM BELOW LINE
+      // await sequelize.sync();
+      // console.log('All models were synchronized successfully.');
 
     } catch (error) {
       console.error('----------------------------------------------------');
