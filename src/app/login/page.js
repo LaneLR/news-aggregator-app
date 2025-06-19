@@ -110,7 +110,7 @@ export default function LoginPage() {
           <h4>
             <p>Don't have an account?</p>
             <Link href="/register">
-              {' '}<u>Create one!</u>
+              <u>Create one!</u>
             </Link>
           </h4>
         </FormWrapper>
