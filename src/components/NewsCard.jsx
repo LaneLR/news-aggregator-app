@@ -101,13 +101,14 @@ export default function NewsCard({ article }) {
                 backgroundColor:
                   currentImageSrc === FALLBACK_IMAGE_URL
                     ? "lightgray"
-                    : "transparent",
+                    : "f0f0f0",
                 objectFit: "cover",
               }}
               src={currentImageSrc}
               fill
               alt={article.title || "News article image"}
               onError={handleImageError}
+              placeholder="blur"
             />
           </a>
         </CardWrapper>
