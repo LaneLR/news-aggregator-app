@@ -1,16 +1,13 @@
-// src/app/api/register/route.js
 import { NextResponse } from 'next/server';
 import initializeDbAndModels from '@/lib/db';
-import { authRateLimitMiddleware } from '@/lib/rate-limiter'; // <-- Import the specific middleware
+import { authRateLimitMiddleware } from '@/lib/rate-limiter'; 
 
-export const dynamic = 'force-dynamic'; // Ensures dynamic execution for rate limiting
+export const dynamic = 'force-dynamic'; 
 
 export async function POST(req) {
   let db;
   try {
-    // --- Apply Rate Limiting: Await the middleware function ---
-    await authRateLimitMiddleware(req, NextResponse); // <-- CORRECT USAGE
-    // --- End Rate Limiting ---
+    await authRateLimitMiddleware(req, NextResponse); 
 
     db = await initializeDbAndModels();
     const User = db.User;

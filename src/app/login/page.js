@@ -107,8 +107,8 @@ export default function LoginPage() {
           {error && <p style={{ color: "red" }}>{error}</p>}
 
           <br />
-          <h4>
-            <p>Don&apos;t forget to log in!</p>
+          <h4 style={{display: 'flex', flexFlow: 'column nowrap', alignItems: 'center', justifyContent: 'center'}}>
+            <p>Don&apos;t have an account?</p>
             <Link href="/register">
               <u>Create one!</u>
             </Link>
