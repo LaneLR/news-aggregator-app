@@ -15,6 +15,9 @@ const nextConfig = {
       },
     ],
   },
+  compiler: {
+    styledComponents: true, //enable the styled-components SWC compiler
+  },
 };
 
 module.exports = nextConfig;
