@@ -1,6 +1,7 @@
 "use client";
 import styled from "styled-components";
 import Image from "next/image";
+import React, { useState, useEffect } from 'react'; 
 
 const Wrapper = styled.div`
   width: 400px;
@@ -52,42 +53,61 @@ const AuthorSection = styled.div`
 `;
 
 export default function NewsCard({ article }) {
-  const fallback = "/images/NoImage.png";
+  const FALLBACK_IMAGE_URL = "/images/NoImage.png"; 
   const index = article.title.lastIndexOf(" - ");
   const cleanTitle =
     index !== -1 ? article.title.substring(0, index) : article.title;
+
+  //state to manage the current image source for the Image component
+  //initialize it based on whether article.urlToImage is a valid-looking string
+  const [currentImageSrc, setCurrentImageSrc] = useState(() => {
+    return (article.urlToImage && typeof article.urlToImage === 'string' && article.urlToImage.trim() !== '')
+      ? article.urlToImage
+      : FALLBACK_IMAGE_URL;
+  });
+
+  //reset image source if the article (specifically its image URL) changes
+  useEffect(() => {
+    setCurrentImageSrc((prevSrc) => {
+      const newSrc = (article.urlToImage && typeof article.urlToImage === 'string' && article.urlToImage.trim() !== '')
+        ? article.urlToImage
+        : FALLBACK_IMAGE_URL;
+      //only update if the source actually changed to avoid unnecessary re-renders
+      return newSrc !== prevSrc ? newSrc : prevSrc;
+    });
+  }, [article.urlToImage]);
+
+  //handler for when the image fails to load
+  const handleImageError = () => {
+    if (currentImageSrc !== FALLBACK_IMAGE_URL) {
+      console.warn(`Image failed to load: ${currentImageSrc}. Using fallback.`);
+      setCurrentImageSrc(FALLBACK_IMAGE_URL);
+    }
+  };
+
+  const imageHeight = 250; 
+  const imageWidth = 400; 
 
   return (
     <>
       <Wrapper>
         <CardWrapper>
-          <a href={article.url} target="_blank">
-            {article.urlToImage ? (
-              <Image
-                style={{
-                  borderTopLeftRadius: "15px",
-                  borderTopRightRadius: "10px",
-                }}
-                src={article.urlToImage}
-                width={400}
-                height={250}
-                alt={article.title}
-              />
-            ) : (
-              <Image
-                style={{
-                  borderTopLeftRadius: "15px",
-                  borderTopRightRadius: "10px",
-                  backgroundColor: "lightgray",
-                }}
-                src={fallback}
-                width={400}
-                height={300}
-                alt={article.title}
-              />
-            )}
+          <a href={article.url} target="_blank" rel="noopener noreferrer"> 
+            <Image
+              style={{
+                borderTopLeftRadius: "15px",
+                borderTopRightRadius: "10px",
+                backgroundColor: currentImageSrc === FALLBACK_IMAGE_URL ? "lightgray" : "transparent",
+                objectFit: "cover", 
+              }}
+              src={currentImageSrc} 
+              width={imageWidth}
+              height={imageHeight}
+              alt={article.title || 'News article image'} 
+              onError={handleImageError} 
+            />
           </a>
-        </CardWrapper>{" "}
+        </CardWrapper>
         <DescriptionSection>
           <TitleSection>{cleanTitle}</TitleSection>
           <AuthorSection>{article.source.name}</AuthorSection>
