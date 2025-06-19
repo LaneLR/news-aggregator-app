@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Bronze",
+  title: "Bronze - News Aggregator",
   description: "Track of all of your favorite news sources in one place",
 };
 
