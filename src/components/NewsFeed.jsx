@@ -4,16 +4,19 @@ import NewsCard from "./NewsCard";
 //as it prevents exposing API keys to the client side and exposing secrets
 
 async function fetchNews() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/news`, {
+  const res = await fetch(`/api/news`, {
     cache: 'force-cache',
     next: { revalidate: 3600 },
   });
     if (!res.ok) {
-        throw new Error('Failed to fetch')
-    }
-    const data = await res.json();
-    console.log(data.articles)
-    return data.articles;
+    // Crucial: Log more details for debugging if the fetch fails
+    const errorText = await res.text();
+    console.error(`Failed to fetch news from /api/news: Status ${res.status}, Error: ${errorText}`);
+    throw new Error(`Failed to fetch news from /api/news: Status ${res.status}`);
+  }
+  const data = await res.json();
+  console.log(data.articles)
+  return data.articles;
 }
 
 export default async function News() {

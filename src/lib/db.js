@@ -11,7 +11,9 @@ if (!global.db) {
 async function initializeDbAndModels() {
   if (!global.db.sequelize || !global.db.User) {
     try {
+      console.log('Attempting to get Sequelize instance and initialize models...');
       const sequelize = await getSequelizeInstance();
+      console.log('Sequelize instance obtained, initializing User model...');
 
       User.init(
         {
@@ -162,8 +164,14 @@ async function initializeDbAndModels() {
     //   console.log('All models were synchronized successfully.');
 
     } catch (error) {
-      console.error('Error initializing database or models:', error);
-      throw error;
+      console.error('----------------------------------------------------');
+      console.error('FATAL: Error initializing database or models during build:');
+      console.error('Error Message:', error.message || 'No specific error message provided.');
+      console.error('Error Name:', error.name || 'N/A');
+      console.error('Error Code:', error.code || 'N/A'); // Network errors often have a code
+      console.error('Stack Trace:', error.stack);
+      console.error('----------------------------------------------------');
+      throw error
     }
   }
   return global.db;
