@@ -5,14 +5,17 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { loginUser } from "@/app/slices/manageLoggedIn";
+import Button from "@/components/Button";
 
 const Wrapper = styled.div`
+  flex-grow: 1;
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
-  height: 100vh;
+  justify-content: center;
   width: 100vw;
-  background-color: rgb(138, 138, 138);
+  background-color: inherit;
+  overflow-y: hidden;
+  flex-flow: column nowrap;
 `;
 
 const FormWrapper = styled.form`
@@ -30,6 +33,10 @@ const LoginFormInput = styled.input`
   margin: 10px 0;
   border: 1px solid #ccc;
   border-radius: 4px;
+
+  &:last-of-type {
+    margin-bottom: 25px;
+  }
 `;
 
 export default function LoginPage() {
@@ -41,7 +48,7 @@ export default function LoginPage() {
   const dispatch = useDispatch();
   const router = useRouter();
 
-   const handleChange = (e) => {
+  const handleChange = (e) => {
     setUser({
       ...user,
       [e.target.name]: e.target.value,
@@ -50,7 +57,7 @@ export default function LoginPage() {
 
   async function handleLoginUser(e) {
     e.preventDefault();
-    setError(null); 
+    setError(null);
 
     try {
       const res = await fetch("/api/login", {
@@ -66,10 +73,9 @@ export default function LoginPage() {
         return;
       }
       dispatch(loginUser({ user: data.user, status: "active" }));
-      setUser({ email: "", password: "" }); 
+      setUser({ email: "", password: "" });
 
       router.push("/");
-
     } catch (err) {
       setError("Something went wrong");
       console.error(err);
@@ -78,13 +84,9 @@ export default function LoginPage() {
 
   return (
     <>
-      <Link href="/">
-        <button>Home page</button>
-      </Link>
       <Wrapper>
+        <h1>Login!</h1>
         <FormWrapper onSubmit={handleLoginUser}>
-          <h1>Login!</h1>
-
           <LoginFormInput
             name="email"
             type="email"
@@ -102,13 +104,21 @@ export default function LoginPage() {
             onChange={handleChange}
           />
 
-          <button type="submit">Login</button>
+          <Button bgColor="#9E6532" type="submit">
+            Login
+          </Button>
           <br />
           {error && <p style={{ color: "red" }}>{error}</p>}
 
-          <br />
-          <h4 style={{display: 'flex', flexFlow: 'column nowrap', alignItems: 'center', justifyContent: 'center'}}>
-            <p>Don&apos;t have an account?</p>
+          <h4
+            style={{
+              display: "flex",
+              flexFlow: "column nowrap",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            Don&apos;t have an account?
             <Link href="/register">
               <u>Create one!</u>
             </Link>

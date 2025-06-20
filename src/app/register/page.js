@@ -1,15 +1,16 @@
 "use client";
+import Button from "@/components/Button";
 import Link from "next/link";
 import { useState } from "react";
 import styled from "styled-components";
 
 const Wrapper = styled.div`
+  flex-grow: 1;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-  height: 100vh;
   width: 100vw;
-  background-color: rgb(138, 138, 138);
+  background-color: inherit;
 `;
 
 const FormWrapper = styled.form`
@@ -21,12 +22,15 @@ const FormWrapper = styled.form`
   background-color: inherit;
 `;
 
-const LoginFormInput = styled.input`
+const RegisterFormInput = styled.input`
   width: 300px;
   padding: 10px;
   margin: 10px 0;
   border: 1px solid #ccc;
   border-radius: 4px;
+
+    &:last-of-type{
+  margin-bottom: 25px;
 `;
 
 export default function RegisterPage() {
@@ -66,33 +70,30 @@ export default function RegisterPage() {
 
   return (
     <>
-      <Link href="/">
-        <button>Home Page</button>
-      </Link>
       <Wrapper>
         <FormWrapper onSubmit={handleCreateUser}>
           <h1>Create an account!</h1>
 
-          <LoginFormInput
+          <RegisterFormInput
             name="email"
             type="email"
             placeholder="Email"
             required
           />
-          <LoginFormInput
+          <RegisterFormInput
             name="password"
             type="password"
             placeholder="Password"
             required
           />
-          <LoginFormInput
+          <RegisterFormInput
             name="confirmPassword"
             type="password"
             placeholder="Confirm Password"
             required
           />
 
-          <button type="submit">Register</button>
+          <Button bgColor='#9E6532' type="submit">Create Account</Button>
 
           {error && <p style={{ color: "red" }}>{error}</p>}
 
