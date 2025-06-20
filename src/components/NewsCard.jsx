@@ -108,7 +108,9 @@ export default function NewsCard({ article }) {
               fill
               alt={article.title || "News article image"}
               onError={handleImageError}
+              loading="lazy"
               placeholder="blur"
+              blurDataURL="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
             />
           </a>
         </CardWrapper>

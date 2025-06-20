@@ -11,11 +11,6 @@ export async function verifyAuthToken(token) {
       return { status: 'unauthenticated', message: 'No token found', user: null, token: null };
     }
 
-    console.log("DEBUG: JWT_SECRET from process.env:",
-      process.env.JWT_SECRET
-        ? `[SET] Length: ${process.env.JWT_SECRET.length}` // Show if it's set and its length
-        : "[NOT SET or EMPTY]"); // Show if it's undefined or empty
-
     if (!process.env.JWT_SECRET) {
       console.error("JWT_SECRET is not defined for token verification!");
       throw new Error('Server configuration error: JWT secret missing');

@@ -3,17 +3,26 @@ import styled from "styled-components";
 import { useSelector } from "react-redux";
 import { logoutUser } from "@/app/slices/manageLoggedIn";
 import { useDispatch } from "react-redux";
+import Image from "next/image";
 import LogoutComponent from "./Logout";
 import Link from "next/link";
+import Button from "./Button";
 
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 50px;
+  height: 80px;
   width: 100vw;
-  background-color: rgb(180, 107, 107);
+  background-image: url('images/BronzeHeaderBackground.png');
+  color: white;
 `;
+
+const HeaderLogo = styled.div`
+background-image: url('images/BronzeLogoHeader.png')
+width: auto;
+height: auto;
+`
 
 const LeftContainer = styled.div`
   display: flex;
@@ -63,7 +72,12 @@ export default function Header() {
       {isLoggedIn ? (
         <>
           <LeftContainer>
-            <h1>The News</h1>
+            <Image 
+            src={'/images/BronzeLogoHeader.png'}
+            width={100}
+            height={50}
+            alt="Bronze Logo in the Header"
+            />
           </LeftContainer>
           <RightContainer>
             <nav style={{display: "flex", columnGap: "10px"}}>
@@ -76,11 +90,21 @@ export default function Header() {
         </>
       ) : (
         <>
-          <LeftContainer />
+          <LeftContainer >
+            <Link href={'/'}>
+                         <Image 
+            src={'/images/BronzeText.png'}
+            width={125}
+            height={39}
+            alt="Bronze Logo in the Header"
+            />
+            </Link>
+
+          </LeftContainer>
           <RightContainer>
             <nav style={{display: "flex", columnGap: "10px"}}>
                 <Link href={"/login"}>
-                <p>Login</p>
+                <Button bgColor='#9E6532'>Login</Button>
                 </Link>
             </nav>
           </RightContainer>
