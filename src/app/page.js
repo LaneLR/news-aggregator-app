@@ -1,5 +1,5 @@
 //keep as server component
-export const dynamic = 'force-dynamic'; // <-- ADD THIS LINE TEMPORARILY
+export const dynamic = "force-dynamic"; // <-- ADD THIS LINE TEMPORARILY
 
 import Header from "@/components/Header";
 import Link from "next/link";
@@ -11,6 +11,7 @@ export default function Home() {
   return (
     <>
       <Suspense fallback={<LoadingComponent />}>
+        <h1>What's making the news</h1>
         <NewsFeed />
       </Suspense>
     </>
