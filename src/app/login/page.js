@@ -23,6 +23,7 @@ const FormWrapper = styled.form`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
   height: 100%;
   background-color: inherit;
 `;
@@ -118,7 +119,7 @@ export default function LoginPage() {
               justifyContent: "center",
             }}
           >
-            Don&apos;t have an account?
+            <p>Don&apos;t have an account?</p>{" "}
             <Link href="/register">
               <u>Create one!</u>
             </Link>
