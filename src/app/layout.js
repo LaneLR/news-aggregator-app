@@ -3,6 +3,8 @@ import "./globals.css";
 import Providers from "@/Provider";
 import Header from "@/components/Header";
 import StyledComponentsRegistry from "@/lib/registry";
+import AppWrapper from "@/components/AppWrapper";
+import MainContentWrapper from "@/components/MainContentWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,11 +24,16 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body
+        style={{ backgroundColor: "lightgray", color: "black" }}
+        className={`${geistSans.variable} ${geistMono.variable}`}
+      >
         <Providers>
           <StyledComponentsRegistry>
-            <Header />
-            {children}
+            <AppWrapper>
+              <Header />
+              <MainContentWrapper>{children}</MainContentWrapper>
+            </AppWrapper>
           </StyledComponentsRegistry>
         </Providers>
       </body>
