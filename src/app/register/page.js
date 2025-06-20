@@ -2,6 +2,7 @@
 import Button from "@/components/Button";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import styled from "styled-components";
 
 const Wrapper = styled.div`
@@ -36,6 +37,7 @@ const RegisterFormInput = styled.input`
 
 export default function RegisterPage() {
   const [error, setError] = useState(null);
+  const router = useRouter();
 
   async function handleCreateUser(e) {
     e.preventDefault(); 
@@ -62,6 +64,8 @@ export default function RegisterPage() {
         setError(data.error || "Failed to create account");
         return;
       }
+
+      router.push('/')
 
     } catch (err) {
       setError("Something went wrong");
