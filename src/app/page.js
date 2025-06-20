@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <>
       <Suspense fallback={<LoadingComponent />}>
-        <h1>What's making the news</h1>
+        <h1>What&apos;s making the news</h1>
         <NewsFeed />
       </Suspense>
     </>
