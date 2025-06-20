@@ -11,6 +11,7 @@ const Wrapper = styled.div`
   justify-content: space-evenly;
   width: 100vw;
   background-color: inherit;
+  box-sizing: border-box;
 `;
 
 const FormWrapper = styled.form`
