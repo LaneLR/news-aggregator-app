@@ -49,7 +49,7 @@ export default function Providers({ children }) {
 
   return (
     <>
-      <Provider store={store}>{loadingAuth ? <div>Loading...</div> : children}</Provider>
+      <Provider store={store}>{loadingAuth ? <div style={{fontSize: '3rem', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>Loading feed...</div> : children}</Provider>
     </>
   );
 }
