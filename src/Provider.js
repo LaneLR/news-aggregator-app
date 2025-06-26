@@ -3,7 +3,7 @@ import createSagaMiddleware from "redux-saga";
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import rootSaga from "./app/sagas";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import LoggedInReducer from "./app/slices/manageLoggedIn";
 import { loginUser, logoutUser } from "./app/slices/manageLoggedIn"; 
 
@@ -22,6 +22,7 @@ sagaMiddleware.run(rootSaga);
 
 export default function Providers({ children }) {
   const dispatch = store.dispatch; 
+  const [loadingAuth, setLoadingAuth] = useState(true)
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -32,6 +33,7 @@ export default function Providers({ children }) {
         if (data.isLoggedIn) {
           //if server says user is logged in, update Redux state
           dispatch(loginUser({ user: data.user, status: "active" }));
+          setLoadingAuth(false)
         } else {
           //if not logged in, ensure Redux state reflects it
           dispatch(logoutUser());
@@ -47,7 +49,7 @@ export default function Providers({ children }) {
 
   return (
     <>
-      <Provider store={store}>{children}</Provider>
+      <Provider store={store}>{loadingAuth ? <div>Loading...</div> : children}</Provider>
     </>
   );
 }
