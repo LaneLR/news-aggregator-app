@@ -14,17 +14,24 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const { email, password } = credentials;
-        const sequelize = await getSequelizeInstance();
-        const db = await initializeDbAndModels();
-        const User = db.User;
+        try {
+          const { email, password } = credentials;
 
-        const user = await User.findOne({ where: { email } });
-        if (!user) throw new Error("No user found with that email");
-        const isValid = await bcrypt.compare(password, user.password);
-        if (!isValid) throw new Error("Incorrect password");
+          const sequelize = await getSequelizeInstance();
+          const db = await initializeDbAndModels();
+          const User = db.User;
 
-        return { id: user.id, email: user.email, tier: user.tier };
+          const user = await User.findOne({ where: { email } });
+          if (!user) throw new Error("No user found with that email");
+
+          const isValid = await bcrypt.compare(password, user.password);
+          if (!isValid) throw new Error("Incorrect password");
+
+          return { id: user.id, email: user.email, tier: user.tier };
+        } catch (err) {
+          console.error("ERROR HERE FOR authorize() error:", err);
+          throw err;
+        }
       },
     }),
   ],
@@ -45,8 +52,6 @@ export const authOptions = {
     },
   },
 };
-
-
 
 // import NextAuth from "next-auth";
 // import CredentialsProvider from "next-auth/providers/credentials";
