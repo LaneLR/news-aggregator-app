@@ -5,8 +5,8 @@ import { Provider } from "react-redux";
 import rootSaga from "./app/sagas";
 import { useEffect, useState } from "react";
 import LoggedInReducer from "./app/slices/manageLoggedIn";
-import { loginUser, logoutUser } from "./app/slices/manageLoggedIn"; 
-
+import { loginUser, logoutUser } from "./app/slices/manageLoggedIn";
+import SessProvider from "./components/SessionProvider";
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -21,22 +21,23 @@ const store = configureStore({
 sagaMiddleware.run(rootSaga);
 
 export default function Providers({ children }) {
-  const dispatch = store.dispatch; 
-  const [loadingAuth, setLoadingAuth] = useState(true)
+  const dispatch = store.dispatch;
+  const [loadingAuth, setLoadingAuth] = useState(true);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const res = await fetch("/api/auth-status"); 
+        const res = await fetch("/api/auth-status");
         const data = await res.json();
 
         if (data.isLoggedIn) {
           //if server says user is logged in, update Redux state
           dispatch(loginUser({ user: data.user, status: "active" }));
-          setLoadingAuth(false)
+          setLoadingAuth(false);
         } else {
           //if not logged in, ensure Redux state reflects it
           dispatch(logoutUser());
+          setLoadingAuth(false);
         }
       } catch (err) {
         console.error("Error checking auth status:", err);
@@ -45,11 +46,29 @@ export default function Providers({ children }) {
     };
 
     checkAuthStatus();
-  }, [dispatch]); 
+  }, [dispatch]);
 
   return (
     <>
-      <Provider store={store}>{loadingAuth ? <div style={{fontSize: '3rem', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>Loading feed...</div> : children}</Provider>
+      <SessProvider>
+        <Provider store={store}>
+          {loadingAuth ? (
+            <div
+              style={{
+                fontSize: "3rem",
+                height: "100vh",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              Loading feed...
+            </div>
+          ) : (
+            children
+          )}
+        </Provider>
+      </SessProvider>
     </>
   );
 }
