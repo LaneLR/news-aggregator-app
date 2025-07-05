@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import styled from "styled-components";
 
 const SearchBarWrapper = styled.div`
@@ -19,33 +20,36 @@ const Search = styled.input`
 
 export default function SearchBar() {
   // const { user, setResult, searchTerm, setSearchTerm } = useCalendar();
+  const [result, setResult] = useState([])
 
-  async function handleSearch(e) {
-    const name = e.target.value;
-    setSearchTerm(name);
+  // async function handleSearch(e) {
+  //   const name = e.target.value;
+  //   setSearchTerm(name);
 
-    if (name.length < 3) {
-      setResult([]);
-      return;
-    }
+  //   if (name.length < 3) {
+  //     setResult([]);
+  //     return;
+  //   }
 
-    // //user cant find themselves in search
-    // data = data.filter(user => user.username !== currentUser)
+  //   // //user cant find themselves in search
+  //   // data = data.filter(user => user.username !== currentUser)
 
-    const res = await fetch(`/api/search?query=${name}&exclude=${user.id}`);
-    const data = await res.json();
+  //   const res = await fetch(`/api/search?query=${name}&exclude=${user.id}`);
+  //   const data = await res.json();
 
-    setResult(data);
-  }
+  //   setResult(data);
+  // }
 
   return (
     <>
       <SearchBarWrapper>
         <Search
           type="text"
-          placeholder="Find new contacts..."
+          placeholder="Search"
           value={''}
-          onChange={handleSearch}
+          // onChange={
+          //   handleSearch
+          // }
         />
       </SearchBarWrapper>
     </>
