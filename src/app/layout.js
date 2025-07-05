@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import StyledComponentsRegistry from "@/lib/registry";
 import AppWrapper from "@/components/AppWrapper";
 import MainContentWrapper from "@/components/MainContentWrapper";
-
+import SessProvider from "@/components/SessionProvider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -32,7 +32,9 @@ export default function RootLayout({ children }) {
           <StyledComponentsRegistry>
             <AppWrapper>
               <Header />
-              <MainContentWrapper>{children}</MainContentWrapper>
+              <MainContentWrapper>
+                <SessProvider>{children}</SessProvider>
+              </MainContentWrapper>
             </AppWrapper>
           </StyledComponentsRegistry>
         </Providers>
