@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styled from "styled-components";
+import { signIn } from "next-auth/react";
 
 const Wrapper = styled.div`
   flex-grow: 1;
@@ -31,8 +32,9 @@ const RegisterFormInput = styled.input`
   border: 1px solid #ccc;
   border-radius: 4px;
 
-    &:last-of-type{
-  margin-bottom: 25px;
+  &:last-of-type {
+    margin-bottom: 25px;
+  }
 `;
 
 export default function RegisterPage() {
@@ -40,7 +42,7 @@ export default function RegisterPage() {
   const router = useRouter();
 
   async function handleCreateUser(e) {
-    e.preventDefault(); 
+    e.preventDefault();
     const formData = new FormData(e.target);
     const email = formData.get("email");
     const password = formData.get("password");
@@ -65,8 +67,17 @@ export default function RegisterPage() {
         return;
       }
 
-      router.push('/')
+      const loginRes = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
+      if (loginRes?.error) {
+        setError("Account created but login failed");
+      } else {
+        router.push("/account"); // or home
+      }
     } catch (err) {
       setError("Something went wrong");
       console.error(err);
@@ -74,43 +85,43 @@ export default function RegisterPage() {
   }
 
   return (
-    <>
-      <Wrapper>
-        <FormWrapper onSubmit={handleCreateUser}>
-          <h1>Create an account!</h1>
+    <Wrapper>
+      <FormWrapper onSubmit={handleCreateUser}>
+        <h1>Create an account!</h1>
 
-          <RegisterFormInput
-            name="email"
-            type="email"
-            placeholder="Email"
-            required
-          />
-          <RegisterFormInput
-            name="password"
-            type="password"
-            placeholder="Password"
-            required
-          />
-          <RegisterFormInput
-            name="confirmPassword"
-            type="password"
-            placeholder="Confirm Password"
-            required
-          />
+        <RegisterFormInput
+          name="email"
+          type="email"
+          placeholder="Email"
+          required
+        />
+        <RegisterFormInput
+          name="password"
+          type="password"
+          placeholder="Password"
+          required
+        />
+        <RegisterFormInput
+          name="confirmPassword"
+          type="password"
+          placeholder="Confirm Password"
+          required
+        />
 
-          <Button bgColor='#9E6532' type="submit">Create Account</Button>
+        <Button bgColor="#9E6532" type="submit">
+          Create Account
+        </Button>
 
-          {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
 
-          <br />
-          <h4>
-            Already have an account?{" "}
-            <Link href="/login">
-              <u>Login!</u>
-            </Link>
-          </h4>
-        </FormWrapper>
-      </Wrapper>
-    </>
+        <br />
+        <h4>
+          Already have an account?{" "}
+          <Link href="/login">
+            <u>Login!</u>
+          </Link>
+        </h4>
+      </FormWrapper>
+    </Wrapper>
   );
 }
