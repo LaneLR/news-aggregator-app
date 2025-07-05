@@ -1,4 +1,4 @@
-import Credentials from "next-auth/providers/credentials";
+import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import getSequelizeInstance from "@/lib/sequelize.mjs";
 import initializeDbAndModels from "@/lib/db.mjs";
@@ -7,7 +7,7 @@ export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
   providers: [
-    Credentials({
+    CredentialsProvider({
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
@@ -45,6 +45,7 @@ export const authOptions = {
     },
   },
 };
+
 
 
 // import NextAuth from "next-auth";
