@@ -83,7 +83,10 @@ export default function Header() {
             <nav style={{display: "flex", columnGap: "10px"}}>
               <LogoutComponent onClick={handleLogout}>Logout</LogoutComponent>
               <UserAccountIcon>
+                <Link href='/account'>
                 <p>User</p>
+                </Link>
+                
               </UserAccountIcon>
             </nav>
           </RightContainer>

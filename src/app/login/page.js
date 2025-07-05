@@ -1,10 +1,10 @@
 "use client";
-import Link from "next/link";
+
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import Link from "next/link";
 import styled from "styled-components";
-import { loginUser } from "@/app/slices/manageLoggedIn";
+import { useSession, signIn } from "next-auth/react";
 import Button from "@/components/Button";
 
 const Wrapper = styled.div`
@@ -41,91 +41,88 @@ const LoginFormInput = styled.input`
 `;
 
 export default function LoginPage() {
-  const [user, setUser] = useState({
-    email: "",
-    password: "",
-  });
+  const [user, setUser] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
-  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/");
+    }
+  }, [status, router]);
 
   const handleChange = (e) => {
-    setUser({
-      ...user,
-      [e.target.name]: e.target.value,
-    });
+    setUser({ ...user, [e.target.name]: e.target.value });
   };
 
   async function handleLoginUser(e) {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
-    try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(user),
-      });
+    const res = await signIn("credentials", {
+      email: user.email,
+      password: user.password,
+      redirect: false,
+    });
 
-      const data = await res.json();
+    setLoading(false);
 
-      if (!res.ok) {
-        setError(data.error || "Login failed");
-        return;
-      }
-      dispatch(loginUser({ user: data.user, status: "active" }));
-      setUser({ email: "", password: "" });
-
-      router.push("/");
-    } catch (err) {
-      setError("Something went wrong");
-      console.error(err);
+    if (res?.error) {
+      setError("Invalid credentials");
+    } else {
+      router.refresh();
+      router.push("/account");
     }
   }
 
+  if (status === "loading") {
+    return <p>Loading...</p>;
+  }
+
   return (
-    <>
-      <Wrapper>
-        <h1>Login!</h1>
-        <FormWrapper onSubmit={handleLoginUser}>
-          <LoginFormInput
-            name="email"
-            type="email"
-            placeholder="Email"
-            required
-            value={user.email}
-            onChange={handleChange}
-          />
-          <LoginFormInput
-            name="password"
-            type="password"
-            placeholder="Password"
-            required
-            value={user.password}
-            onChange={handleChange}
-          />
+    <Wrapper>
+      <h1>Login</h1>
+      <FormWrapper onSubmit={handleLoginUser}>
+        <LoginFormInput
+          name="email"
+          type="email"
+          placeholder="Email"
+          required
+          value={user.email}
+          onChange={handleChange}
+        />
+        <LoginFormInput
+          name="password"
+          type="password"
+          placeholder="Password"
+          required
+          value={user.password}
+          onChange={handleChange}
+        />
 
-          <Button bgColor="#9E6532" type="submit">
-            Login
-          </Button>
-          <br />
-          {error && <p style={{ color: "red" }}>{error}</p>}
+        <Button bgColor="#9E6532" type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </Button>
 
-          <h4
-            style={{
-              display: "flex",
-              flexFlow: "column nowrap",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <p>Don&apos;t have an account?</p>
-            <Link href="/register">
-              <u>Create one!</u>
-            </Link>
-          </h4>
-        </FormWrapper>
-      </Wrapper>
-    </>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+
+        <h4
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <p>Don&apos;t have an account?</p>
+          <Link href="/register">
+            <u>Create one!</u>
+          </Link>
+        </h4>
+      </FormWrapper>
+    </Wrapper>
   );
 }
