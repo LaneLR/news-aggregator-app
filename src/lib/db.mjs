@@ -1,5 +1,5 @@
 // src/lib/db.js
-import getSequelizeInstance from "./sequelize";
+import getSequelizeInstance from "./sequelize.mjs";
 import User from "./models/User";
 import { DataTypes, Op } from "sequelize";
 import bcrypt from "bcryptjs";
