@@ -1,5 +1,5 @@
 // src/lib/db.js
-import getSequelizeInstance from "./sequelize.mjs";
+import getSequelizeInstance from "./sequelize.js";
 import User from "./models/User";
 import { DataTypes, Op } from "sequelize";
 import bcrypt from "bcryptjs";
@@ -169,7 +169,6 @@ async function initializeDbAndModels() {
       //DO NOT REMOVE COMMENTS FROM BELOW LINE
       // await sequelize.sync();
       // console.log("All models were synchronized successfully.");
-
     } catch (error) {
       console.error("----------------------------------------------------");
       console.error(

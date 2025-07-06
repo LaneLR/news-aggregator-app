@@ -1,12 +1,10 @@
 "use client";
 import styled from "styled-components";
-import { useSelector } from "react-redux";
-import { logoutUser } from "@/app/slices/manageLoggedIn";
-import { useDispatch } from "react-redux";
 import Image from "next/image";
-import LogoutComponent from "./Logout";
 import Link from "next/link";
 import Button from "./Button";
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const Wrapper = styled.div`
   display: flex;
@@ -14,7 +12,7 @@ const Wrapper = styled.div`
   justify-content: space-between;
   height: 80px;
   width: 100vw;
-  background-image: url('images/BronzeHeaderBackground.png');
+  background-image: url("images/BronzeHeaderBackground.png");
   color: white;
 `;
 
@@ -22,7 +20,7 @@ const HeaderLogo = styled.div`
 background-image: url('images/BronzeLogoHeader.png')
 width: auto;
 height: auto;
-`
+`;
 
 const LeftContainer = styled.div`
   display: flex;
@@ -58,57 +56,70 @@ const UserAccountIcon = styled.div`
   color: black;
 `;
 
-export default function Header() {
-  const isLoggedIn = useSelector((state) => state.manageLoggedIn.isLoggedIn);
-  const dispatch = useDispatch();
+const LogoutButton = styled.button`
+  background-color: rgb(179, 40, 31);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 1rem;
+  &:hover {
+    background-color: rgb(139, 15, 15);
+  }
+`;
 
-  const handleLogout = () => {
-    dispatch(logoutUser());
-    window.location.href = "/login";
-  };
+export default function Header() {
+  const {data: session, status} = useSession();
+  const router = useRouter();
+
+  if (status === "loading") return null
+
 
   return (
     <Wrapper>
-      {isLoggedIn ? (
+      {session?.user ? (
         <>
           <LeftContainer>
-            <Image 
-            src={'/images/BronzeLogoHeader.png'}
-            width={100}
-            height={50}
-            alt="Bronze Logo in the Header"
-            />
+            <Link href={'/'}>
+              <Image
+                src={"/images/BronzeLogoHeader.png"}
+                width={100}
+                height={50}
+                alt="Bronze Logo in the Header"
+              />
+            </Link>
           </LeftContainer>
           <RightContainer>
-            <nav style={{display: "flex", columnGap: "10px"}}>
-              <LogoutComponent onClick={handleLogout}>Logout</LogoutComponent>
+            <nav style={{ display: "flex", columnGap: "10px" }}>
+              <LogoutButton onClick={() => signOut({ callbackUrl: "/login" })}>
+                Logout
+              </LogoutButton>
               <UserAccountIcon>
-                <Link href='/account'>
-                <p>User</p>
+                <Link href="/account">
+                  <p>User</p>
                 </Link>
-                
               </UserAccountIcon>
             </nav>
           </RightContainer>
         </>
       ) : (
         <>
-          <LeftContainer >
-            <Link href={'/'}>
-                         <Image 
-            src={'/images/BronzeText.png'}
-            width={125}
-            height={39}
-            alt="Bronze Logo in the Header"
-            />
+          <LeftContainer>
+            <Link href={"/"}>
+              <Image
+                src={"/images/BronzeText.png"}
+                width={125}
+                height={39}
+                alt="Bronze Logo in the Header"
+              />
             </Link>
-
           </LeftContainer>
           <RightContainer>
-            <nav style={{display: "flex", columnGap: "10px"}}>
-                <Link href={"/login"}>
-                <Button bgColor='#9E6532'>Login</Button>
-                </Link>
+            <nav style={{ display: "flex", columnGap: "10px" }}>
+              <Link href={"/login"}>
+                <Button bgColor="#9E6532">Login</Button>
+              </Link>
             </nav>
           </RightContainer>
         </>

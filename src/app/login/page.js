@@ -67,15 +67,18 @@ export default function LoginPage() {
       email: user.email,
       password: user.password,
       redirect: false,
+      callbackUrl: "/",
     });
 
     setLoading(false);
 
-    if (res?.error) {
-      setError("Invalid credentials");
+    if (res.error) {
+      setError(`Invalid credentials: ${res.error}`);
     } else {
-      router.refresh();
-      router.push("/account");
+      setTimeout(() => {
+        router.push("/");
+        location.reload();
+      }, 100);
     }
   }
 
