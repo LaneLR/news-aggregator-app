@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import initializeDbAndModels from "@/lib/db.mjs";
+import initializeDbAndModels from "@/lib/db.js";
 import { authRateLimitMiddleware } from "@/lib/rate-limiter";
 import { runValidation } from "@/lib/validate";
 
@@ -15,13 +15,16 @@ export async function POST(req) {
 
     const body = await req.json();
     const { email, password } = body;
-    
+
     req.body = bodyData;
 
     await runValidation(req, [
-      body('email').trim().isEmail().withMessage('Must be a valid email.'),
-      body('password').trim().isLength({min: 6}).withMessage('Password must be at least 6 characters.'),
-    ])
+      body("email").trim().isEmail().withMessage("Must be a valid email."),
+      body("password")
+        .trim()
+        .isLength({ min: 6 })
+        .withMessage("Password must be at least 6 characters."),
+    ]);
 
     if (!email || !password) {
       return NextResponse.json(
