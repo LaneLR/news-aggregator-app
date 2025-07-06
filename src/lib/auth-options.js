@@ -1,7 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import getSequelizeInstance from "@/lib/sequelize.mjs";
-import initializeDbAndModels from "@/lib/db.mjs";
+import getSequelizeInstance from "@/lib/sequelize.js";
+import initializeDbAndModels from "@/lib/db.js";
 
 export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
