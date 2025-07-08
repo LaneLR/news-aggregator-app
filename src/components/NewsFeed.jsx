@@ -1,5 +1,6 @@
 import NewsCard from "@/components/NewsCard";
 import NewsGridWrapper from "./NewsGridWrapper";
+import SearchBar from "./SearchBar";
 
 async function fetchNews() {
   let baseUrl;
@@ -18,7 +19,7 @@ async function fetchNews() {
 
   const res = await fetch(url, {
     cache: "force-cache",
-    next: { revalidate: 3600 },
+    next: { revalidate: 300 },
   });
 
   if (!res.ok) {
@@ -37,10 +38,26 @@ export default async function News() {
   const articles = await fetchNews();
 
   return (
-    <NewsGridWrapper>
-      {articles.map((article, i) => (
-        <NewsCard key={i} article={article} />
-      ))}
-    </NewsGridWrapper>
+    <>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "start",
+          width: "100%",
+        }}
+      >
+        <h1>What&apos;s making the news</h1>
+        <SearchBar />
+      </div>
+
+      <NewsGridWrapper>
+        {articles.map((article, i) => (
+          <NewsCard key={i} article={article} />
+        ))}
+      </NewsGridWrapper>
+    </>
   );
 }

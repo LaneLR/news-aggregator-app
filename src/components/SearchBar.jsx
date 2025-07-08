@@ -1,57 +1,69 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import styled from "styled-components";
 
 const SearchBarWrapper = styled.div`
-  width: 100%;
-  height: auto;
+  width: 80%;
+  max-width: 1200px;
   margin: 5px 0 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
-const Search = styled.input`
+const SearchInput = styled.input`
   font-size: 1.4rem;
-  width: 60%;
-  padding: 5px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 
   &:focus {
     outline: none;
+    border-color: #9e6532;
   }
 `;
 
+const ResultsWrapper = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
+  width: 80%;
+  max-width: 1200px;
+`;
+
+const ResultItem = styled.li`
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  background-color: white;
+  color: black;
+  border-radius: 4px;
+  margin-bottom: 5px;
+`;
+
 export default function SearchBar() {
-  // const { user, setResult, searchTerm, setSearchTerm } = useCalendar();
-  const [result, setResult] = useState([])
+  const [query, setQuery] = useState("");
+  const router = useRouter();
 
-  // async function handleSearch(e) {
-  //   const name = e.target.value;
-  //   setSearchTerm(name);
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && query.trim()) {
+      const newQuery = query.trim();
+      const newUrl = `/search?query=${encodeURIComponent(newQuery)}`;
 
-  //   if (name.length < 3) {
-  //     setResult([]);
-  //     return;
-  //   }
-
-  //   // //user cant find themselves in search
-  //   // data = data.filter(user => user.username !== currentUser)
-
-  //   const res = await fetch(`/api/search?query=${name}&exclude=${user.id}`);
-  //   const data = await res.json();
-
-  //   setResult(data);
-  // }
-
+      router.push(newUrl);
+      router.refresh();
+    }
+  };
   return (
-    <>
-      <SearchBarWrapper>
-        <Search
-          type="text"
-          placeholder="Search"
-          value={''}
-          // onChange={
-          //   handleSearch
-          // }
-        />
-      </SearchBarWrapper>
-    </>
+    <SearchBarWrapper>
+      <SearchInput
+        type="text"
+        placeholder="Search articles by title"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+    </SearchBarWrapper>
   );
 }
