@@ -70,18 +70,16 @@ const LogoutButton = styled.button`
 `;
 
 export default function Header() {
-  const {data: session, status} = useSession();
-  const router = useRouter();
+  const { data: session, status } = useSession();
 
-  if (status === "loading") return null
-
+  if (status === "loading") return null;
 
   return (
     <Wrapper>
       {session?.user ? (
         <>
           <LeftContainer>
-            <Link href={'/'}>
+            <Link href={"/"}>
               <Image
                 src={"/images/BronzeLogoHeader.png"}
                 width={100}
@@ -95,11 +93,14 @@ export default function Header() {
               <LogoutButton onClick={() => signOut({ callbackUrl: "/login" })}>
                 Logout
               </LogoutButton>
-              <UserAccountIcon>
-                <Link href="/account">
-                  <p>User</p>
-                </Link>
-              </UserAccountIcon>
+              <Link href="/account">
+                <UserAccountIcon>
+                  <p>
+                    {session?.user?.username?.slice(0, 2).toUpperCase()}
+                      AD
+                  </p>
+                </UserAccountIcon>
+              </Link>
             </nav>
           </RightContainer>
         </>
