@@ -9,6 +9,9 @@ text-align: center;
 width: 100%;
 height: auto;
 padding: 3px;
+border: 1px solid black;
+margin: 15px 0;
+font-size: 1.3rem;
 `
 
 export default function NavTab({ href, children}) {
