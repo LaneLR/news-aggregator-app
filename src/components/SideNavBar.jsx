@@ -7,6 +7,7 @@ const SideBarNavWrapper = styled.div`
   height: 100%;
   background-color: #aaa;
   border: 1px solid transparent;
+  border-radius: 8px;
 `;
 
 export default function SideBarNav({ href, children }) {
@@ -17,6 +18,7 @@ export default function SideBarNav({ href, children }) {
           <NavTab href={"/account"}>Manage Account</NavTab>
           <NavTab href={"/account/subscription"}>Subscription</NavTab>
           <NavTab href={"/account/privacy"}>Privacy</NavTab>
+          <NavTab href={"/account/payment"}>Payment Details</NavTab>
         </div>
       </SideBarNavWrapper>
     </>
