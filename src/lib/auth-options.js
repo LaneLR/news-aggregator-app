@@ -38,14 +38,15 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
         token.tier = user.tier;
+      } else {
+        const dbUser = await db.User.findOne({ where: { email: token.email } });
+        if (dbUser) token.tier = dbUser.tier;
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id;
+      if (token?.tier !== undefined) {
         session.user.tier = token.tier;
       }
       return session;
