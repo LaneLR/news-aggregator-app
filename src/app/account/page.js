@@ -12,7 +12,7 @@ export default async function AccountPage() {
   }
 
   return (
-    <div style={{display: 'flex', height: '100%'}}>
+    <div style={{display: 'flex', justifyContent: 'center', width: '100%'}}>
 
       {/* name property doesn't exist in user, so commented out */}
       {/* <h1>Welcome, {session.user.name}</h1> */}
