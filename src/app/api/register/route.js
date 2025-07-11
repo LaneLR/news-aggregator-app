@@ -1,100 +1,54 @@
 import { NextResponse } from "next/server";
 import initializeDbAndModels from "@/lib/db.js";
 import { authRateLimitMiddleware } from "@/lib/rate-limiter";
-import { runValidation } from "@/lib/validate";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req) {
-  let db;
   try {
     await authRateLimitMiddleware(req, NextResponse);
 
-    db = await initializeDbAndModels();
-    const User = db.User;
+    const { email, password } = await req.json();
 
-    const body = await req.json();
-    const { email, password } = body;
-
-    req.body = bodyData;
-
-    await runValidation(req, [
-      body("email").trim().isEmail().withMessage("Must be a valid email."),
-      body("password")
-        .trim()
-        .isLength({ min: 6 })
-        .withMessage("Password must be at least 6 characters."),
-    ]);
-
-    if (!email || !password) {
+    // Basic manual validation
+    if (!email || !password)
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { error: "Email and password are required." },
         { status: 400 }
       );
-    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return NextResponse.json(
+        { error: "Must be a valid email." },
+        { status: 400 }
+      );
+    if (password.length < 6)
+      return NextResponse.json(
+        { error: "Password must be at least 6 characters." },
+        { status: 400 }
+      );
+
+    const db = await initializeDbAndModels();
+    const { User } = db;
 
     const newUser = await User.create({ email, password });
-
-    const { password: _, ...userWithoutPassword } = newUser.toJSON();
+    const { password: _pw, ...userWithoutPassword } = newUser.toJSON();
 
     return NextResponse.json(
-      {
-        message: "User registered successfully!",
-        user: userWithoutPassword,
-      },
+      { message: "User registered successfully!", user: userWithoutPassword },
       { status: 201 }
     );
   } catch (err) {
-    if (err && err.status === 429) {
-      console.warn(
-        "Rate limit exceeded for registration attempt from IP:",
-        req.ip || req.headers["x-forwarded-for"]
-      );
-      return NextResponse.json(
-        { error: "Too many registration attempts. Please try again later." },
-        { status: 429 }
-      );
-    }
-
-    console.error("Error in /api/register POST request:", err);
+    console.error("Error in /api/register:", err);
 
     if (err.name === "SequelizeUniqueConstraintError") {
-      const field =
-        err.errors && err.errors.length > 0 ? err.errors[0].path : "email";
       return NextResponse.json(
-        { error: `User with this ${field} already exists.` },
+        { error: "User with this email already exists." },
         { status: 409 }
       );
-    } else if (err.name === "SequelizeValidationError") {
-      const errors = err.errors
-        ? err.errors.map((e) => e.message)
-        : ["Validation error"];
-      return NextResponse.json(
-        { error: "Registration validation failed", details: errors },
-        { status: 400 }
-      );
-    } else if (
-      err.message &&
-      (err.message.includes("Database URL is missing.") ||
-        err.message.includes(
-          "Unable to connect to the database or initialize Sequelize:"
-        ))
-    ) {
-      return NextResponse.json(
-        {
-          error: "Database connection or initialization failed.",
-          details: err.message,
-        },
-        { status: 500 }
-      );
-    } else {
-      return NextResponse.json(
-        {
-          error: "Internal server error during registration",
-          details: err.message,
-        },
-        { status: 500 }
-      );
     }
+    return NextResponse.json(
+      { error: "Internal server error", details: err.message },
+      { status: 500 }
+    );
   }
 }
