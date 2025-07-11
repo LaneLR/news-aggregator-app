@@ -1,9 +1,12 @@
+import LoadingComponent from "@/components/Loading";
 import SideBarNav from "@/components/SideNavBar";
+import { Suspense } from "react";
 
 export default function AccountLayout({ children }) {
   return (
     <>
-      <div style={{ display: "flex", height: "90vh", padding: "10px", width: '100%', }}>
+    <Suspense fallback={<LoadingComponent />}>
+            <div style={{ display: "flex", height: "90vh", padding: "10px", width: '100%', }}>
         <div style={{ height: "100%" }}>
           <SideBarNav />
         </div>
@@ -11,6 +14,8 @@ export default function AccountLayout({ children }) {
           <main style={{ flexGrow: "1", width: '100%', }}>{children}</main>
         </div>
       </div>
+    </Suspense>
+
     </>
   );
 }

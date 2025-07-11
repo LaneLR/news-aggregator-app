@@ -19,6 +19,7 @@ export default function SideBarNav({ href, children }) {
           <NavTab href={"/account/subscription"}>Subscription</NavTab>
           <NavTab href={"/account/privacy"}>Privacy</NavTab>
           <NavTab href={"/account/payment"}>Payment Details</NavTab>
+          <NavTab href={"/archives"}>Archives</NavTab>
         </div>
       </SideBarNavWrapper>
     </>

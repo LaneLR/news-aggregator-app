@@ -6,6 +6,7 @@ import initializeDbAndModels from "@/lib/db.js";
 export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
+
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -13,42 +14,44 @@ export const authOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
-        try {
-          const { email, password } = credentials;
+      async authorize({ email, password }) {
+        const db = await initializeDbAndModels();
+        const { User } = db;
 
-          const sequelize = await getSequelizeInstance();
-          const db = await initializeDbAndModels();
-          const User = db.User;
+        const user = await User.findOne({ where: { email } });
+        if (!user) throw new Error("No user found with that email");
 
-          const user = await User.findOne({ where: { email } });
-          if (!user) throw new Error("No user found with that email");
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid) throw new Error("Incorrect password");
 
-          const isValid = await bcrypt.compare(password, user.password);
-          if (!isValid) throw new Error("Incorrect password");
-
-          return { id: user.id, email: user.email, tier: user.tier };
-        } catch (err) {
-          console.error("ERROR HERE FOR authorize() error:", err);
-          throw err;
-        }
+        return { id: user.id, email: user.email, tier: user.tier };
       },
     }),
   ],
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        token.id = user.id;
         token.tier = user.tier;
-      } else {
-        const dbUser = await db.User.findOne({ where: { email: token.email } });
-        if (dbUser) token.tier = dbUser.tier;
+        return token;
       }
+
+      if (token.email) {
+        const db = await initializeDbAndModels();
+        const { User } = db;
+        const dbUser = await User.findOne({ where: { email: token.email } });
+        if (dbUser) {
+          token.tier = dbUser.tier;
+        }
+      }
+
       return token;
     },
+
     async session({ session, token }) {
-      if (token?.tier !== undefined) {
-        session.user.tier = token.tier;
-      }
+      if (token?.id) session.user.id = token.id;
+      if (token?.tier !== undefined) session.user.tier = token.tier;
       return session;
     },
   },
