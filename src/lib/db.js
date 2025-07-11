@@ -1,6 +1,8 @@
 // src/lib/db.js
 import getSequelizeInstance from "./sequelize.js";
-import User from "./models/User";
+import User from "./models/User.js";
+import Archive from "./models/Archive.js";
+import SavedArticle from "./models/SavedArticle.js";
 import { DataTypes, Op } from "sequelize";
 import bcrypt from "bcryptjs";
 
@@ -129,6 +131,13 @@ async function initializeDbAndModels() {
                 user.password = await bcrypt.hash(user.password, salt);
               }
             },
+            afterCreate: async (user, options) => {
+              const { Archive } = user.sequelize.models;
+              await Archive.create({
+                name: "Saved for later",
+                userId: user.id,
+              });
+            },
           },
           indexes: [
             {
@@ -163,12 +172,86 @@ async function initializeDbAndModels() {
         }
       );
 
+      Archive.init(
+        {
+          id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+          },
+          name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          userId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+          },
+        },
+        {
+          sequelize,
+          modelName: "Archive",
+          timestamps: true,
+          unique: "archive_article_unique",
+        }
+      );
+
+      SavedArticle.init(
+        {
+          id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+          },
+          title: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          url: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+            unique: "archive_article_unique",
+          },
+          urlToImage: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+          },
+          sourceName: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          archiveId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+          },
+        },
+        {
+          sequelize,
+          modelName: "SavedArticle",
+          timestamps: true,
+        }
+      );
+
       global.db.sequelize = sequelize;
       global.db.User = User;
+      global.db.Archive = Archive;
+      global.db.SavedArticle = SavedArticle;
+
+      User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
+      Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
+
+      Archive.hasMany(SavedArticle, {
+        foreignKey: "archiveId",
+        onDelete: "CASCADE",
+      });
+      SavedArticle.belongsTo(Archive, {
+        foreignKey: "archiveId",
+        onDelete: "CASCADE",
+      });
 
       //DO NOT REMOVE COMMENTS FROM BELOW LINE
-      // await sequelize.sync();
-      // console.log("All models were synchronized successfully.");
+      await sequelize.sync({ alter: true });
+      console.log("All models were synchronized and created successfully.");
     } catch (error) {
       console.error("----------------------------------------------------");
       console.error(
