@@ -31,6 +31,10 @@ export async function POST(req) {
     const { User } = db;
 
     const newUser = await User.create({ email, password });
+    await db.Archive.create({
+      name: "Saved for later",
+      userId: newUser.id,
+    });
     const { password: _pw, ...userWithoutPassword } = newUser.toJSON();
 
     return NextResponse.json(
