@@ -7,7 +7,10 @@ export async function GET(req, { params }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+      return NextResponse.json(
+        { error: "User not authenticated" },
+        { status: 401 }
+      );
     }
 
     const archiveId = parseInt(params.archiveId, 10);
@@ -26,17 +29,20 @@ export async function POST(req, { params }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    const body = await req.json();
     const archiveId = parseInt(params.archiveId, 10);
-    const { title, url, urlToImage, sourceName } = await req.json();
-    if (!title || !url) {
+
+    if (!archiveId || isNaN(archiveId)) {
       return NextResponse.json(
-        { error: "Title and URL are required" },
+        { message: "Invalid archive ID" },
         { status: 400 }
       );
     }
+
+    const { title, url, urlToImage, source } = body;
 
     const db = await initializeDbAndModels();
     const { SavedArticle } = db;
@@ -45,14 +51,16 @@ export async function POST(req, { params }) {
       title,
       url,
       urlToImage,
-      sourceName,
+      sourceName: source?.name || "Unknown Source", 
       archiveId,
     });
 
-    return NextResponse.json(newArticle, { status: 201 });
-
+    return NextResponse.json({ message: "Article saved", article: newArticle });
   } catch (err) {
     console.error("POST /api/archives/[id]/articles error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
