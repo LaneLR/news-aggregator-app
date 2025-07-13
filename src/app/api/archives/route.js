@@ -3,7 +3,16 @@ import initializeDbAndModels from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 
-export async function GET(req) {
+export async function GET(req, { params }) {
+  const archiveIdStr = params?.archiveId;
+  if (!archiveIdStr || archiveIdStr === "undefined") {
+    return NextResponse.json({ saved: false }, { status: 400 });
+  }
+
+  const archiveId = Number(archiveIdStr);   // or keep as string if UUID
+  if (isNaN(archiveId)) {
+    return NextResponse.json({ saved: false }, { status: 400 });
+  }
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
