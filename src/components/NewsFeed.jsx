@@ -1,41 +1,51 @@
+'use client'
+import { useEffect, useState } from "react";
 import NewsCard from "@/components/NewsCard";
 import NewsGridWrapper from "./NewsGridWrapper";
 import SearchBar from "./SearchBar";
 
 async function fetchNews() {
-  let baseUrl;
+  let baseUrl =
+    process.env.RENDER_EXTERNAL_URL ||
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    "http://localhost:3000";
 
-  if (process.env.RENDER_EXTERNAL_URL) {
-    baseUrl = process.env.RENDER_EXTERNAL_URL;
-  } else if (process.env.NEXT_PUBLIC_BASE_URL) {
-    baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  } else {
-    baseUrl = "http://localhost:3000";
-  }
-
-  const url = `${baseUrl}/api/news`;
-
-  console.log(`[NewsFeed] Attempting to fetch news from: ${url}`);
-
-  const res = await fetch(url, {
+  const res = await fetch(`${baseUrl}/api/news`, {
     cache: "force-cache",
     next: { revalidate: 300 },
   });
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.error(
-      `[NewsFeed] Failed to fetch news from ${url}: Status ${res.status}, Error: ${errorText}`
-    );
-    throw new Error(`Failed to fetch news from ${url}: Status ${res.status}`);
-  }
+  if (!res.ok) throw new Error("Failed to fetch news");
+
   const data = await res.json();
-  console.log("[NewsFeed] Successfully fetched articles.");
   return data.articles;
 }
 
-export default async function News() {
-  const articles = await fetchNews();
+export default function News({archiveId}) {
+  const [articles, setArticles] = useState([]);
+  const [defaultArchiveId, setDefaultArchiveId] = useState(null);
+
+  useEffect(() => {
+    fetchNews()
+      .then(setArticles)
+      .catch((err) => console.error("Failed to load articles:", err));
+    
+    const fetchArchive = async () => {
+      try {
+        const res = await fetch("/api/archives/default");
+        const data = await res.json();
+        if (res.ok) {
+          setDefaultArchiveId(data.archiveId);
+        } else {
+          console.warn("Could not get default archive:", data.error);
+        }
+      } catch (err) {
+        console.error("Archive fetch error:", err);
+      }
+    };
+
+    fetchArchive();
+  }, []);
 
   return (
     <>
@@ -54,8 +64,8 @@ export default async function News() {
       </div>
 
       <NewsGridWrapper>
-        {articles.map((article, i) => (
-          <NewsCard key={i} article={article} />
+        {articles.map((article) => (
+          <NewsCard key={article.id} article={article} archiveId={archiveId} />
         ))}
       </NewsGridWrapper>
     </>
