@@ -2,6 +2,7 @@
 import styled from "styled-components";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
+import ArchiveToggleButton from "./ArchiveToggleButton";
 
 const Wrapper = styled.div`
   flex-flow: column nowrap;
@@ -52,7 +53,7 @@ const AuthorSection = styled.div`
   font-size: 0.9rem;
 `;
 
-export default function NewsCard({ article }) {
+export default function NewsCard({ article, archiveId }) {
   const FALLBACK_IMAGE_URL = "/images/NoImage.png";
   const index = article.title.lastIndexOf(" - ");
   const cleanTitle =
@@ -116,7 +117,18 @@ export default function NewsCard({ article }) {
         </CardWrapper>
         <DescriptionSection>
           <TitleSection>{cleanTitle}</TitleSection>
-          <AuthorSection>{article.source.name}</AuthorSection>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "95%",
+            }}
+          >
+            <AuthorSection>
+              {article.sourceName || article.source?.name || "Unknown source"}
+            </AuthorSection>
+            <ArchiveToggleButton article={article} archiveId={archiveId} />
+          </div>
         </DescriptionSection>
       </Wrapper>
     </>
