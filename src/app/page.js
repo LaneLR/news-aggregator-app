@@ -1,18 +1,18 @@
-//keep as server component
-export const dynamic = "force-dynamic"; // <-- ADD THIS LINE TEMPORARILY
+import { authOptions } from "@/lib/auth-options";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
-import Header from "@/components/Header";
-import Link from "next/link";
-import NewsFeed from "@/components/NewsFeed";
-import { Suspense } from "react";
-import LoadingComponent from "@/components/Loading";
+export default async function LandingPage() {
+const session = await getServerSession(authOptions);
+if (session) {
+  return redirect("/news");
+}
 
-export default function Home() {
   return (
-    <>
-      <Suspense fallback={<LoadingComponent />}>
-        <NewsFeed />
-      </Suspense>
-    </>
+    <main style={{ padding: "2rem", textAlign: "center" }}>
+      <h1>Welcome to NewsHub</h1>
+      <p>Stay informed with the latest articles curated for you.</p>
+      <a href="/api/auth/signin">Sign In</a> {/* or use a styled Link */}
+    </main>
   );
 }
