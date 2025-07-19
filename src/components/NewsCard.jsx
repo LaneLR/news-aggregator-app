@@ -53,7 +53,7 @@ const AuthorSection = styled.div`
   font-size: 0.9rem;
 `;
 
-export default function NewsCard({ article, archiveId }) {
+export default function NewsCard({ article, archiveId, viewOnly = false }) {
   const FALLBACK_IMAGE_URL = "/images/NoImage.png";
   const index = article.title.lastIndexOf(" - ");
   const cleanTitle =
@@ -127,7 +127,7 @@ export default function NewsCard({ article, archiveId }) {
             <AuthorSection>
               {article.sourceName || article.source?.name || "Unknown source"}
             </AuthorSection>
-            <ArchiveToggleButton article={article} archiveId={archiveId} />
+            <ArchiveToggleButton article={article} archiveId={archiveId} viewOnly={viewOnly} />
           </div>
         </DescriptionSection>
       </Wrapper>

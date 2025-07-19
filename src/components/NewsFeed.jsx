@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { useEffect, useState } from "react";
 import NewsCard from "@/components/NewsCard";
 import NewsGridWrapper from "./NewsGridWrapper";
@@ -21,7 +21,7 @@ async function fetchNews() {
   return data.articles;
 }
 
-export default function News({archiveId}) {
+export default function News({ archiveId }) {
   const [articles, setArticles] = useState([]);
   const [defaultArchiveId, setDefaultArchiveId] = useState(null);
 
@@ -29,7 +29,7 @@ export default function News({archiveId}) {
     fetchNews()
       .then(setArticles)
       .catch((err) => console.error("Failed to load articles:", err));
-    
+
     const fetchArchive = async () => {
       try {
         const res = await fetch("/api/archives/default");
@@ -65,7 +65,12 @@ export default function News({archiveId}) {
 
       <NewsGridWrapper>
         {articles.map((article) => (
-          <NewsCard key={article.id} article={article} archiveId={archiveId} />
+          <NewsCard
+            key={article.url}
+            article={article}
+            archiveId={defaultArchiveId}
+            viewOnly={true}
+          />
         ))}
       </NewsGridWrapper>
     </>
