@@ -13,13 +13,8 @@ const Wrapper = styled.div`
   height: 80px;
   width: 100vw;
   background-image: url("images/BronzeHeaderBackground.png");
+  background-color: #b0b0b0;
   color: white;
-`;
-
-const HeaderLogo = styled.div`
-background-image: url('images/BronzeLogoHeader.png')
-width: auto;
-height: auto;
 `;
 
 const LeftContainer = styled.div`
@@ -76,10 +71,11 @@ export default function Header() {
 
   return (
     <Wrapper>
-      {session?.user ? (
+      {!!session ? (
         <>
           <LeftContainer>
-            <Link href={"/"}>
+            {session?.user ?
+            <Link href={'/news'}>
               <Image
                 src={"/images/BronzeLogoHeader.png"}
                 width={100}
@@ -87,6 +83,16 @@ export default function Header() {
                 alt="Bronze Logo in the Header"
               />
             </Link>
+              :
+            <Link href={'/'}>
+              <Image
+                src={"/images/BronzeLogoHeader.png"}
+                width={100}
+                height={50}
+                alt="Bronze Logo in the Header"
+              />
+            </Link>
+            }
           </LeftContainer>
           <RightContainer>
             <nav style={{ display: "flex", columnGap: "10px" }}>
@@ -97,7 +103,7 @@ export default function Header() {
                 <UserAccountIcon>
                   <p>
                     {session?.user?.username?.slice(0, 2).toUpperCase()}
-                      AD
+                    AD
                   </p>
                 </UserAccountIcon>
               </Link>
