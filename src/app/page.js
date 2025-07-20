@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function LandingPage() {
@@ -12,7 +13,7 @@ if (session) {
     <main style={{ padding: "2rem", textAlign: "center" }}>
       <h1>Welcome to NewsHub</h1>
       <p>Stay informed with the latest articles curated for you.</p>
-      <a href="/api/auth/signin">Sign In</a> {/* or use a styled Link */}
+      <Link href="/api/auth/signin">Sign In</Link> 
     </main>
   );
 }
