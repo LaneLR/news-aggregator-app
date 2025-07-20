@@ -38,12 +38,12 @@ async function getSequelizeInstance() {
           acquire: 30000, //max wait time for a connection
           idle: 10000, //max idle time before a connection is released
         },
-        // dialectOptions: {
-        //   ssl: {
-        //     require: true,
-        //     rejectUnauthorized: false
-        //   }
-        // }
+        dialectOptions: {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false
+          }
+        }
       });
 
       await sequelizeInstance.authenticate();
