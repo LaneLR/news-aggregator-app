@@ -13,7 +13,7 @@ export default async function ArchiveDetailPage({ params }) {
 
   const archive = await db.Archive.findOne({
     where: {
-      id: Number(params.id),
+      id: Number(params?.id),
       userId: session.user.id,
     },
     include: [{ model: db.SavedArticle }],
@@ -31,7 +31,7 @@ export default async function ArchiveDetailPage({ params }) {
       ) : (
         <NewsGridWrapper>
           {articles.map((article) => (
-            <NewsCard key={article.id} article={article} />
+            <NewsCard key={article.id} article={article} archiveId={archive.id} viewOnly={false} />
           ))}
         </NewsGridWrapper>
       )}

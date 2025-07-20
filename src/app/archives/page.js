@@ -1,8 +1,10 @@
-// app/archives/page.js
+// app/archives/page.jsx
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import initializeDbAndModels from "@/lib/db";
 import Link from "next/link";
+import CreateArchiveClient from "@/components/CreateArchiveClient";
+import DeleteArchiveButton from "@/components/DeleteArchiveButton";
 
 export default async function ArchivesPage() {
   const session = await getServerSession(authOptions);
@@ -20,12 +22,18 @@ export default async function ArchivesPage() {
   return (
     <div style={{ padding: "20px" }}>
       <h2>Your Archives</h2>
-      <ul>
+
+      <CreateArchiveClient />
+
+      <ul style={{ marginTop: "1rem" }}>
         {archives.map((archive) => (
-          <li key={archive.id}>
+          <li key={archive.id} style={{ marginBottom: "0.5rem" }}>
             <Link href={`/archives/${archive.id}`}>
               <u>{archive.name}</u>
             </Link>
+            {archive.name !== "Saved for later" && (
+              <DeleteArchiveButton archiveId={archive.id} />
+            )}
           </li>
         ))}
       </ul>

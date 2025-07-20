@@ -192,7 +192,12 @@ async function initializeDbAndModels() {
           sequelize,
           modelName: "Archive",
           timestamps: true,
-          unique: "archive_article_unique",
+          indexes: [
+            {
+              unique: true,
+              fields: ["userId", "name"],
+            },
+          ],
         }
       );
 
@@ -210,7 +215,7 @@ async function initializeDbAndModels() {
           url: {
             type: DataTypes.TEXT,
             allowNull: false,
-            unique: "archive_article_unique",
+            unique: "archive_url_unique",
           },
           urlToImage: {
             type: DataTypes.TEXT,
@@ -223,12 +228,19 @@ async function initializeDbAndModels() {
           archiveId: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            unique: "archive_url_unique",
           },
         },
         {
           sequelize,
           modelName: "SavedArticle",
           timestamps: true,
+          indexes: [
+            {
+              unique: true,
+              fields: ["url", "archiveId"], 
+            },
+          ],
         }
       );
 
@@ -249,8 +261,15 @@ async function initializeDbAndModels() {
         onDelete: "CASCADE",
       });
 
+      // await sequelize.query(`ALTER TABLE "SavedArticles" DROP CONSTRAINT IF EXISTS "SavedArticles_url_key";`);
+
+      // Uncomment the line below to alter tables without wiping data
+      // await sequelize.sync({ alter: true });
+
+
       //DO NOT REMOVE COMMENTS FROM BELOW LINE
-      await sequelize.sync({ alter: true });
+      //Wipes all data from the database and re-creates tables
+      // await sequelize.sync({ force: true });
       console.log("All models were synchronized and created successfully.");
     } catch (error) {
       console.error("----------------------------------------------------");

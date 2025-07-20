@@ -3,69 +3,49 @@ import initializeDbAndModels from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 
-export async function GET(req, { params }) {
-  const archiveIdStr = params?.archiveId;
-  if (!archiveIdStr || archiveIdStr === "undefined") {
-    return NextResponse.json({ saved: false }, { status: 400 });
-  }
+// export async function GET() {
+//   const session = await getServerSession(authOptions);
+//   if (!session)
+//     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const archiveId = Number(archiveIdStr);   // or keep as string if UUID
-  if (isNaN(archiveId)) {
-    return NextResponse.json({ saved: false }, { status: 400 });
-  }
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json(
-        { error: "User not authenticated" },
-        { status: 401 }
-      );
-    }
+//   const db = await initializeDbAndModels();
+//   const archives = await db.Archive.findAll({
+//     where: { userId: session.user.id },
+//   });
 
-    const db = await initializeDbAndModels();
-    const { Archive } = db;
+//   return NextResponse.json({ archives });
+// }
 
-    const archives = await Archive.findAll({
-      where: { userId: session.user.id },
-      order: [["createdAt", "DESC"]],
-    });
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session)
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-    return NextResponse.json(archives);
-  } catch (err) {
-    console.error("GET /api/archives error:", err);
-    return NextResponse.json({ error: err }, { status: 500 });
-  }
+  const db = await initializeDbAndModels();
+  const archives = await db.Archive.findAll({
+    where: { userId: session.user.id },
+    order: [["createdAt", "DESC"]],
+  });
+
+  return NextResponse.json({ archives });
 }
 
 export async function POST(req) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json(
-        { error: "User not authenticated" },
-        { status: 401 }
-      );
-    }
+  const session = await getServerSession(authOptions);
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { name } = await req.json();
-    if (!name || name.trim() === "") {
-      return NextResponse.json(
-        { error: "Archive must have a name" },
-        { status: 400 }
-      );
-    }
+  const { name } = await req.json();
+  if (!name || !name.trim())
+    return NextResponse.json({ error: "Name required" }, { status: 400 });
 
-    const db = await initializeDbAndModels();
-    const { Archive } = db;
-
-    const newArchive = await Archive.create({
-      name: name.trim(),
+  const db = await initializeDbAndModels();
+  const [archive, created] = await db.Archive.findOrCreate({
+    where: {
       userId: session.user.id,
-    });
+      name: name.trim(),
+    },
+  });
 
-    return NextResponse.json(newArchive, { status: 201 });
-  } catch (err) {
-    console.error("POST /api/archives error:", err);
-    return NextResponse.json({ error: err }, { status: 500 });
-  }
+  return NextResponse.json({ archive });
 }
