@@ -1,3 +1,3 @@
 export default function LoadingComponent() {
-  return <div>Loading...</div>;
+  return <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '2rem'}}>Loading...</div>;
 }
