@@ -2,15 +2,16 @@
 import styled from "styled-components";
 
 const Wrapper = styled.button`
-  padding: 9px;
-  font-size: 1.2rem;
-  border-radius: 6px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
+  font-weight: 600;
 `
 
-export default function Button({ bgColor, children }) {
+export default function Button({ bgColor, clr, children }) {
   return (
-    <Wrapper style={{ backgroundColor: `${bgColor}` }}>{children}</Wrapper>
+    <Wrapper style={{ backgroundColor: `${bgColor}`, color: `${clr}` }}>{children}</Wrapper>
   );
 }
