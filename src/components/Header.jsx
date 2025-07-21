@@ -12,8 +12,8 @@ const Wrapper = styled.div`
   justify-content: space-between;
   height: 80px;
   width: 100vw;
-  background-image: url("images/BronzeHeaderBackground.png");
-  background-color: #b0b0b0;
+  // background-image: url("images/BronzeHeaderBackground.png");
+  background-color: #EE821F;
   color: white;
 `;
 
@@ -76,12 +76,13 @@ export default function Header() {
           <LeftContainer>
             {session?.user ?
             <Link href={'/news'}>
-              <Image
+              {/* <Image
                 src={"/images/BronzeLogoHeader.png"}
                 width={100}
                 height={50}
                 alt="Bronze Logo in the Header"
-              />
+              /> */}
+              News
             </Link>
               :
             <Link href={'/'}>
@@ -97,13 +98,12 @@ export default function Header() {
           <RightContainer>
             <nav style={{ display: "flex", columnGap: "10px" }}>
               <LogoutButton onClick={() => signOut({ callbackUrl: "/login" })}>
-                Logout
+                Log out
               </LogoutButton>
               <Link href="/account">
                 <UserAccountIcon>
                   <p>
                     {session?.user?.username?.slice(0, 2).toUpperCase()}
-                    AD
                   </p>
                 </UserAccountIcon>
               </Link>
@@ -114,18 +114,19 @@ export default function Header() {
         <>
           <LeftContainer>
             <Link href={"/"}>
-              <Image
+              {/* <Image
                 src={"/images/BronzeText.png"}
                 width={125}
                 height={39}
                 alt="Bronze Logo in the Header"
-              />
+              /> */}
+              <p style={{fontWeight: '600', fontSize: '2rem'}}>News</p>
             </Link>
           </LeftContainer>
           <RightContainer>
             <nav style={{ display: "flex", columnGap: "10px" }}>
               <Link href={"/login"}>
-                <Button bgColor="#9E6532">Login</Button>
+                <Button bgColor="#FFEFD5" clr={"#EE821F"}>Log In</Button>
               </Link>
             </nav>
           </RightContainer>
