@@ -8,11 +8,11 @@ const CardContainer = styled.div`
   background-color: var(--white);
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
+//   overflow: hidden;
   width: 100%;
   max-width: 400px;
-//   margin: 15px;
-margin-bottom: 15px;
+  //   margin: 15px;
+  margin-bottom: 15px;
   display: flex;
   flex-direction: column;
   border: 1px solid gray;
@@ -93,7 +93,7 @@ const ArticleSnippet = styled.p`
 const ReadMoreButton = styled.a`
   background-color: var(--primary-blue);
   color: #fff;
-  padding: 12px 25px;
+  padding: 12px 20px;
   border-radius: 6px;
   font-size: 1rem;
   font-weight: bold;
@@ -169,8 +169,7 @@ export default function NewsCardThree({
         {/* <NewTag>New</NewTag> */}
         <ArticleTitle>{cleanTitle}</ArticleTitle>
         <ArticleSnippet>
-          Source -{" "}
-          {article.sourceName || article.source?.name || "Unknown source"}
+          - {article.sourceName || article.source?.name || "Unknown source"}
         </ArticleSnippet>
         <div
           style={{
@@ -179,7 +178,7 @@ export default function NewsCardThree({
             alignItems: "center",
           }}
         >
-          <ReadMoreButton href={article.url}>READ MORE</ReadMoreButton>
+          <ReadMoreButton href={article.url} target="_blank">Read article</ReadMoreButton>
           <ArchiveToggleButton
             article={article}
             archiveId={archiveId}

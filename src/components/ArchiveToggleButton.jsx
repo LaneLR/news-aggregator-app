@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 
 const SaveButton = styled.div`
-background-color: var(--primary-blue);
+  background-color: var(--primary-blue);
   color: #fff;
-  padding: 12px 25px;
+  padding: 12px 20px;
   border-radius: 6px;
   font-size: 1rem;
   font-weight: bold;
@@ -25,7 +25,7 @@ background-color: var(--primary-blue);
   &:active {
     transform: translateY(0);
   }
-  `;
+`;
 
 export default function ArchiveToggleButton({
   article,
@@ -55,29 +55,31 @@ export default function ArchiveToggleButton({
   }, []);
 
   useEffect(() => {
-  if (isSaved || !article.url || propArchiveId) return;
+    if (isSaved || !article.url || propArchiveId) return;
 
-  const checkIfSaved = async () => {
-    try {
-      const res = await fetch(`/api/articles/check?url=${encodeURIComponent(article.url)}`);
-      if (!res.ok) {
-        const text = await res.text();
-        console.warn("Check failed:", text);
-        return;
+    const checkIfSaved = async () => {
+      try {
+        const res = await fetch(
+          `/api/articles/check?url=${encodeURIComponent(article.url)}`
+        );
+        if (!res.ok) {
+          const text = await res.text();
+          console.warn("Check failed:", text);
+          return;
+        }
+
+        const data = await res.json();
+        if (data.saved) {
+          setIsSaved(true);
+          setSelectedArchiveId(data.archiveId);
+        }
+      } catch (err) {
+        console.error("Error checking saved status:", err);
       }
+    };
 
-      const data = await res.json();
-      if (data.saved) {
-        setIsSaved(true);
-        setSelectedArchiveId(data.archiveId);
-      }
-    } catch (err) {
-      console.error("Error checking saved status:", err);
-    }
-  };
-
-  checkIfSaved();
-}, [article.url, propArchiveId, isSaved]);
+    checkIfSaved();
+  }, [article.url, propArchiveId, isSaved]);
 
   const handleArchiveSelect = async (archiveId) => {
     setLoading(true);
@@ -135,12 +137,19 @@ export default function ArchiveToggleButton({
 
   return (
     <div style={{ position: "relative" }}>
-      {isSaved && propArchiveId &&!viewOnly ? (
+      {isSaved && propArchiveId && !viewOnly ? (
         <SaveButton onClick={handleRemove} disabled={loading}>
-          {loading ? "Removing..." : "Delete"}
+          {loading ? "Removing..." : "Remove"}
         </SaveButton>
       ) : viewOnly && isSaved ? (
-        <div style={{ border: 'none', color: "red", cursor: "default", background: "transparent" }}>
+        <div
+          style={{
+            border: "none",
+            color: "red",
+            cursor: "default",
+            background: "transparent",
+          }}
+        >
           ❤️
         </div>
       ) : (
@@ -159,14 +168,16 @@ export default function ArchiveToggleButton({
                 top: "100%",
                 left: 0,
                 zIndex: 10,
+                userSelect: "none",
                 background: "#fff",
                 border: "1px solid #ccc",
                 padding: "0.5rem",
                 listStyle: "none",
+                borderBottom: "1px solid #ccc",
               }}
             >
               {archives.map((archive) => (
-                <li key={archive.id}>
+                <li key={archive.id} style={{ borderBottom: "1px solid #ccc" }}>
                   <button
                     style={{
                       all: "unset",
