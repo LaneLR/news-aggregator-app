@@ -10,6 +10,7 @@ const HomePageWrapper = styled.div`
   justify-content: center;
   height: auto;
   width: 100%;
+  min-height: 100vh;
 `;
 
 const StyledHomePageSectionOne = styled.div`
@@ -19,7 +20,7 @@ const StyledHomePageSectionOne = styled.div`
   align-items: center;
   height: 100%;
   width: 100%;
-  background-color: #ffefd5;
+  background-color: var(--deep-blue);
   padding: 65px 0;
 `;
 
@@ -30,55 +31,62 @@ const StyledHomePageSectionTwo = styled.div`
   align-items: center;
   height: 100%;
   width: 100%;
-  background-color: #fff8e8;
+  background-color: var(--white);
   padding: 5% 0;
+`;
+
+const SpaceFillerSection = styled.div`
+  display: flex;
+  flex-grow: 1;
+  height: 100%;
+  width: 100%;
+  background-color: var(--white);
 `;
 
 const MainHeaderText = styled.h1`
   font-size: 3rem;
   font-weight: 700;
-  color: #333;
-  color: #3e2a12;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+  ${props => props.color && `color: ${props.color};`}
 `;
 
 const StyledParagraphLeft = styled.p`
   font-size: 1.1rem;
-  color: #555;
   text-align: center;
   max-width: 600px;
-  color: #3e2a12;
+  ${props => props.color && `color: ${props.color};`}
   display: flex;
   justify-content: center;
   align-items: center;
-  text-align: Left;
+  text-align: left;
+  padding: 0 10px;
 `;
 
 const StyledParagraphRight = styled.p`
   font-size: 1.1rem;
-  color: #555;
   text-align: center;
   max-width: 600px;
-  color: #3e2a12;
+  ${props => props.color && `color: ${props.color};`}
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: right;
+  padding: 0 10px;
 `;
 
 const StyledParagraphCenter = styled.p`
   font-size: 1.1rem;
-  color: #555;
   text-align: center;
   max-width: 600px;
-  color: #3e2a12;
+  ${props => props.color && `color: ${props.color};`}
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+  padding: 0 10px;
 `;
 
 const ImageContainer = styled.div`
@@ -111,31 +119,31 @@ const ExploreImageContainers = styled.div`
   height: 100%;
   width: 100%;
   max-width: 300px;
-  row-gap: 14px;
+  row-gap: 10px;
+  margin-bottom: 10px;
 `;
 
 export default function HomePage() {
   return (
     <HomePageWrapper>
       <StyledHomePageSectionOne>
-        <MainHeaderText>Stay Informed.</MainHeaderText>
-        <MainHeaderText>Your Way.</MainHeaderText>
+        <MainHeaderText color={"var(--light-white)"}>Stay Informed.</MainHeaderText>
+        <MainHeaderText color={"var(--light-white)"}>Your Way.</MainHeaderText>
         <br />
-        <StyledParagraphCenter>
+        <StyledParagraphCenter color={"var(--light-white)"}>
           Save and discover the latest news from around the web
         </StyledParagraphCenter>
         <br />
         {/* <input placeholder="Search articles"/> */}
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center"}}>
           <Link href={"/register"}>
-            <Button bgColor={"#EE821F"} clr={"#fff"}>
+            <Button bgColor={"var(--primary-blue)"} clr={"var(--light-white)"}>
               Sign Up
             </Button>
           </Link>
-          <p>or</p>
           <Link href={"/login"}>
-            <Button bgColor={"#EE821F"} clr={"#fff"}>
-              Log In
+            <Button bgColor={"var(--primary-blue)"} clr={"var(--light-white)"}>
+              Log in
             </Button>
           </Link>
         </div>
@@ -173,7 +181,7 @@ export default function HomePage() {
               }}
             >
               <Link href={"/login"}>
-                <Button bgColor={"#EE821F"}>Explore Tech News</Button>
+                <Button bgColor={"var(--primary-blue)"}>Explore Tech News</Button>
               </Link>
             </div>
           </ExploreImageContainers>
@@ -202,7 +210,7 @@ export default function HomePage() {
               }}
             >
               <Link href={"/login"}>
-                <Button bgColor={"#EE821F"}>Explore World News</Button>
+                <Button bgColor={"var(--primary-blue)"}>Explore World News</Button>
               </Link>
             </div>
           </ExploreImageContainers>
@@ -229,7 +237,7 @@ export default function HomePage() {
               }}
             >
               <Link href={"/login"}>
-                <Button bgColor={"#EE821F"}>Explore Entertainment News</Button>
+                <Button bgColor={"var(--primary-blue)"}>Explore Entertainment News</Button>
               </Link>
             </div>
           </ExploreImageContainers>
@@ -256,12 +264,13 @@ export default function HomePage() {
               }}
             >
               <Link href={"/login"}>
-                <Button bgColor={"#EE821F"}>Explore Weather News</Button>
+                <Button bgColor={"var(--primary-blue)"}>Explore Weather News</Button>
               </Link>
             </div>
           </ExploreImageContainers>
         </ImageContainer>
       </StyledHomePageSectionTwo>
+      <SpaceFillerSection />
     </HomePageWrapper>
   );
 }
