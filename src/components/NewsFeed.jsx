@@ -10,7 +10,7 @@ import styled from "styled-components";
 const SearchBarHeader = styled.div`
   font-size: 3rem;
   font-weight: 600;
-  color: var(--deep-blue);
+  color: var(--dark-blue);
   padding: 10px 0;
   text-align: center;
   width: 100%;
@@ -20,7 +20,7 @@ const SearchBarHeader = styled.div`
     font-weight: 700;
   }
   `
-  
+
 async function fetchNews() {
   let baseUrl =
     process.env.RENDER_EXTERNAL_URL ||

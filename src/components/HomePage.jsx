@@ -50,14 +50,15 @@ const MainHeaderText = styled.h1`
   justify-content: center;
   align-items: center;
   text-align: center;
-  ${props => props.color && `color: ${props.color};`}
+  ${(props) => props.color && `color: ${props.color};`}
 `;
 
 const StyledParagraphLeft = styled.p`
+  text-algin: justify;
   font-size: 1.1rem;
   text-align: center;
   max-width: 600px;
-  ${props => props.color && `color: ${props.color};`}
+  ${(props) => props.color && `color: ${props.color};`}
   display: flex;
   justify-content: center;
   align-items: center;
@@ -66,10 +67,11 @@ const StyledParagraphLeft = styled.p`
 `;
 
 const StyledParagraphRight = styled.p`
+  text-algin: justify;
   font-size: 1.1rem;
   text-align: center;
   max-width: 600px;
-  ${props => props.color && `color: ${props.color};`}
+  ${(props) => props.color && `color: ${props.color};`}
   display: flex;
   justify-content: center;
   align-items: center;
@@ -78,10 +80,11 @@ const StyledParagraphRight = styled.p`
 `;
 
 const StyledParagraphCenter = styled.p`
+  text-algin: justify;
   font-size: 1.1rem;
   text-align: center;
   max-width: 600px;
-  ${props => props.color && `color: ${props.color};`}
+  ${(props) => props.color && `color: ${props.color};`}
   display: flex;
   justify-content: center;
   align-items: center;
@@ -127,7 +130,9 @@ export default function HomePage() {
   return (
     <HomePageWrapper>
       <StyledHomePageSectionOne>
-        <MainHeaderText color={"var(--light-white)"}>Stay Informed.</MainHeaderText>
+        <MainHeaderText color={"var(--light-white)"}>
+          Stay Informed.
+        </MainHeaderText>
         <MainHeaderText color={"var(--light-white)"}>Your Way.</MainHeaderText>
         <br />
         <StyledParagraphCenter color={"var(--light-white)"}>
@@ -135,7 +140,7 @@ export default function HomePage() {
         </StyledParagraphCenter>
         <br />
         {/* <input placeholder="Search articles"/> */}
-        <div style={{ display: "flex", gap: "10px", alignItems: "center"}}>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <Link href={"/register"}>
             <Button bgColor={"var(--primary-blue)"} clr={"var(--light-white)"}>
               Sign Up
@@ -181,7 +186,9 @@ export default function HomePage() {
               }}
             >
               <Link href={"/login"}>
-                <Button bgColor={"var(--primary-blue)"}>Explore Tech News</Button>
+                <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
+                  Explore Tech News
+                </Button>
               </Link>
             </div>
           </ExploreImageContainers>
@@ -210,7 +217,9 @@ export default function HomePage() {
               }}
             >
               <Link href={"/login"}>
-                <Button bgColor={"var(--primary-blue)"}>Explore World News</Button>
+                <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
+                  Explore World News
+                </Button>
               </Link>
             </div>
           </ExploreImageContainers>
@@ -237,7 +246,9 @@ export default function HomePage() {
               }}
             >
               <Link href={"/login"}>
-                <Button bgColor={"var(--primary-blue)"}>Explore Entertainment News</Button>
+                <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
+                  Explore Entertainment News
+                </Button>
               </Link>
             </div>
           </ExploreImageContainers>
@@ -264,7 +275,9 @@ export default function HomePage() {
               }}
             >
               <Link href={"/login"}>
-                <Button bgColor={"var(--primary-blue)"}>Explore Weather News</Button>
+                <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
+                  Explore Weather News
+                </Button>
               </Link>
             </div>
           </ExploreImageContainers>

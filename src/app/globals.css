@@ -1,35 +1,39 @@
 :root {
-  --background: #ffffff;
-  --foreground: #535353;
+  --background: #022665;
+  --foreground: #022665;
 
   /* New Color Palette */
-  --dark-blue: #0A1430;
+  --dark-blue: #0a1430;
   --light-white: #f1f1f1;
-  --white: #FEFEFE;
-  --light-gray: #E1E5E9;
-  --primary-blue: #004CD2; /* Note: The user provided this color twice, so I'm naming it 'primary-blue' */
+  --white: #fefefe;
+  --light-gray: #e1e5e9;
+  --primary-blue: #004cd2; /* Note: The user provided this color twice, so I'm naming it 'primary-blue' */
   --deep-blue: #022665;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #535353;
-    --foreground: #ededed;
+    --background: #022665;
+    --foreground: #022665;
 
     /* New Color Palette for Dark Mode (adjust as needed if you want different shades) */
-    --dark-blue: #131C23; /* Might remain the same or be a slightly lighter dark */
-    --light-gray: #E1E5E9; /* Might become a darker gray for contrast */
-    --primary-blue: #1C44B9; /* Typically remains consistent for brand primary */
+    --dark-blue: #0a1430; /* Might remain the same or be a slightly lighter dark */
+    --light-gray: #e1e5e9; /* Might become a darker gray for contrast */
+    --primary-blue: #004cd2; /* Typically remains consistent for brand primary */
     --deep-blue: #022665; /* Might remain the same or be a slightly lighter deep blue */
+    --white: #fefefe;
+    --light-white: #f1f1f1;
   }
 }
 
-html, body {
+html,
+body {
   height: 100%;
+  box-sizing: border-box;
   overflow-x: hidden;
   margin: 0;
   padding: 0;
-  background: var(--background); 
+  background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -42,10 +46,16 @@ html, body {
   flex-direction: column;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+}
+
+* {
+  background-color: auto;
 }
 
 a {
