@@ -14,14 +14,22 @@ const Wrapper = styled.div`
   border-bottom-right-radius: 20px;
   border-top-left-radius: 20px;
   border-top-right-radius: 15px;
+  max-width: 350px;
 `;
 
 const CardWrapper = styled.div`
-  width: 100%;
+  // width: 100%;
   aspect-ratio: 16 / 9;
   position: relative;
-  overflow: hidden;
-`;
+  // overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%;
+  width: 100%;
+  row-gap: 14px;
+  `;
 
 const DescriptionSection = styled.div`
   width: 100%;
@@ -31,6 +39,9 @@ const DescriptionSection = styled.div`
   padding: 5px 7px 7px;
   align-items: flex-start;
   justify-content: space-between;
+  background-color: var(--white);
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 20px;
 `;
 
 const TitleSection = styled.div`
