@@ -4,42 +4,37 @@ import { useState } from "react";
 import styled from "styled-components";
 
 const SearchBarWrapper = styled.div`
-  width: 80%;
-  max-width: 1200px;
+  // width: 90%;
+  width: 1240px;
   margin: 5px 0 10px 0;
   display: flex;
   justify-content: center;
   align-items: center;
+
+  @media (max-width: 1290px) {
+    width: 820px;
+  }
+
+  @media (max-width: 885px) {
+    width: 400px;
+  }
+
+  @media (max-width: 600px) {
+    width: 372px;
+  }
 `;
 
 const SearchInput = styled.input`
   font-size: 1.4rem;
   width: 100%;
   padding: 10px;
-  border-radius: 4px;
+  border-radius: 10px;
   border: 1px solid #ccc;
 
   &:focus {
     outline: none;
     border-color: #9e6532;
   }
-`;
-
-const ResultsWrapper = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin-top: 15px;
-  width: 80%;
-  max-width: 1200px;
-`;
-
-const ResultItem = styled.li`
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
-  background-color: white;
-  color: black;
-  border-radius: 4px;
-  margin-bottom: 5px;
 `;
 
 export default function SearchBar() {
@@ -59,7 +54,7 @@ export default function SearchBar() {
     <SearchBarWrapper>
       <SearchInput
         type="text"
-        placeholder="Search articles by title"
+        placeholder="Search by title, topic, or author..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyDown}
