@@ -12,6 +12,7 @@ padding: 3px;
 border: 1px solid black;
 margin: 15px 0;
 font-size: 1.3rem;
+background-color: var(--deep-blue);
 `
 
 export default function NavTab({ href, children}) {

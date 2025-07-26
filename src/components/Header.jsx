@@ -13,7 +13,7 @@ const Wrapper = styled.div`
   height: 80px;
   width: 100vw;
   // background-image: url("images/BronzeHeaderBackground.png");
-  background-color: #EE821F;
+  background-color: var(--dark-blue);
   color: white;
 `;
 
@@ -26,6 +26,7 @@ const LeftContainer = styled.div`
   width: auto;
   height: 100%;
   padding: 0 0 0 20px;
+  background-color: inherit;
 `;
 
 const RightContainer = styled.div`
@@ -37,30 +38,38 @@ const RightContainer = styled.div`
   width: auto;
   height: 100%;
   padding: 0 20px 0 0;
+  background-color: inherit;
 `;
 
 const UserAccountIcon = styled.div`
   width: 40px;
   height: 40px;
-  background-color: #fff;
-  border-radius: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
-  color: black;
+  color: var(--light-white);
 `;
 
-const LogoutButton = styled.button`
-  background-color: rgb(179, 40, 31);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 15px;
+const HeaderLogoBox = styled.div`
+  display: flex;
+  background-color: inherit;
+  font-size: 2.5rem;
+  font-weight: 700;
+`;
+
+const MenuIcon = styled.div`
+  width: 20px;
+  height: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   cursor: pointer;
-  font-size: 1rem;
-  &:hover {
-    background-color: rgb(139, 15, 15);
+  span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: var(--white);
   }
 `;
 
@@ -74,37 +83,43 @@ export default function Header() {
       {!!session ? (
         <>
           <LeftContainer>
-            {session?.user ?
-            <Link href={'/news'}>
-              {/* <Image
+            {session?.user ? (
+              <Link href={"/news"}>
+                {/* <Image
                 src={"/images/BronzeLogoHeader.png"}
                 width={100}
                 height={50}
                 alt="Bronze Logo in the Header"
               /> */}
-              News
-            </Link>
-              :
-            <Link href={'/'}>
-              <Image
-                src={"/images/BronzeLogoHeader.png"}
-                width={100}
-                height={50}
-                alt="Bronze Logo in the Header"
-              />
-            </Link>
-            }
+                <HeaderLogoBox>News</HeaderLogoBox>
+              </Link>
+            ) : (
+              <Link href={"/"}>
+                <Image
+                  src={"/images/BronzeLogoHeader.png"}
+                  width={100}
+                  height={50}
+                  alt="Bronze Logo in the Header"
+                />
+              </Link>
+            )}
           </LeftContainer>
           <RightContainer>
             <nav style={{ display: "flex", columnGap: "10px" }}>
-              <LogoutButton onClick={() => signOut({ callbackUrl: "/login" })}>
+              <Button
+                bgColor={"var(--primary-blue)"}
+                clr={"var(--light-white)"}
+                onClick={() => signOut({ callbackUrl: "/login" })}
+              >
                 Log out
-              </LogoutButton>
+              </Button>
               <Link href="/account">
                 <UserAccountIcon>
-                  <p>
-                    {session?.user?.username?.slice(0, 2).toUpperCase()}
-                  </p>
+                  <MenuIcon>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </MenuIcon>
                 </UserAccountIcon>
               </Link>
             </nav>
@@ -120,13 +135,18 @@ export default function Header() {
                 height={39}
                 alt="Bronze Logo in the Header"
               /> */}
-              <p style={{fontWeight: '600', fontSize: '2rem'}}>News</p>
+              <HeaderLogoBox>News</HeaderLogoBox>
             </Link>
           </LeftContainer>
           <RightContainer>
             <nav style={{ display: "flex", columnGap: "10px" }}>
               <Link href={"/login"}>
-                <Button bgColor="#FFEFD5" clr={"#EE821F"}>Log In</Button>
+                <Button
+                  bgColor={"var(--primary-blue)"}
+                  clr={"var(--light-white)"}
+                >
+                  Log in
+                </Button>
               </Link>
             </nav>
           </RightContainer>

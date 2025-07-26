@@ -6,6 +6,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  background-color: var(--light-white);
 `;
 
 export default function MainContentWrapper({ children }) {

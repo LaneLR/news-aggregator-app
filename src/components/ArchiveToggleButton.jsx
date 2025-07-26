@@ -1,6 +1,31 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import styled from "styled-components";
+
+const SaveButton = styled.div`
+background-color: var(--primary-blue);
+  color: #fff;
+  padding: 12px 25px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  align-self: flex-start;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+
+  &:hover {
+    background-color: #173b9e;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+  `;
 
 export default function ArchiveToggleButton({
   article,
@@ -111,21 +136,21 @@ export default function ArchiveToggleButton({
   return (
     <div style={{ position: "relative" }}>
       {isSaved && propArchiveId &&!viewOnly ? (
-        <button onClick={handleRemove} disabled={loading}>
+        <SaveButton onClick={handleRemove} disabled={loading}>
           {loading ? "Removing..." : "Delete"}
-        </button>
+        </SaveButton>
       ) : viewOnly && isSaved ? (
-        <button disabled style={{ border: 'none', color: "red", cursor: "default", background: "transparent" }}>
+        <div style={{ border: 'none', color: "red", cursor: "default", background: "transparent" }}>
           ❤️
-        </button>
+        </div>
       ) : (
         <>
-          <button
+          <SaveButton
             onClick={() => setDropdownVisible(!dropdownVisible)}
             disabled={loading}
           >
-            {loading ? "Saving..." : isSaved ? "Saved" : "Save Article"}
-          </button>
+            {loading ? "Saving..." : isSaved ? "Saved" : "Save"}
+          </SaveButton>
 
           {dropdownVisible && (
             <ul
