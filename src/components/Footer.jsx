@@ -7,7 +7,7 @@ const Wrapper = styled.div`
   justify-content: space-between;
   height: 50px;
   width: 100vw;
-  background-color: #eb9e57ff;
+  background-color: var(--primary-blue);
   color: white;
 `;
 
