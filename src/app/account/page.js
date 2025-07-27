@@ -2,7 +2,6 @@ import Divider from "@/components/Divider";
 import SideBarNav from "@/components/SideNavBar";
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
-
 import { redirect } from "next/navigation";
 
 export default async function AccountPage() {
@@ -13,15 +12,21 @@ export default async function AccountPage() {
   }
 
   return (
-    <div style={{color: 'var(--dark-blue)', display: 'flex', justifyContent: 'center', width: '100%', height: "auto", alignItems: 'center', flexDirection: 'column'}}>
+    <div
+      style={{
+        color: "var(--dark-blue)",
+        display: "flex",
+        justifyContent: "center",
+        width: "100%",
+        height: "auto",
+        alignItems: "center",
+        flexDirection: "column",
+      }}
+    >
       <h1>Profile</h1>
       <p>Your email: {session.user.email}</p>
       <Divider />
       <p>Subscription stuff</p>
-      <Divider />
-      <p>Security, password resets, etc.</p>
-      <Divider />
-      <p>Privacy stuff</p>
     </div>
   );
 }
