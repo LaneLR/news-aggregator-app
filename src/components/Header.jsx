@@ -6,13 +6,14 @@ import Button from "./Button";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import SearchBar from "./SearchBar";
 
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 80px;
-  width: 100vw;
+  width: 100%;
   // background-image: url("images/BronzeHeaderBackground.png");
   background-color: var(--dark-blue);
   color: white;
@@ -22,11 +23,23 @@ const LeftContainer = styled.div`
   display: flex;
   align-items: center;
   text-align: left;
-  justify-content: space-evenly;
-  max-width: 50%;
-  width: auto;
+  justify-content: left;
+  // max-width: 33%;
+  width: 327px;
   height: 100%;
   padding: 0 0 0 20px;
+  background-color: inherit;
+`;
+
+const CenterContainer = styled.div`
+  display: flex;
+  align-items: center;
+  text-align: right;
+  justify-content: space-evenly;
+  // max-width: 33%;
+  width: 50%;
+  height: 100%;
+  padding: 0 50px;
   background-color: inherit;
 `;
 
@@ -34,12 +47,13 @@ const RightContainer = styled.div`
   display: flex;
   align-items: center;
   text-align: right;
-  justify-content: space-evenly;
-  max-width: 50%;
-  width: auto;
+  justify-content: right;
+  // max-width: 33%;
+  width: 327px;
   height: 100%;
   padding: 0 20px 0 0;
   background-color: inherit;
+  user-select: none;
 `;
 
 const UserAccountIcon = styled.div`
@@ -139,12 +153,12 @@ export default function Header() {
   }, [isDropdownOpen]);
 
   const handleLogout = async () => {
-    setIsDropdownOpen(false); // Close dropdown
-    await signOut({ callbackUrl: "/login" }); // Redirect to login after logout
+    setIsDropdownOpen(false);
+    await signOut({ callbackUrl: "/login" });
   };
 
   const handleNavigation = (path) => {
-    setIsDropdownOpen(false); // Close dropdown
+    setIsDropdownOpen(false);
     router.push(path);
   };
 
@@ -156,31 +170,52 @@ export default function Header() {
         <>
           <LeftContainer>
             <Link href={"/news"}>
-              <HeaderLogoBox>News</HeaderLogoBox>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  columnGap: "10px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    backgroundColor: "#eee",
+                    padding: "6px",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <Image
+                    src={"/images/Relay-logo-color-transparent-bg.png"}
+                    alt={"Relay News logo"}
+                    width={33}
+                    height={40}
+                  />
+                </div>
+                <p style={{ fontSize: "2.5rem" }}>
+                  <span
+                    style={{
+                      color: "var(--secondary-blue)",
+                      fontWeight: "700",
+                    }}
+                  >
+                    RELAY
+                  </span>
+                  <span style={{ color: "var(--white)", fontWeight: "400" }}>
+                    NEWS
+                  </span>
+                </p>
+              </div>
             </Link>
           </LeftContainer>
+          <CenterContainer>
+            <SearchBar />
+          </CenterContainer>
           <RightContainer>
-            {/* The Logout Button is now part of the dropdown */}
-            {/* <nav style={{ display: "flex", columnGap: "10px" }}>
-                <Button
-                    bgColor={"var(--primary-blue)"}
-                    clr={"var(--light-white)"}
-                    onClick={() => signOut({ callbackUrl: "/login" })}
-                >
-                    Log out
-                </Button>
-            </nav> */}
-
-            {/* Dropdown Toggle and Menu */}
             <DropdownContainer ref={dropdownRef}>
-              {" "}
-              {/* Attach ref here */}
               <UserAccountIcon onClick={toggleDropdown}>
-                {/* You can display initials here or use the MenuIcon */}
-                {/* {userInitials} */}
                 <MenuIcon>
-                  {" "}
-                  {/* This is your hamburger icon */}
                   <span></span>
                   <span></span>
                   <span></span>
@@ -188,7 +223,7 @@ export default function Header() {
               </UserAccountIcon>
               {isDropdownOpen && (
                 <DropdownMenu>
-                  <DropdownMenuItem onClick={handleLogout}>
+                  <DropdownMenuItem onClick={() => handleNavigation("/news")}>
                     <div
                       style={{
                         display: "flex",
@@ -198,12 +233,34 @@ export default function Header() {
                         columnGap: "20px",
                       }}
                     >
-                      <p>News</p>
+                      <p style={{ fontWeight: "600" }}>News</p>
                       <Image
                         alt={"Log out image"}
                         height={22}
                         width={22}
                         src="/images/newspaper.svg"
+                      />
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleNavigation("/archives")}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        width: "100%",
+                        columnGap: "20px",
+                      }}
+                    >
+                      <p style={{ fontWeight: "600" }}>Archives</p>
+                      <Image
+                        alt={"Log out image"}
+                        height={22}
+                        width={22}
+                        src="/images/list-heart.svg"
+                        style={{ filter: "grayscale(100%)" }}
                       />
                     </div>
                   </DropdownMenuItem>
@@ -219,7 +276,7 @@ export default function Header() {
                         columnGap: "20px",
                       }}
                     >
-                      <p>Profile</p>
+                      <p style={{ fontWeight: "600" }}>Profile</p>
                       <Image
                         alt={"Profile image"}
                         height={22}
@@ -240,7 +297,7 @@ export default function Header() {
                         columnGap: "20px",
                       }}
                     >
-                      <p>Settings</p>
+                      <p style={{ fontWeight: "600" }}>Settings</p>
                       <Image
                         alt={"Settings image"}
                         height={22}
@@ -259,7 +316,7 @@ export default function Header() {
                         columnGap: "20px",
                       }}
                     >
-                      <p>Log out</p>
+                      <p style={{ fontWeight: "600" }}>Log out</p>
                       <Image
                         alt={"Log out image"}
                         height={22}
@@ -277,7 +334,43 @@ export default function Header() {
         <>
           <LeftContainer>
             <Link href={"/"}>
-              <HeaderLogoBox>News</HeaderLogoBox>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  columnGap: "10px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    backgroundColor: "#eee",
+                    padding: "6px",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <Image
+                    src={"/images/Relay-logo-color-transparent-bg.png"}
+                    alt={"Relay News logo"}
+                    width={33}
+                    height={40}
+                  />
+                </div>
+                <p style={{ fontSize: "2.5rem" }}>
+                  <span
+                    style={{
+                      color: "var(--secondary-blue)",
+                      fontWeight: "700",
+                    }}
+                  >
+                    RELAY
+                  </span>
+                  <span style={{ color: "var(--white)", fontWeight: "400" }}>
+                    NEWS
+                  </span>
+                </p>
+              </div>
             </Link>
           </LeftContainer>
           <RightContainer>
