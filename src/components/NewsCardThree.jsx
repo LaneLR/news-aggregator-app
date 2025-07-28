@@ -154,12 +154,7 @@ export default function NewsCardThree({
   return (
     <CardContainer>
       <CardHeader>
-        <BrandText>NewsBrief</BrandText>{" "}
-        {/* <MenuIcon>
-          <span></span>
-          <span></span>
-          <span></span>
-        </MenuIcon> */}
+        <BrandText>Relay News</BrandText>
       </CardHeader>
       <ThumbnailImage
         src={currentImageSrc}
