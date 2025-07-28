@@ -1,11 +1,11 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const SearchBarWrapper = styled.div`
-  // width: 90%;
-  width: 1240px;
+  width: 100%;
+  // width: 1240px;
   margin: 5px 0 10px 0;
   display: flex;
   justify-content: center;
@@ -30,8 +30,8 @@ const SearchInput = styled.input`
   padding: 10px;
   border-radius: 10px;
   border: 1px solid #ccc;
-  color: var(--white);
-  background-color: var(--dark-blue);
+  color: var(--dark-blue);
+  background-color: white;
 
   &:focus {
     outline: none;
@@ -41,7 +41,17 @@ const SearchInput = styled.input`
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
   const router = useRouter();
+  // const pathname = usePathname();
+
+  // useEffect(() => {
+  //   if (pathname === "/news" || pathname === "/search") {
+  //     setShowSearch(true);
+  //   } else {
+  //     setShowSearch(false);
+  //   }
+  // }, [pathname]);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && query.trim()) {
@@ -49,18 +59,23 @@ export default function SearchBar() {
       const newUrl = `/search?query=${encodeURIComponent(newQuery)}`;
 
       router.push(newUrl);
+      setQuery("");
       router.refresh();
     }
   };
   return (
-    <SearchBarWrapper>
-      <SearchInput
-        type="text"
-        placeholder="Search by title, topic, or author..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-    </SearchBarWrapper>
+    <>
+      {/* {showSearch && ( */}
+        <SearchBarWrapper>
+          <SearchInput
+            type="text"
+            placeholder="Search by title, topic, or author..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+        </SearchBarWrapper>
+      {/* )} */}
+    </>
   );
 }
