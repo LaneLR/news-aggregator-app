@@ -4,24 +4,17 @@ import styled from "styled-components";
 import NewsCard from "./NewsCard";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
+import { usePathname } from "next/navigation";
 
-const SearchBarHeader = styled.div`
-  font-size: 2.5rem;
-  font-weight: 600;
-  color: var(--dark-blue);
-  padding: 15px 0 5px 0;
-  text-align: center;
-  width: 100%;
+const FeedWrapper = styled.div`
   display: flex;
-  justify-content: left;
-
-  @media (max-width: 440px) {
-    font-size: 1.8rem;
-    font-weight: 700;
-  }
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
 `;
 
-export default function SearchFeed({ initialQuery }) {
+export default function SearchFeed({ initialQuery, article, archiveId, viewOnly }) {
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState([]);
   const [page, setPage] = useState(1);
@@ -82,12 +75,28 @@ export default function SearchFeed({ initialQuery }) {
 
   return (
     <>
-      <SearchBarHeader>
-        {query ? `Results for: '${query}'` : "Results:"}
-      </SearchBarHeader>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "start",
+          width: "100%",
+        }}
+      >
+        <SearchBarHeader>What&apos;s making the news</SearchBarHeader>
+      </div>
+      
+      {query ? `Results for: '${query}'` : "Results"}
       <NewsGridWrapper>
-        {results.map((article, i) => (
-          <NewsCardThree key={i} article={article} />
+        {articles.map((article) => (
+          <NewsCardThree
+            key={article.url}
+            article={article}
+            archiveId={defaultArchiveId}
+            viewOnly={true}
+          />
         ))}
       </NewsGridWrapper>
     </>
