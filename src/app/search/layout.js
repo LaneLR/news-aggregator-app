@@ -13,10 +13,8 @@ export default function SearchLayout({ children }) {
           width: "100%",
         }}
       >
-        <h1>What&apos;s making the news</h1>
-        <SearchBar />
+        <main>{children}</main>
       </div>
-      <main>{children}</main>
     </>
   );
 }
