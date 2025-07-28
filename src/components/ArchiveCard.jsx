@@ -8,7 +8,7 @@ const CardContainer = styled.div`
   background-color: var(--white);
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-//   overflow: hidden;
+  //   overflow: hidden;
   width: 100%;
   max-width: 400px;
   //   margin: 15px;
@@ -33,7 +33,7 @@ const CardHeader = styled.div`
 `;
 
 const BrandText = styled.span`
-  font-size: 1rem;
+  font-size: 1.3rem;
   font-weight: bold;
   color: var(--dark-blue);
 `;
@@ -64,7 +64,7 @@ const NewTag = styled.span`
   align-self: flex-start;
 `;
 
-const ArticleTitle = styled.h3`
+const ArchiveTitle = styled.h3`
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--dark-blue);
@@ -114,72 +114,25 @@ const ReadMoreButton = styled.a`
   }
 `;
 
-export default function NewsCardThree({
-  article,
-  archiveId,
-  viewOnly = false,
-}) {
+export default function ArchiveCard({ archive }) {
   const FALLBACK_IMAGE_URL = "/images/blurimage.png";
-  const index = article.title.lastIndexOf(" - ");
-  const cleanTitle =
-    index !== -1 ? article.title.substring(0, index) : article.title;
 
-  const [currentImageSrc, setCurrentImageSrc] = useState(() => {
-    return article.urlToImage &&
-      typeof article.urlToImage === "string" &&
-      article.urlToImage.trim() !== ""
-      ? article.urlToImage
-      : FALLBACK_IMAGE_URL;
-  });
-
-  useEffect(() => {
-    setCurrentImageSrc((prevSrc) => {
-      const newSrc =
-        article.urlToImage &&
-        typeof article.urlToImage === "string" &&
-        article.urlToImage.trim() !== ""
-          ? article.urlToImage
-          : FALLBACK_IMAGE_URL;
-      return newSrc !== prevSrc ? newSrc : prevSrc;
-    });
-  }, [article.urlToImage]);
-
-  const handleImageError = () => {
-    if (currentImageSrc !== FALLBACK_IMAGE_URL) {
-      console.warn(`Image failed to load: ${currentImageSrc}. Using fallback.`);
-      setCurrentImageSrc(FALLBACK_IMAGE_URL);
-    }
-  };
+  const [currentImageSrc, setCurrentImageSrc] = useState(FALLBACK_IMAGE_URL)
 
   return (
     <CardContainer>
       <CardHeader>
-        <BrandText>Relay News</BrandText>
+        <BrandText>{archive.name}</BrandText>
       </CardHeader>
-      <ThumbnailImage
-        src={currentImageSrc}
-        alt={article.title || "News article image"}
-      />
+        <ThumbnailImage src={FALLBACK_IMAGE_URL} />
       <ContentArea>
-        {/* <NewTag>New</NewTag> */}
-        <ArticleTitle>{cleanTitle}</ArticleTitle>
-        <ArticleSnippet>
-          - {article.sourceName || article.source?.name || "Unknown source"}
-        </ArticleSnippet>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <ReadMoreButton href={article.url} target="_blank">Read article</ReadMoreButton>
-          <ArchiveToggleButton
-            article={article}
-            archiveId={archiveId}
-            viewOnly={viewOnly}
-          />
-        </div>
+        {/* <ArticleSnippet>
+          {archive.description || "No description available."}
+        </ArticleSnippet> */}
+
+        <ReadMoreButton href={`/archives/${archive.id}`}>
+          View Archive
+        </ReadMoreButton>
       </ContentArea>
     </CardContainer>
   );

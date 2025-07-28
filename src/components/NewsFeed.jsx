@@ -19,7 +19,7 @@ const SearchBarHeader = styled.div`
     font-size: 1.8rem;
     font-weight: 700;
   }
-  `
+`;
 
 async function fetchNews() {
   let baseUrl =
@@ -77,7 +77,6 @@ export default function News({ archiveId }) {
         }}
       >
         <SearchBarHeader>What&apos;s making the news</SearchBarHeader>
-        <SearchBar />
       </div>
 
       <NewsGridWrapper>
