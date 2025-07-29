@@ -10,18 +10,6 @@ const SearchBarWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
-  @media (max-width: 1290px) {
-    width: 820px;
-  }
-
-  @media (max-width: 885px) {
-    width: 400px;
-  }
-
-  @media (max-width: 600px) {
-    width: 372px;
-  }
 `;
 
 const SearchInput = styled.input`
