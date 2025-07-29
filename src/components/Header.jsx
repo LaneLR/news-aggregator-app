@@ -24,14 +24,15 @@ const LeftContainer = styled.div`
   align-items: center;
   text-align: left;
   justify-content: left;
-  // max-width: 33%;
-  width: 327px;
+  width: 33%;
+  // width: 327px;
   height: 100%;
   padding: 0 0 0 20px;
   background-color: inherit;
 
-  @media (max-width: 440px) {
+  @media (max-width: 1000px) {
     width: auto;
+    padding: 0 0 0 20px;
   }
 `;
 
@@ -46,8 +47,13 @@ const CenterContainer = styled.div`
   padding: 0 50px;
   background-color: inherit;
 
+  @media (max-width: 860px) {
+    justify-content: center;
+    width: 100%;
+    padding: 0 10px;
+  }
+
   @media (max-width: 440px) {
-    // display: none;
     justify-content: center;
     width: 65%;
     padding: 0 10px;
@@ -59,16 +65,18 @@ const RightContainer = styled.div`
   align-items: center;
   text-align: right;
   justify-content: right;
-  // max-width: 33%;
-  width: 327px;
+  width: 33%;
+  // width: 327px;
   height: 100%;
   padding: 0 20px 0 0;
   background-color: inherit;
   user-select: none;
 
-  @media (max-width: 440px) {
+  @media (max-width: 1000px) {
     width: auto;
+    padding: 0 20px 0 0;
   }
+
 `;
 
 const UserAccountIcon = styled.div`
@@ -153,6 +161,7 @@ const LogoContainer = styled.div`
   alignitems: "center";
   columngap: "10px";
   background-color: var(--dark-blue);
+  width: 100%;
 `;
 
 const LogoText = styled.p`
@@ -175,7 +184,7 @@ const LogoText = styled.p`
     background-color: var(--dark-blue);
   }
 
-  @media (max-width: 440px) {
+  @media (max-width: 860px) {
     width: auto;
     background-color: var(--dark-blue);
 
