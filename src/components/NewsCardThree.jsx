@@ -2,13 +2,14 @@
 import styled from "styled-components";
 import ArchiveToggleButton from "./ArchiveToggleButton.jsx";
 import { useEffect, useState } from "react";
+import Link from "next/link.js";
 
 // 1. Main Card Container
 const CardContainer = styled.div`
   background-color: var(--white);
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-//   overflow: hidden;
+  //   overflow: hidden;
   width: 100%;
   max-width: 400px;
   //   margin: 15px;
@@ -16,7 +17,7 @@ const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   border: 1px solid gray;
-
+  
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   &:hover {
     transform: translateY(-3px);
@@ -156,10 +157,12 @@ export default function NewsCardThree({
       <CardHeader>
         <BrandText>Relay News</BrandText>
       </CardHeader>
-      <ThumbnailImage
-        src={currentImageSrc}
-        alt={article.title || "News article image"}
-      />
+      <Link href={article.url} target={"_blank"}>
+        <ThumbnailImage
+          src={currentImageSrc}
+          alt={article.title || "News article image"}
+        />
+      </Link>
       <ContentArea>
         {/* <NewTag>New</NewTag> */}
         <ArticleTitle>{cleanTitle}</ArticleTitle>
@@ -173,7 +176,9 @@ export default function NewsCardThree({
             alignItems: "center",
           }}
         >
-          <ReadMoreButton href={article.url} target="_blank">Read article</ReadMoreButton>
+          <ReadMoreButton href={article.url} target="_blank">
+            Read article
+          </ReadMoreButton>
           <ArchiveToggleButton
             article={article}
             archiveId={archiveId}

@@ -10,18 +10,6 @@ const SearchBarWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
-  @media (max-width: 1290px) {
-    width: 820px;
-  }
-
-  @media (max-width: 885px) {
-    width: 400px;
-  }
-
-  @media (max-width: 600px) {
-    width: 372px;
-  }
 `;
 
 const SearchInput = styled.input`
@@ -35,7 +23,7 @@ const SearchInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #9e6532;
+    border-color: #fff;
   }
 `;
 
@@ -66,15 +54,15 @@ export default function SearchBar() {
   return (
     <>
       {/* {showSearch && ( */}
-        <SearchBarWrapper>
-          <SearchInput
-            type="text"
-            placeholder="Search by title, topic, or author..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-        </SearchBarWrapper>
+      <SearchBarWrapper>
+        <SearchInput
+          type="text"
+          placeholder={window.innerWidth <= 430 ? "Search..." : "Search by title, topic, or author..."}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+      </SearchBarWrapper>
       {/* )} */}
     </>
   );

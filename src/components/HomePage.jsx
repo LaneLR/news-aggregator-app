@@ -143,7 +143,7 @@ export default function HomePage() {
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <Link href={"/register"}>
             <Button bgColor={"var(--primary-blue)"} clr={"var(--light-white)"}>
-              Sign Up
+              Sign up
             </Button>
           </Link>
           <Link href={"/login"}>

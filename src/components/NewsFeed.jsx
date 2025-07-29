@@ -10,14 +10,17 @@ import styled from "styled-components";
 const SearchBarHeader = styled.div`
   font-size: 3rem;
   font-weight: 600;
-  color: var(--dark-blue);
-  padding: 10px 0;
+  color: var(--deep-blue);
+  padding: 20px 0 0 0;
   text-align: center;
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
 
   @media (max-width: 440px) {
     font-size: 1.8rem;
-    font-weight: 700;
   }
 `;
 
@@ -76,7 +79,7 @@ export default function News({ archiveId }) {
           width: "100%",
         }}
       >
-        <SearchBarHeader>What&apos;s making the news</SearchBarHeader>
+        <SearchBarHeader>The most recent headlines</SearchBarHeader>
       </div>
 
       <NewsGridWrapper>
