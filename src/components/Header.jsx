@@ -29,6 +29,10 @@ const LeftContainer = styled.div`
   height: 100%;
   padding: 0 0 0 20px;
   background-color: inherit;
+
+  @media (max-width: 440px) {
+    width: auto;
+  }
 `;
 
 const CenterContainer = styled.div`
@@ -41,6 +45,13 @@ const CenterContainer = styled.div`
   height: 100%;
   padding: 0 50px;
   background-color: inherit;
+
+  @media (max-width: 440px) {
+    // display: none;
+    justify-content: center;
+    width: 65%;
+    padding: 0 10px;
+  }
 `;
 
 const RightContainer = styled.div`
@@ -54,6 +65,10 @@ const RightContainer = styled.div`
   padding: 0 20px 0 0;
   background-color: inherit;
   user-select: none;
+
+  @media (max-width: 440px) {
+    width: auto;
+  }
 `;
 
 const UserAccountIcon = styled.div`
@@ -107,6 +122,10 @@ const DropdownMenu = styled.ul`
   padding: 8px 0;
   list-style: none;
   z-index: 1000;
+
+  @media (max-width: 430px) {
+    right: calc(-20%);
+  }
 `;
 
 const DropdownMenuItem = styled.li`
@@ -126,6 +145,43 @@ const DropdownMenuItem = styled.li`
     display: block;
     text-decoration: none;
     color: inherit;
+  }
+`;
+
+const LogoContainer = styled.div`
+  display: "flex";
+  alignitems: "center";
+  columngap: "10px";
+  background-color: var(--dark-blue);
+`;
+
+const LogoText = styled.p`
+  font-size: 2.5rem;
+  padding: 0 0 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--dark-blue);
+
+  span:first-child {
+    color: var(--secondary-blue);
+    font-weight: 700;
+    background-color: var(--dark-blue);
+  }
+
+  span:last-child {
+    color: var(--white);
+    font-weight: 400;
+    background-color: var(--dark-blue);
+  }
+
+  @media (max-width: 440px) {
+    width: auto;
+    background-color: var(--dark-blue);
+
+    span {
+      display: none;
+    }
   }
 `;
 
@@ -169,14 +225,8 @@ export default function Header() {
       {!!session ? (
         <>
           <LeftContainer>
-            <Link href={"/news"}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  columnGap: "10px",
-                }}
-              >
+            <Link style={{ display: "inherit" }} href={"/news"}>
+              <LogoContainer>
                 <div
                   style={{
                     display: "flex",
@@ -193,20 +243,11 @@ export default function Header() {
                     height={40}
                   />
                 </div>
-                <p style={{ fontSize: "2.5rem" }}>
-                  <span
-                    style={{
-                      color: "var(--secondary-blue)",
-                      fontWeight: "700",
-                    }}
-                  >
-                    RELAY
-                  </span>
-                  <span style={{ color: "var(--white)", fontWeight: "400" }}>
-                    NEWS
-                  </span>
-                </p>
-              </div>
+              </LogoContainer>
+              <LogoText>
+                <span>RELAY</span>
+                <span>NEWS</span>
+              </LogoText>
             </Link>
           </LeftContainer>
           <CenterContainer>
@@ -333,8 +374,8 @@ export default function Header() {
       ) : (
         <>
           <LeftContainer>
-            <Link href={"/"}>
-              <div
+            <Link style={{ display: "inherit" }} href={"/"}>
+              <LogoContainer
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -357,25 +398,16 @@ export default function Header() {
                     height={40}
                   />
                 </div>
-                <p style={{ fontSize: "2.5rem" }}>
-                  <span
-                    style={{
-                      color: "var(--secondary-blue)",
-                      fontWeight: "700",
-                    }}
-                  >
-                    RELAY
-                  </span>
-                  <span style={{ color: "var(--white)", fontWeight: "400" }}>
-                    NEWS
-                  </span>
-                </p>
-              </div>
+              </LogoContainer>
+              <LogoText>
+                <span>RELAY</span>
+                <span>NEWS</span>
+              </LogoText>
             </Link>
           </LeftContainer>
           <RightContainer>
             <nav style={{ display: "flex", columnGap: "10px" }}>
-              <Link href={"/login"}>
+              <Link style={{ display: "flex" }} href={"/login"}>
                 <Button
                   bgColor={"var(--primary-blue)"}
                   clr={"var(--light-white)"}
