@@ -35,7 +35,7 @@ const SearchInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #9e6532;
+    border-color: #fff;
   }
 `;
 
@@ -66,15 +66,15 @@ export default function SearchBar() {
   return (
     <>
       {/* {showSearch && ( */}
-        <SearchBarWrapper>
-          <SearchInput
-            type="text"
-            placeholder="Search by title, topic, or author..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-        </SearchBarWrapper>
+      <SearchBarWrapper>
+        <SearchInput
+          type="text"
+          placeholder={window.innerWidth <= 430 ? "Search..." : "Search by title, topic, or author..."}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+      </SearchBarWrapper>
       {/* )} */}
     </>
   );
