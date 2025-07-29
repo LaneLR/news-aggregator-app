@@ -19,7 +19,11 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Relay News",
-  description: "Relay News is a fast, customizable RSS feed reader and news aggregator that lets you track, read, and save stories from top news websites in one place.",
+  description:
+    "Relay News is a fast, customizable RSS feed reader and news aggregator that lets you track, read, and save stories from top news websites in one place.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({ children }) {
