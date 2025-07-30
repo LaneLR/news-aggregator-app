@@ -3,6 +3,7 @@ import getSequelizeInstance from "./sequelize.js";
 import User from "./models/User.js";
 import Archive from "./models/Archive.js";
 import SavedArticle from "./models/SavedArticle.js";
+import defineFetchedArticle from "./models/FetchedArticle.js";
 import { DataTypes, Op } from "sequelize";
 import bcrypt from "bcryptjs";
 
@@ -18,6 +19,8 @@ async function initializeDbAndModels() {
       );
       const sequelize = await getSequelizeInstance();
       console.log("Sequelize instance obtained, initializing User model...");
+
+      const FetchedArticle = defineFetchedArticle(sequelize);
 
       User.init(
         {
@@ -213,16 +216,24 @@ async function initializeDbAndModels() {
             allowNull: false,
           },
           url: {
+            // Will receive from RSS `link`
             type: DataTypes.TEXT,
             allowNull: false,
             unique: "archive_url_unique",
           },
           urlToImage: {
+            // Will receive from RSS `urlToImage`
             type: DataTypes.TEXT,
             allowNull: true,
           },
           sourceName: {
+            // Will receive from RSS `source`
             type: DataTypes.STRING,
+            allowNull: true,
+          },
+          publishedAt: {
+            // New field for date from RSS `pubDate`
+            type: DataTypes.DATE,
             allowNull: true,
           },
           archiveId: {
@@ -238,7 +249,7 @@ async function initializeDbAndModels() {
           indexes: [
             {
               unique: true,
-              fields: ["url", "archiveId"], 
+              fields: ["url", "archiveId"], // Prevent duplicate saves in same archive
             },
           ],
         }
@@ -248,6 +259,7 @@ async function initializeDbAndModels() {
       global.db.User = User;
       global.db.Archive = Archive;
       global.db.SavedArticle = SavedArticle;
+      global.db.FetchedArticle = FetchedArticle;
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -265,7 +277,6 @@ async function initializeDbAndModels() {
 
       // Uncomment the line below to alter tables without wiping data
       // await sequelize.sync({ alter: true });
-
 
       //DO NOT REMOVE COMMENTS FROM BELOW LINE
       //Wipes all data from the database and re-creates tables

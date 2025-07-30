@@ -1,8 +1,4 @@
 "use client";
-import { useState } from "react";
-import { ImNewspaper } from "react-icons/im";
-import { MdOutlineAttachMoney } from "react-icons/md";
-
 import styled from "styled-components";
 import AccordionItem from "./AccordionItem";
 
@@ -22,8 +18,6 @@ const Wrapper = styled.div`
 `;
 
 export default function AboutRelayNewsPage() {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
     <>
       <Wrapper>
@@ -83,7 +77,7 @@ export default function AboutRelayNewsPage() {
         />
         <AccordionItem
           question="Is my data secure?"
-          
+
           answer="Yes. Any saved preferences or archives are tied to your user account
             and stored securely. We do not store or process any sensitive
             personal data like payment information on our servers — if we use

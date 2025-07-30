@@ -126,24 +126,24 @@ export default function NewsCardThree({
     index !== -1 ? article.title.substring(0, index) : article.title;
 
   const [currentImageSrc, setCurrentImageSrc] = useState(() => {
-    return article.urlToImage &&
-      typeof article.urlToImage === "string" &&
-      article.urlToImage.trim() !== ""
-      ? article.urlToImage
+    return article.imageUrl &&
+      typeof article.imageUrl === "string" &&
+      article.imageUrl.trim() !== ""
+      ? article.imageUrl
       : FALLBACK_IMAGE_URL;
   });
 
   useEffect(() => {
     setCurrentImageSrc((prevSrc) => {
       const newSrc =
-        article.urlToImage &&
-        typeof article.urlToImage === "string" &&
-        article.urlToImage.trim() !== ""
-          ? article.urlToImage
+        article.imageUrl &&
+        typeof article.imageUrl === "string" &&
+        article.imageUrl.trim() !== ""
+          ? article.imageUrl
           : FALLBACK_IMAGE_URL;
       return newSrc !== prevSrc ? newSrc : prevSrc;
     });
-  }, [article.urlToImage]);
+  }, [article.imageUrl]);
 
   const handleImageError = () => {
     if (currentImageSrc !== FALLBACK_IMAGE_URL) {
@@ -151,6 +151,13 @@ export default function NewsCardThree({
       setCurrentImageSrc(FALLBACK_IMAGE_URL);
     }
   };
+
+  const sourceIndex = article.sourceName.lastIndexOf(" > ");
+      sourceIndex !== -1 ? article.title.substring(0, sourceIndex) : article.sourceName;
+
+  const cleanSourceName = article.sourceName
+
+  const cleanDate = article.publishedAt.slice(0, 10);
 
   return (
     <CardContainer>
@@ -167,7 +174,9 @@ export default function NewsCardThree({
         {/* <NewTag>New</NewTag> */}
         <ArticleTitle>{cleanTitle}</ArticleTitle>
         <ArticleSnippet>
-          - {article.sourceName || article.source?.name || "Unknown source"}
+          {/* {article.description} */}
+          - {article.sourceName || article.source?.name || "Unknown source"} {" "}
+          {cleanDate}
         </ArticleSnippet>
         <div
           style={{
