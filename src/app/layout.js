@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        style={{ backgroundColor: "lightgray", color: "black" }}
+        style={{ backgroundColor: "var(--dark-blue)", color: "black" }}
         className={`${geistSans.variable} ${geistMono.variable}`}
       >
         <Providers>
