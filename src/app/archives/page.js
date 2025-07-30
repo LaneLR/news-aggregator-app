@@ -7,11 +7,12 @@ import CreateArchiveClient from "@/components/CreateArchiveClient";
 import DeleteArchiveButton from "@/components/DeleteArchiveButton";
 import ArchiveCard from "@/components/ArchiveCard";
 import NewsGridWrapper from "@/components/NewsGridWrapper";
+import { redirect } from "next/navigation";
 
 export default async function ArchivesPage() {
   const session = await getServerSession(authOptions);
   if (!session) {
-    return <p>You must be logged in to view this page.</p>;
+    return redirect('/')
   }
 
   const db = await initializeDbAndModels();
