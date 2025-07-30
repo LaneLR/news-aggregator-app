@@ -173,7 +173,7 @@ export default function HomePage() {
               />
             </Link>
 
-            <h3>Tech</h3>
+            <h3 style={{color: 'var(--dark-blue)'}}>Tech</h3>
             <StyledParagraphLeft>
               Get the latest updates on technology and gadgets.
             </StyledParagraphLeft>
@@ -204,7 +204,7 @@ export default function HomePage() {
               />
             </Link>
 
-            <h3>World</h3>
+            <h3 style={{color: 'var(--dark-blue)'}}>World</h3>
             <StyledParagraphLeft>
               Find breaking stories from across the globe.
             </StyledParagraphLeft>
@@ -233,7 +233,7 @@ export default function HomePage() {
                 style={{ borderRadius: "14px", objectFit: "cover" }}
               />
             </Link>
-            <h3>Entertainment</h3>
+            <h3 style={{color: 'var(--dark-blue)'}}>Entertainment</h3>
             <StyledParagraphLeft>
               Stay updated on movies, TV shows, and celebrities.
             </StyledParagraphLeft>
@@ -262,7 +262,7 @@ export default function HomePage() {
                 style={{ borderRadius: "14px", objectFit: "cover" }}
               />
             </Link>
-            <h3>Weather</h3>
+            <h3 style={{color: 'var(--dark-blue)'}}>Weather</h3>
             <StyledParagraphLeft>
               Follow developing storms and weather forecasts across the globe.
             </StyledParagraphLeft>
