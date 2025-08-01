@@ -17,7 +17,7 @@ const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   border: 1px solid gray;
-  
+
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   &:hover {
     transform: translateY(-3px);
@@ -126,24 +126,28 @@ export default function NewsCardThree({
     index !== -1 ? article.title.substring(0, index) : article.title;
 
   const [currentImageSrc, setCurrentImageSrc] = useState(() => {
-    return article.imageUrl &&
-      typeof article.imageUrl === "string" &&
-      article.imageUrl.trim() !== ""
-      ? article.imageUrl
+    return article.urlToImage &&
+      typeof article.urlToImage === "string" &&
+      article.urlToImage.trim() !== ""
+      ? article.urlToImage
       : FALLBACK_IMAGE_URL;
   });
 
   useEffect(() => {
     setCurrentImageSrc((prevSrc) => {
       const newSrc =
-        article.imageUrl &&
-        typeof article.imageUrl === "string" &&
-        article.imageUrl.trim() !== ""
-          ? article.imageUrl
+        article.urlToImage &&
+        typeof article.urlToImage === "string" &&
+        article.urlToImage.trim() !== ""
+          ? article.urlToImage
           : FALLBACK_IMAGE_URL;
       return newSrc !== prevSrc ? newSrc : prevSrc;
     });
-  }, [article.imageUrl]);
+  }, [article.urlToImage]);
+
+  const proxiedImage = `/api/image-proxy?url=${encodeURIComponent(
+    currentImageSrc
+  )}`;
 
   const handleImageError = () => {
     if (currentImageSrc !== FALLBACK_IMAGE_URL) {
@@ -153,11 +157,13 @@ export default function NewsCardThree({
   };
 
   const sourceIndex = article.sourceName.lastIndexOf(" > ");
-      sourceIndex !== -1 ? article.title.substring(0, sourceIndex) : article.sourceName;
+  sourceIndex !== -1
+    ? article.title.substring(0, sourceIndex)
+    : article.sourceName;
 
-  const cleanSourceName = article.sourceName
+  const cleanSourceName = article.sourceName;
 
-  const cleanDate = article.publishedAt.slice(0, 10);
+  // const cleanDate = article.publishedAt.slice(0, 10);
 
   return (
     <CardContainer>
@@ -166,17 +172,18 @@ export default function NewsCardThree({
       </CardHeader>
       <Link href={article.url} target={"_blank"}>
         <ThumbnailImage
-          src={currentImageSrc}
+          src={article.urlToImage}
           alt={article.title || "News article image"}
+          onError={handleImageError}
         />
       </Link>
       <ContentArea>
         {/* <NewTag>New</NewTag> */}
         <ArticleTitle>{cleanTitle}</ArticleTitle>
         <ArticleSnippet>
-          {/* {article.description} */}
-          - {article.sourceName || article.source?.name || "Unknown source"} {" "}
-          {cleanDate}
+          {/* {article.description} */}-{" "}
+          {article.sourceName || article.source?.name || "Unknown source"}{" "}
+          {/* {cleanDate} */}
         </ArticleSnippet>
         <div
           style={{

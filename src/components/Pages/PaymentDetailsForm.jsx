@@ -1,7 +1,7 @@
 "use client";
 import styled from "styled-components";
 import { useState } from "react";
-import Button from "./Button";
+import Button from "./Reuseable/Button";
 import { useRouter } from "next/navigation";
 
 const FormWrapper = styled.div`
@@ -46,8 +46,7 @@ export default function PaymentDetailsForm() {
 
     const data = await res.json();
     window.location.reload();
-    router.push('/account')
-    
+    router.push("/account");
   };
 
   return (

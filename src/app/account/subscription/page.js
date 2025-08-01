@@ -1,5 +1,5 @@
 import SideBarNav from "@/components/SideNavBar";
-import UnsubscribeComponent from "@/components/Unsubscribe";
+import UnsubscribeComponent from "@/components/Pages/Unsubscribe";
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
 import Link from "next/link";

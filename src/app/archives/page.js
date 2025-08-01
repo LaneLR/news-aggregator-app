@@ -3,16 +3,16 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import initializeDbAndModels from "@/lib/db";
 import Link from "next/link";
-import CreateArchiveClient from "@/components/CreateArchiveClient";
-import DeleteArchiveButton from "@/components/DeleteArchiveButton";
-import ArchiveCard from "@/components/ArchiveCard";
-import NewsGridWrapper from "@/components/NewsGridWrapper";
+import CreateArchiveClient from "@/components/Reuseable/CreateArchiveClient";
+import DeleteArchiveButton from "@/components/Reuseable/DeleteArchiveButton";
+import ArchiveCard from "@/components/Reuseable/ArchiveCard";
+import NewsGridWrapper from "@/components/Pages/NewsGridWrapper";
 import { redirect } from "next/navigation";
 
 export default async function ArchivesPage() {
   const session = await getServerSession(authOptions);
   if (!session) {
-    return redirect('/')
+    return redirect("/");
   }
 
   const db = await initializeDbAndModels();

@@ -1,4 +1,4 @@
-import SearchBar from "@/components/SearchBar";
+import SearchBar from "@/components/Reuseable/SearchBar";
 
 export default function SearchLayout({ children }) {
   return (

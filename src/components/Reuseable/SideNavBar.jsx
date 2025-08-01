@@ -1,6 +1,6 @@
 "use client";
 import styled from "styled-components";
-import NavTab from "./NavTab";
+import NavTab from "./Reuseable/NavTab";
 
 const SideBarNavWrapper = styled.div`
   width: 200px;

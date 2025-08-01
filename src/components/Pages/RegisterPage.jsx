@@ -1,5 +1,5 @@
 "use client";
-import Button from "@/components/Button";
+import Button from "@/components/Reuseable/Button";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -50,7 +50,6 @@ const Header = styled.div`
     font-weight: 700;
   }
 `;
-
 
 export default function RegisterPage() {
   const [error, setError] = useState(null);

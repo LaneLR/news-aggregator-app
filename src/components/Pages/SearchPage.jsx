@@ -14,7 +14,12 @@ const FeedWrapper = styled.div`
   padding: 20px;
 `;
 
-export default function SearchFeed({ initialQuery, article, archiveId, viewOnly }) {
+export default function SearchFeed({
+  initialQuery,
+  article,
+  archiveId,
+  viewOnly,
+}) {
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState([]);
   const [page, setPage] = useState(1);
@@ -87,7 +92,7 @@ export default function SearchFeed({ initialQuery, article, archiveId, viewOnly 
       >
         <SearchBarHeader>What&apos;s making the news</SearchBarHeader>
       </div>
-      
+
       {query ? `Results for: '${query}'` : "Results"}
       <NewsGridWrapper>
         {articles.map((article) => (

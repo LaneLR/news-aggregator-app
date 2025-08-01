@@ -66,7 +66,7 @@ export default function News({ archiveId }) {
 
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
-  }, [latestTimestamp]);
+  }, []);
 
   const loadInitialArticles = async () => {
     try {

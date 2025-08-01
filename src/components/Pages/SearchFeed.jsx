@@ -1,8 +1,7 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import NewsCard from "./NewsCard";
-import NewsGridWrapper from "./NewsGridWrapper";
+import NewsGridWrapper from "./Pages/NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 
 const SearchBarHeader = styled.div`
@@ -21,13 +20,20 @@ const SearchBarHeader = styled.div`
   }
 `;
 
+const CategorySelect = styled.select`
+  margin: 10px 0 20px 0;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 5px;
+`;
+
 export default function SearchFeed({ initialQuery }) {
   const [query, setQuery] = useState(initialQuery);
+  const [category, setCategory] = useState(""); // New state
   const [results, setResults] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-
   const observerRef = useRef();
 
   useEffect(() => {
@@ -36,12 +42,17 @@ export default function SearchFeed({ initialQuery }) {
 
       setLoading(true);
       try {
-        const res = await fetch(
-          `/api/search?query=${encodeURIComponent(query)}&page=${page}`
-        );
+        let endpoint = `/api/search?query=${encodeURIComponent(
+          query
+        )}&page=${page}`;
+        if (category) {
+          endpoint += `&category=${encodeURIComponent(category)}`;
+        }
+
+        const res = await fetch(endpoint);
         const data = await res.json();
 
-        if (data.results.length === 0) {
+        if (data.results?.length === 0) {
           setHasMore(false);
         } else {
           setResults((prev) => [...prev, ...data.results]);
@@ -54,7 +65,7 @@ export default function SearchFeed({ initialQuery }) {
     };
 
     fetchArticles();
-  }, [query, page]);
+  }, [query, page, category]);
 
   useEffect(() => {
     if (!observerRef.current) return;
@@ -62,7 +73,7 @@ export default function SearchFeed({ initialQuery }) {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loading) {
-          setPage((prevPage) => prevPage + 1);
+          setPage((prev) => prev + 1);
         }
       },
       { rootMargin: "100px" }
@@ -70,7 +81,6 @@ export default function SearchFeed({ initialQuery }) {
 
     const current = observerRef.current;
     observer.observe(current);
-
     return () => observer.unobserve(current);
   }, [hasMore, loading]);
 
@@ -78,18 +88,33 @@ export default function SearchFeed({ initialQuery }) {
     setPage(1);
     setResults([]);
     setHasMore(true);
-  }, [query]);
+  }, [query, category]);
 
   return (
     <>
       <SearchBarHeader>
         {query ? `Results for: '${query}'` : "Results:"}
       </SearchBarHeader>
+
+      <CategorySelect
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+      >
+        <option value="">All Categories</option>
+        <option value="tech">Tech</option>
+        <option value="business">Business</option>
+        <option value="finance">Finance</option>
+        <option value="politics">Politics</option>
+        {/* Add more categories as needed */}
+      </CategorySelect>
+
       <NewsGridWrapper>
         {results.map((article, i) => (
           <NewsCardThree key={i} article={article} />
         ))}
       </NewsGridWrapper>
+
+      <div ref={observerRef} style={{ height: "1px" }} />
     </>
   );
 }

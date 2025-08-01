@@ -2,7 +2,7 @@
 import styled from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
-import Button from "./Button";
+import Button from "./Reuseable/Button";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -76,7 +76,6 @@ const RightContainer = styled.div`
     width: auto;
     padding: 0 20px 0 0;
   }
-
 `;
 
 const UserAccountIcon = styled.div`

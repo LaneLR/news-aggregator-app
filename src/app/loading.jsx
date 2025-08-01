@@ -1,13 +1,13 @@
-import LoadingComponent from "@/components/Loading";
+import LoadingComponent from "@/components/Global/Loading";
 
-import React from 'react'
+import React from "react";
 
 const loading = () => {
-  return (<>
-  <LoadingComponent />
-  </>
+  return (
+    <>
+      <LoadingComponent />
+    </>
+  );
+};
 
-  )
-}
-
-export default loading
+export default loading;

@@ -1,4 +1,4 @@
-import Divider from "@/components/Divider";
+import Divider from "@/components/Reuseable/Divider";
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";

@@ -36,7 +36,7 @@ export default function ArchiveToggleButton({
   const [selectedArchiveId, setSelectedArchiveId] = useState(
     propArchiveId || null
   );
-  const [isSaved, setIsSaved] = useState(!!article.id); // Assume saved if article has an ID
+  const [isSaved, setIsSaved] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const pathname = usePathname();
@@ -55,7 +55,7 @@ export default function ArchiveToggleButton({
   }, []);
 
   useEffect(() => {
-    if (isSaved || !article.url || propArchiveId) return;
+    if (isSaved || !article.url || propArchiveId || viewOnly) return;
 
     const checkIfSaved = async () => {
       try {
@@ -90,6 +90,7 @@ export default function ArchiveToggleButton({
         body: JSON.stringify({
           title: article.title,
           url: article.url,
+          publishedAt,
           urlToImage: article.urlToImage,
           sourceName:
             article.sourceName || article.source?.name || "Unknown source",

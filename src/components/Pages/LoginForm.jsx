@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styled from "styled-components";
 import { useSession, signIn } from "next-auth/react";
-import Button from "@/components/Button";
+import Button from "@/components/Reuseable/Button";
 
 const Wrapper = styled.div`
   flex-grow: 1;
