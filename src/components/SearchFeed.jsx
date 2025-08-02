@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import NewsGridWrapper from "./Pages/NewsGridWrapper";
+import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 
 const SearchBarHeader = styled.div`

@@ -1,5 +1,5 @@
-import LoadingComponent from "@/components/Global/Loading";
-import RegisterPage from "@/components/Pages/RegisterPage";
+import LoadingComponent from "@/components/Loading";
+import RegisterPage from "@/components/RegisterPage";
 import { Suspense } from "react";
 
 export default function Register() {

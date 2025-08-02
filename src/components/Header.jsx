@@ -2,7 +2,7 @@
 import styled from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
-import Button from "./Reuseable/Button";
+import Button from "./Button";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";

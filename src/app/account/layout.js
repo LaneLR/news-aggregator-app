@@ -1,4 +1,4 @@
-import LoadingComponent from "@/components/Global/Loading";
+import LoadingComponent from "@/components/Loading";
 import SideBarNav from "@/components/SideNavBar";
 import { Suspense } from "react";
 

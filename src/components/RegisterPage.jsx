@@ -1,5 +1,5 @@
 "use client";
-import Button from "@/components/Reuseable/Button";
+import Button from "@/components/Button";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

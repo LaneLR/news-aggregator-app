@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import SessProvider from "./components/Pages/SessionProvider";
+import SessProvider from "./components/SessionProvider";
 
 export default function Providers({ children }) {
   const [loadingAuth, setLoadingAuth] = useState(true);

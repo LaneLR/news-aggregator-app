@@ -1,4 +1,4 @@
-import Divider from "@/components/Reuseable/Divider";
+import Divider from "@/components/Divider";
 import SideBarNav from "@/components/SideNavBar";
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";

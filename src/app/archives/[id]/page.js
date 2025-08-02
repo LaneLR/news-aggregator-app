@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import initializeDbAndModels from "@/lib/db";
 import { notFound } from "next/navigation";
-import NewsGridWrapper from "@/components/Pages/NewsGridWrapper";
+import NewsGridWrapper from "@/components/NewsGridWrapper";
 import NewsCardThree from "@/components/NewsCardThree";
 
 export default async function ArchiveDetailPage({ params }) {

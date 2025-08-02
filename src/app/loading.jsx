@@ -1,4 +1,4 @@
-import LoadingComponent from "@/components/Global/Loading";
+import LoadingComponent from "@/components/Loading";
 
 import React from "react";
 

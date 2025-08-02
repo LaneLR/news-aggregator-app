@@ -1,6 +1,6 @@
 "use client";
 import styled from "styled-components";
-import Button from "../Reuseable/Button";
+import Button from "./Button";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -136,7 +136,8 @@ export default function HomePage() {
         <MainHeaderText color={"var(--light-white)"}>Your Way.</MainHeaderText>
         <br />
         <StyledParagraphCenter color={"var(--light-white)"}>
-          Save and discover the latest news from around the web
+          {/* Save and discover the latest news from around the web */}
+          Find and save all of your favorite news sources in one place
         </StyledParagraphCenter>
         <br />
         {/* <input placeholder="Search articles"/> */}

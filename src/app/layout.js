@@ -3,10 +3,10 @@ import "./globals.css";
 import Providers from "@/Provider";
 import Header from "@/components/Header";
 import StyledComponentsRegistry from "@/lib/registry";
-import AppWrapper from "@/components/Global/AppWrapper";
-import MainContentWrapper from "@/components/Pages/MainContentWrapper";
-import SessProvider from "@/components/Pages/SessionProvider";
-import Footer from "@/components/Global/Footer";
+import AppWrapper from "@/components/AppWrapper";
+import MainContentWrapper from "@/components/MainContentWrapper";
+import SessProvider from "@/components/SessionProvider";
+import Footer from "@/components/Footer";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

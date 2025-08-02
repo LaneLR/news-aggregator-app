@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import styled from "styled-components";
 import NewsCard from "./NewsCard";
-import NewsGridWrapper from "./NewsGridWrapper";
+import NewsGridWrapper from "../NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 import { usePathname } from "next/navigation";
 

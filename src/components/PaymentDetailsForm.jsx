@@ -1,7 +1,7 @@
 "use client";
 import styled from "styled-components";
 import { useState } from "react";
-import Button from "./Reuseable/Button";
+import Button from "./Button";
 import { useRouter } from "next/navigation";
 
 const FormWrapper = styled.div`

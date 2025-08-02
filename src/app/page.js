@@ -1,5 +1,5 @@
-import HomePage from "@/components/Pages/HomePage";
-import LoadingComponent from "@/components/Global/Loading";
+import HomePage from "@/components/HomePage";
+import LoadingComponent from "@/components/Loading";
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
