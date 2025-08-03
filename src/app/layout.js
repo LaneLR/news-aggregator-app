@@ -7,6 +7,7 @@ import AppWrapper from "@/components/AppWrapper";
 import MainContentWrapper from "@/components/MainContentWrapper";
 import SessProvider from "@/components/SessionProvider";
 import Footer from "@/components/Footer";
+import HeaderNavBar from "@/components/HeaderNavBar";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
