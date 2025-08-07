@@ -423,7 +423,7 @@ export default function Header() {
                 <Link style={{ display: "flex" }} href={"/login"}>
                   <Button
                     bgColor={"var(--primary-blue)"}
-                    clr={"var(--light-white)"}
+                    clr={"var(--white)"}
                   >
                     Log in
                   </Button>

@@ -143,12 +143,12 @@ export default function HomePage() {
         {/* <input placeholder="Search articles"/> */}
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <Link href={"/register"}>
-            <Button bgColor={"var(--primary-blue)"} clr={"var(--light-white)"}>
+            <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
               Sign up
             </Button>
           </Link>
           <Link href={"/login"}>
-            <Button bgColor={"var(--primary-blue)"} clr={"var(--light-white)"}>
+            <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
               Log in
             </Button>
           </Link>
