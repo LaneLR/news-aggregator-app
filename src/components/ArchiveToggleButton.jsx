@@ -90,7 +90,7 @@ export default function ArchiveToggleButton({
         body: JSON.stringify({
           title: article.title,
           url: article.url,
-          publishedAt,
+          publishedAt: article.publishedAt,
           urlToImage: article.urlToImage,
           sourceName:
             article.sourceName || article.source?.name || "Unknown source",
