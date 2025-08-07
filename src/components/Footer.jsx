@@ -2,7 +2,14 @@
 import Link from "next/link";
 import styled from "styled-components";
 
-const Wrapper = styled.div`
+const FooterWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  color: var(--white);
+  height: 90px;
+`;
+
+const LinkWrapper = styled.div`
   display: flex;
   align-items: end;
   justify-content: center;
@@ -22,6 +29,11 @@ const TextContainer = styled.div`
   padding: 20px;
 `;
 
+const Disclaimer = styled.p`
+  font-size: 0.8rem;
+  padding: 0 30px 20px;
+`;
+
 const Underline = styled.div`
   margin-top: 2px;
   border-top: 1px solid #fff;
@@ -30,25 +42,32 @@ const Underline = styled.div`
 
 export default function Footer() {
   return (
-    <Wrapper>
-      <TextContainer>
-        <p>© 2025</p>
-        <p>|</p>
-        <div style={{ width: "auto" }}>
-          <Link href={"/about"}>Privacy</Link>
-          <Underline />
-        </div>
-        <p> | </p>
-        <div style={{ width: "auto" }}>
-          <Link href={"/about"}>About us</Link>
-          <Underline />
-        </div>{" "}
-        <p> | </p>
-        <div style={{ width: "auto" }}>
-          <Link href={"/about"}>Contact us</Link>
-          <Underline />
-        </div>{" "}
-      </TextContainer>
-    </Wrapper>
+    <FooterWrapper>
+      <LinkWrapper>
+        <TextContainer>
+          <p>© 2025</p>
+          <p>|</p>
+          <div style={{ width: "auto" }}>
+            <Link href={"/about"}>Privacy</Link>
+            <Underline />
+          </div>
+          <p> | </p>
+          <div style={{ width: "auto" }}>
+            <Link href={"/about"}>About us</Link>
+            <Underline />
+          </div>
+          <p> | </p>
+          <div style={{ width: "auto" }}>
+            <Link href={"/about"}>Contact us</Link>
+            <Underline />
+          </div>
+        </TextContainer>
+      </LinkWrapper>
+      <Disclaimer style={{ fontSize: "0.8rem" }}>
+        This site displays publicly available RSS content for informational
+        purposes. All articles link to their original publishers and remain the
+        intellectual property of their respective owners.
+      </Disclaimer>
+    </FooterWrapper>
   );
 }
