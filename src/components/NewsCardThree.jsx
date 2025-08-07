@@ -172,7 +172,12 @@ export default function NewsCardThree({
       </CardHeader>
       <Link href={article.url} target={"_blank"}>
         <ThumbnailImage
-          src={article.urlToImage}
+          src={
+            article.urlToImage || FALLBACK_IMAGE_URL
+            // article.urlToImage?.startsWith("https://cdn.cnn.com")
+            //   ? article.urlToImage
+            //   : `/api/image-proxy?url=${encodeURIComponent(article.urlToImage)}`
+          }
           alt={article.title || "News article image"}
           onError={handleImageError}
         />
