@@ -117,6 +117,14 @@ async function initializeDbAndModels() {
             type: DataTypes.STRING,
             allowNull: true,
           },
+          pendingDeletion: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+          },
+          deletionRequestedAt: {
+            type: DataTypes.DATE,
+            allowNull: true,
+          },
         },
         {
           sequelize,
@@ -260,7 +268,7 @@ async function initializeDbAndModels() {
       //   interactionType: DataTypes.STRING, // 'click', 'search', 'save'
       //   timestamp: DataTypes.DATE,
       // });
-      // global.db.UserInteraction = UserInteraction; 
+      // global.db.UserInteraction = UserInteraction;
 
       global.db.sequelize = sequelize;
       global.db.User = User;
