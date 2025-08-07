@@ -90,7 +90,10 @@ export default function RegisterPage() {
       if (loginRes?.error) {
         setError("Account created but login failed");
       } else {
-        router.push("/account"); // or home
+        router.push("/news"); // or home
+        setTimeout(() => {
+          location.reload();
+        }, 100)
       }
     } catch (err) {
       setError("Something went wrong");
