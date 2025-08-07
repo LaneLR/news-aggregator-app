@@ -29,18 +29,7 @@ const SearchInput = styled.input`
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
-  const [showSearch, setShowSearch] = useState(false);
   const router = useRouter();
-  // const pathname = usePathname();
-
-  // useEffect(() => {
-  //   if (pathname === "/news" || pathname === "/search") {
-  //     setShowSearch(true);
-  //   } else {
-  //     setShowSearch(false);
-  //   }
-  // }, [pathname]);
-
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && query.trim()) {
       const newQuery = query.trim();
@@ -53,7 +42,6 @@ export default function SearchBar() {
   };
   return (
     <>
-      {/* {showSearch && ( */}
       <SearchBarWrapper>
         <SearchInput
           type="text"
@@ -63,7 +51,6 @@ export default function SearchBar() {
           onKeyDown={handleKeyDown}
         />
       </SearchBarWrapper>
-      {/* )} */}
     </>
   );
 }
