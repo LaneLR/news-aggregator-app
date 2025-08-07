@@ -30,7 +30,11 @@ export default function defineFetchedArticle(sequelize) {
         type: DataTypes.DATE,
         allowNull: true,
       },
-      categories: {
+      country: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      category: {
         type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: true,
       },
