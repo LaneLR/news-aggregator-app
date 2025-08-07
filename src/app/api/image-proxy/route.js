@@ -11,23 +11,23 @@ export async function GET(req) {
   try {
     const response = await fetch(imageUrl, {
       headers: {
-        // Optional: some servers require headers to serve image
-        "User-Agent": "Mozilla/5.0",
+        "User-Agent": "Mozilla/5.0", // helpful for some domains
       },
     });
 
     if (!response.ok) {
+      console.warn(`Failed to fetch image: ${imageUrl}`);
       return NextResponse.json({ error: "Image fetch failed" }, { status: response.status });
     }
 
     const contentType = response.headers.get("content-type") || "image/jpeg";
-    const buffer = await response.arrayBuffer();
+    const buffer = Buffer.from(await response.arrayBuffer());
 
-    return new NextResponse(buffer, {
+    return new Response(buffer, {
       status: 200,
       headers: {
         "Content-Type": contentType,
-        "Cache-Control": "public, max-age=86400", // cache for 1 day
+        "Cache-Control": "public, max-age=86400",
       },
     });
   } catch (err) {
