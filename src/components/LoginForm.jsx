@@ -6,6 +6,8 @@ import Link from "next/link";
 import styled from "styled-components";
 import { useSession, signIn } from "next-auth/react";
 import Button from "@/components/Button";
+import LoadingDots from "./Loading";
+import Loading from "@/app/loading";
 
 const Wrapper = styled.div`
   flex-grow: 1;
@@ -97,7 +99,7 @@ export default function LoginPage() {
   }
 
   if (status === "loading") {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
 
   return (

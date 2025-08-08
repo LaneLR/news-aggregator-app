@@ -1,11 +1,11 @@
-import LoadingComponent from "@/components/Loading";
-import SideBarNav from "@/components/SideNavBar";
+import LoadingDots from "@/components/Loading";
 import { Suspense } from "react";
+import Loading from "../loading";
 
 export default function AccountLayout({ children }) {
   return (
     <>
-      <Suspense fallback={<LoadingComponent />}>
+      <Suspense fallback={<Loading />}>
         <div
           style={{
             display: "flex",

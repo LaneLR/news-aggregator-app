@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import SessProvider from "./components/SessionProvider";
-import LoadingComponent from "./components/Loading";
+import LoadingDots from "./components/Loading";
+import Loading from "./app/loading";
 
 export default function Providers({ children }) {
   const [loadingAuth, setLoadingAuth] = useState(true);
@@ -14,13 +15,5 @@ export default function Providers({ children }) {
     return () => clearTimeout(timer);
   }, []);
 
-  return (
-    <SessProvider>
-      {loadingAuth ? (
-        <LoadingComponent />
-      ) : (
-        children
-      )}
-    </SessProvider>
-  );
+  return <SessProvider>{loadingAuth ? <Loading /> : children}</SessProvider>;
 }

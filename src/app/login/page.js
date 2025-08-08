@@ -1,9 +1,10 @@
-import LoadingComponent from "@/components/Loading";
+import LoadingDots from "@/components/Loading";
 import LoginPage from "@/components/LoginForm";
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import Loading from "../loading";
 
 export default async function Login() {
   const session = await getServerSession(authOptions);
@@ -14,7 +15,7 @@ export default async function Login() {
 
   return (
     <>
-      <Suspense fallback={<LoadingComponent />}>
+      <Suspense fallback={<Loading />}>
         <LoginPage />
       </Suspense>
     </>
