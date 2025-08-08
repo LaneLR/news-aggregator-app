@@ -90,7 +90,7 @@ export default function LoadingDots({
         <Dot size={size} color={color} duration={duration} stagger={stagger} />
         <Dot size={size} color={color} duration={duration} stagger={stagger} />
       </DotsWrapper>
-      <LoadingText>Loading</LoadingText>
+      {/* <LoadingText>Loading</LoadingText> */}
     </Wrapper>
   );
 }
