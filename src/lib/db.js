@@ -295,8 +295,8 @@ async function initializeDbAndModels() {
 
       //DO NOT REMOVE COMMENTS FROM BELOW LINE
       //Wipes all data from the database and re-creates tables
-      await sequelize.sync({ force: true });
-      console.log("All models were synchronized and created successfully.");
+      // await sequelize.sync({ force: true });
+      // console.log("All models were synchronized and created successfully.");
     } catch (error) {
       console.error("----------------------------------------------------");
       console.error(
