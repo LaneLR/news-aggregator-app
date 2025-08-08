@@ -1,13 +1,17 @@
-import LoadingComponent from "@/components/Loading";
+import LoadingDots from "@/components/Loading";
 
 import React from "react";
 
-const loading = () => {
+export default function Loading() {
   return (
     <>
-      <LoadingComponent />
+      <LoadingDots
+        size={14}
+        color="var(--primary-blue)"
+        duration={1.0}
+        gap={10}
+        stagger={0.14}
+      />
     </>
   );
 };
-
-export default loading;
