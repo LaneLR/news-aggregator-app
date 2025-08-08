@@ -12,7 +12,7 @@ import { redirect } from "next/navigation";
 export default async function ArchivesPage() {
   const session = await getServerSession(authOptions);
   if (!session) {
-    return redirect('/')
+    return redirect("/");
   }
 
   const db = await initializeDbAndModels();

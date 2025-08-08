@@ -29,7 +29,7 @@ const CardWrapper = styled.div`
   height: 100%;
   width: 100%;
   row-gap: 14px;
-  `;
+`;
 
 const DescriptionSection = styled.div`
   width: 100%;
@@ -138,7 +138,11 @@ export default function NewsCard({ article, archiveId, viewOnly = false }) {
             <AuthorSection>
               {article.sourceName || article.source?.name || "Unknown source"}
             </AuthorSection>
-            <ArchiveToggleButton article={article} archiveId={archiveId} viewOnly={viewOnly} />
+            <ArchiveToggleButton
+              article={article}
+              archiveId={archiveId}
+              viewOnly={viewOnly}
+            />
           </div>
         </DescriptionSection>
       </Wrapper>

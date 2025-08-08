@@ -1,46 +1,48 @@
-import { NextResponse } from "next/server";
+import initializeDbAndModels from "@/lib/db";
 
 export async function GET(req) {
+  const { sequelize } = await initializeDbAndModels();
   const { searchParams } = new URL(req.url);
-  const query = searchParams.get("query")?.toLowerCase() || "";
 
-  if (!query.trim()) {
-    return NextResponse.json({ results: [] });
-  }
+  const query = searchParams.get("query")?.trim() || "";
+  const category = searchParams.get("category");
+  const page = parseInt(searchParams.get("page") || "1");
+  const limit = 20;
+  const offset = (page - 1) * limit;
 
   try {
-    const page = parseInt(searchParams.get("page") || "1", 10);
+    const terms = query
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => word.replace(/'/g, "''"));
 
-    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(
-      query
-    )}&language=en&pageSize=21&page=${page}&apiKey=${process.env.NEWS_API_KEY}`;
+    const whereParts = [];
 
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (data.status !== "ok") {
-      console.error("NewsAPI error:", data);
-      return NextResponse.json(
-        { error: "NewsAPI failed to fetch articles" },
-        { status: 500 }
-      );
+    for (const word of terms) {
+      whereParts.push(`(
+        "title" ILIKE '%${word}%' OR
+        "sourceName" ILIKE '%${word}%'
+      )`);
     }
 
-    const results = data.articles.map((article) => ({
-      title: article.title,
-      url: article.url,
-      urlToImage: article.urlToImage,
-      description: article.description,
-      source: article.source,
-      publishedAt: article.publishedAt,
-    }));
+    if (category) {
+      whereParts.push(`"categories"::text ILIKE '%${category}%'`);
+    }
 
-    return NextResponse.json({ results });
-  } catch (error) {
-    console.error("Error fetching articles from NewsAPI:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch articles" },
-      { status: 500 }
-    );
+    const whereClauseSQL =
+      whereParts.length > 0 ? `WHERE ${whereParts.join(" AND ")}` : "";
+
+    const [results] = await sequelize.query(`
+      SELECT *
+      FROM "FetchedArticles"
+      ${whereClauseSQL}
+      ORDER BY "publishedAt" DESC
+      LIMIT ${limit} OFFSET ${offset};
+    `);
+
+    return Response.json({ results });
+  } catch (err) {
+    console.error("Search failed:", err);
+    return Response.json({ error: "Search failed" }, { status: 500 });
   }
 }

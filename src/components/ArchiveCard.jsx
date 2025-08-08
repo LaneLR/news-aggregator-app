@@ -117,14 +117,14 @@ const ReadMoreButton = styled.a`
 export default function ArchiveCard({ archive }) {
   const FALLBACK_IMAGE_URL = "/images/blurimage.png";
 
-  const [currentImageSrc, setCurrentImageSrc] = useState(FALLBACK_IMAGE_URL)
+  const [currentImageSrc, setCurrentImageSrc] = useState(FALLBACK_IMAGE_URL);
 
   return (
     <CardContainer>
       <CardHeader>
         <BrandText>{archive.name}</BrandText>
       </CardHeader>
-        <ThumbnailImage src={FALLBACK_IMAGE_URL} />
+      <ThumbnailImage src={FALLBACK_IMAGE_URL} />
       <ContentArea>
         {/* <ArticleSnippet>
           {archive.description || "No description available."}

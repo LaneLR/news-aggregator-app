@@ -1,34 +1,37 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import NewsCard from "./NewsCard";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 
-const SearchBarHeader = styled.div`
-  font-size: 2.5rem;
-  font-weight: 600;
-  color: var(--dark-blue);
-  padding: 15px 0 5px 0;
-  text-align: center;
-  width: 100%;
+const FeedWrapper = styled.div`
   display: flex;
-  justify-content: left;
-
-  @media (max-width: 440px) {
-    font-size: 1.8rem;
-    font-weight: 700;
-  }
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
 `;
 
-export default function SearchFeed({ initialQuery }) {
+const SearchBarHeader = styled.h2`
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  text-align: center;
+`;
+
+export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-
   const observerRef = useRef();
+
+  useEffect(() => {
+    // Reset state if query changes
+    setResults([]);
+    setPage(1);
+    setHasMore(true);
+  }, [query]);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -41,13 +44,20 @@ export default function SearchFeed({ initialQuery }) {
         );
         const data = await res.json();
 
-        if (data.results.length === 0) {
+        if (!data.results || data.results.length === 0) {
           setHasMore(false);
         } else {
-          setResults((prev) => [...prev, ...data.results]);
+          setResults((prev) => {
+            const existingUrls = new Set(prev.map((a) => a.url));
+            const newUniqueArticles = data.results.filter(
+              (a) => !existingUrls.has(a.url)
+            );
+            return [...prev, ...newUniqueArticles];
+          });
         }
       } catch (err) {
-        console.error("Failed to load more articles:", err);
+        console.error("Failed to load articles:", err);
+        setHasMore(false);
       } finally {
         setLoading(false);
       }
@@ -60,36 +70,43 @@ export default function SearchFeed({ initialQuery }) {
     if (!observerRef.current) return;
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading) {
-          setPage((prevPage) => prevPage + 1);
+      ([entry]) => {
+        if (entry.isIntersecting && hasMore && !loading) {
+          setPage((prev) => prev + 1);
         }
       },
-      { rootMargin: "100px" }
+      { rootMargin: "150px" }
     );
 
     const current = observerRef.current;
     observer.observe(current);
 
-    return () => observer.unobserve(current);
+    return () => {
+      if (current) observer.unobserve(current);
+    };
   }, [hasMore, loading]);
-
-  useEffect(() => {
-    setPage(1);
-    setResults([]);
-    setHasMore(true);
-  }, [query]);
 
   return (
     <>
-      <SearchBarHeader>
-        {query ? `Results for: '${query}'` : "Results:"}
-      </SearchBarHeader>
+      <div style={{ textAlign: "center", width: "100%" }}>
+        <SearchBarHeader>What&apos;s making the news</SearchBarHeader>
+        <p>{query ? `Results for: '${query}'` : "Results"}</p>
+      </div>
+
       <NewsGridWrapper>
         {results.map((article, i) => (
-          <NewsCardThree key={i} article={article} />
+          <NewsCardThree
+            key={i}
+            article={article}
+            archiveId={archiveId}
+            viewOnly={viewOnly}
+          />
         ))}
       </NewsGridWrapper>
+
+      <div ref={observerRef} style={{ height: "20px", margin: "40px 0" }} />
+      {loading && <p style={{ textAlign: "center" }}>Loading more...</p>}
+      {!hasMore && <p style={{ textAlign: "center" }}>No more results</p>}
     </>
   );
 }

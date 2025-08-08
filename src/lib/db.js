@@ -6,6 +6,7 @@ import SavedArticle from "./models/SavedArticle.js";
 import defineFetchedArticle from "./models/FetchedArticle.js";
 import { DataTypes, Op } from "sequelize";
 import bcrypt from "bcryptjs";
+import UserInteraction from "./models/UserInteraction.js";
 
 if (!global.db) {
   global.db = {};
@@ -116,6 +117,14 @@ async function initializeDbAndModels() {
             type: DataTypes.STRING,
             allowNull: true,
           },
+          pendingDeletion: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+          },
+          deletionRequestedAt: {
+            type: DataTypes.DATE,
+            allowNull: true,
+          },
         },
         {
           sequelize,
@@ -216,23 +225,19 @@ async function initializeDbAndModels() {
             allowNull: false,
           },
           url: {
-            // Will receive from RSS `link`
             type: DataTypes.TEXT,
             allowNull: false,
             unique: "archive_url_unique",
           },
           urlToImage: {
-            // Will receive from RSS `urlToImage`
             type: DataTypes.TEXT,
             allowNull: true,
           },
           sourceName: {
-            // Will receive from RSS `source`
             type: DataTypes.STRING,
             allowNull: true,
           },
           publishedAt: {
-            // New field for date from RSS `pubDate`
             type: DataTypes.DATE,
             allowNull: true,
           },
@@ -254,6 +259,16 @@ async function initializeDbAndModels() {
           ],
         }
       );
+
+      //UserInteraction is in testing; when ready uncomment
+
+      // UserInteraction.init({
+      //   userId: DataTypes.UUID,
+      //   articleUrl: DataTypes.TEXT,
+      //   interactionType: DataTypes.STRING, // 'click', 'search', 'save'
+      //   timestamp: DataTypes.DATE,
+      // });
+      // global.db.UserInteraction = UserInteraction;
 
       global.db.sequelize = sequelize;
       global.db.User = User;
@@ -281,7 +296,7 @@ async function initializeDbAndModels() {
       //DO NOT REMOVE COMMENTS FROM BELOW LINE
       //Wipes all data from the database and re-creates tables
       // await sequelize.sync({ force: true });
-      console.log("All models were synchronized and created successfully.");
+      // console.log("All models were synchronized and created successfully.");
     } catch (error) {
       console.error("----------------------------------------------------");
       console.error(

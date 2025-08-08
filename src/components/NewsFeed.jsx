@@ -1,9 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import NewsCard from "@/components/NewsCard";
 import NewsGridWrapper from "./NewsGridWrapper";
-import SearchBar from "./SearchBar";
-import NewsCardTwo from "./NewsCardTwo";
 import NewsCardThree from "./NewsCardThree";
 import styled from "styled-components";
 
@@ -17,7 +14,6 @@ const SearchBarHeader = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
 
   @media (max-width: 440px) {
     font-size: 1.8rem;
@@ -54,7 +50,9 @@ export default function News({ archiveId }) {
         const latest = await fetchNews();
         const latestArticle = latest[0];
         if (latestArticle) {
-          const latestDate = new Date(latestArticle.publishedAt || latestArticle.updatedAt);
+          const latestDate = new Date(
+            latestArticle.publishedAt || latestArticle.updatedAt
+          );
           if (latestTimestamp && latestDate > latestTimestamp) {
             setNewAvailable(true);
           }
@@ -66,7 +64,7 @@ export default function News({ archiveId }) {
 
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
-  }, [latestTimestamp]);
+  }, []);
 
   const loadInitialArticles = async () => {
     try {
@@ -101,7 +99,14 @@ export default function News({ archiveId }) {
 
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
         <SearchBarHeader>The most recent headlines</SearchBarHeader>
 
         {newAvailable && (
@@ -136,7 +141,6 @@ export default function News({ archiveId }) {
     </>
   );
 }
-
 
 // async function fetchNews() {
 //   let baseUrl =
@@ -209,5 +213,3 @@ export default function News({ archiveId }) {
 //     </>
 //   );
 // }
-
-

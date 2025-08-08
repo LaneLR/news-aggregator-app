@@ -67,9 +67,7 @@ export default function RedditCard({ article, archiveId, viewOnly = false }) {
     index !== -1 ? article.title.substring(0, index) : article.title;
 
   const [currentImageSrc, setCurrentImageSrc] = useState(() => {
-    return article.thumbnail?.trim()
-      ? article.thumbnail
-      : FALLBACK_IMAGE_URL;
+    return article.thumbnail?.trim() ? article.thumbnail : FALLBACK_IMAGE_URL;
   });
 
   useEffect(() => {
@@ -114,7 +112,10 @@ export default function RedditCard({ article, archiveId, viewOnly = false }) {
         <TitleSection>{cleanTitle}</TitleSection>
         <FooterRow>
           <AuthorSection>
-            {(article.sourceName || article.source?.domain || "Unknown source").split(/[\s/]+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
+            {(article.sourceName || article.source?.domain || "Unknown source")
+              .split(/[\s/]+/)
+              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(" ")}
           </AuthorSection>
           <ArchiveToggleButton
             article={article}

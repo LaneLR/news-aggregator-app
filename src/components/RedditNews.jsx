@@ -1,4 +1,3 @@
-
 "use client";
 import { useEffect, useState } from "react";
 import NewsCard from "@/components/NewsCard";
@@ -24,14 +23,17 @@ export async function fetchRedditNews({ subs = [], limit = 10 }) {
   return data.articles;
 }
 
-export default function RedditNews({ archiveId, selectedSubs = ["technology", "science", "worldnews"] }) {
+export default function RedditNews({
+  archiveId,
+  selectedSubs = ["technology", "science", "worldnews"],
+}) {
   const [articles, setArticles] = useState([]);
   const [defaultArchiveId, setDefaultArchiveId] = useState(null);
 
- useEffect(() => {
-  fetchRedditNews({ subs: selectedSubs }) 
-    .then(setArticles)
-    .catch((err) => console.error("Failed to load Reddit articles:", err));
+  useEffect(() => {
+    fetchRedditNews({ subs: selectedSubs })
+      .then(setArticles)
+      .catch((err) => console.error("Failed to load Reddit articles:", err));
 
     const fetchArchive = async () => {
       try {
@@ -66,18 +68,17 @@ export default function RedditNews({ archiveId, selectedSubs = ["technology", "s
         <SearchBar />
       </div>
 
-<NewsGridWrapper>
-  {console.log("Articles to render:", articles)}
-  {articles.map((article, i) => (
-    <RedditCard
-      key={article.url || i} // fallback to `i` if needed
-      article={article}
-      archiveId={defaultArchiveId}
-      viewOnly={true}
-    />
-  ))}
-</NewsGridWrapper>
-
+      <NewsGridWrapper>
+        {console.log("Articles to render:", articles)}
+        {articles.map((article, i) => (
+          <RedditCard
+            key={article.url || i} // fallback to `i` if needed
+            article={article}
+            archiveId={defaultArchiveId}
+            viewOnly={true}
+          />
+        ))}
+      </NewsGridWrapper>
     </>
   );
 }

@@ -3,9 +3,10 @@ export const dynamic = "force-dynamic"; // <-- ADD THIS LINE TEMPORARILY
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
-import LoadingComponent from "@/components/Loading";
 import { Suspense } from "react";
 import News from "@/components/NewsFeed";
+import LoadingDots from "@/components/Loading";
+import Loading from "../loading";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -15,7 +16,7 @@ export default async function Home() {
   }
   return (
     <>
-      <Suspense fallback={<LoadingComponent />}>
+      <Suspense fallback={<Loading />}>
         <News />
       </Suspense>
     </>

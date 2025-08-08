@@ -136,18 +136,19 @@ export default function HomePage() {
         <MainHeaderText color={"var(--light-white)"}>Your Way.</MainHeaderText>
         <br />
         <StyledParagraphCenter color={"var(--light-white)"}>
-          Save and discover the latest news from around the web
+          {/* Save and discover the latest news from around the web */}
+          Find and save all of your favorite news sources in one place
         </StyledParagraphCenter>
         <br />
         {/* <input placeholder="Search articles"/> */}
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <Link href={"/register"}>
-            <Button bgColor={"var(--primary-blue)"} clr={"var(--light-white)"}>
+            <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
               Sign up
             </Button>
           </Link>
           <Link href={"/login"}>
-            <Button bgColor={"var(--primary-blue)"} clr={"var(--light-white)"}>
+            <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
               Log in
             </Button>
           </Link>
@@ -173,7 +174,7 @@ export default function HomePage() {
               />
             </Link>
 
-            <h3 style={{color: 'var(--dark-blue)'}}>Tech</h3>
+            <h3 style={{ color: "var(--dark-blue)" }}>Tech</h3>
             <StyledParagraphLeft>
               Get the latest updates on technology and gadgets.
             </StyledParagraphLeft>
@@ -204,7 +205,7 @@ export default function HomePage() {
               />
             </Link>
 
-            <h3 style={{color: 'var(--dark-blue)'}}>World</h3>
+            <h3 style={{ color: "var(--dark-blue)" }}>World</h3>
             <StyledParagraphLeft>
               Find breaking stories from across the globe.
             </StyledParagraphLeft>
@@ -233,7 +234,7 @@ export default function HomePage() {
                 style={{ borderRadius: "14px", objectFit: "cover" }}
               />
             </Link>
-            <h3 style={{color: 'var(--dark-blue)'}}>Entertainment</h3>
+            <h3 style={{ color: "var(--dark-blue)" }}>Entertainment</h3>
             <StyledParagraphLeft>
               Stay updated on movies, TV shows, and celebrities.
             </StyledParagraphLeft>
@@ -262,7 +263,7 @@ export default function HomePage() {
                 style={{ borderRadius: "14px", objectFit: "cover" }}
               />
             </Link>
-            <h3 style={{color: 'var(--dark-blue)'}}>Weather</h3>
+            <h3 style={{ color: "var(--dark-blue)" }}>Weather</h3>
             <StyledParagraphLeft>
               Follow developing storms and weather forecasts across the globe.
             </StyledParagraphLeft>

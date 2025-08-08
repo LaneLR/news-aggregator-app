@@ -46,8 +46,7 @@ export default function PaymentDetailsForm() {
 
     const data = await res.json();
     window.location.reload();
-    router.push('/account')
-    
+    router.push("/account");
   };
 
   return (

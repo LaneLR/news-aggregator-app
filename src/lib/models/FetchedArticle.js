@@ -18,16 +18,24 @@ export default function defineFetchedArticle(sequelize) {
         type: DataTypes.TEXT,
         allowNull: true,
       },
-      description: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
+      // description: {
+      //   type: DataTypes.TEXT,
+      //   allowNull: true,
+      // },
       sourceName: {
         type: DataTypes.STRING,
         allowNull: true,
       },
       publishedAt: {
         type: DataTypes.DATE,
+        allowNull: true,
+      },
+      country: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      category: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: true,
       },
     },

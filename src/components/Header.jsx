@@ -7,6 +7,7 @@ import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import SearchBar from "./SearchBar";
+import HeaderNavBar from "./HeaderNavBar";
 
 const Wrapper = styled.div`
   display: flex;
@@ -76,7 +77,6 @@ const RightContainer = styled.div`
     width: auto;
     padding: 0 20px 0 0;
   }
-
 `;
 
 const UserAccountIcon = styled.div`
@@ -230,204 +230,209 @@ export default function Header() {
   if (status === "loading") return null;
 
   return (
-    <Wrapper>
+    <>
       {!!session ? (
-        <>
-          <LeftContainer>
-            <Link style={{ display: "inherit" }} href={"/news"}>
-              <LogoContainer>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    backgroundColor: "#eee",
-                    padding: "6px",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <Image
-                    src={"/images/Relay-logo-color-transparent-bg.png"}
-                    alt={"Relay News logo"}
-                    width={33}
-                    height={40}
-                  />
-                </div>
-              </LogoContainer>
-              <LogoText>
-                <span>RELAY</span>
-                <span>NEWS</span>
-              </LogoText>
-            </Link>
-          </LeftContainer>
-          <CenterContainer>
-            <SearchBar />
-          </CenterContainer>
-          <RightContainer>
-            <DropdownContainer ref={dropdownRef}>
-              <UserAccountIcon onClick={toggleDropdown}>
-                <MenuIcon>
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </MenuIcon>
-              </UserAccountIcon>
-              {isDropdownOpen && (
-                <DropdownMenu>
-                  <DropdownMenuItem onClick={() => handleNavigation("/news")}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        width: "100%",
-                        columnGap: "20px",
-                      }}
-                    >
-                      <p style={{ fontWeight: "600" }}>News</p>
-                      <Image
-                        alt={"Log out image"}
-                        height={22}
-                        width={22}
-                        src="/images/newspaper.svg"
-                      />
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleNavigation("/archives")}
+        <div style={{ width: '100%'}}>
+          <Wrapper>
+            <LeftContainer>
+              <Link style={{ display: "inherit" }} href={"/news"}>
+                <LogoContainer>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      backgroundColor: "#eee",
+                      padding: "6px",
+                      borderRadius: "8px",
+                    }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        width: "100%",
-                        columnGap: "20px",
-                      }}
+                    <Image
+                      src={"/images/Relay-logo-color-transparent-bg.png"}
+                      alt={"Relay News logo"}
+                      width={33}
+                      height={40}
+                    />
+                  </div>
+                </LogoContainer>
+                <LogoText>
+                  <span>RELAY</span>
+                  <span>NEWS</span>
+                </LogoText>
+              </Link>
+            </LeftContainer>
+            <CenterContainer>
+              <SearchBar />
+            </CenterContainer>
+            <RightContainer>
+              <DropdownContainer ref={dropdownRef}>
+                <UserAccountIcon onClick={toggleDropdown}>
+                  <MenuIcon>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </MenuIcon>
+                </UserAccountIcon>
+                {isDropdownOpen && (
+                  <DropdownMenu>
+                    <DropdownMenuItem onClick={() => handleNavigation("/news")}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "100%",
+                          columnGap: "20px",
+                        }}
+                      >
+                        <p style={{ fontWeight: "600" }}>News</p>
+                        <Image
+                          alt={"Log out image"}
+                          height={22}
+                          width={22}
+                          src="/images/newspaper.svg"
+                        />
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleNavigation("/archives")}
                     >
-                      <p style={{ fontWeight: "600" }}>Archives</p>
-                      <Image
-                        alt={"Log out image"}
-                        height={22}
-                        width={22}
-                        src="/images/list-heart.svg"
-                        style={{ filter: "grayscale(100%)" }}
-                      />
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleNavigation("/account")}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        width: "100%",
-                        columnGap: "20px",
-                      }}
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "100%",
+                          columnGap: "20px",
+                        }}
+                      >
+                        <p style={{ fontWeight: "600" }}>Archives</p>
+                        <Image
+                          alt={"Log out image"}
+                          height={22}
+                          width={22}
+                          src="/images/list-heart.svg"
+                          style={{ filter: "grayscale(100%)" }}
+                        />
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleNavigation("/account")}
                     >
-                      <p style={{ fontWeight: "600" }}>Profile</p>
-                      <Image
-                        alt={"Profile image"}
-                        height={22}
-                        width={22}
-                        src="/images/profile.svg"
-                      />
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleNavigation("/settings")}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        width: "100%",
-                        columnGap: "20px",
-                      }}
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "100%",
+                          columnGap: "20px",
+                        }}
+                      >
+                        <p style={{ fontWeight: "600" }}>Profile</p>
+                        <Image
+                          alt={"Profile image"}
+                          height={22}
+                          width={22}
+                          src="/images/profile.svg"
+                        />
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleNavigation("/settings")}
                     >
-                      <p style={{ fontWeight: "600" }}>Settings</p>
-                      <Image
-                        alt={"Settings image"}
-                        height={22}
-                        width={22}
-                        src="/images/gear.svg"
-                      />
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        width: "100%",
-                        columnGap: "20px",
-                      }}
-                    >
-                      <p style={{ fontWeight: "600" }}>Log out</p>
-                      <Image
-                        alt={"Log out image"}
-                        height={22}
-                        width={22}
-                        src="/images/logout.svg"
-                      />
-                    </div>
-                  </DropdownMenuItem>
-                </DropdownMenu>
-              )}
-            </DropdownContainer>
-          </RightContainer>
-        </>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "100%",
+                          columnGap: "20px",
+                        }}
+                      >
+                        <p style={{ fontWeight: "600" }}>Settings</p>
+                        <Image
+                          alt={"Settings image"}
+                          height={22}
+                          width={22}
+                          src="/images/gear.svg"
+                        />
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "100%",
+                          columnGap: "20px",
+                        }}
+                      >
+                        <p style={{ fontWeight: "600" }}>Log out</p>
+                        <Image
+                          alt={"Log out image"}
+                          height={22}
+                          width={22}
+                          src="/images/logout.svg"
+                        />
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenu>
+                )}
+              </DropdownContainer>
+            </RightContainer>
+          </Wrapper>
+          <HeaderNavBar />
+        </div>
       ) : (
         <>
-          <LeftContainer>
-            <Link style={{ display: "inherit" }} href={"/"}>
-              <LogoContainer
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  columnGap: "10px",
-                }}
-              >
-                <div
+          <Wrapper>
+            <LeftContainer>
+              <Link style={{ display: "inherit" }} href={"/"}>
+                <LogoContainer
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    backgroundColor: "#eee",
-                    padding: "6px",
-                    borderRadius: "8px",
+                    columnGap: "10px",
                   }}
                 >
-                  <Image
-                    src={"/images/Relay-logo-color-transparent-bg.png"}
-                    alt={"Relay News logo"}
-                    width={33}
-                    height={40}
-                  />
-                </div>
-              </LogoContainer>
-              <LogoText>
-                <span>RELAY</span>
-                <span>NEWS</span>
-              </LogoText>
-            </Link>
-          </LeftContainer>
-          <RightContainer>
-            <nav style={{ display: "flex", columnGap: "10px" }}>
-              <Link style={{ display: "flex" }} href={"/login"}>
-                <Button
-                  bgColor={"var(--primary-blue)"}
-                  clr={"var(--light-white)"}
-                >
-                  Log in
-                </Button>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      backgroundColor: "#eee",
+                      padding: "6px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Image
+                      src={"/images/Relay-logo-color-transparent-bg.png"}
+                      alt={"Relay News logo"}
+                      width={33}
+                      height={40}
+                    />
+                  </div>
+                </LogoContainer>
+                <LogoText>
+                  <span>RELAY</span>
+                  <span>NEWS</span>
+                </LogoText>
               </Link>
-            </nav>
-          </RightContainer>
+            </LeftContainer>
+            <RightContainer>
+              <nav style={{ display: "flex", columnGap: "10px" }}>
+                <Link style={{ display: "flex" }} href={"/login"}>
+                  <Button
+                    bgColor={"var(--primary-blue)"}
+                    clr={"var(--white)"}
+                  >
+                    Log in
+                  </Button>
+                </Link>
+              </nav>
+            </RightContainer>
+          </Wrapper>
         </>
       )}
-    </Wrapper>
+    </>
   );
 }
