@@ -307,6 +307,11 @@ async function initializeDbAndModels() {
 
       //DO NOT REMOVE COMMENTS FROM BELOW LINE
       //Wipes all data from the database and re-creates tables
+
+      //to reset data, follow these steps:
+      //1. delete tables in this order on PgAdmin4: SavedArticles, then Archives, then users
+      //2. uncomment the sync line, then create a new account to repopulate the tables
+
       // await sequelize.sync({ force: true });
       // console.log("All models were synchronized and created successfully.");
     } catch (error) {
