@@ -3,6 +3,7 @@ import styled from "styled-components";
 import ArchiveToggleButton from "./ArchiveToggleButton.jsx";
 import { useEffect, useState } from "react";
 import Link from "next/link.js";
+import Image from "next/image.js";
 
 // 1. Main Card Container
 const CardContainer = styled.div`
@@ -39,7 +40,7 @@ const BrandText = styled.span`
   color: var(--dark-blue);
 `;
 
-const ThumbnailImage = styled.img`
+const ThumbnailImage = styled(Image)`
   width: 100%;
   height: 200px;
   object-fit: cover;
@@ -180,6 +181,7 @@ export default function NewsCardThree({
           }
           alt={article.title || "News article image"}
           onError={handleImageError}
+          priority
         />
       </Link>
       <ContentArea>

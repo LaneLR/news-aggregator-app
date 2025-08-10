@@ -247,6 +247,7 @@ export default function Header() {
                     }}
                   >
                     <Image
+                      priority
                       src={"/images/Relay-logo-color-transparent-bg.png"}
                       alt={"Relay News logo"}
                       width={33}
@@ -286,6 +287,7 @@ export default function Header() {
                       >
                         <p style={{ fontWeight: "600" }}>News</p>
                         <Image
+                          priority
                           alt={"Log out image"}
                           height={22}
                           width={22}
@@ -307,6 +309,7 @@ export default function Header() {
                       >
                         <p style={{ fontWeight: "600" }}>Archives</p>
                         <Image
+                          priority
                           alt={"Log out image"}
                           height={22}
                           width={22}
@@ -329,6 +332,7 @@ export default function Header() {
                       >
                         <p style={{ fontWeight: "600" }}>Profile</p>
                         <Image
+                          priority
                           alt={"Profile image"}
                           height={22}
                           width={22}
@@ -350,6 +354,7 @@ export default function Header() {
                       >
                         <p style={{ fontWeight: "600" }}>Settings</p>
                         <Image
+                          priority
                           alt={"Settings image"}
                           height={22}
                           width={22}
@@ -369,6 +374,7 @@ export default function Header() {
                       >
                         <p style={{ fontWeight: "600" }}>Log out</p>
                         <Image
+                          priority
                           alt={"Log out image"}
                           height={22}
                           width={22}
@@ -405,6 +411,7 @@ export default function Header() {
                     }}
                   >
                     <Image
+                      priority
                       src={"/images/Relay-logo-color-transparent-bg.png"}
                       alt={"Relay News logo"}
                       width={33}
