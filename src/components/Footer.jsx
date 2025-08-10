@@ -32,6 +32,10 @@ const TextContainer = styled.div`
 const Disclaimer = styled.p`
   font-size: 0.8rem;
   padding: 0 30px 20px;
+  display: flex;
+  justify-content: center;
+  align-item: center;
+  text-align: left;
 `;
 
 const Underline = styled.div`
@@ -63,7 +67,7 @@ export default function Footer() {
           </div>
         </TextContainer>
       </LinkWrapper>
-      <Disclaimer style={{ fontSize: "0.8rem" }}>
+      <Disclaimer>
         This site displays publicly available RSS content for informational
         purposes. All articles link to their original publishers and remain the
         intellectual property of their respective owners.
