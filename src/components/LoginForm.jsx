@@ -89,7 +89,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (res.error) {
-      setError(`Invalid credentials: ${res.error}`);
+      setError(`${res.error}`);
     } else {
       setTimeout(() => {
         router.push("/");
@@ -132,7 +132,12 @@ export default function LoginPage() {
           {loading ? "Logging in..." : "Log in"}
         </Button>
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && (
+          <>
+            <br />
+            <p style={{ color: "red" }}>{error}</p>
+          </>
+        )}
 
         <h4
           style={{
