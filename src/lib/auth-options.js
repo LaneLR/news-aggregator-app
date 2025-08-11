@@ -24,6 +24,11 @@ export const authOptions = {
         const valid = await bcrypt.compare(password, user.password);
         if (!valid) throw new Error("Incorrect password");
 
+        // Check if the user is verified
+        if (!user.isVerified) {
+          throw new Error("Please verify your email address to log in.");
+        }
+
         return { id: user.id, email: user.email, tier: user.tier };
       },
     }),
