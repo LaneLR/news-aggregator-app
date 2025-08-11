@@ -81,20 +81,7 @@ export default function RegisterPage() {
         return;
       }
 
-      const loginRes = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (loginRes?.error) {
-        setError("Account created but login failed");
-      } else {
-        router.push("/news"); // or home
-        setTimeout(() => {
-          location.reload();
-        }, 100)
-      }
+      router.push("/verification/verify-email"); // or home
     } catch (err) {
       setError("Something went wrong");
       console.error(err);
@@ -133,7 +120,12 @@ export default function RegisterPage() {
           Create Account
         </Button>
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && (
+          <>
+            <br /> 
+            <p style={{ color: "red" }}>{error}</p>
+          </>
+        )}
 
         <h4
           style={{
@@ -146,7 +138,7 @@ export default function RegisterPage() {
           <div style={{ color: "var(--dark-blue)", textAlign: "center" }}>
             <p>Already have an account?</p>
             <Link href="/login">
-              <u>Login!</u>
+              <u>Log in!</u>
             </Link>
           </div>
         </h4>
