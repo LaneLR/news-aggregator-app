@@ -9,10 +9,15 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   height: auto;
-  padding: 10px 0;
+  padding: 10px 15px;
   font-size: 1.2rem;
   color: var(--white);
   gap: 20px;
+  overflow-x: auto;
+
+  @media(max-width: 1030px) {
+  justify-content: left;
+  }
 `;
 
 const StyledLink = styled(Link)`

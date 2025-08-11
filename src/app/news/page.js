@@ -5,7 +5,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { Suspense } from "react";
 import News from "@/components/NewsFeed";
-import LoadingDots from "@/components/Loading";
 import Loading from "../loading";
 
 export default async function Home() {
@@ -14,6 +13,7 @@ export default async function Home() {
   if (!session) {
     redirect("/");
   }
+
   return (
     <>
       <Suspense fallback={<Loading />}>

@@ -1,7 +1,10 @@
 "use client";
+import { useSession } from "next-auth/react";
 import Button from "./Button";
 import Divider from "./Divider";
 import styled from "styled-components";
+import Loading from "@/app/loading";
+import { useState, useEffect } from "react"; 
 
 const WarningWrapper = styled.div`
   display: flex;
@@ -20,54 +23,89 @@ const Underline = styled.div`
 
 const DeleteAccountWarning = styled.div`
   background-color: rgba(255, 34, 34, 0.42);
-  max-width: 500px;
+  width: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
   padding: 16px 32px;
-  font-weight: 600;
+  font-weight: 500;
   border-radius: 6px;
   margin: 0 0 20px 0;
 `;
 
-export default function ProfilePage({ session }) {
+const EmphasizedText = styled.div`
+  font-weight: 600;
+`;
+
+export default function ProfilePage() {
+  const { data: session, status, update } = useSession();
+  const [isPendingDeletion, setIsPendingDeletion] = useState(false);
+
+  useEffect(() => {
+    if (session?.user) {
+      setIsPendingDeletion(session.user.pendingDeletion !== false);
+    }
+  }, [session]);
+
+  if (status === "loading") {
+    return <Loading />;
+  }
+
+  if (!session) {
+    return (
+      <div style={{ padding: "2rem", textAlign: "center" }}>
+        Please log in to view your profile.
+      </div>
+    );
+  }
+
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const tomorrowDateString = tomorrow.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   const handleCancelDeletion = async () => {
+    setIsPendingDeletion(false);
     try {
       const res = await fetch("/api/users/cancel-deletion", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       if (!res.ok) throw new Error("Failed to cancel account deletion");
 
+      await update();
       alert("Account deletion has been canceled.");
-      location.reload();
     } catch (err) {
+      setIsPendingDeletion(true);
       console.error("Cancellation error:", err);
       alert("Something went wrong while canceling account deletion.");
     }
   };
 
   const handleRequestDeletion = async () => {
+    setIsPendingDeletion(true);
     try {
       const res = await fetch("/api/users/request-deletion", {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       if (!res.ok) throw new Error("Failed to request account deletion");
 
+      await update();
       alert(
         "Account deletion requested. Your account will be deleted in 24 hours unless you cancel."
       );
-      location.reload();
     } catch (err) {
+      setIsPendingDeletion(false);
       console.error("Deletion request error:", err);
       alert("Something went wrong while requesting account deletion.");
     }
@@ -75,10 +113,13 @@ export default function ProfilePage({ session }) {
 
   return (
     <>
-      {session.user.pendingDeletion !== false ? (
+      {isPendingDeletion ? (
         <WarningWrapper>
           <DeleteAccountWarning>
-            <p>Your account is scheduled to be deleted at 11:59pm CT.</p>
+            <p>
+              Your account is scheduled to be deleted on{" "}
+              <b>{tomorrowDateString}</b> at <b>11:59pm CT</b>.
+            </p>
             <Underline />
           </DeleteAccountWarning>
           <Button
@@ -86,29 +127,21 @@ export default function ProfilePage({ session }) {
             bgColor={"#333333ff"}
             clr={"var(--white)"}
           >
-            Cancel Account Deletion
+            Cancel Deleting Account
           </Button>
         </WarningWrapper>
-      ) : (
-        ""
-      )}
-      <div
-        style={{
-          color: "var(--dark-blue)",
-          display: "flex",
-          justifyContent: "center",
-          width: "100%",
-          height: "auto",
-          alignItems: "center",
-          flexDirection: "column",
-        }}
-      >
+      ) : null}
+
+      <div>
         <h1>Profile</h1>
         <p>Your email: {session.user.email}</p>
         <Divider />
         <p>Subscription stuff</p>
       </div>
-      <Button onClick={handleRequestDeletion}>Request Account Deletion</Button>
+
+      {!isPendingDeletion && (
+        <Button onClick={handleRequestDeletion} bgColor={"var(--primary-blue)"}>Delete Account</Button>
+      )}
     </>
   );
 }

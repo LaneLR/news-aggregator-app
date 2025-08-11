@@ -1,5 +1,5 @@
 // src/app/api/cron/delete-users/route.js
-import { deleteExpiredUsers } from "@/app/utils/deleteExpiredUsers.mjs";
+import { deleteExpiredUsers } from "@/utils/deleteExpiredUsers.mjs";
 
 export async function POST(req) {
   const authHeader = req.headers.get("authorization");

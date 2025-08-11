@@ -166,6 +166,7 @@ export default function HomePage() {
           <ExploreImageContainers>
             <Link href={"/login"}>
               <Image
+                priority
                 height={300}
                 width={300}
                 src={"/images/tech1.png"}
@@ -197,6 +198,7 @@ export default function HomePage() {
           <ExploreImageContainers>
             <Link href={"/login"}>
               <Image
+                priority
                 height={300}
                 width={300}
                 src={"/images/earth1.png"}
@@ -227,6 +229,7 @@ export default function HomePage() {
           <ExploreImageContainers>
             <Link href={"/login"}>
               <Image
+                priority
                 height={300}
                 width={300}
                 src={"/images/band1.png"}
@@ -256,6 +259,7 @@ export default function HomePage() {
           <ExploreImageContainers>
             <Link href={"/login"}>
               <Image
+                priority
                 height={300}
                 width={300}
                 src={"/images/weather1.png"}

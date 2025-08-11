@@ -3,6 +3,7 @@ import styled from "styled-components";
 import ArchiveToggleButton from "./ArchiveToggleButton.jsx";
 import { useEffect, useState } from "react";
 import Link from "next/link.js";
+import Image from "next/image.js";
 
 // 1. Main Card Container
 const CardContainer = styled.div`
@@ -37,14 +38,6 @@ const BrandText = styled.span`
   font-size: 1rem;
   font-weight: bold;
   color: var(--dark-blue);
-`;
-
-const ThumbnailImage = styled.img`
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  display: block;
-  border-bottom: 1px solid #eee;
 `;
 
 const ContentArea = styled.div`
@@ -145,8 +138,8 @@ export default function NewsCardThree({
     });
   }, [article.urlToImage]);
 
-  const proxiedImage = `/api/image-proxy?url=${encodeURIComponent(
-    currentImageSrc
+  const proxiedImageUrl = `/api/image-proxy?url=${encodeURIComponent(
+    article.urlToImage || FALLBACK_IMAGE_URL
   )}`;
 
   const handleImageError = () => {
@@ -170,21 +163,31 @@ export default function NewsCardThree({
       <CardHeader>
         <BrandText>Relay News</BrandText>
       </CardHeader>
-      <Link href={article.url} target={"_blank"}>
-        <ThumbnailImage
-          src={
-            article.urlToImage || FALLBACK_IMAGE_URL
-            // article.urlToImage?.startsWith("https://cdn.cnn.com")
-            //   ? article.urlToImage
-            //   : `/api/image-proxy?url=${encodeURIComponent(article.urlToImage)}`
-          }
+      <Link
+        href={article.url}
+        target={"_blank"}
+        style={{ position: "relative", width: "100%", height: "200px", }}
+      >
+        <Image
+          src={article.urlToImage || FALLBACK_IMAGE_URL}
           alt={article.title || "News article image"}
           onError={handleImageError}
+          priority
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw" // Adjust these sizes as needed
+          style={{
+            objectFit: "cover",
+            borderBottom: "1px solid #eee",
+          }}
         />
       </Link>
       <ContentArea>
         {/* <NewTag>New</NewTag> */}
-        <ArticleTitle>{cleanTitle}</ArticleTitle>
+        <ArticleTitle>
+          <Link href={article.url} target={"_blank"}>
+            {cleanTitle}
+          </Link>
+        </ArticleTitle>
         <ArticleSnippet>
           {/* {article.description} */}-{" "}
           {article.sourceName || article.source?.name || "Unknown source"}{" "}
