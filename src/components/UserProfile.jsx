@@ -20,7 +20,7 @@ const Underline = styled.div`
 
 const DeleteAccountWarning = styled.div`
   background-color: rgba(255, 34, 34, 0.42);
-  max-width: 500px;
+  width: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -33,6 +33,16 @@ const DeleteAccountWarning = styled.div`
 `;
 
 export default function ProfilePage({ session }) {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const tomorrowDateString = tomorrow.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   const handleCancelDeletion = async () => {
     try {
       const res = await fetch("/api/users/cancel-deletion", {
@@ -78,7 +88,10 @@ export default function ProfilePage({ session }) {
       {session.user.pendingDeletion !== false ? (
         <WarningWrapper>
           <DeleteAccountWarning>
-            <p>Your account is scheduled to be deleted at 11:59pm CT.</p>
+            <p>
+              Your account is scheduled to be deleted on{" "}
+              <b>{tomorrowDateString}</b> at <b>11:59pm CT</b>.
+            </p>
             <Underline />
           </DeleteAccountWarning>
           <Button
