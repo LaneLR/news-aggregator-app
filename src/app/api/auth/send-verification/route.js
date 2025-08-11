@@ -13,7 +13,7 @@ export async function POST(req) {
     if (!user) {
       return Response.json({ error: "User not found" }, { status: 404 });
     }
-    if (user.isVerified) {
+    if (user.emailIsVerified) {
       return Response.json({ error: "Already verified" }, { status: 400 });
     }
 

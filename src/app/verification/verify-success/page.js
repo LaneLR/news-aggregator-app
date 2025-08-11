@@ -8,7 +8,7 @@ export default async function VerifyEmailSuccessPage() {
   if (!session) {
     return redirect("/");
   }
-  if (session.user.isVerified) {
+  if (session.user.emailIsVerified) {
     setTimeout(() => {
       redirect("/");
     }, 2000);

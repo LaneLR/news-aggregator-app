@@ -45,7 +45,7 @@ export async function POST(req) {
     const newUser = await User.create({
       email,
       password: password,
-      isVerified: false,
+      emailIsVerified: false,
     });
 
     await db.Archive.findOrCreate({
@@ -64,7 +64,7 @@ export async function POST(req) {
     await sendEmail({
       to: newUser.email,
       subject: "Verify your RelayNews account",
-      html: `<p>Click the link to verify your account:</p>
+      html: `<p>Click the link below to verify your RelayNews account</p>
               <a href="${verifyUrl}">Verify Account</a>
               <p>This link is only valid for 24 hours.</p>`,
     });

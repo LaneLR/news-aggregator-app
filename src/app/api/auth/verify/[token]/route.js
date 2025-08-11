@@ -20,7 +20,7 @@ export async function GET(req, { params }) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    user.isVerified = true;
+    user.emailIsVerified = true;
     await user.save();
 
     return NextResponse.redirect(new URL("/verification/verify-success", req.url));

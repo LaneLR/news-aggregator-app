@@ -125,17 +125,9 @@ async function initializeDbAndModels() {
             type: DataTypes.DATE,
             allowNull: true,
           },
-          isVerified: {
+          emailIsVerified: {
             type: DataTypes.BOOLEAN,
             defaultValue: false,
-          },
-          verificationToken: {
-            type: DataTypes.STRING,
-            allowNull: true,
-          },
-          verificationTokenExpires: {
-            type: DataTypes.DATE,
-            allowNull: true,
           },
         },
         {
