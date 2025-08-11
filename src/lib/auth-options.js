@@ -1,6 +1,6 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import initializeDbAndModels from "@/lib/db.js"; // Assuming this handles your Sequelize setup
+import initializeDbAndModels from "@/lib/db.js"; 
 
 export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -27,7 +27,6 @@ export const authOptions = {
           throw new Error("Please verify your email address to log in.");
         }
 
-        // Return the pendingDeletion status on login
         return {
           id: user.id,
           email: user.email,
