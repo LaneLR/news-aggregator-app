@@ -13,9 +13,9 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100%;
   width: 100vw;
-  background-color: var(--white);
+  background-color: var(--light-white);
   flex-direction: column;
 `;
 
