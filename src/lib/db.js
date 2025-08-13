@@ -3,6 +3,7 @@ import getSequelizeInstance from "./sequelize.js";
 import User from "./models/User.js";
 import Archive from "./models/Archive.js";
 import SavedArticle from "./models/SavedArticle.js";
+import defineJournalArticle from "./models/JournalArticle.js";
 import defineFetchedArticle from "./models/FetchedArticle.js";
 import { DataTypes, Op } from "sequelize";
 import bcrypt from "bcryptjs";
@@ -22,6 +23,7 @@ async function initializeDbAndModels() {
       console.log("Sequelize instance obtained, initializing User model...");
 
       const FetchedArticle = defineFetchedArticle(sequelize);
+      const JournalArticle = defineJournalArticle(sequelize);
 
       User.init(
         {
@@ -279,6 +281,8 @@ async function initializeDbAndModels() {
       global.db.Archive = Archive;
       global.db.SavedArticle = SavedArticle;
       global.db.FetchedArticle = FetchedArticle;
+      global.db.JournalArticle = JournalArticle;
+
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
