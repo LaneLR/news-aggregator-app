@@ -1,9 +1,9 @@
-import CategoryPage from "@/components/CategoryPage";
+import CategoryPageComponent from "@/components/CategoryPage";
 
 export default function BusinessNewsPage() {
   return (
     <>
-      <CategoryPage />
+      <CategoryPageComponent category={"Business"}/>
     </>
   );
 }

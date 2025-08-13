@@ -1,9 +1,9 @@
-import CategoryPage from "@/components/CategoryPage";
+import CategoryPageComponent from "@/components/CategoryPage";
 
 export default function WeatherNewsPage() {
   return (
     <>
-      <CategoryPage />
+      <CategoryPageComponent category={"Weather"}/>
     </>
   );
 }
