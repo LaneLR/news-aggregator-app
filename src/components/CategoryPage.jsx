@@ -1,75 +1,175 @@
 "use client";
+import { useEffect, useState } from "react";
+import NewsGridWrapper from "./NewsGridWrapper";
+import NewsCardThree from "./NewsCardThree";
+import styled from "styled-components";
+import Button from "./Button";
 
-import { useState, useEffect } from "react";
-import NewsCardThree from "@/components/NewsCardThree";
-import NewsGridWrapper from "@/components/NewsGridWrapper";
+const SearchBarHeader = styled.div`
+  font-size: 3rem;
+  font-weight: 600;
+  color: var(--deep-blue);
+  padding: 20px 0 0 0;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-export default function CategoryPageComponent({ category }) {
+  @media (max-width: 440px) {
+    font-size: 1.8rem;
+  }
+`;
+
+// New helper function to fetch articles for a specific category
+async function fetchCategoryArticles(category) {
+  const baseUrl =
+    process.env.RENDER_EXTERNAL_URL ||
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    "http://localhost:3000";
+
+  // Use the correct API endpoint for category-specific articles
+  const res = await fetch(`${baseUrl}/api/articles/${category}`, {
+    cache: "no-store", // always get fresh data
+  });
+
+  if (!res.ok) throw new Error("Failed to fetch news for category");
+
+  const data = await res.json();
+  return data.articles;
+}
+
+export default function CategoryPage({ category, archiveId }) {
   const [articles, setArticles] = useState([]);
+  const [defaultArchiveId, setDefaultArchiveId] = useState(null);
+  const [latestTimestamp, setLatestTimestamp] = useState(null);
+  const [newAvailable, setNewAvailable] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  if (!category) {
-    return <p>Error: Category not specified.</p>;
-  }
-
-  // Use this for display ONLY (e.g., "Science")
   const categoryNameForDisplay =
     category.charAt(0).toUpperCase() + category.slice(1);
 
+  // A single function to load articles, used for initial load and refresh
+  const loadArticles = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await fetchCategoryArticles(category.toLowerCase());
+      setArticles(data);
+      if (data.length > 0) {
+        const newest = new Date(data[0].publishedAt || data[0].updatedAt);
+        setLatestTimestamp(newest);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (!category) return;
+    if (category) {
+      loadArticles();
+    }
 
-    const fetchArticles = async () => {
-      setIsLoading(true);
-      setError(null);
+    const handleFocus = async () => {
+      if (!category) return;
       try {
-        // *** THE FIX FOR THE 404 ERROR ***
-        // Always use the original, lowercase 'category' prop for the API URL.
-        const response = await fetch(`/api/articles/${category.toLowerCase()}`);
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch articles. Server responded with ${response.status}`);
+        const latest = await fetchCategoryArticles(category.toLowerCase());
+        const latestArticle = latest[0];
+        if (latestArticle) {
+          const latestDate = new Date(
+            latestArticle.publishedAt || latestArticle.updatedAt
+          );
+          if (latestTimestamp && latestDate > latestTimestamp) {
+            setNewAvailable(true);
+          }
         }
-
-        const data = await response.json();
-        setArticles(data.articles || []);
       } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
+        console.error("Failed to check for new articles:", err);
       }
     };
 
-    fetchArticles();
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, [category]);
+
+  const refreshArticles = async () => {
+    setNewAvailable(false);
+    await loadArticles();
+  };
+
+  // Add the default archive fetch logic
+  useEffect(() => {
+    const fetchDefaultArchive = async () => {
+      try {
+        const res = await fetch("/api/archives/default");
+        const data = await res.json();
+        if (res.ok) {
+          setDefaultArchiveId(data.archiveId);
+        } else {
+          console.warn("Could not get default archive:", data.error);
+        }
+      } catch (err) {
+        console.error("Archive fetch error:", err);
+      }
+    };
+    fetchDefaultArchive();
+  }, []);
+
+  if (isLoading) {
+    return <p>Loading articles...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   return (
     <>
-      {/* Use the capitalized variable for the heading */}
-      <h1 style={{ marginBottom: "1rem" }}>{categoryNameForDisplay} News</h1>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        <SearchBarHeader>{categoryNameForDisplay} Headlines</SearchBarHeader>
+        {newAvailable && (
+          <div
+            style={{
+              margin: "20px 0 0 0",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ fontSize: "1.6rem" }}>🔄</div>
+            <Button
+              bgColor={"var(--primary-blue)"}
+              clr={"var(--white)"}
+              onClick={refreshArticles}
+            >
+              New articles available
+            </Button>
+          </div>
+        )}
+      </div>
 
-      {isLoading && <p>Loading articles...</p>}
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
-
-      {!isLoading && !error && (
-        <>
-          {articles.length > 0 ? (
-            <NewsGridWrapper>
-              {articles.map((article) => (
-                <NewsCardThree
-                  key={article.url}
-                  article={article}
-                  // Make sure archiveId is passed if needed
-                  // archiveId={...} 
-                  viewOnly={true}
-                />
-              ))}
-            </NewsGridWrapper>
-          ) : (
-            <p>No articles found for {categoryNameForDisplay}.</p>
-          )}
-        </>
+      {articles.length > 0 ? (
+        <NewsGridWrapper>
+          {articles.map((article) => (
+            <NewsCardThree
+              key={article.url}
+              article={article}
+              archiveId={defaultArchiveId}
+              viewOnly={true}
+            />
+          ))}
+        </NewsGridWrapper>
+      ) : (
+        <p>No articles found for {categoryNameForDisplay}.</p>
       )}
     </>
   );
