@@ -16,8 +16,9 @@ export async function POST(req) {
 
     await sendEmail({
       to: user.email,
-      subject: "Password Reset",
-      html: `<p>Click to reset your password:</p><a href="${resetUrl}">${resetUrl}</a>`,
+      subject: "Reset your password",
+      html: `<p>Click to reset your password to your RelayNews account:</p>
+              <a href="${resetUrl}">${resetUrl}</a>`,
     });
 
     return Response.json({ message: "Password reset email sent" });
