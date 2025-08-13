@@ -14,6 +14,7 @@ const Wrapper = styled.div`
   width: 100vw;
   background-color: var(--light-white);
   box-sizing: border-box;
+  padding: 0 0 10px 0;
 `;
 
 const FormWrapper = styled.form`

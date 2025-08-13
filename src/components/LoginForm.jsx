@@ -18,6 +18,7 @@ const Wrapper = styled.div`
   overflow-y: hidden;
   flex-flow: column nowrap;
   background-color: var(--light-white);
+  padding: 0 0 10px 0;
 `;
 
 const FormWrapper = styled.form`
