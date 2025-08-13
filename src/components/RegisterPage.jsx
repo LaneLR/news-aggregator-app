@@ -14,6 +14,7 @@ const Wrapper = styled.div`
   width: 100vw;
   background-color: var(--light-white);
   box-sizing: border-box;
+  padding: 0 0 10px 0;
 `;
 
 const FormWrapper = styled.form`
@@ -23,6 +24,13 @@ const FormWrapper = styled.form`
   justify-content: center;
   height: 100%;
   background-color: inherit;
+`;
+
+const InputWrapper = styled.div`
+  height: fit-content;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const RegisterFormInput = styled.input`
@@ -92,29 +100,30 @@ export default function RegisterPage() {
     <Wrapper>
       <FormWrapper onSubmit={handleCreateUser}>
         <Header>Create an account!</Header>
-
-        <RegisterFormInput
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-        />
-        <RegisterFormInput
-          name="password"
-          type="password"
-          placeholder="Password"
-          required
-        />
-        <RegisterFormInput
-          name="confirmPassword"
-          type="password"
-          placeholder="Confirm Password"
-          required
-        />
+        <InputWrapper>
+          <RegisterFormInput
+            name="email"
+            type="email"
+            placeholder="Email"
+            required
+          />
+          <RegisterFormInput
+            name="password"
+            type="password"
+            placeholder="Password"
+            required
+          />
+          <RegisterFormInput
+            name="confirmPassword"
+            type="password"
+            placeholder="Confirm Password"
+            required
+          />
+        </InputWrapper>
 
         <Button
           bgColor={"var(--primary-blue)"}
-          clr={"var(--light-white)"}
+          clr={"var(--white)"}
           type="submit"
         >
           Create Account
@@ -122,7 +131,7 @@ export default function RegisterPage() {
 
         {error && (
           <>
-            <br /> 
+            <br />
             <p style={{ color: "red" }}>{error}</p>
           </>
         )}

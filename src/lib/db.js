@@ -3,6 +3,7 @@ import getSequelizeInstance from "./sequelize.js";
 import User from "./models/User.js";
 import Archive from "./models/Archive.js";
 import SavedArticle from "./models/SavedArticle.js";
+import defineJournalArticle from "./models/JournalArticle.js";
 import defineFetchedArticle from "./models/FetchedArticle.js";
 import { DataTypes, Op } from "sequelize";
 import bcrypt from "bcryptjs";
@@ -22,6 +23,7 @@ async function initializeDbAndModels() {
       console.log("Sequelize instance obtained, initializing User model...");
 
       const FetchedArticle = defineFetchedArticle(sequelize);
+      const JournalArticle = defineJournalArticle(sequelize);
 
       User.init(
         {
@@ -46,7 +48,7 @@ async function initializeDbAndModels() {
           },
           password: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
             validate: {
               notEmpty: { msg: "Password is required" },
               len: {
@@ -279,6 +281,8 @@ async function initializeDbAndModels() {
       global.db.Archive = Archive;
       global.db.SavedArticle = SavedArticle;
       global.db.FetchedArticle = FetchedArticle;
+      global.db.JournalArticle = JournalArticle;
+
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -304,8 +308,8 @@ async function initializeDbAndModels() {
       //1. delete tables in this order on PgAdmin4: SavedArticles, then Archives, then users
       //2. uncomment the sync line, then create a new account to repopulate the tables
 
-      await sequelize.sync({ force: true });
-      console.log("All models were synchronized and created successfully.");
+      // await sequelize.sync({ force: true });
+      // console.log("All models were synchronized and created successfully.");
     } catch (error) {
       console.error("----------------------------------------------------");
       console.error(

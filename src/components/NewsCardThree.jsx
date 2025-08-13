@@ -1,24 +1,20 @@
 "use client";
 import styled from "styled-components";
 import ArchiveToggleButton from "./ArchiveToggleButton.jsx";
-import { useEffect, useState } from "react";
 import Link from "next/link.js";
 import Image from "next/image.js";
+import { useState } from "react";
 
-// 1. Main Card Container
 const CardContainer = styled.div`
   background-color: var(--white);
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  //   overflow: hidden;
   width: 100%;
   max-width: 400px;
-  //   margin: 15px;
   margin-bottom: 15px;
   display: flex;
   flex-direction: column;
   border: 1px solid gray;
-
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   &:hover {
     transform: translateY(-3px);
@@ -44,18 +40,6 @@ const ContentArea = styled.div`
   padding: 20px;
   display: flex;
   flex-direction: column;
-`;
-
-const NewTag = styled.span`
-  background-color: var(--primary-blue);
-  color: #fff;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  align-self: flex-start;
 `;
 
 const ArticleTitle = styled.h3`
@@ -97,12 +81,10 @@ const ReadMoreButton = styled.a`
   align-self: flex-start;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-
   &:hover {
     background-color: #173b9e;
     transform: translateY(-1px);
   }
-
   &:active {
     transform: translateY(0);
   }
@@ -114,49 +96,20 @@ export default function NewsCardThree({
   viewOnly = false,
 }) {
   const FALLBACK_IMAGE_URL = "/images/blurimage.png";
-  const index = article.title.lastIndexOf(" - ");
+
+  const rawUrl =
+    typeof article?.urlToImage === "string" ? article.urlToImage.trim() : "";
+  const initialImage = rawUrl || FALLBACK_IMAGE_URL;
+
+  const [imageSrc, setImageSrc] = useState(initialImage);
+
+  const handleImageError = () => setImageSrc(FALLBACK_IMAGE_URL);
+
   const cleanTitle =
-    index !== -1 ? article.title.substring(0, index) : article.title;
-
-  const [currentImageSrc, setCurrentImageSrc] = useState(() => {
-    return article.urlToImage &&
-      typeof article.urlToImage === "string" &&
-      article.urlToImage.trim() !== ""
-      ? article.urlToImage
-      : FALLBACK_IMAGE_URL;
-  });
-
-  useEffect(() => {
-    setCurrentImageSrc((prevSrc) => {
-      const newSrc =
-        article.urlToImage &&
-        typeof article.urlToImage === "string" &&
-        article.urlToImage.trim() !== ""
-          ? article.urlToImage
-          : FALLBACK_IMAGE_URL;
-      return newSrc !== prevSrc ? newSrc : prevSrc;
-    });
-  }, [article.urlToImage]);
-
-  const proxiedImageUrl = `/api/image-proxy?url=${encodeURIComponent(
-    article.urlToImage || FALLBACK_IMAGE_URL
-  )}`;
-
-  const handleImageError = () => {
-    if (currentImageSrc !== FALLBACK_IMAGE_URL) {
-      console.warn(`Image failed to load: ${currentImageSrc}. Using fallback.`);
-      setCurrentImageSrc(FALLBACK_IMAGE_URL);
-    }
-  };
-
-  const sourceIndex = article.sourceName.lastIndexOf(" > ");
-  sourceIndex !== -1
-    ? article.title.substring(0, sourceIndex)
-    : article.sourceName;
-
-  const cleanSourceName = article.sourceName;
-
-  // const cleanDate = article.publishedAt.slice(0, 10);
+    article.title?.substring(0, article.title.lastIndexOf(" - ")) ||
+    article.title;
+  const cleanSourceName =
+    article.sourceName || article.source?.name || "Unknown source";
 
   return (
     <CardContainer>
@@ -166,15 +119,15 @@ export default function NewsCardThree({
       <Link
         href={article.url}
         target={"_blank"}
-        style={{ position: "relative", width: "100%", height: "200px", }}
+        style={{ position: "relative", width: "100%", height: "200px" }}
       >
         <Image
-          src={article.urlToImage || FALLBACK_IMAGE_URL}
-          alt={article.title || "News article image"}
+          src={imageSrc || FALLBACK_IMAGE_URL}
+          alt={article?.title || "News article image"}
           onError={handleImageError}
           priority
           fill
-          sizes="(max-width: 768px) 100vw, 33vw" // Adjust these sizes as needed
+          sizes="(max-width: 768px) 100vw, 33vw"
           style={{
             objectFit: "cover",
             borderBottom: "1px solid #eee",
@@ -182,17 +135,12 @@ export default function NewsCardThree({
         />
       </Link>
       <ContentArea>
-        {/* <NewTag>New</NewTag> */}
         <ArticleTitle>
           <Link href={article.url} target={"_blank"}>
             {cleanTitle}
           </Link>
         </ArticleTitle>
-        <ArticleSnippet>
-          {/* {article.description} */}-{" "}
-          {article.sourceName || article.source?.name || "Unknown source"}{" "}
-          {/* {cleanDate} */}
-        </ArticleSnippet>
+        <ArticleSnippet>- {cleanSourceName}</ArticleSnippet>
         <div
           style={{
             display: "flex",

@@ -1,8 +1,11 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { User } from "@/lib/models/User";
+import User from "@/lib/models/User";
+import initializeDbAndModels from "@/lib/db";
 
 export async function POST(req, { params }) {
+  const db = await initializeDbAndModels();
+  const { User } = db;
   try {
     const { token } = params;
     const { newPassword } = await req.json();

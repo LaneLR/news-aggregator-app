@@ -18,6 +18,7 @@ const Wrapper = styled.div`
   overflow-y: hidden;
   flex-flow: column nowrap;
   background-color: var(--light-white);
+  padding: 0 0 10px 0;
 `;
 
 const FormWrapper = styled.form`
@@ -28,6 +29,13 @@ const FormWrapper = styled.form`
   text-align: center;
   height: 100%;
   background-color: inherit;
+`;
+
+const InputWrapper = styled.div`
+  height: fit-content;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const LoginFormInput = styled.input`
@@ -106,30 +114,31 @@ export default function LoginPage() {
     <Wrapper>
       <Header>Login</Header>
       <FormWrapper onSubmit={handleLoginUser}>
-        <LoginFormInput
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          value={user.email}
-          onChange={handleChange}
-        />
-        <LoginFormInput
-          name="password"
-          type="password"
-          placeholder="Password"
-          required
-          value={user.password}
-          onChange={handleChange}
-        />
-
+        <InputWrapper>
+          <LoginFormInput
+            name="email"
+            type="email"
+            placeholder="Email"
+            required
+            value={user.email}
+            onChange={handleChange}
+          />
+          <LoginFormInput
+            name="password"
+            type="password"
+            placeholder="Password"
+            required
+            value={user.password}
+            onChange={handleChange}
+          />
+        </InputWrapper>
         <Button
           bgColor={"var(--primary-blue)"}
-          clr={"var(--light-white)"}
+          clr={"var(--white)"}
           type="submit"
           disabled={loading}
         >
-          {loading ? "Logging in..." : "Log in"}
+          Log in
         </Button>
 
         {error && (
@@ -139,22 +148,56 @@ export default function LoginPage() {
           </>
         )}
 
-        <h4
+        <h5
           style={{
             display: "flex",
-            flexDirection: "column",
             alignItems: "center",
+            marginTop: "20px",
           }}
         >
           <br />
-          <div style={{ color: "var(--dark-blue)", textAlign: "center" }}>
+          <div
+            style={{
+              color: "var(--dark-blue)",
+              textAlign: "center",
+              display: "flex",
+              gap: "5px",
+            }}
+          >
             <p>Don&apos;t have an account?</p>
             <Link href="/register">
               <u>Create one!</u>
             </Link>
           </div>
-        </h4>
+        </h5>
+        <h5
+          style={{
+            display: "flex",
+            alignItems: "center",
+            marginTop: "20px",
+          }}
+        >
+          <br />
+          <div
+            style={{
+              color: "var(--dark-blue)",
+              textAlign: "center",
+              display: "flex",
+              gap: "5px",
+            }}
+          >
+            <p>Forgot your password?</p>
+            <Link href="/forgot-password">
+              <u>Reset password</u>
+            </Link>
+          </div>
+        </h5>
       </FormWrapper>
+      <br />
+      <br />
+      <Button bgColor={"var(--primary-blue"} clr={"var(--white)"} onClick={() => signIn("google", { callbackUrl: "/" })}>
+        Sign In with Google
+      </Button>
     </Wrapper>
   );
 }

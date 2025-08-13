@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 import styled from "styled-components";
+import Button from "./Button";
 
 const SearchBarHeader = styled.div`
   font-size: 3rem;
@@ -108,23 +109,23 @@ export default function News({ archiveId }) {
         }}
       >
         <SearchBarHeader>The most recent headlines</SearchBarHeader>
-
         {newAvailable && (
-          <button
-            onClick={refreshArticles}
+          <div
             style={{
-              background: "var(--primary-blue)",
-              color: "#fff",
-              border: "none",
-              padding: "10px 20px",
-              borderRadius: "8px",
-              margin: "1rem 0",
-              cursor: "pointer",
-              fontSize: "1rem",
+              margin: "20px 0 0 0",
+              display: "flex",
+              alignItems: "center",
             }}
           >
-            🔄 New articles available — Click to refresh
-          </button>
+            <div style={{ fontSize: "1.6rem" }}>🔄</div>
+            <Button
+              bgColor={"var(--primary-blue)"}
+              clr={"var(--white)"}
+              onClick={refreshArticles}
+            >
+              New articles available
+            </Button>
+          </div>
         )}
       </div>
 
@@ -141,75 +142,3 @@ export default function News({ archiveId }) {
     </>
   );
 }
-
-// async function fetchNews() {
-//   let baseUrl =
-//     process.env.RENDER_EXTERNAL_URL ||
-//     process.env.NEXT_PUBLIC_BASE_URL ||
-//     "http://localhost:3000";
-
-//   const res = await fetch(`${baseUrl}/api/fetched`, {
-//     cache: "force-cache",
-//     next: { revalidate: 300 },
-//   });
-
-//   if (!res.ok) throw new Error("Failed to fetch news");
-
-//   const data = await res.json();
-//   return data.articles;
-// }
-
-// export default function News({ archiveId }) {
-//   const [articles, setArticles] = useState([]);
-//   const [defaultArchiveId, setDefaultArchiveId] = useState(null);
-
-//   useEffect(() => {
-//     fetchNews()
-//       .then(setArticles)
-//       .catch((err) => console.error("Failed to load articles:", err));
-
-//     const fetchArchive = async () => {
-//       try {
-//         const res = await fetch("/api/archives/default");
-//         const data = await res.json();
-//         if (res.ok) {
-//           setDefaultArchiveId(data.archiveId);
-//         } else {
-//           console.warn("Could not get default archive:", data.error);
-//         }
-//       } catch (err) {
-//         console.error("Archive fetch error:", err);
-//       }
-//     };
-
-//     fetchArchive();
-//   }, []);
-
-//   return (
-//     <>
-//       <div
-//         style={{
-//           display: "flex",
-//           flexDirection: "column",
-//           alignItems: "center",
-//           justifyContent: "center",
-//           textAlign: "start",
-//           width: "100%",
-//         }}
-//       >
-//         <SearchBarHeader>The most recent headlines</SearchBarHeader>
-//       </div>
-
-//       <NewsGridWrapper>
-//         {articles.map((article) => (
-//           <NewsCardThree
-//             key={article.url}
-//             article={article}
-//             archiveId={defaultArchiveId}
-//             viewOnly={true}
-//           />
-//         ))}
-//       </NewsGridWrapper>
-//     </>
-//   );
-// }

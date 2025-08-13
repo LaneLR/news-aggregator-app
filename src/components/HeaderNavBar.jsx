@@ -12,17 +12,22 @@ const Wrapper = styled.div`
   padding: 10px 15px;
   font-size: 1.2rem;
   color: var(--white);
-  gap: 20px;
+  gap: 25px;
   overflow-x: auto;
 
-  @media(max-width: 1030px) {
-  justify-content: left;
+  @media (max-width: 990px) {
+    justify-content: left;
   }
+
+  ::-webkit-scrollbar {
+    height: 4px;
+  
+    }
 `;
 
 const StyledLink = styled(Link)`
-// text-decoration: underline;
-`
+  // text-decoration: underline;
+`;
 
 const Underline = styled.div`
   border: 1px solid var(--white);
@@ -36,47 +41,45 @@ export default function HeaderNavBar() {
           <StyledLink href={"/category/science"}>Science</StyledLink>
           {/* <Underline /> */}
         </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <StyledLink href={"/category/business"}>Business</StyledLink>
           {/* <Underline /> */}
         </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <StyledLink href={"/category/health"}>Health</StyledLink>
           {/* <Underline /> */}
         </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/entertainment"}>Entertainment</StyledLink>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <StyledLink href={"/category/entertainment"}>
+            Entertainment
+          </StyledLink>
           {/* <Underline /> */}
         </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <StyledLink href={"/category/tech"}>Tech</StyledLink>
           {/* <Underline /> */}
         </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <StyledLink href={"/category/politics"}>Politics</StyledLink>
           {/* <Underline /> */}
         </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <StyledLink href={"/category/sports"}>Sports</StyledLink>
           {/* <Underline /> */}
         </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <StyledLink href={"/category/world"}>World</StyledLink>
           {/* <Underline /> */}
         </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <StyledLink href={"/category/us"}>US</StyledLink>
           {/* <Underline /> */}
         </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <StyledLink href={"/category/finance"}>Finance</StyledLink>
           {/* <Underline /> */}
         </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/general"}>General</StyledLink>
-          {/* <Underline /> */}
-        </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <StyledLink href={"/category/weather"}>Weather</StyledLink>
           {/* <Underline /> */}
         </div>
