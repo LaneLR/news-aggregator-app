@@ -8,13 +8,32 @@ import { useSession, signIn } from "next-auth/react";
 import Button from "@/components/Button";
 import LoadingDots from "./Loading";
 import Loading from "@/app/loading";
+import GoogleSignInButton from "./GoogleSignInButton";
 
-const Wrapper = styled.div`
+const PageWrapper = styled.div`
   flex-grow: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100vw;
+  overflow-y: hidden;
+  flex-flow: column-reverse nowrap;
+  background-color: var(--light-white);
+  padding: 0 0 10px 0;
+
+  @media (min-width: 955px) {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+`;
+
+const Wrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
   overflow-y: hidden;
   flex-flow: column nowrap;
   background-color: var(--light-white);
@@ -56,6 +75,37 @@ const Header = styled.div`
   color: var(--dark-blue);
   padding: 10px 0;
   text-align: center;
+  width: 100%;
+
+  @media (max-width: 440px) {
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+`;
+
+const SignInButtonWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: var(--white);
+  border-radius: 8px;
+  height: auto;
+  margin-bottom: 220px;
+
+  @media (max-width: 955px) {
+    margin-bottom: 0;
+    margin: 20px;
+  }
+`;
+
+const SSOText = styled.div`
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--dark-blue);
+  text-align: center;
+  margin-bottom: 20px;
   width: 100%;
 
   @media (max-width: 440px) {
@@ -111,93 +161,98 @@ export default function LoginPage() {
   }
 
   return (
-    <Wrapper>
-      <Header>Login</Header>
-      <FormWrapper onSubmit={handleLoginUser}>
-        <InputWrapper>
-          <LoginFormInput
-            name="email"
-            type="email"
-            placeholder="Email"
-            required
-            value={user.email}
-            onChange={handleChange}
-          />
-          <LoginFormInput
-            name="password"
-            type="password"
-            placeholder="Password"
-            required
-            value={user.password}
-            onChange={handleChange}
-          />
-        </InputWrapper>
-        <Button
-          bgColor={"var(--primary-blue)"}
-          clr={"var(--white)"}
-          type="submit"
-          disabled={loading}
-        >
-          Log in
-        </Button>
+    <PageWrapper>
+      <Wrapper>
+        <Header>Login</Header>
+        <FormWrapper onSubmit={handleLoginUser}>
+          <InputWrapper>
+            <LoginFormInput
+              name="email"
+              type="email"
+              placeholder="Email"
+              required
+              value={user.email}
+              onChange={handleChange}
+            />
+            <LoginFormInput
+              name="password"
+              type="password"
+              placeholder="Password"
+              required
+              value={user.password}
+              onChange={handleChange}
+            />
+          </InputWrapper>
+          <Button
+            bgColor={"var(--primary-blue)"}
+            clr={"var(--white)"}
+            type="submit"
+            disabled={loading}
+          >
+            Log in
+          </Button>
 
-        {error && (
-          <>
+          {error && (
+            <>
+              <br />
+              <p style={{ color: "red" }}>{error}</p>
+            </>
+          )}
+
+          <h5
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginTop: "20px",
+            }}
+          >
             <br />
-            <p style={{ color: "red" }}>{error}</p>
-          </>
-        )}
-
-        <h5
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginTop: "20px",
-          }}
-        >
-          <br />
-          <div
+            <div
+              style={{
+                color: "var(--dark-blue)",
+                textAlign: "center",
+                display: "flex",
+                gap: "5px",
+              }}
+            >
+              <p>Don&apos;t have an account?</p>
+              <Link href="/register">
+                <u>Create one!</u>
+              </Link>
+            </div>
+          </h5>
+          <h5
             style={{
-              color: "var(--dark-blue)",
-              textAlign: "center",
               display: "flex",
-              gap: "5px",
+              alignItems: "center",
+              marginTop: "20px",
             }}
           >
-            <p>Don&apos;t have an account?</p>
-            <Link href="/register">
-              <u>Create one!</u>
-            </Link>
-          </div>
-        </h5>
-        <h5
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginTop: "20px",
-          }}
-        >
-          <br />
-          <div
-            style={{
-              color: "var(--dark-blue)",
-              textAlign: "center",
-              display: "flex",
-              gap: "5px",
-            }}
-          >
-            <p>Forgot your password?</p>
-            <Link href="/forgot-password">
-              <u>Reset password</u>
-            </Link>
-          </div>
-        </h5>
-      </FormWrapper>
-      <br />
-      <br />
-      <Button bgColor={"var(--primary-blue"} clr={"var(--white)"} onClick={() => signIn("google", { callbackUrl: "/" })}>
-        Sign In with Google
-      </Button>
-    </Wrapper>
+            <br />
+            <div
+              style={{
+                color: "var(--dark-blue)",
+                textAlign: "center",
+                display: "flex",
+                gap: "5px",
+              }}
+            >
+              <p>Forgot your password?</p>
+              <Link href="/forgot-password">
+                <u>Reset password</u>
+              </Link>
+            </div>
+          </h5>
+        </FormWrapper>
+        <br />
+        <br />
+      </Wrapper>
+      <SignInButtonWrapper>
+        <SSOText>Sign in with</SSOText>
+        <GoogleSignInButton
+          onClick={() => signIn("google", { callbackUrl: "/" })}
+        />
+      </SignInButtonWrapper>
+    </PageWrapper>
   );
 }
