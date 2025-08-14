@@ -99,9 +99,13 @@ export default function NewsCardThree({
 
   const rawUrl =
     typeof article?.urlToImage === "string" ? article.urlToImage.trim() : "";
-  const initialImage = rawUrl || FALLBACK_IMAGE_URL;
+  
+  // Here's the key change: we construct the URL to use the proxy
+  const proxiedImageUrl = rawUrl
+    ? `/api/image-proxy?url=${encodeURIComponent(rawUrl)}`
+    : FALLBACK_IMAGE_URL;
 
-  const [imageSrc, setImageSrc] = useState(initialImage);
+  const [imageSrc, setImageSrc] = useState(proxiedImageUrl);
 
   const handleImageError = () => setImageSrc(FALLBACK_IMAGE_URL);
 
@@ -122,7 +126,7 @@ export default function NewsCardThree({
         style={{ position: "relative", width: "100%", height: "200px" }}
       >
         <Image
-          src={imageSrc || FALLBACK_IMAGE_URL}
+          src={imageSrc} // Now using the proxied URL
           alt={article?.title || "News article image"}
           onError={handleImageError}
           priority
@@ -130,6 +134,7 @@ export default function NewsCardThree({
           sizes="(max-width: 768px) 100vw, 33vw"
           style={{
             objectFit: "cover",
+            objectPosition: "top",
             borderBottom: "1px solid #eee",
           }}
         />
