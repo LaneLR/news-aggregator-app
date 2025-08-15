@@ -6,7 +6,6 @@ const FooterWrapper = styled.div`
   display: flex;
   flex-direction: column;
   color: var(--white);
-  height: 90px;
 `;
 
 const LinkWrapper = styled.div`
