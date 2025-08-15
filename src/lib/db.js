@@ -62,6 +62,14 @@ async function initializeDbAndModels() {
             type: DataTypes.ENUM("Free", "Pro"),
             defaultValue: "Free",
           },
+          name: {
+            type: DataTypes.STRING,
+            allowNull: true, 
+          },
+          image: {
+            type: DataTypes.TEXT, 
+            allowNull: true,
+          },
           paymentProvider: {
             type: DataTypes.STRING,
             defaultValue: "stripe",
@@ -131,7 +139,7 @@ async function initializeDbAndModels() {
         },
         {
           sequelize,
-          modelName: "user",
+          modelName: "User",
           timestamps: true,
           hooks: {
             beforeCreate: async (user) => {
