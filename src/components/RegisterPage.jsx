@@ -9,12 +9,12 @@ import { signIn } from "next-auth/react";
 const Wrapper = styled.div`
   flex-grow: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-evenly;
   width: 100vw;
   background-color: var(--light-white);
   box-sizing: border-box;
-  padding: 0 0 10px 0;
+  padding: 80px 0 40px 0;
 `;
 
 const FormWrapper = styled.form`
@@ -143,7 +143,11 @@ export default function RegisterPage() {
           <input type="checkbox" id="tos" name="tos" required />
           <label htmlFor="tos">
             I agree to the{" "}
-            <Link href="/terms-of-service" target="_blank" rel="noopener noreferrer">
+            <Link
+              href="/terms-of-service"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Terms of Service
             </Link>{" "}
             and{" "}
@@ -176,7 +180,14 @@ export default function RegisterPage() {
           }}
         >
           <br />
-          <div style={{ color: "var(--dark-blue)", textAlign: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "5px",
+              color: "var(--dark-blue)",
+              textAlign: "center",
+            }}
+          >
             <p>Already have an account?</p>
             <Link href="/login">
               <u>Log in!</u>
