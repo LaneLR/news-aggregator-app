@@ -43,27 +43,35 @@ const Underline = styled.div`
   width: 100%;
 `;
 
+const LinkContainer = styled.div`
+  width: auto;
+`;
+
+const Paragraph = styled.p`
+
+`
+
 export default function Footer() {
   return (
     <FooterWrapper>
       <LinkWrapper>
         <TextContainer>
-          <p>© 2025</p>
-          <p>|</p>
-          <div style={{ width: "auto" }}>
-            <Link href={"/about"}>Privacy</Link>
+          <Paragraph>© 2025</Paragraph>
+          <Paragraph>|</Paragraph>
+          <LinkContainer>
+            <Link href={"/privacy"}>Privacy</Link>
             <Underline />
-          </div>
-          <p> | </p>
-          <div style={{ width: "auto" }}>
+          </LinkContainer>
+          <Paragraph> | </Paragraph>
+          <LinkContainer>
             <Link href={"/about"}>About us</Link>
             <Underline />
-          </div>
-          <p> | </p>
-          <div style={{ width: "auto" }}>
-            <Link href={"/about"}>Contact us</Link>
+          </LinkContainer>
+          <Paragraph> | </Paragraph>
+          <LinkContainer>
+            <Link href={"/contact-us"}>Contact us</Link>
             <Underline />
-          </div>
+          </LinkContainer>
         </TextContainer>
       </LinkWrapper>
       <Disclaimer>
