@@ -59,6 +59,24 @@ const Header = styled.div`
   }
 `;
 
+const CheckboxWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* Space between checkbox and text */
+  margin: 0 0 25px 0;
+  max-width: 320px;
+  text-align: left;
+  font-size: 0.85rem;
+  color: var(--slate);
+
+  /* Style for the links within the checkbox label */
+  a {
+    color: var(--primary-blue);
+    text-decoration: underline;
+  }
+`;
+
 export default function RegisterPage() {
   const [error, setError] = useState(null);
   const router = useRouter();
@@ -121,6 +139,20 @@ export default function RegisterPage() {
           />
         </InputWrapper>
 
+        <CheckboxWrapper>
+          <input type="checkbox" id="tos" name="tos" required />
+          <label htmlFor="tos">
+            I agree to the{" "}
+            <Link href="/terms-of-service" target="_blank" rel="noopener noreferrer">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" target="_blank" rel="noopener noreferrer">
+              Privacy Policy
+            </Link>
+            .
+          </label>
+        </CheckboxWrapper>
         <Button
           bgColor={"var(--primary-blue)"}
           clr={"var(--white)"}
