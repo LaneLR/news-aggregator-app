@@ -51,7 +51,7 @@ const MainHeaderText = styled.h1`
   justify-content: center;
   align-items: center;
   text-align: center;
-  color: var(--dark-blue);
+  ${(props) => props.color && `color: ${props.color};`}
 `;
 
 const StyledParagraphLeft = styled.p`
@@ -156,7 +156,7 @@ export default function HomePage() {
         </div>
       </StyledHomePageSectionOne>
       <StyledHomePageSectionTwo>
-        <MainHeaderText>Discover the Latest News</MainHeaderText>
+        <MainHeaderText color={"var(--deep-blue)"}>Discover the Latest News</MainHeaderText>
         <StyledParagraphCenter>
           <br />
           Explore a wide range of articles from various sources, tailored to
