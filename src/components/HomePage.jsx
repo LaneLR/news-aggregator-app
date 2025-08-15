@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Button from "./Button";
 import Link from "next/link";
 import Image from "next/image";
+import TierCard from "./TierCard";
 
 const HomePageWrapper = styled.div`
   display: flex;
@@ -50,7 +51,7 @@ const MainHeaderText = styled.h1`
   justify-content: center;
   align-items: center;
   text-align: center;
-  ${(props) => props.color && `color: ${props.color};`}
+  color: var(--dark-blue);
 `;
 
 const StyledParagraphLeft = styled.p`
@@ -289,6 +290,7 @@ export default function HomePage() {
         </ImageContainer>
       </StyledHomePageSectionTwo>
       <SpaceFillerSection />
+      {/* <TierCard title={"Pro"} /> */}
     </HomePageWrapper>
   );
 }
