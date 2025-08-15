@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { Op } from "sequelize";
 
 export async function GET(req, { params }) {
-  const { FetchedArticle } = await initializeDbAndModels();
+  const { NewsArticle } = await initializeDbAndModels();
 
   const { category } = params;
 
@@ -15,7 +15,7 @@ export async function GET(req, { params }) {
   const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
 
   try {
-    const { count, rows: articles } = await FetchedArticle.findAndCountAll({
+    const { count, rows: articles } = await NewsArticle.findAndCountAll({
       where: {
         category: {
           [Op.contains]: [categoryName],

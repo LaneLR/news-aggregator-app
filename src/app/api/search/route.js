@@ -34,7 +34,7 @@ export async function GET(req) {
 
     const [results] = await sequelize.query(`
       SELECT *
-      FROM "FetchedArticles"
+      FROM "NewsArticles"
       ${whereClauseSQL}
       ORDER BY "publishedAt" DESC
       LIMIT ${limit} OFFSET ${offset};

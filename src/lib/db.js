@@ -4,7 +4,7 @@ import User from "./models/User.js";
 import Archive from "./models/Archive.js";
 import SavedArticle from "./models/SavedArticle.js";
 import defineJournalArticle from "./models/JournalArticle.js";
-import defineFetchedArticle from "./models/FetchedArticle.js";
+import defineNewsArticle from "./models/NewsArticle.js";
 import { DataTypes, Op } from "sequelize";
 import bcrypt from "bcryptjs";
 import UserInteraction from "./models/UserInteraction.js";
@@ -22,7 +22,7 @@ async function initializeDbAndModels() {
       const sequelize = await getSequelizeInstance();
       console.log("Sequelize instance obtained, initializing User model...");
 
-      const FetchedArticle = defineFetchedArticle(sequelize);
+      const NewsArticle = defineNewsArticle(sequelize);
       const JournalArticle = defineJournalArticle(sequelize);
 
       User.init(
@@ -58,12 +58,9 @@ async function initializeDbAndModels() {
             },
           },
           tier: {
-            type: DataTypes.INTEGER,
-            defaultValue: 0,
-            validate: {
-              min: 0,
-              max: 2,
-            },
+            //add more tiers to ENUM as needed
+            type: DataTypes.ENUM("Free", "Pro"),
+            defaultValue: "Free",
           },
           paymentProvider: {
             type: DataTypes.STRING,
@@ -280,9 +277,8 @@ async function initializeDbAndModels() {
       global.db.User = User;
       global.db.Archive = Archive;
       global.db.SavedArticle = SavedArticle;
-      global.db.FetchedArticle = FetchedArticle;
+      global.db.NewsArticle = NewsArticle;
       global.db.JournalArticle = JournalArticle;
-
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -308,8 +304,8 @@ async function initializeDbAndModels() {
       //1. delete tables in this order on PgAdmin4: SavedArticles, then Archives, then users
       //2. uncomment the sync line, then create a new account to repopulate the tables
 
-      // await sequelize.sync({ force: true });
-      // console.log("All models were synchronized and created successfully.");
+      await sequelize.sync({ force: true });
+      console.log("All models were synchronized and created successfully.");
     } catch (error) {
       console.error("----------------------------------------------------");
       console.error(

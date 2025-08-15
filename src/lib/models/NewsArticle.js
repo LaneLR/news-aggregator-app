@@ -1,9 +1,9 @@
 import { DataTypes, Model } from "sequelize";
 
-class FetchedArticle extends Model {}
+class NewsArticle extends Model {}
 
-export default function defineFetchedArticle(sequelize) {
-  FetchedArticle.init(
+export default function defineNewsArticle(sequelize) {
+  NewsArticle.init(
     {
       title: {
         type: DataTypes.STRING,
@@ -41,10 +41,10 @@ export default function defineFetchedArticle(sequelize) {
     },
     {
       sequelize,
-      modelName: "FetchedArticle",
+      modelName: "NewsArticle",
       timestamps: true,
     }
   );
 
-  return FetchedArticle;
+  return NewsArticle;
 }
