@@ -30,10 +30,10 @@ export async function POST(req) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    user.tier = 1;
+    user.tier = 'Pro';
     await user.save();
 
-    return NextResponse.json({ message: "Tier upgraded to 1!" });
+    return NextResponse.json({ message: "Tier upgraded to Pro!" });
   } catch (err) {
     console.error("Upgrade error:", err);
     return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
@@ -55,10 +55,10 @@ export async function PUT() {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    user.tier = 0;
+    user.tier = 'Free';
     await user.save();
 
-    return NextResponse.json({ message: "Subscription canceled. Tier downgraded to 0." });
+    return NextResponse.json({ message: "Subscription canceled. Tier downgraded to the Free version." });
   } catch (err) {
     console.error("Unsubscribe error:", err);
     return NextResponse.json({ message: "Something went wrong" }, { status: 500 });

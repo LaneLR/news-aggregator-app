@@ -24,7 +24,7 @@ export default async function SubcriptionPage() {
         }}
       >
         Your subscription tier:
-        {session.user.tier === 0 ? (
+        {session.user.tier === 'Free' ? (
           <div
             style={{
               display: "flex",
@@ -45,7 +45,7 @@ export default async function SubcriptionPage() {
               </Link>
             </p>
           </div>
-        ) : session.user.tier === 1 ? (
+        ) : session.user.tier === 'Pro' ? (
           <div
             style={{
               display: "flex",
