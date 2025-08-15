@@ -1,5 +1,4 @@
 "use client";
-
 import { useSession } from "next-auth/react";
 import Button from "./Button";
 import Divider from "./Divider";
@@ -8,30 +7,51 @@ import Loading from "@/app/loading";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
-// --- (Your styled-components remain the same) ---
 const WarningWrapper = styled.div`
-  /* ... */
-`;
-const Underline = styled.div`
-  /* ... */
-`;
-const DeleteAccountWarning = styled.div`
-  /* ... */
-`;
-const EmphasizedText = styled.div`
-  /* ... */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+  margin: 0 0 20px 0;
 `;
 
-// Define a constant for your fallback image
+const Underline = styled.div`
+  margin-top: 2px;
+  border-top: 2px solid #000;
+  width: 100%;
+`;
+
+const DeleteAccountWarning = styled.div`
+  background-color: rgba(255, 34, 34, 0.42);
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 16px 32px;
+  font-weight: 500;
+  border-radius: 6px;
+  margin: 0 0 20px 0;
+`;
+
+const EmphasizedText = styled.div`
+  font-weight: 600;
+`;
+
 const FALLBACK_IMAGE_URL = "/default-avatar.png";
 
 export default function ProfilePage() {
   const { data: session, status, update } = useSession();
   const [isPendingDeletion, setIsPendingDeletion] = useState(false);
-  // Initialize imageSrc state with the fallback
+
+  const proxiedImageUrl = session?.user?.image
+    ? `/api/image-proxy?url=${encodeURIComponent(session.user.image)}`
+    : FALLBACK_IMAGE_URL;
+
   const [imageSrc, setImageSrc] = useState(FALLBACK_IMAGE_URL);
 
-  // This effect runs when the session data is loaded or changes
   useEffect(() => {
     if (session?.user?.image) {
       // Get the raw URL from the session
@@ -47,9 +67,8 @@ export default function ProfilePage() {
     if (session?.user) {
       setIsPendingDeletion(session.user.pendingDeletion !== false);
     }
-  }, [session]); // The dependency array ensures this runs when `session` changes
+  }, [session]);
 
-  // This function will be called by the <Image> component on error
   const handleImageError = () => {
     setImageSrc(FALLBACK_IMAGE_URL);
   };
@@ -62,7 +81,6 @@ export default function ProfilePage() {
     return <p>Access Denied. Please sign in to view your profile.</p>;
   }
 
-  // ... (Your date logic and handlers for deletion remain the same) ...
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
@@ -74,16 +92,65 @@ export default function ProfilePage() {
   });
 
   const handleCancelDeletion = async () => {
-    /* ... */
+    setIsPendingDeletion(false);
+    try {
+      const res = await fetch("/api/users/cancel-deletion", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) throw new Error("Failed to cancel account deletion");
+
+      await update();
+      alert("Account deletion has been canceled.");
+    } catch (err) {
+      setIsPendingDeletion(true);
+      console.error("Cancellation error:", err);
+      alert("Something went wrong while canceling account deletion.");
+    }
   };
+
   const handleRequestDeletion = async () => {
-    /* ... */
+    setIsPendingDeletion(true);
+    try {
+      const res = await fetch("/api/users/request-deletion", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) throw new Error("Failed to request account deletion");
+
+      await update();
+      alert(
+        "Account deletion requested. Your account will be deleted in 24 hours unless you cancel."
+      );
+    } catch (err) {
+      setIsPendingDeletion(false);
+      console.error("Deletion request error:", err);
+      alert("Something went wrong while requesting account deletion.");
+    }
   };
 
   return (
     <>
-      {isPendingDeletion ? <WarningWrapper>{/* ... */}</WarningWrapper> : null}
-
+      {session.user.pendingDeletion ? (
+        <WarningWrapper>
+          <DeleteAccountWarning>
+            <p>
+              Your account is scheduled to be deleted on
+              <b>{tomorrowDateString}</b> at <b>11:59pm CT</b>.
+            </p>
+            <Underline />
+          </DeleteAccountWarning>
+          <Button
+            onClick={handleCancelDeletion}
+            bgColor={"#333333ff"}
+            clr={"var(--white)"}
+          >
+            Cancel Deleting Account
+          </Button>
+        </WarningWrapper>
+      ) : null}
       <div>
         <h1>Profile</h1>
         {/* The Image component now correctly uses the state */}
@@ -96,13 +163,10 @@ export default function ProfilePage() {
           style={{ borderRadius: "50%" }}
         />
         <p>Your email: {session.user.email}</p>
-        <br />
-        <p>Your name: {session.user.name}</p>
-        <Divider />
-        <p>Subscription stuff</p>
+        <br /> <p>Your name: {session.user.name}</p>
+        <Divider /> <p>Subscription stuff</p>
       </div>
-
-      {!isPendingDeletion && (
+      {!session.user.pendingDeletion && (
         <Button onClick={handleRequestDeletion} bgColor={"var(--primary-blue)"}>
           Delete Account
         </Button>
