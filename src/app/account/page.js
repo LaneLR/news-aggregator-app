@@ -1,4 +1,4 @@
-import ProfilePage from "@/components/UserProfile";
+import ProfilePage from "@/components/ProfilePage";
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";

@@ -32,7 +32,7 @@ export async function GET(req) {
 
     const [articles] = await sequelize.query(`
       SELECT DISTINCT ON ("sourceName") *
-      FROM "FetchedArticles"
+      FROM "NewsArticles"
       ${whereClauseSQL}
       ORDER BY "sourceName", "publishedAt" DESC
       LIMIT 50;

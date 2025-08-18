@@ -10,8 +10,8 @@ const Wrapper = styled.button`
   font-weight: 600;
 `
 
-export default function Button({ bgColor, clr, children, onClick }) {
+export default function Button({ bgColor, clr, wide, children, onClick }) {
   return (
-    <Wrapper style={{ backgroundColor: `${bgColor}`, color: `${clr}`}} onClick={onClick}>{children}</Wrapper>
+    <Wrapper style={{ backgroundColor: `${bgColor}`, color: `${clr}`, width: `${wide}`}} onClick={onClick}>{children}</Wrapper>
   );
 }

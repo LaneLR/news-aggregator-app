@@ -53,70 +53,56 @@ export const authOptions = {
   ],
 
   callbacks: {
-    // 3. Add the 'signIn' callback (crucial for SSO)
     async signIn({ user, account }) {
-      // This callback is triggered on a successful sign-in.
       if (account.provider === "google") {
         try {
-          const { email, name } = user;
+          const { email, name, image } = user; // Get name and image from Google user object
           const { User } = await initializeDbAndModels();
-
-          // Check if user already exists in your DB
           let dbUser = await User.findOne({ where: { email } });
 
-          // If not, create a new user entry
           if (!dbUser) {
             dbUser = await User.create({
               email,
-              name, // Assuming you have a name field
-              password: null, // No password for SSO users
-              emailIsVerified: true, // Google handles email verification
+              name, 
+              image,
+              password: null,
+              emailIsVerified: true,
             });
           }
 
-          // Attach your internal DB user ID to the user object
-          // This ensures it gets passed to the JWT callback
+          // Pass all necessary data to the JWT callback
           user.id = dbUser.id;
           user.tier = dbUser.tier;
+          user.name = dbUser.name;
+          user.image = dbUser.image; // Pass the image along
           user.pendingDeletion = dbUser.pendingDeletion;
           user.emailIsVerified = dbUser.emailIsVerified;
-
-          return true; // Allow sign-in
+          return true;
         } catch (error) {
           console.error("SSO SignIn Error:", error);
-          return false; // Prevent sign-in on error
+          return false;
         }
       }
-      // For credentials provider, the authorize function already handled it.
       return true;
     },
-
     async jwt({ token, user }) {
-      // This runs after signIn. The 'user' object is available on initial login.
       if (user) {
+        // This runs on initial sign-in for both providers
         token.id = user.id;
         token.tier = user.tier;
+        token.name = user.name; // <-- ADDED: Save name to token
+        token.picture = user.image; // <-- ADDED: Save picture to token
         token.pendingDeletion = user.pendingDeletion;
         token.emailIsVerified = user.emailIsVerified;
       }
-
-      // This logic for keeping the token fresh on subsequent requests is fine.
-      if (token.email) {
-        const { User } = await initializeDbAndModels();
-        const dbUser = await User.findOne({ where: { email: token.email } });
-        if (dbUser) {
-          token.tier = dbUser.tier;
-          token.pendingDeletion = dbUser.pendingDeletion;
-        }
-      }
-
+      // This part for keeping the token fresh is fine
       return token;
     },
-
     async session({ session, token }) {
-      // Your session callback is already perfect and needs no changes.
       if (token?.id) session.user.id = token.id;
       if (token?.tier !== undefined) session.user.tier = token.tier;
+      if (token?.name) session.user.name = token.name; // <-- ADDED: Expose name to session
+      if (token?.picture) session.user.image = token.picture; // <-- ADDED: Expose picture to session
       if (token?.pendingDeletion !== undefined) {
         session.user.pendingDeletion = token.pendingDeletion;
       }

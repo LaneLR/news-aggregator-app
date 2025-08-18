@@ -14,10 +14,10 @@ const PageWrapper = styled.div`
   flex-grow: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: left;
   width: 100vw;
   overflow-y: hidden;
-  flex-flow: column-reverse nowrap;
+  flex-flow: column nowrap;
   background-color: var(--light-white);
   padding: 0 0 10px 0;
 
@@ -88,8 +88,9 @@ const SignInButtonWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  row-gap: 8px;
   padding: 20px;
-  background-color: var(--white);
+  // background-color: var(--white);
   border-radius: 8px;
   height: auto;
   margin-bottom: 220px;
@@ -162,6 +163,12 @@ export default function LoginPage() {
 
   return (
     <PageWrapper>
+      <SignInButtonWrapper>
+        {/* <SSOText>Sign in with</SSOText> */}
+        <GoogleSignInButton
+          onClick={() => signIn("google", { callbackUrl: "/" })}
+        />
+      </SignInButtonWrapper>
       <Wrapper>
         <Header>Login</Header>
         <FormWrapper onSubmit={handleLoginUser}>
@@ -247,12 +254,6 @@ export default function LoginPage() {
         <br />
         <br />
       </Wrapper>
-      <SignInButtonWrapper>
-        <SSOText>Sign in with</SSOText>
-        <GoogleSignInButton
-          onClick={() => signIn("google", { callbackUrl: "/" })}
-        />
-      </SignInButtonWrapper>
     </PageWrapper>
   );
 }

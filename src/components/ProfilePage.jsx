@@ -4,7 +4,8 @@ import Button from "./Button";
 import Divider from "./Divider";
 import styled from "styled-components";
 import Loading from "@/app/loading";
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
+import Image from "next/image";
 
 const WarningWrapper = styled.div`
   display: flex;
@@ -39,26 +40,45 @@ const EmphasizedText = styled.div`
   font-weight: 600;
 `;
 
+const FALLBACK_IMAGE_URL = "/default-avatar.png";
+
 export default function ProfilePage() {
   const { data: session, status, update } = useSession();
   const [isPendingDeletion, setIsPendingDeletion] = useState(false);
 
+  const proxiedImageUrl = session?.user?.image
+    ? `/api/image-proxy?url=${encodeURIComponent(session.user.image)}`
+    : FALLBACK_IMAGE_URL;
+
+  const [imageSrc, setImageSrc] = useState(FALLBACK_IMAGE_URL);
+
   useEffect(() => {
+    if (session?.user?.image) {
+      // Get the raw URL from the session
+      const rawUrl = session.user.image;
+      // Construct the proxied URL
+      const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(rawUrl)}`;
+      setImageSrc(proxiedUrl);
+    } else {
+      // If there's no image in the session, ensure it uses the fallback
+      setImageSrc(FALLBACK_IMAGE_URL);
+    }
+
     if (session?.user) {
       setIsPendingDeletion(session.user.pendingDeletion !== false);
     }
   }, [session]);
 
+  const handleImageError = () => {
+    setImageSrc(FALLBACK_IMAGE_URL);
+  };
+
   if (status === "loading") {
     return <Loading />;
   }
 
-  if (!session) {
-    return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
-        Please log in to view your profile.
-      </div>
-    );
+  if (status === "unauthenticated" || !session) {
+    return <p>Access Denied. Please sign in to view your profile.</p>;
   }
 
   const today = new Date();
@@ -113,11 +133,11 @@ export default function ProfilePage() {
 
   return (
     <>
-      {isPendingDeletion ? (
+      {session.user.pendingDeletion ? (
         <WarningWrapper>
           <DeleteAccountWarning>
             <p>
-              Your account is scheduled to be deleted on{" "}
+              Your account is scheduled to be deleted on
               <b>{tomorrowDateString}</b> at <b>11:59pm CT</b>.
             </p>
             <Underline />
@@ -131,16 +151,25 @@ export default function ProfilePage() {
           </Button>
         </WarningWrapper>
       ) : null}
-
       <div>
         <h1>Profile</h1>
+        {/* The Image component now correctly uses the state */}
+        <Image
+          src={imageSrc}
+          width={100}
+          height={100}
+          alt={"User image"}
+          onError={handleImageError} // This is a great safety net
+          style={{ borderRadius: "50%" }}
+        />
         <p>Your email: {session.user.email}</p>
-        <Divider />
-        <p>Subscription stuff</p>
+        <br /> <p>Your name: {session.user.name}</p>
+        <Divider /> <p>Subscription stuff</p>
       </div>
-
-      {!isPendingDeletion && (
-        <Button onClick={handleRequestDeletion} bgColor={"var(--primary-blue)"}>Delete Account</Button>
+      {!session.user.pendingDeletion && (
+        <Button onClick={handleRequestDeletion} bgColor={"var(--primary-blue)"}>
+          Delete Account
+        </Button>
       )}
     </>
   );

@@ -9,12 +9,12 @@ import { signIn } from "next-auth/react";
 const Wrapper = styled.div`
   flex-grow: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-evenly;
   width: 100vw;
   background-color: var(--light-white);
   box-sizing: border-box;
-  padding: 0 0 10px 0;
+  padding: 80px 0 40px 0;
 `;
 
 const FormWrapper = styled.form`
@@ -56,6 +56,24 @@ const Header = styled.div`
   @media (max-width: 440px) {
     font-size: 1.8rem;
     font-weight: 700;
+  }
+`;
+
+const CheckboxWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* Space between checkbox and text */
+  margin: 0 0 25px 0;
+  max-width: 320px;
+  text-align: left;
+  font-size: 0.85rem;
+  color: var(--slate);
+
+  /* Style for the links within the checkbox label */
+  a {
+    color: var(--primary-blue);
+    text-decoration: underline;
   }
 `;
 
@@ -121,6 +139,24 @@ export default function RegisterPage() {
           />
         </InputWrapper>
 
+        <CheckboxWrapper>
+          <input type="checkbox" id="tos" name="tos" required />
+          <label htmlFor="tos">
+            I agree to the{" "}
+            <Link
+              href="/terms-of-service"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" target="_blank" rel="noopener noreferrer">
+              Privacy Policy
+            </Link>
+            .
+          </label>
+        </CheckboxWrapper>
         <Button
           bgColor={"var(--primary-blue)"}
           clr={"var(--white)"}
@@ -144,7 +180,14 @@ export default function RegisterPage() {
           }}
         >
           <br />
-          <div style={{ color: "var(--dark-blue)", textAlign: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "5px",
+              color: "var(--dark-blue)",
+              textAlign: "center",
+            }}
+          >
             <p>Already have an account?</p>
             <Link href="/login">
               <u>Log in!</u>
