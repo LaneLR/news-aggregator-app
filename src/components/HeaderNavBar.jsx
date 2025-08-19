@@ -21,8 +21,7 @@ const Wrapper = styled.div`
 
   ::-webkit-scrollbar {
     height: 4px;
-  
-    }
+  }
 `;
 
 const StyledLink = styled(Link)`
@@ -37,6 +36,10 @@ export default function HeaderNavBar() {
   return (
     <>
       <Wrapper>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <StyledLink href={"/category/market"}>Market</StyledLink>
+          {/* <Underline /> */}
+        </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <StyledLink href={"/category/science"}>Science</StyledLink>
           {/* <Underline /> */}
