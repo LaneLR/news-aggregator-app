@@ -270,7 +270,6 @@ export default function HomePage() {
             features={[
               "Access to hundreds of news sources and blog posts",
               "Unlimited number of Archives to save your favorite articles",
-              "Access to journals and daily market data",
             ]}
             cost={"$8 / mo"}
           />
@@ -279,7 +278,7 @@ export default function HomePage() {
             features={[
               "Access to hundreds of news sources and blog posts",
               "Unlimited number of Archives to save your favorite articles",
-              "Access to journals and hourly market data",
+              "Access to journals, daily market data, and podcasts",
               "Customizable news feed",
               "Priority support",
               "Exclusive content and features",
