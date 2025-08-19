@@ -8,6 +8,8 @@ import defineNewsArticle from "./models/NewsArticle.js";
 import { DataTypes, Op } from "sequelize";
 import bcrypt from "bcryptjs";
 import UserInteraction from "./models/UserInteraction.js";
+import defineMarketArticle from "./models/MarketArticle.js";
+import definePodcast from "./models/Podcast.js";
 
 if (!global.db) {
   global.db = {};
@@ -24,6 +26,8 @@ async function initializeDbAndModels() {
 
       const NewsArticle = defineNewsArticle(sequelize);
       const JournalArticle = defineJournalArticle(sequelize);
+      const MarketArticle = defineMarketArticle(sequelize);
+      const Podcast = definePodcast(sequelize);
 
       User.init(
         {
@@ -64,10 +68,10 @@ async function initializeDbAndModels() {
           },
           name: {
             type: DataTypes.STRING,
-            allowNull: true, 
+            allowNull: true,
           },
           image: {
-            type: DataTypes.TEXT, 
+            type: DataTypes.TEXT,
             allowNull: true,
           },
           paymentProvider: {
@@ -287,6 +291,8 @@ async function initializeDbAndModels() {
       global.db.SavedArticle = SavedArticle;
       global.db.NewsArticle = NewsArticle;
       global.db.JournalArticle = JournalArticle;
+      global.db.MarketArticle = MarketArticle;
+      global.db.Podcast = Podcast;
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -312,8 +318,8 @@ async function initializeDbAndModels() {
       //1. delete tables in this order on PgAdmin4: SavedArticles, then Archives, then users
       //2. uncomment the sync line, then create a new account to repopulate the tables
 
-      await sequelize.sync({ force: true });
-      console.log("All models were synchronized and created successfully.");
+      // await sequelize.sync({ force: true });
+      // console.log("All models were synchronized and created successfully.");
     } catch (error) {
       console.error("----------------------------------------------------");
       console.error(
