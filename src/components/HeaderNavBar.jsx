@@ -37,6 +37,10 @@ export default function HeaderNavBar() {
     <>
       <Wrapper>
         <div style={{ display: "flex", flexDirection: "column" }}>
+          <StyledLink href={"/category/journal"}>Journals</StyledLink>
+          {/* <Underline /> */}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <StyledLink href={"/category/market"}>Market</StyledLink>
           {/* <Underline /> */}
         </div>
