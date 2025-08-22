@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import SearchBar from "./SearchBar";
 import HeaderNavBar from "./HeaderNavBar";
+import SubscribeButton from "./SubscribeButton";
 
 const Wrapper = styled.div`
   display: flex;
@@ -194,7 +195,7 @@ const LogoText = styled.p`
   }
 `;
 
-export default function Header() {
+export default function Header({priceId}) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -232,7 +233,7 @@ export default function Header() {
   return (
     <>
       {!!session ? (
-        <div style={{ width: '100%'}}>
+        <div style={{ width: "100%" }}>
           <Wrapper>
             <LeftContainer>
               <Link style={{ display: "inherit" }} href={"/news"}>
@@ -265,6 +266,9 @@ export default function Header() {
               <SearchBar />
             </CenterContainer>
             <RightContainer>
+              <Link href={"/subscription-page"}>
+                <Button>SubscriptionPage</Button>
+              </Link>
               <DropdownContainer ref={dropdownRef}>
                 <UserAccountIcon onClick={toggleDropdown}>
                   <MenuIcon>
@@ -428,10 +432,7 @@ export default function Header() {
             <RightContainer>
               <nav style={{ display: "flex", columnGap: "10px" }}>
                 <Link style={{ display: "flex" }} href={"/login"}>
-                  <Button
-                    bgColor={"var(--primary-blue)"}
-                    clr={"var(--white)"}
-                  >
+                  <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
                     Log in
                   </Button>
                 </Link>
