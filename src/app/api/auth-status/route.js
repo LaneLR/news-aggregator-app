@@ -19,6 +19,8 @@ export async function GET(req) {
         tier: token.tier,
         pendingDeletion: token.pendingDeletion,
         emailIsVerified: token.emailIsVerified,
+        stripeSubscriptionStatus: token.stripeSubscriptionStatus,
+        stripeSubscriptionEndsAt: token.stripeSubscriptionEndsAt,
       },
     },
     { status: 200 }
