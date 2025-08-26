@@ -1,5 +1,5 @@
 import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google"; // 1. Import Google Provider
+import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import initializeDbAndModels from "@/lib/db.js";
@@ -8,11 +8,10 @@ export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
   pages: {
-    signIn: "/login", // Specify your custom login page
+    signIn: "/login",
   },
 
   providers: [
-    // 2. Add GoogleProvider to the array
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -28,7 +27,6 @@ export const authOptions = {
         const user = await User.findOne({ where: { email } });
 
         if (!user) throw new Error("No user found with that email");
-        // Prevent Google users from signing in with credentials
         if (!user.password) {
           throw new Error("Please sign in with Google to access your account.");
         }
@@ -40,74 +38,98 @@ export const authOptions = {
           throw new Error("Please verify your email address to log in.");
         }
 
-        // Return all necessary fields for the JWT
+        // This data gets passed to the 'user' object in the jwt callback on sign-in
         return {
           id: user.id,
           email: user.email,
           tier: user.tier,
           pendingDeletion: user.pendingDeletion,
           emailIsVerified: user.emailIsVerified,
+          stripeSubscriptionStatus: user.stripeSubscriptionStatus,
+          stripeSubscriptionEndsAt: user.stripeSubscriptionEndsAt,
         };
       },
     }),
   ],
 
   callbacks: {
+    // CORRECTED: Restored original logic for Google sign-in
     async signIn({ user, account }) {
       if (account.provider === "google") {
         try {
-          const { email, name, image } = user; // Get name and image from Google user object
+          const { email, name, image } = user;
           const { User } = await initializeDbAndModels();
           let dbUser = await User.findOne({ where: { email } });
 
+          // Create user if they don't exist
           if (!dbUser) {
             dbUser = await User.create({
               email,
-              name, 
+              name,
               image,
-              password: null,
+              password: null, // No password for OAuth users
               emailIsVerified: true,
             });
           }
 
-          // Pass all necessary data to the JWT callback
+          // Populate the NextAuth user object with your database user's ID and other fields
           user.id = dbUser.id;
           user.tier = dbUser.tier;
-          user.name = dbUser.name;
-          user.image = dbUser.image; // Pass the image along
-          user.pendingDeletion = dbUser.pendingDeletion;
-          user.emailIsVerified = dbUser.emailIsVerified;
+          user.stripeSubscriptionStatus = dbUser.stripeSubscriptionStatus;
+          // ... etc.
+
           return true;
         } catch (error) {
           console.error("SSO SignIn Error:", error);
           return false;
         }
       }
-      return true;
+      return true; // Allow sign-in for other providers
     },
+
+    // CORRECTED: Added the logic to refresh the token with fresh DB data
     async jwt({ token, user }) {
+      // The 'user' object is only available on initial sign-in.
       if (user) {
-        // This runs on initial sign-in for both providers
         token.id = user.id;
         token.tier = user.tier;
-        token.name = user.name; // <-- ADDED: Save name to token
-        token.picture = user.image; // <-- ADDED: Save picture to token
-        token.pendingDeletion = user.pendingDeletion;
-        token.emailIsVerified = user.emailIsVerified;
+        token.stripeSubscriptionStatus = user.stripeSubscriptionStatus;
+        token.stripeSubscriptionEndsAt = user.stripeSubscriptionEndsAt;
+        // Add any other user properties you want in the token
+        return token;
       }
-      // This part for keeping the token fresh is fine
-      return token;
+
+      // On subsequent requests, 'user' is undefined.
+      // We must re-fetch data from the DB to keep the session fresh.
+      const { User } = await initializeDbAndModels();
+      const dbUser = await User.findByPk(token.id);
+
+      if (!dbUser) {
+        // If the user was deleted, invalidate the token
+        return null;
+      }
+
+      // Update the token with the latest user data
+      return {
+        ...token, // Preserve existing token data (like name, email, etc.)
+        tier: dbUser.tier,
+        stripeSubscriptionStatus: dbUser.stripeSubscriptionStatus,
+        stripeSubscriptionEndsAt: dbUser.stripeSubscriptionEndsAt,
+      };
     },
+
+    // This callback is now correct because the `token` it receives is always up-to-date
     async session({ session, token }) {
-      if (token?.id) session.user.id = token.id;
-      if (token?.tier !== undefined) session.user.tier = token.tier;
-      if (token?.name) session.user.name = token.name; // <-- ADDED: Expose name to session
-      if (token?.picture) session.user.image = token.picture; // <-- ADDED: Expose picture to session
-      if (token?.pendingDeletion !== undefined) {
+      if (token) {
+        session.user.id = token.id;
+        session.user.tier = token.tier;
+        session.user.name = token.name;
+        session.user.image = token.picture;
         session.user.pendingDeletion = token.pendingDeletion;
-      }
-      if (token?.emailIsVerified)
         session.user.emailIsVerified = token.emailIsVerified;
+        session.user.stripeSubscriptionStatus = token.stripeSubscriptionStatus;
+        session.user.stripeSubscriptionEndsAt = token.stripeSubscriptionEndsAt;
+      }
       return session;
     },
   },
