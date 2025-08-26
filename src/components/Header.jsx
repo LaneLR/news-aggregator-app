@@ -266,7 +266,7 @@ export default function Header({priceId}) {
               <SearchBar />
             </CenterContainer>
             <RightContainer>
-              <Link href={"/subscription-page"}>
+              <Link href={"/pricing"}>
                 <Button>SubscriptionPage</Button>
               </Link>
               <DropdownContainer ref={dropdownRef}>
