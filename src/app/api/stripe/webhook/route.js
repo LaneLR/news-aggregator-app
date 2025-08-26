@@ -2,22 +2,20 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import initializeDbAndModels from "@/lib/db";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(req) {
-  const payload = await req.text();
+  const buf = await req.arrayBuffer();
   const signature = req.headers.get("stripe-signature");
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+    event = stripe.webhooks.constructEvent(
+      Buffer.from(buf), // Use the buffer here
+      signature,
+      webhookSecret
+    );
   } catch (err) {
     console.error("Webhook signature verification failed:", err.message);
     return NextResponse.json(
@@ -66,7 +64,6 @@ export async function POST(req) {
         if (priceId === "price_1Ry0mKFlSQA8kdoEj98uKzPj") newTier = "Pro";
         else if (priceId === "price_1Ry0oNFlSQA8kdoEdZzVvegu")
           newTier = "Pro Annual";
-
         await user.update({
           tier: newTier,
           stripeCustomerId: subscription.customer,
@@ -88,11 +85,20 @@ export async function POST(req) {
 
         const updateFields = {
           stripeSubscriptionStatus: subscription.status,
+          stripePriceId: subscription.items.data[0].price.id,
+          stripeSubscriptionEndsAt: subscription.cancel_at,
         };
 
-        if (subscription.current_period_end) {
+        let endDateTimestamp = null;
+        if (typeof subscription.cancel_at === "number") {
+          endDateTimestamp = subscription.cancel_at;
+        } else if (typeof subscription.current_period_end === "number") {
+          endDateTimestamp = subscription.current_period_end;
+        }
+
+        if (endDateTimestamp !== null) {
           updateFields.stripeSubscriptionEndsAt = new Date(
-            subscription.current_period_end * 1000
+            endDateTimestamp * 1000
           );
         }
 

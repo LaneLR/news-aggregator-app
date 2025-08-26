@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { headers } from "next/headers"; // <-- Import headers here
+import { headers } from "next/headers"; 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import initializeDbAndModels from "@/lib/db";
+import { revalidatePath } from "next/cache";
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -40,6 +41,8 @@ export async function POST(req) {
       client_reference_id: user.id,
       customer_email: user.email,
     });
+
+    revalidatePath("/pricing");
 
     return NextResponse.json({ sessionId: stripeSession.id });
   } catch (err) {
