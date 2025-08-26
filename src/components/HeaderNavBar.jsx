@@ -15,12 +15,8 @@ const Wrapper = styled.div`
   gap: 25px;
   overflow-x: auto;
 
-  @media (max-width: 990px) {
+  @media (max-width: 1156px) {
     justify-content: left;
-  }
-
-  ::-webkit-scrollbar {
-    height: 4px;
   }
 `;
 
