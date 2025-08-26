@@ -5,7 +5,7 @@ import LoadingDots from "./Loading";
 import Loading from "@/app/loading";
 
 export default function AccountClientPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
 
   if (status === "loading") return <Loading />;
   if (!session) return <p>Access Denied</p>;
