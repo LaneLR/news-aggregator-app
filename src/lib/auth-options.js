@@ -29,7 +29,7 @@ export const authOptions = {
         if (!user) throw new Error("No user found with that email");
 
         if (user.status === "inactive") {
-          throw new Error("AccountInactive");
+          throw new Error("This account is inactive or deleted.");
         }
 
         if (!user.password) {
