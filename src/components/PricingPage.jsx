@@ -1,4 +1,3 @@
-// src/components/PricingPage.js (Client Component)
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,17 +7,14 @@ import SubscribeButton from "@/components/SubscribeButton";
 import { useSession } from "next-auth/react";
 import ResumeSubscriptionButton from "./ResumeSubscriptionButton";
 
-// Accept initial session data as a prop
 export default function PricingPageComponent({ sessionData }) {
   const { data: session, status, update } = useSession({ data: sessionData });
 
-  // Add the periodic update as a fallback
   useEffect(() => {
     const interval = setInterval(() => update(), 1000 * 60 * 5); // Refreshes every 5 minutes
     return () => clearInterval(interval);
   }, [update]);
 
-  // Use the session data passed from the server or the updated client session
   const stripeSubscriptionStatus = session?.user?.stripeSubscriptionStatus;
   const stripeSubscriptionEndsAt = session?.user?.stripeSubscriptionEndsAt;
   const isSubscriptionActive = session?.user?.stripeSubscriptionStatus === "active";
@@ -36,10 +32,8 @@ export default function PricingPageComponent({ sessionData }) {
       {isSubscriptionActive ? (
         <div>
           {isCancellationScheduled ? (
-            // If cancellation is scheduled, show the RESUME button
             <ResumeSubscriptionButton updateSession={update} />
           ) : (
-            // Otherwise, show the CANCEL button
             <CancelSubscriptionButton
               updateSession={update}
               subscriptionEndDate={stripeSubscriptionEndsAt}
