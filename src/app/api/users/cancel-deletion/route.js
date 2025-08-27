@@ -14,11 +14,11 @@ export async function PATCH() {
 
   await User.update(
     {
-      pendingDeletion: false,
+      isPendingDeletion: false,
       deletionRequestedAt: null,
     },
     {
-      where: { email: session.user.email },
+      where: { id: session.user.id },
     }
   );
 
