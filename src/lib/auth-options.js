@@ -27,6 +27,11 @@ export const authOptions = {
         const user = await User.findOne({ where: { email } });
 
         if (!user) throw new Error("No user found with that email");
+
+        if (user.status === "inactive") {
+          throw new Error("AccountInactive");
+        }
+
         if (!user.password) {
           throw new Error("Please sign in with Google to access your account.");
         }
@@ -38,7 +43,6 @@ export const authOptions = {
           throw new Error("Please verify your email address to log in.");
         }
 
-        // This data gets passed to the 'user' object in the jwt callback on sign-in
         return {
           id: user.id,
           email: user.email,
@@ -53,72 +57,61 @@ export const authOptions = {
   ],
 
   callbacks: {
-    // CORRECTED: Restored original logic for Google sign-in
     async signIn({ user, account }) {
-      if (account.provider === "google") {
-        try {
-          const { email, name, image } = user;
-          const { User } = await initializeDbAndModels();
-          let dbUser = await User.findOne({ where: { email } });
+      try {
+        const { User } = await initializeDbAndModels();
+        const dbUser = await User.findOne({ where: { email: user.email } });
 
-          // Create user if they don't exist
-          if (!dbUser) {
-            dbUser = await User.create({
-              email,
-              name,
-              image,
-              password: null, // No password for OAuth users
-              emailIsVerified: true,
-            });
+        if (dbUser) {
+          if (dbUser.status === "inactive") {
+            return "/login?error=AccountInactive";
           }
-
-          // Populate the NextAuth user object with your database user's ID and other fields
           user.id = dbUser.id;
-          user.tier = dbUser.tier;
-          user.stripeSubscriptionStatus = dbUser.stripeSubscriptionStatus;
-          // ... etc.
-
-          return true;
-        } catch (error) {
-          console.error("SSO SignIn Error:", error);
-          return false;
+        } else if (account.provider === "google") {
+          const { email, name, image } = user;
+          const newDbUser = await User.create({
+            email,
+            name,
+            image,
+            password: null,
+            emailIsVerified: true,
+          });
+          user.id = newDbUser.id;
         }
+
+        return true;
+      } catch (error) {
+        console.error("SignIn Error:", error);
+        return false;
       }
-      return true; // Allow sign-in for other providers
     },
 
-    // CORRECTED: Added the logic to refresh the token with fresh DB data
     async jwt({ token, user }) {
-      // The 'user' object is only available on initial sign-in.
       if (user) {
         token.id = user.id;
         token.tier = user.tier;
+        token.isPendingDeletion = user.isPendingDeletion;
         token.stripeSubscriptionStatus = user.stripeSubscriptionStatus;
         token.stripeSubscriptionEndsAt = user.stripeSubscriptionEndsAt;
-        // Add any other user properties you want in the token
         return token;
       }
 
-      // On subsequent requests, 'user' is undefined.
-      // We must re-fetch data from the DB to keep the session fresh.
       const { User } = await initializeDbAndModels();
       const dbUser = await User.findByPk(token.id);
 
-      if (!dbUser) {
-        // If the user was deleted, invalidate the token
+      if (!dbUser || dbUser.status === "inactive") {
         return null;
       }
 
-      // Update the token with the latest user data
       return {
-        ...token, // Preserve existing token data (like name, email, etc.)
+        ...token,
         tier: dbUser.tier,
+        isPendingDeletion: dbUser.isPendingDeletion,
         stripeSubscriptionStatus: dbUser.stripeSubscriptionStatus,
         stripeSubscriptionEndsAt: dbUser.stripeSubscriptionEndsAt,
       };
     },
 
-    // This callback is now correct because the `token` it receives is always up-to-date
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
