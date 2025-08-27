@@ -12,7 +12,7 @@ export async function deleteExpiredUsers() {
 
   const deleted = await User.destroy({
     where: {
-      pendingDeletion: true,
+      isPendingDeletion: true,
       deletionRequestedAt: { [Op.lt]: twentyFourHours },
     },
   });

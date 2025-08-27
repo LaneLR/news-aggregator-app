@@ -43,7 +43,7 @@ export const authOptions = {
           id: user.id,
           email: user.email,
           tier: user.tier,
-          pendingDeletion: user.pendingDeletion,
+          isPendingDeletion: user.isPendingDeletion,
           emailIsVerified: user.emailIsVerified,
           stripeSubscriptionStatus: user.stripeSubscriptionStatus,
           stripeSubscriptionEndsAt: user.stripeSubscriptionEndsAt,
@@ -125,7 +125,7 @@ export const authOptions = {
         session.user.tier = token.tier;
         session.user.name = token.name;
         session.user.image = token.picture;
-        session.user.pendingDeletion = token.pendingDeletion;
+        session.user.isPendingDeletion = token.isPendingDeletion;
         session.user.emailIsVerified = token.emailIsVerified;
         session.user.stripeSubscriptionStatus = token.stripeSubscriptionStatus;
         session.user.stripeSubscriptionEndsAt = token.stripeSubscriptionEndsAt;
