@@ -90,6 +90,14 @@ async function initializeDbAndModels() {
             type: DataTypes.BOOLEAN,
             defaultValue: false,
           },
+          deletionRequestedAt: {
+            type: DataTypes.DATE,
+            allowNull: true,
+          },
+          status: {
+            type: DataTypes.ENUM("active", "inactive"),
+            defaultValue: "active",
+          },
         },
         {
           sequelize,
@@ -268,8 +276,8 @@ async function initializeDbAndModels() {
       //1. delete tables in this order on PgAdmin4: SavedArticles, then Archives, then users
       //2. uncomment the sync line, then create a new account to repopulate the tables
 
-      // await sequelize.sync({ force: true });
-      // console.log("All models were synchronized and created successfully.");
+      await sequelize.sync({ force: true });
+      console.log("All models were synchronized and created successfully.");
     } catch (error) {
       console.error("----------------------------------------------------");
       console.error(
