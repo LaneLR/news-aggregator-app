@@ -78,7 +78,14 @@ const ButtonContainer = styled.div`
   align-items: center;
 `;
 
-export default function Banner3({ title, features, cost, onClick, children }) {
+const PromoCodeText = styled.p`
+  font-size: 0.9rem;
+  padding: 10px 0 0 0;
+  text-align: left;
+  width: 100%;
+`;
+
+export default function Banner3({ title, features, cost, children, promoCode }) {
   return (
     <>
       <Wrapper>
@@ -90,9 +97,8 @@ export default function Banner3({ title, features, cost, onClick, children }) {
           ))}
         </PlanBody>
         <Cost>{cost}</Cost>
-        <ButtonContainer>
-          {children}
-        </ButtonContainer>
+        <ButtonContainer>{children}</ButtonContainer>
+        <div>{promoCode}</div>
       </Wrapper>
     </>
   );
