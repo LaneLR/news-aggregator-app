@@ -1,9 +1,10 @@
 // src/components/SubscribeButton.js
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import Button from "./Button";
+import { useSession } from "next-auth/react";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -13,8 +14,11 @@ export default function SubscribeButton({
   priceId,
   clr,
   bgColor,
-  updateSession,
+  sessionData,
 }) {
+  const { data: session, update: updateSession } = useSession({
+    data: sessionData,
+  });
   const [error, setError] = useState(null);
 
   const handleSubscribe = async () => {
@@ -26,25 +30,46 @@ export default function SubscribeButton({
     }
 
     try {
-      const response = await fetch("/api/stripe/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId }),
-      });
+      // Determine if the user has an existing subscription
+      const hasExistingSubscription = !!session?.user?.stripeSubscriptionId;
 
-      const { sessionId, error: apiError } = await response.json();
+      if (hasExistingSubscription) {
+        // This is an upgrade/downgrade. Call the API to update the subscription.
+        const response = await fetch("/api/stripe/create-checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ priceId }),
+        });
+        const data = await response.json();
 
-      if (apiError || !sessionId) {
-        throw new Error(apiError || "Failed to create a session.");
-      }
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to update subscription.");
+        }
 
-      const stripe = await stripePromise;
-      const { error: stripeError } = await stripe.redirectToCheckout({
-        sessionId,
-      });
+        // Update the session to reflect the new subscription status
+        await updateSession();
+      } else {
+        // This is a new subscription. Create a checkout session.
+        const response = await fetch("/api/stripe/create-checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ priceId }),
+        });
 
-      if (stripeError) {
-        throw new Error(stripeError.message);
+        const { sessionId, error: apiError } = await response.json();
+
+        if (apiError || !sessionId) {
+          throw new Error(apiError || "Failed to create a session.");
+        }
+
+        const stripe = await stripePromise;
+        const { error: stripeError } = await stripe.redirectToCheckout({
+          sessionId,
+        });
+
+        if (stripeError) {
+          throw new Error(stripeError.message);
+        }
       }
     } catch (err) {
       setError(err.message);
@@ -52,15 +77,25 @@ export default function SubscribeButton({
     }
   };
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get("session_id");
+
+    if (sessionId) {
+      updateSession();
+    }
+  }, [updateSession]);
+
+  const isCurrentPlan = session?.user?.stripePriceId === priceId;
+
   return (
     <div>
       <Button
-        bgColor={bgColor}
+        bgColor={isCurrentPlan ? "#757575" : bgColor}
         clr={clr}
-        priceId={priceId}
         onClick={handleSubscribe}
       >
-        Subscribe
+        {isCurrentPlan ? "Current Plan" : "Subscribe"}
       </Button>
       {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
     </div>
