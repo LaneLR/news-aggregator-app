@@ -3,11 +3,15 @@
 
 import { useState } from "react";
 import Button from "./Button"; // Assuming you have a generic Button component
+import { useSession } from "next-auth/react";
 
 export default function CancelSubscriptionButton({
   subscriptionEndDate,
   updateSession,
+  sessionData,
 }) {
+  const { data: session, status, update } = useSession({ data: sessionData });
+
   const [error, setError] = useState(null);
 
   const handleCancel = async () => {
@@ -25,8 +29,6 @@ export default function CancelSubscriptionButton({
       }
 
       await updateSession();
-
-      alert("Your subscription has been scheduled for cancellation.");
     } catch (err) {
       setError(err.message);
       console.error(err);
@@ -56,7 +58,7 @@ export default function CancelSubscriptionButton({
 
   return (
     <div>
-      <Button onClick={handleCancel} bgColor={"purple"} clr={"var(--white)"}>
+      <Button onClick={handleCancel} bgColor={"#b40000"} clr={"var(--white)"}>
         Cancel Subscription
       </Button>
       {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
