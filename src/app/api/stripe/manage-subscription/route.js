@@ -1,4 +1,4 @@
-// src/app/api/stripe/resume-subscription/route.js
+// src/app/api/stripe/manage-subscription/route.js
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
@@ -17,31 +17,23 @@ export async function POST(req) {
     const { User } = await initializeDbAndModels();
     const user = await User.findByPk(session.user.id);
 
-    if (!user || !user.stripeSubscriptionId) {
+    if (!user || !user.stripeCustomerId) {
       return NextResponse.json(
-        { error: "User or subscription not found." },
+        { error: "User or Stripe customer not found." },
         { status: 404 }
       );
     }
 
-    await stripe.subscriptions.update(
-      user.stripeSubscriptionId,
-      {
-        cancel_at_period_end: false,
-      }
-    );
-
-    await user.update({
-      stripeSubscriptionEndsAt: null,
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: user.stripeCustomerId,
+      return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/account`, 
     });
 
-    return NextResponse.json({
-      message: "Subscription resumed successfully.",
-    });
+    return NextResponse.json({ url: portalSession.url });
   } catch (err) {
-    console.error("Error resuming subscription:", err);
+    console.error("Error creating Stripe portal session:", err);
     return NextResponse.json(
-      { error: "Could not resume subscription." },
+      { error: "Could not create billing portal session." },
       { status: 500 }
     );
   }
