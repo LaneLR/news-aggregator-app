@@ -33,7 +33,8 @@ export default function VerifyEmailSuccessComponent() {
   }
 
   if (session && session.user.emailIsVerified) {
-    router.push("/news");
+    // router.push("/account");
+    window.location.replace("/account");
   }
 
   return (
@@ -46,10 +47,8 @@ export default function VerifyEmailSuccessComponent() {
           height={112}
           alt={"Image of an email being sent"}
         />
-        <Text>A verification email has been sent to your email.</Text>
-        <Text>
-          Check your spam folder if you don&apos;t see the email in your inbox.
-        </Text>
+        <Text>Your email has been verified.</Text>
+        <Text>You will be redirected in a moment... </Text>
       </TextWrapper>
     </>
   );

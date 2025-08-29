@@ -33,7 +33,8 @@ export default function VerifyEmailComponent() {
   }
 
   if (session && session.user.emailIsVerified) {
-    router.push("/news");
+    // router.push("/news");
+    window.location.replace("/account")
   }
 
   return (
