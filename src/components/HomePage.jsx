@@ -263,7 +263,7 @@ export default function HomePage() {
               "Access to articles from hundreds of news sources and blog posts.",
               "3 Archives to save your favorite articles to.",
             ]}
-            cost={"$0 / mo"}
+            cost={"Free!"}
           >
             <Button bgColor={"var(--orange)"} clr={"var(--white)"}>
               Choose Plan
@@ -279,7 +279,7 @@ export default function HomePage() {
               "Priority support.",
               "Exclusive content and features.",
             ]}
-            cost={"$8 / mo"}
+            cost={"$8.99 / mo"}
           >
             <Button bgColor={"var(--orange)"} clr={"var(--white)"}>
               Choose Plan
@@ -295,7 +295,7 @@ export default function HomePage() {
               "Priority support.",
               "Exclusive content and features.",
             ]}
-            cost={"$80 / yr"}
+            cost={"$79.99 / yr"}
           >
             <Button bgColor={"var(--orange)"} clr={"var(--white)"}>
               Choose Plan
