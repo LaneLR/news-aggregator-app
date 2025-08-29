@@ -40,7 +40,7 @@ const EmphasizedText = styled.div`
   font-weight: 600;
 `;
 
-const FALLBACK_IMAGE_URL = "/default-avatar.png";
+const FALLBACK_IMAGE_URL = "/images/default-avatar.png";
 
 export default function ProfilePage({ sessionData }) {
   const { data: session, status, update } = useSession({ data: sessionData });
