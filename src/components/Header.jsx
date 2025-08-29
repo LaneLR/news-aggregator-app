@@ -195,7 +195,7 @@ const LogoText = styled.p`
   }
 `;
 
-export default function Header({priceId}) {
+export default function Header({ priceId }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -266,9 +266,6 @@ export default function Header({priceId}) {
               <SearchBar />
             </CenterContainer>
             <RightContainer>
-              <Link href={"/pricing"}>
-                <Button>SubscriptionPage</Button>
-              </Link>
               <DropdownContainer ref={dropdownRef}>
                 <UserAccountIcon onClick={toggleDropdown}>
                   <MenuIcon>
@@ -341,6 +338,28 @@ export default function Header({priceId}) {
                           height={22}
                           width={22}
                           src="/images/profile.svg"
+                        />
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleNavigation("/pricing")}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "100%",
+                          columnGap: "20px",
+                        }}
+                      >
+                        <p style={{ fontWeight: "600" }}>Premium</p>
+                        <Image
+                          priority
+                          alt={"Subscribe image"}
+                          height={22}
+                          width={22}
+                          src="/images/subscribe.svg"
                         />
                       </div>
                     </DropdownMenuItem>
