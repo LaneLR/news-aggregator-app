@@ -10,6 +10,7 @@ import bcrypt from "bcryptjs";
 import UserInteraction from "./models/UserInteraction.js";
 import defineMarketArticle from "./models/MarketArticle.js";
 import definePodcast from "./models/Podcast.js";
+import defineFeed from "./models/Feed.js";
 
 if (!global.db) {
   global.db = {};
@@ -28,6 +29,7 @@ async function initializeDbAndModels() {
       const JournalArticle = defineJournalArticle(sequelize);
       const MarketArticle = defineMarketArticle(sequelize);
       const Podcast = definePodcast(sequelize);
+      const Feed = defineFeed(sequelize);
 
       User.init(
         {
@@ -251,6 +253,7 @@ async function initializeDbAndModels() {
       global.db.JournalArticle = JournalArticle;
       global.db.MarketArticle = MarketArticle;
       global.db.Podcast = Podcast;
+      global.db.Feed = Feed;
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -263,6 +266,9 @@ async function initializeDbAndModels() {
         foreignKey: "archiveId",
         onDelete: "CASCADE",
       });
+
+      User.hasMany(Feed, { foreignKey: "userId", onDelete: "CASCADE" });
+      Feed.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
 
       // await sequelize.query(`ALTER TABLE "SavedArticles" DROP CONSTRAINT IF EXISTS "SavedArticles_url_key";`);
 
