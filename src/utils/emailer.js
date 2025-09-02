@@ -28,7 +28,7 @@ export async function sendEmail({ to, subject, html }) {
     console.log("🟢 SMTP server connection is verified and ready.");
 
     const info = await transporter.sendMail({
-      from: `"My App" <${process.env.SMTP_USER}>`,
+      from: `"Relay News" <${process.env.SMTP_USER}>`,
       to,
       subject,
       html,
