@@ -4,6 +4,8 @@ import ArchiveToggleButton from "./ArchiveToggleButton.jsx";
 import Link from "next/link.js";
 import Image from "next/image.js";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation.js";
 
 const CardContainer = styled.div`
   background-color: var(--white);
@@ -40,6 +42,8 @@ const ContentArea = styled.div`
   padding: 20px;
   display: flex;
   flex-direction: column;
+  height: fit-content;
+  justify-content: space-between;
 `;
 
 const ArticleTitle = styled.h3`
@@ -90,17 +94,43 @@ const ReadMoreButton = styled.a`
   }
 `;
 
+const LikeButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 1rem;
+  color: ${(props) => (props.$isLiked ? "var(--primary-blue)" : "#555")};
+
+  &:hover {
+    color: var(--primary-blue);
+  }
+`;
+
+const LikeOrUnlikedButton = styled.img`
+  height: 30px;
+  width: 30px;
+`
+
 export default function NewsCardThree({
   article,
   archiveId,
   viewOnly = false,
 }) {
+  const { data: session } = useSession();
+
+  const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
+  const [likeCount, setLikeCount] = useState(article.likeCount || 0);
+
   const FALLBACK_IMAGE_URL = "/images/blurimage.png";
 
   const rawUrl =
     typeof article?.urlToImage === "string" ? article.urlToImage.trim() : "";
-  
-  // Here's the key change: we construct the URL to use the proxy
+
   const proxiedImageUrl = rawUrl
     ? `/api/image-proxy?url=${encodeURIComponent(rawUrl)}`
     : FALLBACK_IMAGE_URL;
@@ -109,12 +139,40 @@ export default function NewsCardThree({
 
   const handleImageError = () => setImageSrc(FALLBACK_IMAGE_URL);
 
+  const handleLike = async () => {
+    if (!session) {
+      alert("You must be signed in to like articles.");
+      redirect("/login");
+    }
+
+    const originalLikedState = isLiked;
+    const originalLikeCount = likeCount;
+
+    setIsLiked(!isLiked);
+    setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+
+    try {
+      const res = await fetch("/api/articles/like", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ articleUrl: article.url }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update like status");
+      }
+    } catch (err) {
+      console.error(err);
+      setIsLiked(originalLikedState);
+      setLikeCount(originalLikeCount);
+      alert("There was an error. Please try again.");
+    }
+  };
   const cleanTitle =
     article.title?.substring(0, article.title.lastIndexOf(" - ")) ||
     article.title;
   const cleanSourceName =
     article.sourceName || article.source?.name || "Unknown source";
-
   return (
     <CardContainer>
       <CardHeader>
@@ -126,7 +184,7 @@ export default function NewsCardThree({
         style={{ position: "relative", width: "100%", height: "200px" }}
       >
         <Image
-          src={imageSrc} // Now using the proxied URL
+          src={imageSrc}
           alt={article?.title || "News article image"}
           onError={handleImageError}
           priority
@@ -153,14 +211,35 @@ export default function NewsCardThree({
             alignItems: "center",
           }}
         >
-          <ReadMoreButton href={article.url} target="_blank">
-            Read article
-          </ReadMoreButton>
-          <ArchiveToggleButton
-            article={article}
-            archiveId={archiveId}
-            viewOnly={viewOnly}
-          />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ReadMoreButton href={article.url} target="_blank">
+              Read article
+            </ReadMoreButton>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "flex-start",
+            }}
+          >
+            <ArchiveToggleButton
+              article={article}
+              archiveId={archiveId}
+              viewOnly={viewOnly}
+            />
+            <LikeButton onClick={handleLike} $isLiked={isLiked}>
+              <div>{isLiked ? <LikeOrUnlikedButton src="/images/like-button-liked.svg"/> : <LikeOrUnlikedButton src="/images/like-button-unliked.svg" />}</div>
+              <div>{likeCount}</div>
+            </LikeButton>
+          </div>
         </div>
       </ContentArea>
     </CardContainer>
