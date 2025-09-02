@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import SearchBar from "./SearchBar";
 import HeaderNavBar from "./HeaderNavBar";
 import SubscribeButton from "./SubscribeButton";
+import HeaderSubscribeBanner from "./SubscribeHeaderBanner";
 
 const Wrapper = styled.div`
   display: flex;
@@ -410,6 +411,7 @@ export default function Header({ priceId }) {
               </DropdownContainer>
             </RightContainer>
           </Wrapper>
+          <HeaderSubscribeBanner />
           <HeaderNavBar />
         </div>
       ) : (
