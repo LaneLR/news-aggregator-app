@@ -29,7 +29,13 @@ const FilterList = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  $:last-child {
+    border-bottom: 1px solid gray;
+  }
 `;
 const FilterCheckbox = styled.label`
   cursor: pointer;
@@ -199,24 +205,35 @@ export default function CreateFeedModal({
           ))}
         </FilterList>
         <ButtonWrapper>
-          {isEditMode && (
+          {isEditMode ? (
+            <>
+              {" "}
+              <Button
+                onClick={handleSave}
+                bgColor="var(--primary-blue)"
+                clr="white"
+                style={{ marginLeft: "auto" }}
+              >
+                Save Feed
+              </Button>
+              <Button
+                onClick={handleDelete}
+                bgColor="var(--primary-blue)"
+                clr="var(--white)"
+              >
+                Delete Feed
+              </Button>
+            </>
+          ) : (
             <Button
               onClick={handleSave}
               bgColor="var(--primary-blue)"
               clr="white"
               style={{ marginLeft: "auto" }}
             >
-              Save Feed
+              Create Feed
             </Button>
           )}
-
-          <Button
-            onClick={handleDelete}
-            bgColor="var(--primary-blue)"
-            clr="var(--white)"
-          >
-            Delete Feed
-          </Button>
         </ButtonWrapper>
       </ModalContent>
     </ModalBackdrop>
