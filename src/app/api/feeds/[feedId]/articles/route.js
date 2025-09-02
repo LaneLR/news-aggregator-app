@@ -109,6 +109,22 @@ export async function GET(req, context) {
       ...marketArticles,
     ].sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
+    if (session?.user?.id) {
+      const { ArticleLike } = await initializeDbAndModels();
+      const userLikes = await ArticleLike.findAll({
+        where: { userId: session.user.id },
+        attributes: ["articleUrl"],
+      });
+      const likedUrls = new Set(userLikes.map((like) => like.articleUrl));
+
+      const articlesWithLikes = combinedArticles.map((article) => ({
+        ...article.toJSON(),
+        isLikedByUser: likedUrls.has(article.url),
+      }));
+
+      return NextResponse.json({ articles: articlesWithLikes });
+    }
+
     return NextResponse.json({ articles: combinedArticles.slice(0, 100) });
   } catch (err) {
     console.error("Error fetching articles for feed:", err);
