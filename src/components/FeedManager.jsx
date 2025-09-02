@@ -18,17 +18,37 @@ const FeedSelectorWrapper = styled.div`
 const UpgradePrompt = styled.div`
   position: relative;
   padding: 35px 1rem 1rem 1rem;
-  background-color: #eef2f9;
+  background-color: #e6efffff;
   border: 1px solid #d1d9e6;
   border-radius: 8px;
   text-align: center;
-  margin: 20px;
-	width: fit-content;
+  width: fit-content;
+  max-width: 400px;
+  text-align: left;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  // font-weight: 600;
+
+  @media (max-width: 440px) {
+    width: 100%;
+    font-size: 15px;
+    // padding: 0 0.7rem 0.5rem 0.7rem;
+    margin: auto;
+    border: none;
+    background-color: var(--deep-blue);
+    border-radius: 0px;
+    color: var(--white);
+  }
 `;
 
 const UpgradePromptText = styled.div`
-  font-weight: 600;
-  padding: 0 0 10px 0;
+  padding: 0 30px 10px 0;
+
+  // > Link > Button {
+  //   ${bgColor}: var(--white)
+  // }
 `;
 
 const CloseButton = styled.button`
@@ -108,7 +128,7 @@ export default function FeedManager({ sessionData }) {
 
   return (
     <>
-      {isSubscribed ? (
+      {isSubscribed && (
         <FeedSelectorWrapper>
           <select
             value={selectedFeedId || ""}
@@ -127,22 +147,6 @@ export default function FeedManager({ sessionData }) {
             <Button onClick={handleOpenEditModal}>Edit Feed</Button>
           )}
         </FeedSelectorWrapper>
-      ) : (
-        isCtaVisible && (
-          <UpgradePrompt>
-            <CloseButton onClick={handleDismissCta} aria-label="Dismiss">
-              x
-            </CloseButton>
-            <UpgradePromptText>
-              Want to create custom news feeds?
-            </UpgradePromptText>
-            <Link href="/pricing" passHref>
-              <Button bgColor="var(--primary-blue)" clr="white">
-                Upgrade to Pro
-              </Button>
-            </Link>
-          </UpgradePrompt>
-        )
       )}
 
       <CreateFeedModal
@@ -152,7 +156,6 @@ export default function FeedManager({ sessionData }) {
         feedToEdit={feedToEdit}
       />
 
-      {/* Pass the correct feedId. For free users, it will always be null. */}
       <News feedId={isSubscribed ? selectedFeedId : null} />
     </>
   );
