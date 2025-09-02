@@ -34,6 +34,11 @@ export default function defineMarketArticle(sequelize) {
         type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: true,
       },
+      likeCount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+      },
     },
     {
       sequelize,
