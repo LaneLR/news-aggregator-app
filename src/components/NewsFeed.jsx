@@ -149,6 +149,7 @@ import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 import styled from "styled-components";
 import Button from "./Button";
+import Loading from "@/app/loading";
 
 const SearchBarHeader = styled.div`
   font-size: 3rem;
@@ -299,7 +300,7 @@ export default function News({ archiveId, feedId }) {
       </div>
 
       {loading ? (
-        <p>Loading...</p>
+        <Loading />
       ) : (
         <NewsGridWrapper>
           {articles.map((article) => (
