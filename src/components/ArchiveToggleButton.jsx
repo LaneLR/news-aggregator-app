@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 
 const SaveButton = styled.div`
-  background-color: var(--primary-blue);
+  // background-color: var(--primary-blue);
   color: #fff;
-  padding: 12px 20px;
+  // padding: 12px 20px;
   border-radius: 6px;
   font-size: 1rem;
   font-weight: bold;
@@ -25,6 +25,11 @@ const SaveButton = styled.div`
   &:active {
     transform: translateY(0);
   }
+`;
+
+const SavedOrUnsavedButton = styled.img`
+  height: 30px;
+  width: 30px;
 `;
 
 export default function ArchiveToggleButton({
@@ -146,12 +151,11 @@ export default function ArchiveToggleButton({
         <div
           style={{
             border: "none",
-            color: "red",
             cursor: "default",
             background: "transparent",
           }}
         >
-          ❤️
+          <SavedOrUnsavedButton src="/images/save-button-saved.svg" />
         </div>
       ) : (
         <>
@@ -159,7 +163,11 @@ export default function ArchiveToggleButton({
             onClick={() => setDropdownVisible(!dropdownVisible)}
             disabled={loading}
           >
-            {loading ? "Saving..." : isSaved ? "Saved" : "Save"}
+            {isSaved ? (
+              <SavedOrUnsavedButton src="/images/save-button-saved.svg" />
+            ) : (
+              <SavedOrUnsavedButton src="/images/save-button-unsaved.svg" />
+            )}
           </SaveButton>
 
           {dropdownVisible && (
