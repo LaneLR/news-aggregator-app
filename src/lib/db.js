@@ -11,6 +11,7 @@ import UserInteraction from "./models/UserInteraction.js";
 import defineMarketArticle from "./models/MarketArticle.js";
 import definePodcast from "./models/Podcast.js";
 import defineFeed from "./models/Feed.js";
+import defineArticleLike from "./models/ArticleLike.js";
 
 if (!global.db) {
   global.db = {};
@@ -30,6 +31,7 @@ async function initializeDbAndModels() {
       const MarketArticle = defineMarketArticle(sequelize);
       const Podcast = definePodcast(sequelize);
       const Feed = defineFeed(sequelize);
+      const ArticleLike = defineArticleLike(sequelize);
 
       User.init(
         {
@@ -254,6 +256,7 @@ async function initializeDbAndModels() {
       global.db.MarketArticle = MarketArticle;
       global.db.Podcast = Podcast;
       global.db.Feed = Feed;
+      global.db.ArticleLike = ArticleLike;
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -269,6 +272,9 @@ async function initializeDbAndModels() {
 
       User.hasMany(Feed, { foreignKey: "userId", onDelete: "CASCADE" });
       Feed.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
+
+      User.hasMany(ArticleLike, { foreignKey: "userId" });
+      ArticleLike.belongsTo(User, { foreignKey: "userId" });
 
       // await sequelize.query(`ALTER TABLE "SavedArticles" DROP CONSTRAINT IF EXISTS "SavedArticles_url_key";`);
 
