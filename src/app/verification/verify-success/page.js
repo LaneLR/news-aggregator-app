@@ -10,7 +10,7 @@ export default async function VerifyEmailSuccessPage() {
   }
   if (session.user.emailIsVerified) {
     setTimeout(() => {
-      redirect("/");
+      redirect("/login");
     }, 5000);
   }
 
