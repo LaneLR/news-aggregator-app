@@ -78,14 +78,6 @@ export default function FeedManager({ sessionData }) {
   const { data: session, status, update } = useSession({ data: sessionData });
   const isSubscribed = session?.user?.tier !== "Free";
 
-  const [isCtaVisible, setIsCtaVisible] = useState(true);
-
-  useEffect(() => {
-    const ctaDismissed = sessionStorage.getItem("hideUpgradeCTA");
-    if (ctaDismissed === "true") {
-      setIsCtaVisible(false);
-    }
-  }, []);
 
   const fetchFeeds = async () => {
     if (!isSubscribed) return;
@@ -101,11 +93,6 @@ export default function FeedManager({ sessionData }) {
       fetchFeeds();
     }
   }, [session, isSubscribed]);
-
-  const handleDismissCta = () => {
-    setIsCtaVisible(false);
-    sessionStorage.setItem("hideUpgradeCTA", "true");
-  };
 
   const handleOpenEditModal = () => {
     const currentFeed = feeds.find((f) => f.id == selectedFeedId);
