@@ -39,10 +39,11 @@ const BrandText = styled.span`
 `;
 
 const ContentArea = styled.div`
-  padding: 20px;
+  padding: 20px 20px 0px 20px;
   display: flex;
   flex-direction: column;
-  height: fit-content;
+  height: 100%;
+  max-height: 192px;
   justify-content: space-between;
 `;
 
@@ -59,9 +60,9 @@ const ArticleTitle = styled.h3`
   text-overflow: ellipsis;
 `;
 
-const ArticleSnippet = styled.p`
+const ArticleSnippet = styled.div`
   font-size: 1rem;
-  color: var(--deep-blue);
+  color: var(--dark-blue);
   line-height: 1.5;
   font-weight: 700;
   margin-bottom: 20px;
@@ -72,10 +73,17 @@ const ArticleSnippet = styled.p`
   text-overflow: ellipsis;
 `;
 
+const ArticleSnippetText = styled.p`
+  background-color: #dcebfdff;
+  width: fit-content;
+  padding: 3px 6px;
+  border-radius: 6px;
+`;
+
 const ReadMoreButton = styled.a`
   background-color: var(--primary-blue);
   color: #fff;
-  padding: 12px 20px;
+  padding: 8px 15px;
   border-radius: 6px;
   font-size: 1rem;
   font-weight: bold;
@@ -86,7 +94,7 @@ const ReadMoreButton = styled.a`
   cursor: pointer;
   transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
   &:hover {
-    background-color: #173b9e;
+    background-color: var(--deep-blue);
     transform: translateY(-1px);
   }
   &:active {
@@ -101,20 +109,34 @@ const LikeButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  flex-direction: row;
   gap: 6px;
   font-size: 1rem;
   color: ${(props) => (props.$isLiked ? "var(--primary-blue)" : "#555")};
-
-  &:hover {
-    color: var(--primary-blue);
-  }
 `;
 
 const LikeOrUnlikedButton = styled.img`
-  height: 30px;
-  width: 30px;
-`
+  height: 35px;
+  width: 35px;
+  // &:hover {
+  //   transform: translateY(-1px);
+  // }
+
+  // &:active {
+  //   transform: translateY(0);
+  // }
+`;
+
+const LikeCountCounter = styled.div`
+  font-weight: 500;
+  font-size: 1.3rem;
+  color: var(--dark-blue);
+`;
+
+const LockedArticleSVG = styled.img`
+  height: 35px;
+  width: 35px;
+`;
 
 export default function NewsCardThree({
   article,
@@ -122,6 +144,16 @@ export default function NewsCardThree({
   viewOnly = false,
 }) {
   const { data: session } = useSession();
+
+  const PAYWALLED_SOURCES = new Set([
+    "The Washington Post",
+    "Financial Times",
+    "The Wall Street Journal",
+    "The New York Times",
+    "Bloomberg",
+    "The Economist",
+    "Reuters",
+  ]);
 
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
   const [likeCount, setLikeCount] = useState(article.likeCount || 0);
@@ -173,6 +205,9 @@ export default function NewsCardThree({
     article.title;
   const cleanSourceName =
     article.sourceName || article.source?.name || "Unknown source";
+
+  const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
+
   return (
     <CardContainer>
       <CardHeader>
@@ -194,21 +229,27 @@ export default function NewsCardThree({
             objectFit: "cover",
             objectPosition: "top",
             borderBottom: "1px solid #eee",
+            minWidth: "398px",
           }}
         />
       </Link>
       <ContentArea>
-        <ArticleTitle>
-          <Link href={article.url} target={"_blank"}>
-            {cleanTitle}
-          </Link>
-        </ArticleTitle>
-        <ArticleSnippet>- {cleanSourceName}</ArticleSnippet>
+        <div>
+          <ArticleTitle>
+            <Link href={article.url} target={"_blank"}>
+              {cleanTitle}
+            </Link>
+          </ArticleTitle>
+          <ArticleSnippet>
+            <ArticleSnippetText>{cleanSourceName}</ArticleSnippetText>
+          </ArticleSnippet>
+        </div>
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            padding: "0 0 10px 0",
           }}
         >
           <div
@@ -228,16 +269,26 @@ export default function NewsCardThree({
               display: "flex",
               justifyContent: "center",
               alignItems: "flex-start",
+              gap: "6px",
             }}
           >
+            {isPaywalled && (
+              <span title="This article may be behind a paywall">
+                <LockedArticleSVG src="/images/lock.svg" />
+              </span>
+            )}
             <ArchiveToggleButton
               article={article}
               archiveId={archiveId}
               viewOnly={viewOnly}
             />
             <LikeButton onClick={handleLike} $isLiked={isLiked}>
-              <div>{isLiked ? <LikeOrUnlikedButton src="/images/like-button-liked.svg"/> : <LikeOrUnlikedButton src="/images/like-button-unliked.svg" />}</div>
-              <div>{likeCount}</div>
+              {isLiked ? (
+                <LikeOrUnlikedButton src="/images/like-button-liked.svg" />
+              ) : (
+                <LikeOrUnlikedButton src="/images/like-button-unliked.svg" />
+              )}
+              <LikeCountCounter>{likeCount}</LikeCountCounter>
             </LikeButton>
           </div>
         </div>
