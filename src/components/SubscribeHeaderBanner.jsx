@@ -77,7 +77,7 @@ export default function HeaderSubscribeBanner({ sessionData }) {
           </CenterContainer>
           <RightContainer>
             <CloseButton onClick={handleDismissCta}>
-              <img
+              <img alt="Close button"
                 src="/images/close.svg"
                 width={16}
                 height={16}

@@ -162,9 +162,9 @@ export default function ArchiveToggleButton({
             disabled={loading}
           >
             {isSaved ? (
-              <SavedOrUnsavedButton src="/images/save-button-saved.svg" />
+              <SavedOrUnsavedButton src="/images/save-button-saved.svg" alt="Article saved button"/>
             ) : (
-              <SavedOrUnsavedButton src="/images/save-button-unsaved.svg" />
+              <SavedOrUnsavedButton src="/images/save-button-unsaved.svg" alt="Article not saved button"/>
             )}
           </SaveButton>
 

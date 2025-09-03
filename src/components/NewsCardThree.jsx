@@ -194,7 +194,6 @@ export default function NewsCardThree({
         throw new Error("Failed to update like status");
       }
     } catch (err) {
-      console.error(err);
       setIsLiked(originalLikedState);
       setLikeCount(originalLikeCount);
       alert("There was an error. Please try again.");
@@ -274,7 +273,7 @@ export default function NewsCardThree({
           >
             {isPaywalled && (
               <span title="This article may be behind a paywall">
-                <LockedArticleSVG src="/images/lock.svg" />
+                <LockedArticleSVG src="/images/lock.svg" alt="Image may be behind a paywall" />
               </span>
             )}
             <ArchiveToggleButton
@@ -284,9 +283,9 @@ export default function NewsCardThree({
             />
             <LikeButton onClick={handleLike} $isLiked={isLiked}>
               {isLiked ? (
-                <LikeOrUnlikedButton src="/images/like-button-liked.svg" />
+                <LikeOrUnlikedButton src="/images/like-button-liked.svg" alt="Article liked button"/>
               ) : (
-                <LikeOrUnlikedButton src="/images/like-button-unliked.svg" />
+                <LikeOrUnlikedButton src="/images/like-button-unliked.svg" alt="Article not liked button"/>
               )}
               <LikeCountCounter>{likeCount}</LikeCountCounter>
             </LikeButton>
