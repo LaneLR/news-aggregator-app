@@ -10,17 +10,25 @@ import styled from "styled-components";
 import Loading from "@/app/loading";
 import ManageSubscriptionButton from "./ManageSubscriptionButton";
 
-const SmallText = styled.div`
+const SmallTextBottom = styled.div`
   font-size: 0.95rem;
   color: var(--light-white);
   margin-left: -3px;
   padding-bottom: 3px;
 `;
 
+const SmallTextTop = styled.div`
+  font-size: 0.95rem;
+  color: var(--light-white);
+  // margin-left: -3px;
+  padding-bottom: 10px;
+`;
+
 const PriceText = styled.span`
   display: flex;
   align-items: flex-end;
   gap: 3px;
+  font-weight: 500;
 `;
 
 const ButtonWrapper = styled.div`
@@ -159,7 +167,7 @@ export default function PricingPageComponent({ sessionData }) {
             cost={
               <PriceText>
                 {"$8"}
-                <SmallText>.99 / mo</SmallText>
+                <SmallTextBottom>.99 / mo</SmallTextBottom>
               </PriceText>
             }
           >
@@ -189,7 +197,7 @@ export default function PricingPageComponent({ sessionData }) {
             cost={
               <PriceText>
                 {"$79"}
-                <SmallText>.99 / yr</SmallText>
+                <SmallTextBottom>.99 / yr</SmallTextBottom>
               </PriceText>
             }
             // promoCode={<PromoCodeWrapper><PromoCodeText>"Use code"<PromoCodeText></PromoCodeText>ABCDE<PromotionCode>a</PromotionCode></PromoCodeText></PromoCodeWrapper>}
