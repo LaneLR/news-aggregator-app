@@ -2,6 +2,7 @@
 import styled from "styled-components";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 // A simple SVG icon for the bookmark/save feature.
 // In a real app, you'd import this from an icon library or an SVG file.
@@ -27,7 +28,7 @@ const CardContainer = styled.div`
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   margin: 15px;
   width: 100%;
-  max-width: 500px;
+  max-width: 700px;
   position: relative;
 
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -173,6 +174,11 @@ const SaveIconContainer = styled.div`
 export default function NewsCardTwo({ article, archiveId, viewOnly = false }) {
   // Assuming 'article' object has:
   // article.thumbnailUrl, article.title, article.author, article.date
+    const { data: session } = useSession();
+  
+    const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
+    const [likeCount, setLikeCount] = useState(article.likeCount || 0);
+  
 
   const FALLBACK_IMAGE_URL = "/images/NoImage.png";
   const index = article.title.lastIndexOf(" - ");

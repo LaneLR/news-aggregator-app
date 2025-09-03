@@ -2,9 +2,9 @@
 import styled from "styled-components";
 
 const Wrapper = styled.button`
-  padding: 10px 15px;
+  padding: 8px 15px;
   font-size: 1rem;
-  border-radius: 5px;
+  border-radius: 6px;
   border: none;
   cursor: pointer;
   font-weight: 600;

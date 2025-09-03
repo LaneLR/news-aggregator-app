@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import SearchBar from "./SearchBar";
 import HeaderNavBar from "./HeaderNavBar";
+import SubscribeButton from "./SubscribeButton";
+import HeaderSubscribeBanner from "./SubscribeHeaderBanner";
 
 const Wrapper = styled.div`
   display: flex;
@@ -194,7 +196,7 @@ const LogoText = styled.p`
   }
 `;
 
-export default function Header() {
+export default function Header({ priceId }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -232,7 +234,7 @@ export default function Header() {
   return (
     <>
       {!!session ? (
-        <div style={{ width: '100%'}}>
+        <div style={{ width: "100%" }}>
           <Wrapper>
             <LeftContainer>
               <Link style={{ display: "inherit" }} href={"/news"}>
@@ -341,6 +343,28 @@ export default function Header() {
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem
+                      onClick={() => handleNavigation("/pricing")}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "100%",
+                          columnGap: "20px",
+                        }}
+                      >
+                        <p style={{ fontWeight: "600" }}>Premium</p>
+                        <Image
+                          priority
+                          alt={"Subscribe image"}
+                          height={22}
+                          width={22}
+                          src="/images/subscribe.svg"
+                        />
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       onClick={() => handleNavigation("/settings")}
                     >
                       <div
@@ -387,6 +411,7 @@ export default function Header() {
               </DropdownContainer>
             </RightContainer>
           </Wrapper>
+          <HeaderSubscribeBanner />
           <HeaderNavBar />
         </div>
       ) : (
@@ -428,10 +453,7 @@ export default function Header() {
             <RightContainer>
               <nav style={{ display: "flex", columnGap: "10px" }}>
                 <Link style={{ display: "flex" }} href={"/login"}>
-                  <Button
-                    bgColor={"var(--primary-blue)"}
-                    clr={"var(--white)"}
-                  >
+                  <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
                     Log in
                   </Button>
                 </Link>

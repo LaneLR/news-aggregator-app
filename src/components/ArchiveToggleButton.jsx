@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 
 const SaveButton = styled.div`
-  background-color: var(--primary-blue);
+  // background-color: var(--primary-blue);
   color: #fff;
-  padding: 12px 20px;
+  // padding: 12px 20px;
   border-radius: 6px;
   font-size: 1rem;
   font-weight: bold;
@@ -16,15 +16,18 @@ const SaveButton = styled.div`
   align-self: flex-start;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+`;
 
-  &:hover {
-    background-color: #173b9e;
-    transform: translateY(-1px);
-  }
+const SavedOrUnsavedButton = styled.img`
+  height: 35px;
+  width: 35px;
+  // &:hover {
+  //   transform: translateY(-1px);
+  // }
 
-  &:active {
-    transform: translateY(0);
-  }
+  // &:active {
+  //   transform: translateY(0);
+  // }
 `;
 
 export default function ArchiveToggleButton({
@@ -146,12 +149,11 @@ export default function ArchiveToggleButton({
         <div
           style={{
             border: "none",
-            color: "red",
             cursor: "default",
             background: "transparent",
           }}
         >
-          ❤️
+          <SavedOrUnsavedButton src="/images/save-button-saved.svg" />
         </div>
       ) : (
         <>
@@ -159,7 +161,11 @@ export default function ArchiveToggleButton({
             onClick={() => setDropdownVisible(!dropdownVisible)}
             disabled={loading}
           >
-            {loading ? "Saving..." : isSaved ? "Saved" : "Save"}
+            {isSaved ? (
+              <SavedOrUnsavedButton src="/images/save-button-saved.svg" />
+            ) : (
+              <SavedOrUnsavedButton src="/images/save-button-unsaved.svg" />
+            )}
           </SaveButton>
 
           {dropdownVisible && (

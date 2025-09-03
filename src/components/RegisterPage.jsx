@@ -77,6 +77,10 @@ const CheckboxWrapper = styled.div`
   }
 `;
 
+const StyledInput = styled.input`
+  accent-color: var(--primary-blue);
+`
+
 export default function RegisterPage() {
   const [error, setError] = useState(null);
   const router = useRouter();
@@ -140,7 +144,7 @@ export default function RegisterPage() {
         </InputWrapper>
 
         <CheckboxWrapper>
-          <input type="checkbox" id="tos" name="tos" required />
+          <StyledInput type="checkbox" id="tos" name="tos" required />
           <label htmlFor="tos">
             I agree to the{" "}
             <Link

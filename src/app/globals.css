@@ -40,6 +40,28 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--dark-blue);
+  ::-webkit-file-upload-button {
+    width: auto;
+  }
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 9px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: var(--light-white);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #da0000;
+  }
 }
 
 #__next {

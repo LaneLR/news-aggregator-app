@@ -8,6 +8,10 @@ import defineNewsArticle from "./models/NewsArticle.js";
 import { DataTypes, Op } from "sequelize";
 import bcrypt from "bcryptjs";
 import UserInteraction from "./models/UserInteraction.js";
+import defineMarketArticle from "./models/MarketArticle.js";
+import definePodcast from "./models/Podcast.js";
+import defineFeed from "./models/Feed.js";
+import defineArticleLike from "./models/ArticleLike.js";
 
 if (!global.db) {
   global.db = {};
@@ -24,6 +28,10 @@ async function initializeDbAndModels() {
 
       const NewsArticle = defineNewsArticle(sequelize);
       const JournalArticle = defineJournalArticle(sequelize);
+      const MarketArticle = defineMarketArticle(sequelize);
+      const Podcast = definePodcast(sequelize);
+      const Feed = defineFeed(sequelize);
+      const ArticleLike = defineArticleLike(sequelize);
 
       User.init(
         {
@@ -35,11 +43,8 @@ async function initializeDbAndModels() {
           email: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: {
-              msg: "Email address already exists",
-            },
+            unique: true,
             validate: {
-              notEmpty: { msg: "Email is required" },
               isEmail: { msg: "Must be a valid email address" },
             },
             set: function (value) {
@@ -49,82 +54,43 @@ async function initializeDbAndModels() {
           password: {
             type: DataTypes.STRING,
             allowNull: true,
-            validate: {
-              notEmpty: { msg: "Password is required" },
-              len: {
-                args: [6, 100],
-                msg: "Password must be at least 6 characters",
-              },
-            },
           },
           tier: {
-            //add more tiers to ENUM as needed
-            type: DataTypes.ENUM("Free", "Pro"),
+            type: DataTypes.ENUM("Free", "Pro", "Pro Annual"),
             defaultValue: "Free",
           },
-          name: {
-            type: DataTypes.STRING,
-            allowNull: true, 
-          },
-          image: {
-            type: DataTypes.TEXT, 
-            allowNull: true,
-          },
-          paymentProvider: {
-            type: DataTypes.STRING,
-            defaultValue: "stripe",
-          },
-          providerCustomerId: {
+          // The unique ID for the user in Stripe's system.
+          stripeCustomerId: {
             type: DataTypes.STRING,
             unique: true,
             allowNull: true,
           },
-          subscriptionId: {
+          // The ID of their active subscription.
+          stripeSubscriptionId: {
             type: DataTypes.STRING,
             unique: true,
             allowNull: true,
           },
-          subscriptionStatus: {
-            type: DataTypes.STRING,
-            defaultValue: "inactive",
-          },
-          subscriptionPlanId: {
+          // The ID of the specific price plan they are subscribed to.
+          stripePriceId: {
             type: DataTypes.STRING,
             allowNull: true,
           },
-          cardLast4: {
+          // The current status of their subscription (e.g., "active", "canceled", "past_due").
+          stripeSubscriptionStatus: {
             type: DataTypes.STRING,
             allowNull: true,
           },
-          cardBrand: {
-            type: DataTypes.STRING,
-            allowNull: true,
-          },
-          subscriptionStart: {
+          // When the current subscription period ends.
+          stripeSubscriptionEndsAt: {
             type: DataTypes.DATE,
             allowNull: true,
           },
-          subscriptionExpiresAt: {
-            type: DataTypes.DATE,
-            allowNull: true,
-          },
-          isTrial: {
+          emailIsVerified: {
             type: DataTypes.BOOLEAN,
             defaultValue: false,
           },
-          trialEnd: {
-            type: DataTypes.DATE,
-            allowNull: true,
-          },
-          lastPaymentAttempt: {
-            type: DataTypes.DATE,
-            allowNull: true,
-          },
-          lastPaymentStatus: {
-            type: DataTypes.STRING,
-            allowNull: true,
-          },
-          pendingDeletion: {
+          isPendingDeletion: {
             type: DataTypes.BOOLEAN,
             defaultValue: false,
           },
@@ -132,9 +98,9 @@ async function initializeDbAndModels() {
             type: DataTypes.DATE,
             allowNull: true,
           },
-          emailIsVerified: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
+          status: {
+            type: DataTypes.ENUM("active", "inactive"),
+            defaultValue: "active",
           },
         },
         {
@@ -169,24 +135,24 @@ async function initializeDbAndModels() {
             },
             {
               unique: true,
-              fields: ["providerCustomerId"],
+              fields: ["stripeCustomerId"],
               where: {
-                providerCustomerId: {
+                stripeCustomerId: {
                   [Op.ne]: null,
                 },
               },
             },
             {
               unique: true,
-              fields: ["subscriptionId"],
+              fields: ["stripeSubscriptionId"],
               where: {
-                providerCustomerId: {
+                stripeCustomerId: {
                   [Op.ne]: null,
                 },
               },
             },
             {
-              fields: ["subscriptionStatus"],
+              fields: ["stripeSubscriptionStatus"],
             },
             {
               fields: ["tier"],
@@ -287,6 +253,10 @@ async function initializeDbAndModels() {
       global.db.SavedArticle = SavedArticle;
       global.db.NewsArticle = NewsArticle;
       global.db.JournalArticle = JournalArticle;
+      global.db.MarketArticle = MarketArticle;
+      global.db.Podcast = Podcast;
+      global.db.Feed = Feed;
+      global.db.ArticleLike = ArticleLike;
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -299,6 +269,12 @@ async function initializeDbAndModels() {
         foreignKey: "archiveId",
         onDelete: "CASCADE",
       });
+
+      User.hasMany(Feed, { foreignKey: "userId", onDelete: "CASCADE" });
+      Feed.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
+
+      User.hasMany(ArticleLike, { foreignKey: "userId" });
+      ArticleLike.belongsTo(User, { foreignKey: "userId" });
 
       // await sequelize.query(`ALTER TABLE "SavedArticles" DROP CONSTRAINT IF EXISTS "SavedArticles_url_key";`);
 

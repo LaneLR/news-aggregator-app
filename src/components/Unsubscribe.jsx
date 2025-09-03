@@ -12,7 +12,6 @@ export default function UnsubscribeComponent({ children }) {
 
       const data = await res.json();
       if (res.ok) {
-        alert(data.message);
         router.push("/account");
         window.location.reload();
       } else {

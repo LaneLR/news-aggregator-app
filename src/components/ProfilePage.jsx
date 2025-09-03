@@ -40,11 +40,10 @@ const EmphasizedText = styled.div`
   font-weight: 600;
 `;
 
-const FALLBACK_IMAGE_URL = "/default-avatar.png";
+const FALLBACK_IMAGE_URL = "/images/default-avatar.png";
 
-export default function ProfilePage() {
-  const { data: session, status, update } = useSession();
-  const [isPendingDeletion, setIsPendingDeletion] = useState(false);
+export default function ProfilePage({ sessionData }) {
+  const { data: session, status, update } = useSession({ data: sessionData });
 
   const proxiedImageUrl = session?.user?.image
     ? `/api/image-proxy?url=${encodeURIComponent(session.user.image)}`
@@ -62,10 +61,6 @@ export default function ProfilePage() {
     } else {
       // If there's no image in the session, ensure it uses the fallback
       setImageSrc(FALLBACK_IMAGE_URL);
-    }
-
-    if (session?.user) {
-      setIsPendingDeletion(session.user.pendingDeletion !== false);
     }
   }, [session]);
 
@@ -92,52 +87,51 @@ export default function ProfilePage() {
   });
 
   const handleCancelDeletion = async () => {
-    setIsPendingDeletion(false);
     try {
       const res = await fetch("/api/users/cancel-deletion", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: session.user.id }),
       });
 
-      if (!res.ok) throw new Error("Failed to cancel account deletion");
+      if (!res.ok) {
+        throw new Error("Failed to cancel account deletion");
+      }
 
       await update();
-      alert("Account deletion has been canceled.");
     } catch (err) {
-      setIsPendingDeletion(true);
       console.error("Cancellation error:", err);
-      alert("Something went wrong while canceling account deletion.");
     }
   };
 
   const handleRequestDeletion = async () => {
-    setIsPendingDeletion(true);
     try {
       const res = await fetch("/api/users/request-deletion", {
-        method: "DELETE",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: session.user.id }),
       });
 
-      if (!res.ok) throw new Error("Failed to request account deletion");
+      if (!res.ok) {
+        throw new Error("Failed to request account deletion");
+      }
 
       await update();
-      alert(
-        "Account deletion requested. Your account will be deleted in 24 hours unless you cancel."
-      );
+
     } catch (err) {
-      setIsPendingDeletion(false);
       console.error("Deletion request error:", err);
-      alert("Something went wrong while requesting account deletion.");
     }
   };
 
+  const readyForDeletion = session?.user?.isPendingDeletion;
+
   return (
     <>
-      {session.user.pendingDeletion ? (
+      {readyForDeletion ? (
         <WarningWrapper>
           <DeleteAccountWarning>
             <p>
-              Your account is scheduled to be deleted on
+              Your account is scheduled to be deleted on{" "}
               <b>{tomorrowDateString}</b> at <b>11:59pm CT</b>.
             </p>
             <Underline />
@@ -153,21 +147,24 @@ export default function ProfilePage() {
       ) : null}
       <div>
         <h1>Profile</h1>
-        {/* The Image component now correctly uses the state */}
         <Image
           src={imageSrc}
           width={100}
           height={100}
           alt={"User image"}
-          onError={handleImageError} // This is a great safety net
+          onError={handleImageError}
           style={{ borderRadius: "50%" }}
         />
         <p>Your email: {session.user.email}</p>
         <br /> <p>Your name: {session.user.name}</p>
         <Divider /> <p>Subscription stuff</p>
       </div>
-      {!session.user.pendingDeletion && (
-        <Button onClick={handleRequestDeletion} bgColor={"var(--primary-blue)"}>
+      {!readyForDeletion && (
+        <Button
+          onClick={handleRequestDeletion}
+          bgColor={"var(--primary-blue)"}
+          clr={"var(--white)"}
+        >
           Delete Account
         </Button>
       )}

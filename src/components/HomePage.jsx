@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import TierCard from "./TierCard";
 import SubscriptionBanner from "./Banner2";
-import Banner3 from "./Banner3";
+import Banner3 from "./BannerHomePage";
 
 const HomePageWrapper = styled.div`
   display: flex;
@@ -34,7 +34,7 @@ const StyledHomePageSectionOne = styled.div`
   @media (max-width: 1210px) {
     gap: 10px;
   }
-  @media (max-width: 1055px) {
+  @media (max-width: 1520px) {
     padding: 24px 30px 80px 30px;
     flex-direction: column;
     gap: 31px;
@@ -260,32 +260,47 @@ export default function HomePage() {
           <Banner3
             title={"Free"}
             features={[
-              "Access to hundreds of news sources and blog posts",
-              "3 Archives to save your favorite articles to",
+              "Access to articles from hundreds of news sources and blog posts.",
+              "3 Archives to save your favorite articles to.",
             ]}
-            cost={"$0 / mo"}
-          />
+            cost={"Free!"}
+          >
+            <Button bgColor={"var(--orange)"} clr={"var(--white)"}>
+              Choose Plan
+            </Button>
+          </Banner3>
           <Banner3
             title={"Pro"}
             features={[
-              "Access to hundreds of news sources and blog posts",
-              "Unlimited number of Archives to save your favorite articles",
-              "Access to journals and daily market data",
+              "Access to articles from hundreds of news sources and blog posts.",
+              "Unlimited number of Archives to save your favorite articles.",
+              "Access to journals, daily market data, and podcasts.",
+              "Customizable news feed.",
+              "Priority support.",
+              "Exclusive content and features.",
             ]}
-            cost={"$8 / mo"}
-          />
+            cost={"$8.99 / mo"}
+          >
+            <Button bgColor={"var(--orange)"} clr={"var(--white)"}>
+              Choose Plan
+            </Button>
+          </Banner3>
           <Banner3
             title={"Pro Annual"}
             features={[
-              "Access to hundreds of news sources and blog posts",
-              "Unlimited number of Archives to save your favorite articles",
-              "Access to journals and hourly market data",
-              "Customizable news feed",
-              "Priority support",
-              "Exclusive content and features",
+              "Access to articles from hundreds of news sources and blog posts.",
+              "Unlimited number of Archives to save your favorite articles.",
+              "Access to journals, daily market data, and podcasts.",
+              "Customizable news feed.",
+              "Priority support.",
+              "Exclusive content and features.",
             ]}
-            cost={"$80 / yr"}
-          />
+            cost={"$79.99 / yr"}
+          >
+            <Button bgColor={"var(--orange)"} clr={"var(--white)"}>
+              Choose Plan
+            </Button>
+          </Banner3>
         </FirstHeaderCTA>
       </StyledHomePageSectionOne>
       <TransitionBox />

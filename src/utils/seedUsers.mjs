@@ -17,7 +17,7 @@
     "trialEnd": null,
     "lastPaymentAttempt": null,
     "lastPaymentStatus": null,
-    "pendingDeletion": false,
+    "isPendingDeletion": false,
     "deletionRequestedAt": null,
     "emailIsVerified": true
   },
@@ -39,7 +39,7 @@
     "trialEnd": null,
     "lastPaymentAttempt": null,
     "lastPaymentStatus": null,
-    "pendingDeletion": false,
+    "isPendingDeletion": false,
     "deletionRequestedAt": null,
     "emailIsVerified": true
   },
@@ -61,7 +61,7 @@
     "trialEnd": null,
     "lastPaymentAttempt": null,
     "lastPaymentStatus": null,
-    "pendingDeletion": false,
+    "isPendingDeletion": false,
     "deletionRequestedAt": null,
     "emailIsVerified": true
   },
@@ -83,7 +83,7 @@
     "trialEnd": null,
     "lastPaymentAttempt": null,
     "lastPaymentStatus": null,
-    "pendingDeletion": false,
+    "isPendingDeletion": false,
     "deletionRequestedAt": null,
     "emailIsVerified": true
   },
@@ -105,7 +105,7 @@
     "trialEnd": null,
     "lastPaymentAttempt": null,
     "lastPaymentStatus": null,
-    "pendingDeletion": false,
+    "isPendingDeletion": false,
     "deletionRequestedAt": null,
     "emailIsVerified": true
   },
@@ -127,7 +127,7 @@
     "trialEnd": null,
     "lastPaymentAttempt": null,
     "lastPaymentStatus": null,
-    "pendingDeletion": false,
+    "isPendingDeletion": false,
     "deletionRequestedAt": null,
     "emailIsVerified": true
   },
@@ -149,7 +149,7 @@
     "trialEnd": null,
     "lastPaymentAttempt": null,
     "lastPaymentStatus": null,
-    "pendingDeletion": false,
+    "isPendingDeletion": false,
     "deletionRequestedAt": null,
     "emailIsVerified": true
   },
@@ -171,7 +171,7 @@
     "trialEnd": null,
     "lastPaymentAttempt": null,
     "lastPaymentStatus": null,
-    "pendingDeletion": false,
+    "isPendingDeletion": false,
     "deletionRequestedAt": null,
     "emailIsVerified": true
   },
@@ -193,7 +193,7 @@
     "trialEnd": null,
     "lastPaymentAttempt": null,
     "lastPaymentStatus": null,
-    "pendingDeletion": false,
+    "isPendingDeletion": false,
     "deletionRequestedAt": null,
     "emailIsVerified": true
   },
@@ -215,7 +215,7 @@
     "trialEnd": null,
     "lastPaymentAttempt": null,
     "lastPaymentStatus": null,
-    "pendingDeletion": false,
+    "isPendingDeletion": false,
     "deletionRequestedAt": null,
     "emailIsVerified": true
   }

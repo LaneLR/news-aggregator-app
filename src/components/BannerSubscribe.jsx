@@ -1,5 +1,6 @@
+"use client";
 import styled from "styled-components";
-import Button from "./Button";
+import SubscribeButton from "./SubscribeButton";
 
 const Wrapper = styled.div`
   width: 220px;
@@ -65,33 +66,37 @@ const PlanChecklist = styled.p`
 const Cost = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
+  margin-top: 20px;
 `;
 
 const ButtonContainer = styled.div`
   width: 100%;
   height: auto;
-  padding: 20px 0 0 0;
+  margin: 10px 0 0 0;
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
-export default function Banner3({ title, features, cost }) {
+export default function BannerSubscribe({
+  title,
+  features,
+  cost,
+  children
+}) {
   return (
-    <>
-      <Wrapper>
-        <PlanTitle>{title}</PlanTitle>
-        <PlanSubTitle>You&apos;ll get</PlanSubTitle>
-        <PlanBody>
-          {features.map((feature, index) => (
-            <PlanChecklist key={index}>{feature}</PlanChecklist>
-          ))}
-        </PlanBody>
-        <Cost>{cost}</Cost>
-        <ButtonContainer>
-          <Button bgColor={"var(--orange)"}>Choose Plan</Button>
-        </ButtonContainer>
-      </Wrapper>
-    </>
+    <Wrapper>
+      <PlanTitle>{title}</PlanTitle>
+      <PlanSubTitle>You&apos;ll get</PlanSubTitle>
+      <PlanBody>
+        {features.map((feature, index) => (
+          <PlanChecklist key={index}>{feature}</PlanChecklist>
+        ))}
+      </PlanBody>
+      <Cost>{cost}</Cost>
+      <ButtonContainer>
+        {children} 
+      </ButtonContainer>
+    </Wrapper>
   );
 }

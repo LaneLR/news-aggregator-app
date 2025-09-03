@@ -1,4 +1,5 @@
 "use client";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import styled from "styled-components";
 
@@ -15,14 +16,9 @@ const Wrapper = styled.div`
   gap: 25px;
   overflow-x: auto;
 
-  @media (max-width: 990px) {
+  @media (max-width: 1156px) {
     justify-content: left;
   }
-
-  ::-webkit-scrollbar {
-    height: 4px;
-  
-    }
 `;
 
 const StyledLink = styled(Link)`
@@ -33,10 +29,26 @@ const Underline = styled.div`
   border: 1px solid var(--white);
 `;
 
-export default function HeaderNavBar() {
+export default function HeaderNavBar({ sessionData }) {
+  const { data: session, status, update } = useSession({ data: sessionData });
+
+  const isNotSubscribed = session?.user?.tier === "Free";
+
   return (
     <>
       <Wrapper>
+        {isNotSubscribed ? null : (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <StyledLink href={"/category/journal"}>Journals</StyledLink>
+            {/* <Underline /> */}
+          </div>
+        )}
+        {isNotSubscribed ? null : (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <StyledLink href={"/category/market"}>Market</StyledLink>
+            {/* <Underline /> */}
+          </div>
+        )}
         <div style={{ display: "flex", flexDirection: "column" }}>
           <StyledLink href={"/category/science"}>Science</StyledLink>
           {/* <Underline /> */}
