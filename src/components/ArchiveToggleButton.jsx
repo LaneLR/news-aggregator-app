@@ -16,20 +16,18 @@ const SaveButton = styled.div`
   align-self: flex-start;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-
-  &:hover {
-    background-color: #173b9e;
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
 `;
 
 const SavedOrUnsavedButton = styled.img`
-  height: 30px;
-  width: 30px;
+  height: 35px;
+  width: 35px;
+  // &:hover {
+  //   transform: translateY(-1px);
+  // }
+
+  // &:active {
+  //   transform: translateY(0);
+  // }
 `;
 
 export default function ArchiveToggleButton({
