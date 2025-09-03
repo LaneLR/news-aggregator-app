@@ -31,7 +31,7 @@ async function fetchCategoryArticles(category) {
 
   // Use the correct API endpoint for category-specific articles
   const res = await fetch(`${baseUrl}/api/articles/${category}`, {
-    cache: "no-store", // always get fresh data
+    next: { revalidate: 3600 }, // always get fresh data
   });
 
   if (!res.ok) throw new Error("Failed to fetch news for category");
