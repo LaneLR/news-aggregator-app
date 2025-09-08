@@ -147,6 +147,7 @@
 import { useEffect, useState } from "react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
+import NewsCardFour from "./NewsCardFour";
 import styled from "styled-components";
 import Button from "./Button";
 import Loading from "@/app/loading";
@@ -304,7 +305,7 @@ export default function News({ archiveId, feedId }) {
       ) : (
         <NewsGridWrapper>
           {articles.map((article) => (
-            <NewsCardThree
+            <NewsCardFour
               key={article.url}
               article={article}
               archiveId={defaultArchiveId}
