@@ -1,10 +1,10 @@
-import AboutRelayNewsPage from "@/components/AboutRelayNewsPage";
+import AboutPage from "@/components/AboutPage";
 
 export default function AboutPage() {
 
     return (
         <>
-        <AboutRelayNewsPage />
+        <AboutPage />
         </>
     )
 }
