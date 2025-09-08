@@ -37,7 +37,9 @@ export async function POST(req) {
           const subscription = await stripe.subscriptions.retrieve(
             session.subscription
           );
-          const priceId = subscription.items.data[0].price.id;
+          // Correctly get the subscription item from the data array
+          const subscriptionItem = subscription.items.data[0];
+          const priceId = subscriptionItem.price.id;
 
           let newTier = "Free";
           if (priceId === "price_1Ry0mKFlSQA8kdoEj98uKzPj") newTier = "Pro";
@@ -50,17 +52,34 @@ export async function POST(req) {
             stripeSubscriptionId: subscription.id,
             stripePriceId: priceId,
             stripeSubscriptionStatus: subscription.status,
-            stripeSubscriptionEndsAt: null,
+            // Access current_period_end from the subscription item
+            stripeSubscriptionEndsAt: new Date(
+              subscriptionItem.current_period_end * 1000
+            ),
           };
 
-          const periodEndTimestamp = subscription.cancel_at_period_end;
-          if (typeof periodEndTimestamp === "number") {
-            updateFields.stripeSubscriptionEndsAt = new Date(
-              periodEndTimestamp * 1000
-            );
+          const { usedReferralCode, referrerId } = session.metadata;
+
+          if (usedReferralCode) {
+            updateFields.usedReferralCode = usedReferralCode;
           }
 
           await user.update(updateFields);
+
+          if (referrerId) {
+            const referrer = await User.findByPk(referrerId);
+            if (referrer) {
+              await referrer.increment("referralCount");
+              await stripe.customers.createBalanceTransaction(
+                referrer.stripeCustomerId,
+                {
+                  amount: -400, // -400 cents = $4.00 credit
+                  currency: "usd",
+                  description: `Referral credit for ${user.email}`,
+                }
+              );
+            }
+          }
 
           await sendEmail({
             to: user.email,
@@ -88,14 +107,11 @@ export async function POST(req) {
           tier: newTier,
           stripeSubscriptionStatus: subscription.status,
           stripePriceId: priceId,
-          stripeSubscriptionEndsAt: null,
+          subscriptionWillCancel: subscription.cancel_at_period_end,
+          stripeSubscriptionEndsAt: subscription.cancel_at
+            ? new Date(subscription.cancel_at * 1000)
+            : new Date(subscription.current_period_end * 1000),
         };
-
-        if (subscription.cancel_at_period_end) {
-          updateFields.stripeSubscriptionEndsAt = new Date(
-            subscription.cancel_at * 1000
-          );
-        }
 
         await user.update(updateFields);
 
@@ -105,11 +121,11 @@ export async function POST(req) {
 
         const previousAttributes = event.data.previous_attributes;
 
-        if (previousAttributes.items && user.tier !== previousAttributes.tier) {
+        if (previousAttributes.items && user.tier !== newTier) {
           await sendEmail({
             to: user.email,
             subject: "Your Subscription Has Been Updated",
-            html: `<p>Your subscription has been successfully updated to the ${newTier} plan.</p><p>- RelayNews Team</p>`,
+            html: `<p>Your subscription has been successfully updated to the ${newTier} plan.</p><p>- MorningFeeds Team</p>`,
           });
         } else if (
           subscription.cancel_at_period_end &&
@@ -121,7 +137,7 @@ export async function POST(req) {
           await sendEmail({
             to: user.email,
             subject: "Your Subscription Cancellation is Confirmed",
-            html: `<p>We've received your request to cancel your subscription. You will continue to have access until ${endDate}.</p><p>- RelayNews Team</p>`,
+            html: `<p>We've received your request to cancel your subscription. You will continue to have access until ${endDate}.</p><p>- MorningFeeds Team</p>`,
           });
         } else if (
           !subscription.cancel_at_period_end &&
@@ -130,7 +146,7 @@ export async function POST(req) {
           await sendEmail({
             to: user.email,
             subject: "Your Subscription Has Been Resumed",
-            html: `<p>Your subscription has been successfully resumed. You now have full, uninterrupted access.</p><p>- RelayNews Team</p>`,
+            html: `<p>Your subscription has been successfully resumed. You now have full, uninterrupted access.</p><p>- MorningFeeds Team</p>`,
           });
         }
         break;
@@ -148,6 +164,7 @@ export async function POST(req) {
           stripeSubscriptionStatus: "canceled",
           stripeSubscriptionId: null,
           stripePriceId: null,
+          stripeSubscriptionEndsAt: null,
         });
 
         console.log(`Subscription canceled for ${user.email}`);

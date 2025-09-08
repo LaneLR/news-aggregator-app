@@ -1,4 +1,3 @@
-// src/app/api/stripe/resume-subscription/route.js
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
@@ -24,19 +23,12 @@ export async function POST(req) {
       );
     }
 
-    await stripe.subscriptions.update(
-      user.stripeSubscriptionId,
-      {
-        cancel_at_period_end: false,
-      }
-    );
-
-    await user.update({
-      stripeSubscriptionEndsAt: null,
+    await stripe.subscriptions.update(user.stripeSubscriptionId, {
+      cancel_at_period_end: false,
     });
 
     return NextResponse.json({
-      message: "Subscription resumed successfully.",
+      message: "Subscription resume request sent to Stripe successfully.",
     });
   } catch (err) {
     console.error("Error resuming subscription:", err);

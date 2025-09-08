@@ -75,7 +75,7 @@ export async function POST(req) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { priceId } = await req.json();
+  const { priceId, referralCode, promotionCodeId } = await req.json();
   if (!priceId) {
     return NextResponse.json(
       { error: "Price ID is required" },
@@ -100,6 +100,48 @@ export async function POST(req) {
     );
   }
 
+  let discountOptions = {};
+  let metadata = {};
+  let referrer = null;
+
+  if (referralCode) {
+    if (user.usedReferralCode) {
+      return NextResponse.json(
+        { error: "Referral code can only be used once." },
+        { status: 400 }
+      );
+    }
+
+    referrer = await User.findOne({ where: { referralCode } });
+    if (!referrer) {
+      return NextResponse.json(
+        { error: "Invalid referral code." },
+        { status: 400 }
+      );
+    }
+
+    if (referrer.id === user.id) {
+      return NextResponse.json(
+        { error: "You cannot use your own referral code." },
+        { status: 400 }
+      );
+    }
+
+    discountOptions = {
+      discounts: [{ coupon: "promo_1S4Z00FlSQA8kdoEQulnRwV3" }],
+    };
+    metadata = { usedReferralCode: referralCode, referrerId: referrer.id };
+  }
+
+  if (promotionCodeId && referralCode) {
+    discountOptions = { discounts: [{ promotion_code: promotionCodeId }] };
+
+    const referrer = await User.findOne({ where: { referralCode } });
+    if (referrer) {
+      metadata = { usedReferralCode: referralCode, referrerId: referrer.id };
+    }
+  }
+
   try {
     const origin = headers().get("origin") || "http://localhost:3000";
 
@@ -107,10 +149,12 @@ export async function POST(req) {
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
-      success_url: `${origin}/account?subscription_success=true`, 
-      cancel_url: `${origin}/pricing`, 
+      success_url: `${origin}/account?subscription_success=true`,
+      cancel_url: `${origin}/pricing`,
       client_reference_id: user.id,
       customer_email: user.email,
+      ...discountOptions, // Apply the discount if a valid code was used
+      metadata, // Pass referral info to the webhook
     });
 
     revalidatePath("/pricing");
