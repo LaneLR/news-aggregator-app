@@ -162,26 +162,27 @@ const LogoContainer = styled.div`
   display: "flex";
   alignitems: "center";
   columngap: "10px";
-  background-color: var(--dark-blue);
+  background-color: transparent;
   width: 100%;
 `;
 
 const LogoText = styled.p`
-  font-size: 2.5rem;
+  font-size: 2.1rem;
   padding: 0 0 0 10px;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   background-color: var(--dark-blue);
 
   span:first-child {
-    color: var(--secondary-blue);
+    // color: var(--secondary-blue);
+    color: #eba613ff;
     font-weight: 700;
     background-color: var(--dark-blue);
   }
 
   span:last-child {
-    color: var(--white);
+    color: #fff;
     font-weight: 400;
     background-color: var(--dark-blue);
   }
@@ -196,8 +197,8 @@ const LogoText = styled.p`
   }
 `;
 
-export default function Header({ priceId }) {
-  const { data: session, status } = useSession();
+export default function Header({ priceId, sessionData }) {
+  const { data: session, status, update } = useSession({ data: sessionData });
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -243,23 +244,23 @@ export default function Header({ priceId }) {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      backgroundColor: "#eee",
-                      padding: "6px",
+                      backgroundColor: "transparent",
+                      padding: "2px",
                       borderRadius: "8px",
                     }}
                   >
                     <Image
                       priority
-                      src={"/images/Relay-logo-color-transparent-bg.png"}
-                      alt={"Relay News logo"}
-                      width={33}
-                      height={40}
+                      src={"/images/morningfeeds-logo1.png"}
+                      alt={"MorningFeeds logo"}
+                      width={65}
+                      height={60}
                     />
                   </div>
                 </LogoContainer>
                 <LogoText>
-                  <span>RELAY</span>
-                  <span>NEWS</span>
+                  <span>MORNING</span>
+                  <span>FEEDS</span>
                 </LogoText>
               </Link>
             </LeftContainer>
@@ -430,23 +431,23 @@ export default function Header({ priceId }) {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      backgroundColor: "#eee",
-                      padding: "6px",
+                      backgroundColor: "transparent",
+                      padding: "2px",
                       borderRadius: "8px",
                     }}
                   >
                     <Image
                       priority
-                      src={"/images/Relay-logo-color-transparent-bg.png"}
-                      alt={"Relay News logo"}
-                      width={33}
-                      height={40}
+                      src={"/images/morningfeeds-logo1.png"}
+                      alt={"MorningFeeds logo"}
+                      width={65}
+                      height={60}
                     />
                   </div>
                 </LogoContainer>
                 <LogoText>
-                  <span>RELAY</span>
-                  <span>NEWS</span>
+                  <span>morning</span>
+                  <span>feeds</span>
                 </LogoText>
               </Link>
             </LeftContainer>
