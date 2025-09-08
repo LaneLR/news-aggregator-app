@@ -22,16 +22,14 @@ const SearchBarHeader = styled.div`
   }
 `;
 
-// New helper function to fetch articles for a specific category
 async function fetchCategoryArticles(category) {
   const baseUrl =
     process.env.RENDER_EXTERNAL_URL ||
     process.env.NEXT_PUBLIC_BASE_URL ||
     "http://localhost:3000";
 
-  // Use the correct API endpoint for category-specific articles
   const res = await fetch(`${baseUrl}/api/articles/${category}`, {
-    next: { revalidate: 3600 }, // always get fresh data
+    next: { revalidate: 3600 }, 
   });
 
   if (!res.ok) throw new Error("Failed to fetch news for category");
@@ -51,7 +49,6 @@ export default function CategoryPage({ category, archiveId }) {
   const categoryNameForDisplay =
     category.charAt(0).toUpperCase() + category.slice(1);
 
-  // A single function to load articles, used for initial load and refresh
   const loadArticles = async () => {
     setIsLoading(true);
     setError(null);
@@ -101,7 +98,6 @@ export default function CategoryPage({ category, archiveId }) {
     await loadArticles();
   };
 
-  // Add the default archive fetch logic
   useEffect(() => {
     const fetchDefaultArchive = async () => {
       try {
