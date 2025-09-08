@@ -1,139 +1,96 @@
 "use client";
 import styled from "styled-components";
-import ArchiveToggleButton from "./ArchiveToggleButton.jsx";
-import { useEffect, useState } from "react";
+import Link from 'next/link';
 
-// 1. Main Card Container
-const CardContainer = styled.div`
-  background-color: var(--white);
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  //   overflow: hidden;
+// --- Styled Components ---
+
+const CardLink = styled(Link)`
+  display: block;
+  position: relative;
   width: 100%;
-  max-width: 400px;
-  //   margin: 15px;
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid gray;
+  max-width: 350px;
+  height: 220px;
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  background-color: #e0e0e0; // Fallback for archives with 0 images
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
 
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   }
 `;
 
-const CardHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  border-bottom: 1px solid #eee;
-`;
-
-const BrandText = styled.span`
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: var(--dark-blue);
-`;
-
-const ThumbnailImage = styled.img`
+const ImageGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
   width: 100%;
-  height: 200px;
-  object-fit: cover;
-  display: block;
-  border-bottom: 1px solid #eee;
+  height: 100%;
 `;
 
-const ContentArea = styled.div`
-  padding: 20px;
+const GridImage = styled.div`
+  width: 100%;
+  height: 100%;
+  background-image: url(${(props) => props.src});
+  background-size: cover;
+  background-position: center;
+`;
+
+const Overlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 60%);
   display: flex;
   flex-direction: column;
-`;
+  justify-content: flex-end;
+  padding: 1.25rem;
+  color: white;
+  transition: background 0.2s ease-in-out;
 
-const NewTag = styled.span`
-  background-color: var(--primary-blue);
-  color: #fff;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  align-self: flex-start;
+  ${CardLink}:hover & {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.1) 60%);
+  }
 `;
 
 const ArchiveTitle = styled.h3`
-  font-size: 1.2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  color: var(--dark-blue);
-  line-height: 1.3;
-  margin-bottom: 8px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  margin: 0;
+  line-height: 1.2;
 `;
 
-const ArticleSnippet = styled.p`
-  font-size: 1rem;
-  color: var(--deep-blue);
-  line-height: 1.5;
-  font-weight: 700;
-  margin-bottom: 20px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+const ArchiveMeta = styled.p`
+  font-size: 0.9rem;
+  margin: 4px 0 0 0;
+  opacity: 0.8;
 `;
 
-const ReadMoreButton = styled.a`
-  background-color: var(--primary-blue);
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  align-self: flex-start;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+// --- The React Component ---
 
-  &:hover {
-    background-color: #173b9e;
-    transform: translateY(-1px);
-  }
+export default function ArchiveCard2({ archive }) {
+  const { name, articleCount, lastUpdated, articleImages = [] } = archive;
 
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-export default function ArchiveCard({ archive }) {
-  const FALLBACK_IMAGE_URL = "/images/blurimage.png";
-
-  const [currentImageSrc, setCurrentImageSrc] = useState(FALLBACK_IMAGE_URL);
+  // Create a padded array to ensure we always have 4 elements for the grid
+  // This gracefully handles archives with 0, 1, 2, or 3 articles.
+  const displayImages = [...articleImages.slice(0, 4), ...Array(4 - articleImages.length).fill(null)];
 
   return (
-    <CardContainer>
-      <CardHeader>
-        <BrandText>{archive.name}</BrandText>
-      </CardHeader>
-      <ThumbnailImage src={FALLBACK_IMAGE_URL} />
-      <ContentArea>
-        {/* <ArticleSnippet>
-          {archive.description || "No description available."}
-        </ArticleSnippet> */}
-
-        <ReadMoreButton href={`/archives/${archive.id}`}>
-          View Archive
-        </ReadMoreButton>
-      </ContentArea>
-    </CardContainer>
+    <CardLink href={`/archives/${archive.id}`}>
+      <ImageGrid>
+        {displayImages.map((src, index) =>
+          src ? <GridImage key={index} src={src} /> : <div key={index} />
+        )}
+      </ImageGrid>
+      <Overlay>
+        <ArchiveTitle>{name}</ArchiveTitle>
+        <ArchiveMeta>{articleCount} Articles • {lastUpdated}</ArchiveMeta>
+      </Overlay>
+    </CardLink>
   );
 }
