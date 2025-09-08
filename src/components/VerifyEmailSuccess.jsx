@@ -24,9 +24,9 @@ const Text = styled.p`
   width: 100%;
 `;
 
-export default function VerifyEmailSuccessComponent() {
+export default function VerifyEmailSuccessComponent({ sessionData }) {
   const router = useRouter();
-  const { data: session, status, update } = useSession();
+  const { data: session, status, update } = useSession({ data: sessionData });
 
   if (status === "loading") {
     return <Loading />;

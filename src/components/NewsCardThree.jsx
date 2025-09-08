@@ -142,8 +142,9 @@ export default function NewsCardThree({
   article,
   archiveId,
   viewOnly = false,
+  sessionData,
 }) {
-  const { data: session } = useSession();
+  const { data: session, status, update } = useSession({ data: sessionData });
 
   const PAYWALLED_SOURCES = new Set([
     "The Washington Post",
@@ -210,7 +211,7 @@ export default function NewsCardThree({
   return (
     <CardContainer>
       <CardHeader>
-        <BrandText>Relay News</BrandText>
+        <BrandText>MorningFeeds</BrandText>
       </CardHeader>
       <Link
         href={article.url}
@@ -273,7 +274,10 @@ export default function NewsCardThree({
           >
             {isPaywalled && (
               <span title="This article may be behind a paywall">
-                <LockedArticleSVG src="/images/lock.svg" alt="Image may be behind a paywall" />
+                <LockedArticleSVG
+                  src="/images/lock.svg"
+                  alt="Image may be behind a paywall"
+                />
               </span>
             )}
             <ArchiveToggleButton
@@ -283,9 +287,15 @@ export default function NewsCardThree({
             />
             <LikeButton onClick={handleLike} $isLiked={isLiked}>
               {isLiked ? (
-                <LikeOrUnlikedButton src="/images/like-button-liked.svg" alt="Article liked button"/>
+                <LikeOrUnlikedButton
+                  src="/images/like-button-liked.svg"
+                  alt="Article liked button"
+                />
               ) : (
-                <LikeOrUnlikedButton src="/images/like-button-unliked.svg" alt="Article not liked button"/>
+                <LikeOrUnlikedButton
+                  src="/images/like-button-unliked.svg"
+                  alt="Article not liked button"
+                />
               )}
               <LikeCountCounter>{likeCount}</LikeCountCounter>
             </LikeButton>

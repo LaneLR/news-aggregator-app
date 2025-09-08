@@ -115,13 +115,13 @@ const SSOText = styled.div`
   }
 `;
 
-export default function LoginPage() {
+export default function LoginPage({ sessionData }) {
   const [user, setUser] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession({ data: sessionData });
 
   useEffect(() => {
     if (status === "authenticated") {
