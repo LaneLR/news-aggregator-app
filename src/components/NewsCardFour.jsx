@@ -6,6 +6,7 @@ import Image from "next/image.js";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation.js";
+import ShareButton from "./ShareButton.jsx";
 
 const CardContainer = styled.div`
   background-color: var(--white);
@@ -285,6 +286,7 @@ export default function NewsCardThree({
                 />
               </span>
             )}
+            <ShareButton article={article}/>
             <ArchiveToggleButton
               article={article}
               archiveId={archiveId}
