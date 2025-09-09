@@ -201,7 +201,7 @@ export default function PricingPage({ sessionData }) {
     if (userTier === planTier) {
       return (
         <>
-          <div>
+          {/* <div>
             <input
               type="text"
               placeholder="Referral Code (Optional)"
@@ -212,7 +212,7 @@ export default function PricingPage({ sessionData }) {
             <Button onClick={() => handleSubscribe(YOUR_PRICE_ID)}>
               Subscribe
             </Button>
-          </div>
+          </div> */}
           <Button onClick={handleManage} disabled={isLoading}>
             Manage Subscription
           </Button>{" "}
