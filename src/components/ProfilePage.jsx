@@ -5,6 +5,7 @@ import Loading from "@/app/loading";
 import Image from "next/image";
 import Button from "./Button";
 import { useEffect, useState } from "react";
+import CopyButton from "./CopyButton";
 
 const ProfileWrapper = styled.div`
   max-width: 800px;
@@ -232,7 +233,11 @@ export default function ProfilePage({ sessionData }) {
               {user.stripeSubscriptionEndsAt && (
                 <InfoRow>
                   <span>
-                    {user.subscriptionWillCancel ? <b>Cancels on</b> : <b>Renews on</b>}
+                    {user.subscriptionWillCancel ? (
+                      <b>Cancels on</b>
+                    ) : (
+                      <b>Renews on</b>
+                    )}
                   </span>
                   <strong>
                     {new Date(
@@ -283,6 +288,7 @@ export default function ProfilePage({ sessionData }) {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              height: '47px',
             }}
           >
             <p
@@ -292,7 +298,8 @@ export default function ProfilePage({ sessionData }) {
                 letterSpacing: "2px",
                 background: "#f0f0f0",
                 padding: "9px",
-                borderRadius: "10px",
+                borderTopLeftRadius: "10px",
+                borderBottomLeftRadius: "10px",
                 width: "100%",
                 display: "flex",
                 justifyContent: "center",
@@ -301,6 +308,7 @@ export default function ProfilePage({ sessionData }) {
             >
               {user.referralCode}
             </p>
+            <CopyButton textToCopy={user.referralCode} />
           </div>
         </CardContent>
       </Card>
