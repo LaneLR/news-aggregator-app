@@ -6,6 +6,8 @@ import Image from "next/image";
 import Button from "./Button";
 import { useEffect, useState } from "react";
 import CopyButton from "./CopyButton";
+import Link from "next/link";
+import RecentlyLikedItem from "./RecentlyLikedArticle";
 
 const ProfileWrapper = styled.div`
   max-width: 800px;
@@ -109,16 +111,39 @@ const DangerCardHeader = styled(CardHeader)`
   border-bottom-color: #fed7d7;
 `;
 
+const RecentlyLikedList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+`;
+
 const FALLBACK_IMAGE_URL = "/images/default-avatar.png";
 
 export default function ProfilePage({ sessionData }) {
   const { data: session, status, update } = useSession({ data: sessionData });
+  const [recentlyLiked, setRecentlyLiked] = useState([]);
 
   const proxiedImageUrl = session?.user?.image
     ? `/api/image-proxy?url=${encodeURIComponent(session.user.image)}`
     : FALLBACK_IMAGE_URL;
 
   const [imageSrc, setImageSrc] = useState(FALLBACK_IMAGE_URL);
+
+  useEffect(() => {
+    // This fetch logic is correct
+    const fetchRecentlyLiked = async () => {
+      try {
+        const res = await fetch("/api/articles/liked?limit=3");
+        const data = await res.json();
+        if (res.ok) {
+          setRecentlyLiked(data.articles);
+        }
+      } catch (err) {
+        console.error("Failed to fetch recently liked articles:", err);
+      }
+    };
+    fetchRecentlyLiked();
+  }, []);
 
   useEffect(() => {
     if (session?.user?.image) {
@@ -273,44 +298,95 @@ export default function ProfilePage({ sessionData }) {
       <Card>
         <CardHeader>Your Referral Code</CardHeader>
         <CardContent>
-          <p>
-            Share this code with your friends! They&apos;ll get a discount on
-            their first subscription, and you&apos;ll get a credit on your next
-            bill.
-          </p>
-          <div>
-            {user.referralCount > 0 && (
-              <p>Users referred: {user.referralCount} </p>
-            )}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              height: '47px',
-            }}
-          >
-            <p
-              style={{
-                fontSize: "1.6rem",
-                fontWeight: "500",
-                letterSpacing: "2px",
-                background: "#f0f0f0",
-                padding: "9px",
-                borderTopLeftRadius: "10px",
-                borderBottomLeftRadius: "10px",
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {user.referralCode}
-            </p>
-            <CopyButton textToCopy={user.referralCode} />
-          </div>
+          {user.tier === "Free" ? (
+            <>
+              <p>
+                Subscribe to Pro to activate your referral code and start
+                earning credits!
+              </p>
+              <div
+                style={{
+                  filter: "blur(4px)",
+                  background: "#f0f0f0",
+                  padding: "9px",
+                  borderRadius: "10px",
+                  textAlign: "center",
+                  userSelect: "none",
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "1.6rem",
+                    letterSpacing: "2px",
+                  }}
+                >
+                  {user.referralCode}
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <p>
+                Share this code with your friends! They&apos;ll get a discount
+                on their first subscription, and you&apos;ll get a credit on
+                your next bill.
+              </p>
+              <div>
+                {user.referralCount > 0 && (
+                  <p>Users referred: {user.referralCount} </p>
+                )}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  height: "47px",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: "1.6rem",
+                    fontWeight: "500",
+                    letterSpacing: "2px",
+                    background: "#f0f0f0",
+                    padding: "9px",
+                    borderTopLeftRadius: "10px",
+                    borderBottomLeftRadius: "10px",
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {user.referralCode}
+                </p>
+                <CopyButton textToCopy={user.referralCode} />
+              </div>
+            </>
+          )}
         </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>Recently Liked</CardHeader>
+        <CardContent>
+          {recentlyLiked.length > 0 ? (
+            <RecentlyLikedList>
+              {recentlyLiked.map((article) => (
+                <RecentlyLikedItem key={article.url} article={article} />
+              ))}
+            </RecentlyLikedList>
+          ) : (
+            <p>Your recently liked articles will appear here.</p>
+          )}
+        </CardContent>
+        <CardFooter>
+          <Link href="/liked" passHref>
+            <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>View All Liked</Button>
+          </Link>
+        </CardFooter>
       </Card>
 
       <Card>
