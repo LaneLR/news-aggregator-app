@@ -140,7 +140,7 @@ const LockedArticleSVG = styled.img`
   width: 30px;
 `;
 
-export default function NewsCardThree({
+export default function NewsCardFour({
   article,
   archiveId,
   viewOnly = false,
