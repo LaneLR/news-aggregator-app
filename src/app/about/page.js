@@ -1,4 +1,4 @@
-import AboutPageComponent from "@/components/AboutPageComponent";
+import AboutPageComponent from "@/components/AboutPage";
 
 export default function AboutPage() {
 
