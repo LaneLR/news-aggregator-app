@@ -41,16 +41,16 @@ export default function AboutPage() {
         <AccordionItem
           question="What makes Relay News different from other news apps?
 "
-          answer="Relay News doesn't use an algorithm to
-            decide what you see. There's no upvoting, trending scores, or
+          answer="Relay News doesn&apos;t use an algorithm to
+            decide what you see. There&apos;s no upvoting, trending scores, or
             clickbait ranking — just direct, real-time content from sources you
-            choose. It's fast, focused, and ad-free."
+            choose. It&apos;s fast, focused, and ad-free."
         />
         <AccordionItem
           question="Where does the news come from?"
 
           answer="All content is fetched directly from the RSS feeds of news websites,
-            blogs, and publishers. That means you're seeing the original
+            blogs, and publishers. That means you&apos;re seeing the original
             article titles, descriptions, and images — not rewrites or
             summaries."
         />
@@ -58,7 +58,7 @@ export default function AboutPage() {
           question="Can I save articles to read later?"
 
           answer="Yes! You can archive articles into custom folders to read them later
-            or organize them by topic. It's like building your own personal
+            or organize them by topic. It&apos;s like building your own personal
             library of news."
         />
         <AccordionItem
@@ -72,7 +72,7 @@ export default function AboutPage() {
           question="Do you track what I read or click?"
           
           answer="Nope. Relay News is designed with privacy
-            in mind. We don't track your clicks, sell your data, or show
+            in mind. We don&apos;t track your clicks, sell your data, or show
             you targeted ads. What you read is your business."
         />
         <AccordionItem
