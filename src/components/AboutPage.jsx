@@ -17,7 +17,7 @@ const Wrapper = styled.div`
   }
 `;
 
-export default function AboutPage() {
+export default function AboutPageComponent() {
   return (
     <>
       <Wrapper>
