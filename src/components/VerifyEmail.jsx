@@ -24,9 +24,9 @@ const Text = styled.p`
   width: 100%;
 `;
 
-export default function VerifyEmailComponent() {
+export default function VerifyEmailComponent({ sessionData }) {
   const router = useRouter();
-  const { data: session, status, update } = useSession();
+  const { data: session, status, update } = useSession({ data: sessionData });
 
   if (status === "loading") {
     return <Loading />;
@@ -34,7 +34,7 @@ export default function VerifyEmailComponent() {
 
   if (session && session.user.emailIsVerified) {
     // router.push("/news");
-    window.location.replace("/account")
+    window.location.replace("/account");
   }
 
   return (

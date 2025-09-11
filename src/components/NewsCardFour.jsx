@@ -6,6 +6,7 @@ import Image from "next/image.js";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation.js";
+import ShareButton from "./ShareButton.jsx";
 
 const CardContainer = styled.div`
   background-color: var(--white);
@@ -17,6 +18,7 @@ const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   border: 1px solid gray;
+  font-family: 'Inter', sans-serif;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   &:hover {
     transform: translateY(-3px);
@@ -39,11 +41,11 @@ const BrandText = styled.span`
 `;
 
 const ContentArea = styled.div`
-  padding: 20px 20px 0px 20px;
+  padding: 0px 20px 0px 20px;
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-height: 192px;
+  max-height: 150px;
   justify-content: space-between;
 `;
 
@@ -61,22 +63,22 @@ const ArticleTitle = styled.h3`
 `;
 
 const ArticleSnippet = styled.div`
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--dark-blue);
   line-height: 1.5;
-  font-weight: 700;
-  margin-bottom: 20px;
+  font-weight: 500;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding: 8px 0 3px 0;
+  color: #777777ff;
 `;
 
 const ArticleSnippetText = styled.p`
-  background-color: #dcebfdff;
+  // background-color: #dcebfdff;
   width: fit-content;
-  padding: 3px 6px;
   border-radius: 6px;
 `;
 
@@ -116,8 +118,8 @@ const LikeButton = styled.button`
 `;
 
 const LikeOrUnlikedButton = styled.img`
-  height: 35px;
-  width: 35px;
+  height: 30px;
+  width: 30px;
   // &:hover {
   //   transform: translateY(-1px);
   // }
@@ -134,15 +136,15 @@ const LikeCountCounter = styled.div`
 `;
 
 const LockedArticleSVG = styled.img`
-  height: 35px;
-  width: 35px;
+  height: 30px;
+  width: 30px;
 `;
 
-export default function NewsCardThree({
+export default function NewsCardFour({
   article,
   archiveId,
   viewOnly = false,
-  sessionData,
+  sessionData
 }) {
   const { data: session, status, update } = useSession({ data: sessionData });
 
@@ -210,13 +212,13 @@ export default function NewsCardThree({
 
   return (
     <CardContainer>
-      <CardHeader>
+      {/* <CardHeader>
         <BrandText>MorningFeeds</BrandText>
-      </CardHeader>
+      </CardHeader> */}
       <Link
         href={article.url}
         target={"_blank"}
-        style={{ position: "relative", width: "100%", height: "200px" }}
+        style={{ position: "relative", width: "100%", height: "250px" }}
       >
         <Image
           src={imageSrc}
@@ -229,20 +231,24 @@ export default function NewsCardThree({
             objectFit: "cover",
             objectPosition: "top",
             borderBottom: "1px solid #eee",
-            minWidth: "398px",
+            minWidth: "100%",
+            borderTopLeftRadius: "10px",
+            borderTopRightRadius: "10px",
+            // height: '100px'
           }}
         />
       </Link>
       <ContentArea>
         <div>
+          {" "}
+          <ArticleSnippet>
+            <ArticleSnippetText>{cleanSourceName}</ArticleSnippetText>
+          </ArticleSnippet>
           <ArticleTitle>
             <Link href={article.url} target={"_blank"}>
               {cleanTitle}
             </Link>
           </ArticleTitle>
-          <ArticleSnippet>
-            <ArticleSnippetText>{cleanSourceName}</ArticleSnippetText>
-          </ArticleSnippet>
         </div>
         <div
           style={{
@@ -280,6 +286,7 @@ export default function NewsCardThree({
                 />
               </span>
             )}
+            <ShareButton article={article}/>
             <ArchiveToggleButton
               article={article}
               archiveId={archiveId}

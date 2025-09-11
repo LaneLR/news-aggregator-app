@@ -4,6 +4,7 @@ import { authRateLimitMiddleware } from "@/lib/rate-limiter";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "@/utils/emailer";
+import { nanoid } from "nanoid";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,7 @@ export async function POST(req) {
       email,
       password: password,
       emailIsVerified: false,
+      referralCode: nanoid(8).toUpperCase(), // Generate the code here
     });
 
     await db.Archive.findOrCreate({
@@ -63,10 +65,10 @@ export async function POST(req) {
 
     await sendEmail({
       to: newUser.email,
-      subject: "Verify your RelayNews account",
-      html: `<p>Click the link below to verify your RelayNews account</p>
-              <a href="${verifyUrl}">Verify Account</a>
-              <p>This link is only valid for 24 hours.</p>`,
+      subject: "Verify your MorningFeeds account",
+      html: `<p>Click the link below to verify your MorningFeeds account</p>
+               <a href="${verifyUrl}">Verify Account</a>
+               <p>This link is only valid for 24 hours.</p>`,
     });
 
     const { password: _pw, ...userWithoutPassword } = newUser.toJSON();

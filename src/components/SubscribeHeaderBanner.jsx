@@ -19,7 +19,23 @@ const LeftContainer = styled.div``;
 
 const CenterContainer = styled.div`
   display: flex;
+  flex-flow: row nowrap;
   gap: 6px;
+
+  @media (max-width: 618px) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  @media (max-width: 440px) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    font-size: 0.95rem;
+  }
 `;
 
 const RightContainer = styled.div``;
@@ -61,23 +77,23 @@ export default function HeaderSubscribeBanner({ sessionData }) {
         <Wrapper>
           <LeftContainer />
           <CenterContainer>
-            Want to customize your own feeds?
-            <Link href="/pricing">
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  width: "fit-content",
-                }}
-              >
-                <p>Become a member!</p>
-                <Underline />
-              </div>
+            Want to create and customize your own feeds?
+            <Link
+              href="/pricing"
+              style={{
+                display: "flex",
+                flexFlow: "column nowrap",
+                width: "fit-content",
+              }}
+            >
+              <p>Become a member!</p>
+              <Underline />
             </Link>
           </CenterContainer>
           <RightContainer>
             <CloseButton onClick={handleDismissCta}>
               <img
+                alt="Close button"
                 src="/images/close.svg"
                 width={16}
                 height={16}

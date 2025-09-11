@@ -4,8 +4,8 @@ import { useSession } from "next-auth/react";
 import LoadingDots from "./Loading";
 import Loading from "@/app/loading";
 
-export default function AccountClientPage() {
-  const { data: session, status, update } = useSession();
+export default function AccountClientPage({ sessionData }) {
+  const { data: session, status, update } = useSession({ data: sessionData });
 
   if (status === "loading") return <Loading />;
   if (!session) return <p>Access Denied</p>;

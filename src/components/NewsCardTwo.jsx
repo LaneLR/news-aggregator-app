@@ -171,14 +171,18 @@ const SaveIconContainer = styled.div`
   }
 `;
 
-export default function NewsCardTwo({ article, archiveId, viewOnly = false }) {
+export default function NewsCardTwo({
+  article,
+  archiveId,
+  viewOnly = false,
+  sessionData,
+}) {
   // Assuming 'article' object has:
   // article.thumbnailUrl, article.title, article.author, article.date
-    const { data: session } = useSession();
-  
-    const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
-    const [likeCount, setLikeCount] = useState(article.likeCount || 0);
-  
+  const { data: session, status, update } = useSession({ data: sessionData });
+
+  const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
+  const [likeCount, setLikeCount] = useState(article.likeCount || 0);
 
   const FALLBACK_IMAGE_URL = "/images/NoImage.png";
   const index = article.title.lastIndexOf(" - ");

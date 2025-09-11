@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import News from "@/components/NewsFeed";
 import Loading from "../loading";
 import FeedManager from "@/components/FeedManager";
+import NewsPage from "@/components/NewNewsPage";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -19,7 +20,8 @@ export default async function Home() {
     <>
       <Suspense fallback={<Loading />}>
         {/* <News /> */}
-        <FeedManager />
+        {/* <FeedManager /> */}
+      <NewsPage />
       </Suspense>
     </>
   );

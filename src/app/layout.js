@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Roboto, } from "next/font/google";
 import "./globals.css";
 import Providers from "@/Provider";
 import Header from "@/components/Header";
@@ -13,15 +13,23 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+const roboto = Roboto({
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-roboto",
+});
+
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
 export const metadata = {
-  title: "Relay News",
+  title: "MorningFeeds",
   description:
-    "Relay News is a fast, customizable RSS feed reader and news aggregator where you can find and save stories from your favorite news sites all in one place.",
+    "MorningFeeds is a fast, customizable RSS feed reader and news aggregator where you can find and save stories from your favorite news sites all in one place.",
   icons: {
     icon: "/favicon.ico",
   },
@@ -32,7 +40,8 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body
         style={{ backgroundColor: "var(--dark-blue)", color: "black" }}
-        className={`${geistSans.variable} ${geistMono.variable}`}
+        // className={`${geistSans.variable} ${geistMono.variable}`}
+        className={`${roboto.variable}`}
       >
         <Providers>
           <StyledComponentsRegistry>

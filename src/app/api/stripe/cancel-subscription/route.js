@@ -1,4 +1,3 @@
-// src/app/api/stripe/cancel-subscription/route.js
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
@@ -24,43 +23,12 @@ export async function POST(req) {
       );
     }
 
-    const updatedSubscription = await stripe.subscriptions.update(
-      user.stripeSubscriptionId,
-      {
-        cancel_at_period_end: true,
-      }
-    );
-
-    let subscriptionEndDate = null;
-    const endDateTimestamp = updatedSubscription.cancel_at;
-
-    if (typeof endDateTimestamp === "number") {
-      subscriptionEndDate = new Date(endDateTimestamp * 1000);
-    } else {
-      const fallbackTimestamp = updatedSubscription.current_period_end;
-      if (typeof fallbackTimestamp === "number") {
-        subscriptionEndDate = new Date(fallbackTimestamp * 1000);
-      }
-    }
-
-    if (subscriptionEndDate) {
-      await user.update({
-        stripeSubscriptionStatus: updatedSubscription.status,
-        stripeSubscriptionEndsAt: subscriptionEndDate,
-      });
-
-      console.log(
-        `User ${user.email} scheduled subscription for cancellation on ${subscriptionEndDate}`
-      );
-    } else {
-      console.error(
-        "Could not determine subscription end date after cancellation request."
-      );
-    }
+    await stripe.subscriptions.update(user.stripeSubscriptionId, {
+      cancel_at_period_end: true,
+    });
 
     return NextResponse.json({
-      message: "Subscription cancellation scheduled successfully.",
-      subscriptionEndDate,
+      message: "Subscription cancellation request sent to Stripe successfully.",
     });
   } catch (err) {
     console.error("Error canceling subscription:", err);

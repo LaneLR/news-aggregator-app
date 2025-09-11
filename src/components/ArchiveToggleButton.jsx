@@ -12,15 +12,17 @@ const SaveButton = styled.div`
   font-weight: bold;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
-  align-self: flex-start;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
   cursor: pointer;
+  height: 100%;
   transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
 `;
 
 const SavedOrUnsavedButton = styled.img`
-  height: 35px;
-  width: 35px;
+  height: 30px;
+  width: 30px;
   // &:hover {
   //   transform: translateY(-1px);
   // }
@@ -162,9 +164,9 @@ export default function ArchiveToggleButton({
             disabled={loading}
           >
             {isSaved ? (
-              <SavedOrUnsavedButton src="/images/save-button-saved.svg" />
+              <SavedOrUnsavedButton src="/images/save-button-saved.svg" alt="Article saved button"/>
             ) : (
-              <SavedOrUnsavedButton src="/images/save-button-unsaved.svg" />
+              <SavedOrUnsavedButton src="/images/save-button-unsaved.svg" alt="Article not saved button"/>
             )}
           </SaveButton>
 

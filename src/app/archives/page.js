@@ -8,6 +8,8 @@ import DeleteArchiveButton from "@/components/DeleteArchiveButton";
 import ArchiveCard from "@/components/ArchiveCard";
 import NewsGridWrapper from "@/components/NewsGridWrapper";
 import { redirect } from "next/navigation";
+import ArchiveCard2 from "@/components/ArchiveCard";
+import CreateNewArchiveCard from "@/components/CreateNewArchiveCard";
 
 export default async function ArchivesPage() {
   const session = await getServerSession(authOptions);
@@ -27,12 +29,10 @@ export default async function ArchivesPage() {
   return (
     <div style={{ padding: "20px" }}>
       <h2>Your Archives</h2>
-
-      <CreateArchiveClient />
-
       <NewsGridWrapper>
+        <CreateNewArchiveCard />
         {plainArchives.map((archive) => (
-          <ArchiveCard
+          <ArchiveCard2
             archive={archive}
             key={archive.id}
             style={{ marginBottom: "0.5rem" }}
@@ -43,7 +43,8 @@ export default async function ArchivesPage() {
             {archive.name !== "Saved for later" && (
               <DeleteArchiveButton archiveId={archive.id} />
             )}
-          </ArchiveCard>
+          </ArchiveCard2>
+          
         ))}
       </NewsGridWrapper>
     </div>

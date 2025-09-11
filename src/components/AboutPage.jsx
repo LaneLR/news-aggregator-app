@@ -17,7 +17,7 @@ const Wrapper = styled.div`
   }
 `;
 
-export default function AboutRelayNewsPage() {
+export default function AboutPage() {
   return (
     <>
       <Wrapper>
