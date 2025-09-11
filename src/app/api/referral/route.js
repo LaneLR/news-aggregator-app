@@ -29,6 +29,14 @@ export async function POST(req) {
         { status: 404 }
       );
     }
+
+    if (referringUser.tier === "Free") {
+      return NextResponse.json(
+        { error: "This referral code is not from an active subscriber." },
+        { status: 400 }
+      );
+    }
+
     const couponName = "Referral Discount";
     const allCoupons = await stripe.coupons.list();
     const coupon = allCoupons.data.find((c) => c.name === couponName);
