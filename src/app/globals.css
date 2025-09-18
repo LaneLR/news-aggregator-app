@@ -9,7 +9,7 @@
   --primary-blue: #004cd2;
   --secondary-blue: #3cbae6;
   --deep-blue: #022665;
-  --orange: #fd7e14;
+  --orange: #eba613ff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,7 +24,7 @@
     --secondary-blue: #20a9f1;
     --white: #fefefe;
     --light-white: #f1f1f1;
-    --orange: #fd7e14;
+    --orange: #eba613ff;
   }
 }
 
