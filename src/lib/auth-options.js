@@ -56,6 +56,7 @@ export const authOptions = {
           usedReferralCode: user.usedReferralCode,
           status: user.status,
           subscriptionWillCancel: user.subscriptionWillCancel,
+          selectedTheme: user.selectedTheme,
         };
       },
     }),
@@ -65,7 +66,7 @@ export const authOptions = {
     async signIn({ user, account }) {
       try {
         const { User } = await initializeDbAndModels();
-        const dbUser = await User.findOne({ where: { email: user.email } });
+        let dbUser = await User.findOne({ where: { email: user.email } });
 
         if (!dbUser && account.provider === "google") {
           const { email, name, image } = user;
@@ -87,6 +88,8 @@ export const authOptions = {
         }
 
         user.id = dbUser.id;
+        user.name = dbUser.name;
+        user.image = dbUser.image;
         user.tier = dbUser.tier;
         user.isPendingDeletion = dbUser.isPendingDeletion;
         user.stripeSubscriptionStatus = dbUser.stripeSubscriptionStatus;
@@ -96,6 +99,7 @@ export const authOptions = {
         user.usedReferralCode = dbUser.usedReferralCode;
         user.status = dbUser.status;
         user.subscriptionWillCancel = dbUser.subscriptionWillCancel;
+        user.selectedTheme = dbUser.selectedTheme;
 
         // if (dbUser) {
         //   if (dbUser.status === "inactive") {
@@ -124,6 +128,8 @@ export const authOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.name = user.name;
+        token.image = user.image;
         token.tier = user.tier;
         token.isPendingDeletion = user.isPendingDeletion;
         token.stripeSubscriptionStatus = user.stripeSubscriptionStatus;
@@ -133,6 +139,7 @@ export const authOptions = {
         token.usedReferralCode = user.usedReferralCode;
         token.status = user.status;
         token.subscriptionWillCancel = user.subscriptionWillCancel;
+        token.selectedTheme = user.selectedTheme;
         return token;
       }
 
@@ -146,6 +153,8 @@ export const authOptions = {
       return {
         ...token,
         tier: dbUser.tier,
+        name: dbUser.name,
+        image: dbUser.image,
         isPendingDeletion: dbUser.isPendingDeletion,
         stripeSubscriptionStatus: dbUser.stripeSubscriptionStatus,
         stripeSubscriptionEndsAt: dbUser.stripeSubscriptionEndsAt,
@@ -154,12 +163,16 @@ export const authOptions = {
         usedReferralCode: dbUser.usedReferralCode,
         status: dbUser.status,
         subscriptionWillCancel: dbUser.subscriptionWillCancel,
+        selectedTheme: dbUser.selectedTheme,
       };
     },
 
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
+        session.user.email = token.email;
+        session.user.name = token.name;
+        session.user.image = token.image;
         session.user.tier = token.tier;
         session.user.name = token.name;
         session.user.image = token.picture;
@@ -172,6 +185,7 @@ export const authOptions = {
         session.user.usedReferralCode = token.usedReferralCode;
         session.user.status = token.status;
         session.user.subscriptionWillCancel = token.subscriptionWillCancel;
+        session.user.selectedTheme = token.selectedTheme;
       }
       return session;
     },
