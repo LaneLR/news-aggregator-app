@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import CopyButton from "./CopyButton";
 import Link from "next/link";
 import RecentlyLikedItem from "./RecentlyLikedArticle";
+import ThemeSelector from "./ThemeSelector";
 
 const ProfileWrapper = styled.div`
   max-width: 800px;
@@ -306,7 +307,7 @@ export default function ProfilePage({ sessionData }) {
               </p>
               <div
                 style={{
-                  filter: "blur(4px)",
+                  filter: "blur(5px)",
                   background: "#f0f0f0",
                   padding: "9px",
                   borderRadius: "10px",
@@ -321,7 +322,7 @@ export default function ProfilePage({ sessionData }) {
                     letterSpacing: "2px",
                   }}
                 >
-                  {user.referralCode}
+                  FAKECODE
                 </p>
               </div>
             </>
@@ -384,9 +385,22 @@ export default function ProfilePage({ sessionData }) {
         </CardContent>
         <CardFooter>
           <Link href="/liked" passHref>
-            <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>View All Liked</Button>
+            <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
+              View All Liked
+            </Button>
           </Link>
         </CardFooter>
+      </Card>
+
+      <Card>
+        <CardHeader>Appearance</CardHeader>
+        <CardContent>
+          {user.tier === "Free" ? (
+            <p>Upgrade to Pro to unlock custom themes.</p>
+          ) : (
+            <ThemeSelector />
+          )}
+        </CardContent>
       </Card>
 
       <Card>
@@ -395,8 +409,8 @@ export default function ProfilePage({ sessionData }) {
           {user.isPendingDeletion ? (
             <p>
               Your account is scheduled for deletion on <b>{formattedDate}</b>{" "}
-              at <b>{formattedTime}</b>. You can cancel this You can request to
-              cancel this at any time before.
+              at <b>{formattedTime}</b>. You can request to
+              cancel this at any time before the cancellation date.
             </p>
           ) : (
             <p>
