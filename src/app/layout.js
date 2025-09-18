@@ -1,13 +1,14 @@
-import { Geist, Geist_Mono, Roboto, } from "next/font/google";
+import { Geist, Geist_Mono, Roboto } from "next/font/google";
 import "./globals.css";
 import Providers from "@/Provider";
 import Header from "@/components/Header";
 import StyledComponentsRegistry from "@/lib/registry";
 import AppWrapper from "@/components/AppWrapper";
 import MainContentWrapper from "@/components/MainContentWrapper";
-import SessProvider from "@/components/SessionProvider";
+import AuthProvider from "@/components/SessionProvider";
 import Footer from "@/components/Footer";
 import HeaderNavBar from "@/components/HeaderNavBar";
+import ThemeProvider from "@/components/ThemeProvider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -45,13 +46,15 @@ export default function RootLayout({ children }) {
       >
         <Providers>
           <StyledComponentsRegistry>
-            <AppWrapper>
-              <Header />
-              <MainContentWrapper>
-                <SessProvider>{children}</SessProvider>
-              </MainContentWrapper>
-              <Footer />
-            </AppWrapper>
+            <AuthProvider>
+              <ThemeProvider>
+                <AppWrapper>
+                  <Header />
+                  <MainContentWrapper>{children}</MainContentWrapper>
+                  <Footer />
+                </AppWrapper>
+              </ThemeProvider>
+            </AuthProvider>
           </StyledComponentsRegistry>
         </Providers>
       </body>
