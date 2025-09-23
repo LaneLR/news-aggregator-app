@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import Loading from "@/app/loading";
 import Image from "next/image";
 import Button from "./Button";
@@ -20,10 +20,10 @@ const ProfileWrapper = styled.div`
 `;
 
 const Card = styled.div`
-  background-color: var(--white);
+  background-color: ${(props) => props.theme.primary};
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e0e0e0;
+  border: 1px solid ${(props) => props.theme.border};
   overflow: hidden;
 `;
 
@@ -33,7 +33,8 @@ const ProfileHeader = styled.div`
   align-items: center;
   text-align: center;
   padding: 2rem;
-  background-color: #f9f9f9;
+  border-radius: 12px;
+  background-color: ${(props) => props.theme.cardBackground};
 `;
 
 const Avatar = styled.div`
@@ -42,7 +43,7 @@ const Avatar = styled.div`
   border-radius: 50%;
   overflow: hidden;
   margin-bottom: 1rem;
-  border: 4px solid var(--white);
+  border: 4px solid ${(props) => props.theme.border};
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   user-select: none;
 `;
@@ -58,7 +59,7 @@ const UserName = styled.h1`
 
 const UserEmail = styled.p`
   font-size: 1rem;
-  color: #666;
+  color: ${(props) => props.theme.text};
   margin: 0.25rem 0 0 0;
 `;
 
@@ -67,16 +68,16 @@ const TierBadge = styled.span`
   font-weight: bold;
   padding: 4px 12px;
   border-radius: 16px;
-  color: white;
+  color: ${(props) => props.theme.text};
   background-color: ${(props) =>
-    props.tier === "Free" ? "#6c757d" : "var(--primary-blue)"};
+    props.tier === "Free" ? props.theme.textSecondary : props.theme.primary};
 `;
 
 const CardHeader = styled.h2`
   font-size: 1.25rem;
   padding: 1rem 1.5rem;
   margin: 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid ${(props) => props.theme.border};
 `;
 
 const CardContent = styled.div`
@@ -91,25 +92,25 @@ const InfoRow = styled.div`
   justify-content: space-between;
   align-items: center;
   font-size: 1rem;
-  color: #333;
+  color: ${(props) => props.theme.text};
 
   & span:first-child {
-    color: #555;
+    color: ${(props) => props.theme.text};
   }
 `;
 
 const CardFooter = styled.div`
   padding: 1rem 1.5rem;
-  background-color: #f9f9f9;
-  border-top: 1px solid #e0e0e0;
+  background-color: inherit;
+  border: 1px solid ${(props) => props.theme.border};
   display: flex;
   justify-content: flex-end;
 `;
 
 const DangerCardHeader = styled(CardHeader)`
-  background-color: #fff5f5;
+  background-color: ${(props) => props.theme.cardBackground};
   color: #c53030;
-  border-bottom-color: #fed7d7;
+  border-bottom-color: ${(props) => props.theme.border};
 `;
 
 const RecentlyLikedList = styled.ul`
@@ -123,6 +124,8 @@ const FALLBACK_IMAGE_URL = "/images/default-avatar.png";
 export default function ProfilePage({ sessionData }) {
   const { data: session, status, update } = useSession({ data: sessionData });
   const [recentlyLiked, setRecentlyLiked] = useState([]);
+
+  const theme = useTheme();
 
   const proxiedImageUrl = session?.user?.image
     ? `/api/image-proxy?url=${encodeURIComponent(session.user.image)}`
@@ -286,8 +289,8 @@ export default function ProfilePage({ sessionData }) {
             </Button>
           ) : (
             <Button
-              bgColor={"var(--primary-blue"}
-              clr={"var(--white)"}
+              bgColor={theme.primary}
+              clr={theme.text}
               onClick={handleManageSubscription}
             >
               Manage Subscription
@@ -308,7 +311,7 @@ export default function ProfilePage({ sessionData }) {
               <div
                 style={{
                   filter: "blur(5px)",
-                  background: "#f0f0f0",
+                  backgroundColor: theme.background,
                   padding: "9px",
                   borderRadius: "10px",
                   textAlign: "center",
@@ -351,7 +354,7 @@ export default function ProfilePage({ sessionData }) {
                     fontSize: "1.6rem",
                     fontWeight: "500",
                     letterSpacing: "2px",
-                    background: "#f0f0f0",
+                    backgroundColor: theme.background,
                     padding: "9px",
                     borderTopLeftRadius: "10px",
                     borderBottomLeftRadius: "10px",
@@ -385,8 +388,8 @@ export default function ProfilePage({ sessionData }) {
         </CardContent>
         <CardFooter>
           <Link href="/liked" passHref>
-            <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
-              View All Liked
+            <Button bgColor={theme.primary} clr={theme.text}>
+              View Liked Articles
             </Button>
           </Link>
         </CardFooter>
@@ -409,8 +412,8 @@ export default function ProfilePage({ sessionData }) {
           {user.isPendingDeletion ? (
             <p>
               Your account is scheduled for deletion on <b>{formattedDate}</b>{" "}
-              at <b>{formattedTime}</b>. You can request to
-              cancel this at any time before the cancellation date.
+              at <b>{formattedTime}</b>. You can request to cancel this at any
+              time before the cancellation date.
             </p>
           ) : (
             <p>
@@ -426,8 +429,8 @@ export default function ProfilePage({ sessionData }) {
             </Button>
           ) : (
             <Button
-              bgColor="#c53030"
-              clr="white"
+              bgColor={theme.warning}
+              clr={theme.primaryContrast}
               onClick={handleRequestDeletion}
             >
               Delete Account

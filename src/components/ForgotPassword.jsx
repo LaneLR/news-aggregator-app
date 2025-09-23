@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   width: 100vw;
   overflow-y: hidden;
   flex-flow: column nowrap;
-  background-color: var(--light-white);
+  background-color: ${(props) => props.theme.background};
   padding: 0 0 10px 0;
 `;
 
@@ -39,7 +39,7 @@ const FormInput = styled.input`
   width: 300px;
   padding: 10px;
   margin: 10px 0;
-  border: 1px solid #ccc;
+  border: 1px solid ${(props) => props.theme.textSecondary};
   border-radius: 4px;
   margin-bottom: 25px;
 `;
@@ -47,7 +47,7 @@ const FormInput = styled.input`
 const Header = styled.div`
   font-size: 2rem;
   font-weight: 600;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.text};
   padding: 10px 0;
   text-align: center;
   width: 100%;

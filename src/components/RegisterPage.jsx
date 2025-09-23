@@ -12,7 +12,7 @@ const Wrapper = styled.div`
   align-items: flex-start;
   justify-content: space-evenly;
   width: 100vw;
-  background-color: var(--light-white);
+  background-color: ${(props) => props.theme.background};
   box-sizing: border-box;
   padding: 80px 0 40px 0;
 `;
@@ -37,7 +37,7 @@ const RegisterFormInput = styled.input`
   width: 300px;
   padding: 10px;
   margin: 10px 0;
-  border: 1px solid #ccc;
+  border: 1px solid ${(props) => props.theme.border};
   border-radius: 4px;
 
   &:last-of-type {
@@ -48,7 +48,7 @@ const RegisterFormInput = styled.input`
 const Header = styled.div`
   font-size: 2rem;
   font-weight: 600;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.primary};
   padding: 10px 0;
   text-align: center;
   width: 100%;
@@ -68,18 +68,17 @@ const CheckboxWrapper = styled.div`
   max-width: 320px;
   text-align: left;
   font-size: 0.85rem;
-  color: var(--slate);
+  color: ${(props) => props.theme.textTertiary};
 
-  /* Style for the links within the checkbox label */
   a {
-    color: var(--primary-blue);
+    color: ${(props) => props.theme.primary};
     text-decoration: underline;
   }
 `;
 
 const StyledInput = styled.input`
-  accent-color: var(--primary-blue);
-`
+  accent-color: ${(props) => props.theme.primary};
+`;
 
 export default function RegisterPage() {
   const [error, setError] = useState(null);

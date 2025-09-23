@@ -5,14 +5,14 @@ import styled from "styled-components";
 
 const Wrapper = styled.div`
   width: 100%;
-  background-color: var(--primary-blue);
+  background-color: ${(props) => props.theme.background};
   display: flex;
   justify-content: center;
   align-items: center;
   height: auto;
   padding: 10px 15px;
   font-size: 1.2rem;
-  color: var(--white);
+  color: ${(props) => props.theme.text};
   gap: 25px;
   overflow-x: auto;
 
@@ -26,7 +26,7 @@ const StyledLink = styled(Link)`
 `;
 
 const Underline = styled.div`
-  border: 1px solid var(--white);
+  border: 1px solid ${(props) => props.theme.text};
 `;
 
 export default function HeaderNavBar({ sessionData }) {

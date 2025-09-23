@@ -17,20 +17,20 @@ const Button = styled.button`
   align-items: center;
   gap: 6px;
   font-size: 1rem;
-  color: #555;
+  color: ${(props) => props.theme.textSecondary};
   border-radius: 50%;
   transition: background-color 0.2s ease-in-out;
 
   &:hover {
-    background-color: #f0f0f0;
+    background-color: ${(props) => props.theme.background};
   }
 `;
 
 const FallbackMenu = styled.div`
   position: absolute;
-  bottom: 100%; /* Position above the button */
+  bottom: 100%; 
   right: 0;
-  background-color: white;
+  background-color: ${(props) => props.theme.background};
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
   overflow: hidden;
@@ -41,13 +41,13 @@ const FallbackMenu = styled.div`
 const FallbackOption = styled.a`
   display: block;
   padding: 12px 16px;
-  color: #333;
+  color: ${(props) => props.theme.textSecondary};
   text-decoration: none;
   cursor: pointer;
   font-size: 0.95rem;
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: ${(props) => props.theme.background};
   }
 `;
 

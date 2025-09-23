@@ -8,15 +8,15 @@ import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation.js";
 
 const CardContainer = styled.div`
-  background-color: var(--white);
+  background-color: ${(props) => props.theme.cardBackground};
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: ${(props) => props.theme.boxShadow};
   width: 100%;
   max-width: 400px;
   margin-bottom: 15px;
   display: flex;
   flex-direction: column;
-  border: 1px solid gray;
+  border: 1px solid ${(props) => props.theme.border};
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   &:hover {
     transform: translateY(-3px);
@@ -29,13 +29,13 @@ const CardHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid ${(props) => props.theme.border};
 `;
 
 const BrandText = styled.span`
   font-size: 1rem;
   font-weight: bold;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.primary};
 `;
 
 const ContentArea = styled.div`
@@ -50,7 +50,7 @@ const ContentArea = styled.div`
 const ArticleTitle = styled.h3`
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.primary};
   line-height: 1.3;
   margin-bottom: 8px;
   display: -webkit-box;
@@ -62,7 +62,7 @@ const ArticleTitle = styled.h3`
 
 const ArticleSnippet = styled.div`
   font-size: 1rem;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.textSecondary};
   line-height: 1.5;
   font-weight: 700;
   margin-bottom: 20px;
@@ -74,15 +74,16 @@ const ArticleSnippet = styled.div`
 `;
 
 const ArticleSnippetText = styled.p`
-  background-color: #dcebfdff;
+  background-color: ${(props) => props.theme.highlight};
   width: fit-content;
   padding: 3px 6px;
   border-radius: 6px;
+  color: ${(props) => props.theme.primaryContrast};
 `;
 
 const ReadMoreButton = styled.a`
-  background-color: var(--primary-blue);
-  color: #fff;
+  background-color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.primaryContrast};
   padding: 8px 15px;
   border-radius: 6px;
   font-size: 1rem;
@@ -94,7 +95,7 @@ const ReadMoreButton = styled.a`
   cursor: pointer;
   transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
   &:hover {
-    background-color: var(--deep-blue);
+    background-color: ${(props) => props.theme.secondary};
     transform: translateY(-1px);
   }
   &:active {
@@ -112,25 +113,19 @@ const LikeButton = styled.button`
   flex-direction: row;
   gap: 6px;
   font-size: 1rem;
-  color: ${(props) => (props.$isLiked ? "var(--primary-blue)" : "#555")};
+  color: ${(props) =>
+    props.$isLiked ? props.theme.primary : props.theme.textTertiary};
 `;
 
 const LikeOrUnlikedButton = styled.img`
   height: 35px;
   width: 35px;
-  // &:hover {
-  //   transform: translateY(-1px);
-  // }
-
-  // &:active {
-  //   transform: translateY(0);
-  // }
 `;
 
 const LikeCountCounter = styled.div`
   font-weight: 500;
   font-size: 1.3rem;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.primary};
 `;
 
 const LockedArticleSVG = styled.img`

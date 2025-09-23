@@ -20,7 +20,7 @@ const StyledForm = styled.form`
 const Input = styled.input`
   padding: 8px;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid ${(props) => props.theme.border};
   border-radius: 4px;
 `;
 

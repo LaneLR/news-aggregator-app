@@ -1,5 +1,5 @@
 "use client";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import Button from "./Button";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,13 +23,14 @@ const StyledHomePageSectionOne = styled.div`
   align-items: center;
   height: 100%;
   width: 100%;
-  background-color: var(--secondary-blue);
+  // Use themed colors for the background and gradient
+  background-color: ${(props) => props.theme.secondaryContrast};
   padding: 30px 0;
   gap: 150px;
   background-image: linear-gradient(
     to bottom,
-    var(--dark-blue),
-    var(--secondary-blue)
+    ${(props) => props.theme.primary},
+    ${(props) => props.theme.secondaryContrast}
   );
   @media (max-width: 1210px) {
     gap: 10px;
@@ -47,10 +48,11 @@ const StyledHomePageSectionOne = styled.div`
 `;
 
 const TransitionBox = styled.div`
+  // Use themed colors for the background gradient
   background-image: linear-gradient(
     to bottom,
-    var(--secondary-blue),
-    var(--white)
+    ${(props) => props.theme.secondaryContrast},
+    ${(props) => props.theme.background}
   );
   height: 53px;
   width: 100%;
@@ -63,7 +65,8 @@ const StyledHomePageSectionTwo = styled.div`
   align-items: center;
   height: 100%;
   width: 100%;
-  background-color: var(--white);
+  // Use themed background color
+  background-color: ${(props) => props.theme.background};
   padding: 50px 0;
 `;
 
@@ -74,7 +77,8 @@ const StyledHomePageSectionThree = styled.div`
   align-items: center;
   height: 100%;
   width: 100%;
-  background-color: var(--white);
+  // Use themed background color
+  background-color: ${(props) => props.theme.background};
   padding: 50px 0;
 `;
 
@@ -83,7 +87,8 @@ const SpaceFillerSection = styled.div`
   flex-grow: 1;
   height: 100%;
   width: 100%;
-  background-color: var(--white);
+  // Use themed background color
+  background-color: ${(props) => props.theme.background};
 `;
 
 const MainHeaderText = styled.h1`
@@ -190,7 +195,8 @@ const FirstHeaderCTA = styled.div`
   height: 520px;
   padding: 14px;
   column-gap: 20px;
-  background-color: var(--white);
+  // Use themed background color
+  background-color: ${(props) => props.theme.cardBackground};
   border-radius: 14px;
 
   @media (max-width: 440px) {
@@ -211,6 +217,8 @@ const HeaderButtonContainer = styled.div`
 `;
 
 export default function HomePage() {
+  const theme = useTheme();
+
   return (
     <HomePageWrapper>
       <StyledHomePageSectionOne>
@@ -221,14 +229,14 @@ export default function HomePage() {
             alignItems: "center",
           }}
         >
-          <MainHeaderText color={"var(--light-white)"}>
+          <MainHeaderText color={theme.primaryContrast}>
             Stay Informed.
           </MainHeaderText>
-          <MainHeaderText color={"var(--light-white)"}>
+          <MainHeaderText color={theme.primaryContrast}>
             Your Way.
           </MainHeaderText>
           <br />
-          <MainHeaderSubText color={"var(--light-white)"}>
+          <MainHeaderSubText color={theme.primaryContrast}>
             {/* Save and discover the latest news from around the web */}
             Find and save all of your favorite news sources, blog posts, science
             journals, and market data and analysis all in one place.*
@@ -238,8 +246,8 @@ export default function HomePage() {
           <HeaderButtonContainer>
             <Link href={"/register"}>
               <Button
-                bgColor={"var(--orange)"}
-                clr={"var(--white)"}
+                bgColor={theme.titleContrast}
+                clr={theme.primaryContrast}
                 wide={"200px"}
               >
                 Sign up
@@ -247,8 +255,8 @@ export default function HomePage() {
             </Link>
             <Link href={"/login"}>
               <Button
-                bgColor={"var(--orange)"}
-                clr={"var(--white)"}
+                bgColor={theme.titleContrast}
+                clr={theme.primaryContrast}
                 wide={"200px"}
               >
                 Log in
@@ -265,7 +273,7 @@ export default function HomePage() {
             ]}
             cost={"Free!"}
           >
-            <Button bgColor={"var(--orange)"} clr={"var(--white)"}>
+            <Button bgColor={theme.titleContrast} clr={theme.primaryContrast}>
               Choose Plan
             </Button>
           </Banner3>
@@ -281,7 +289,7 @@ export default function HomePage() {
             ]}
             cost={"$8.99 / mo"}
           >
-            <Button bgColor={"var(--orange)"} clr={"var(--white)"}>
+            <Button bgColor={theme.titleContrast} clr={theme.primaryContrast}>
               Choose Plan
             </Button>
           </Banner3>
@@ -297,7 +305,7 @@ export default function HomePage() {
             ]}
             cost={"$79.99 / yr"}
           >
-            <Button bgColor={"var(--orange)"} clr={"var(--white)"}>
+            <Button bgColor={theme.titleContrast} clr={theme.primaryContrast}>
               Choose Plan
             </Button>
           </Banner3>
@@ -305,7 +313,7 @@ export default function HomePage() {
       </StyledHomePageSectionOne>
       <TransitionBox />
       <StyledHomePageSectionTwo>
-        <MainHeaderText color={"var(--deep-blue)"}>
+        <MainHeaderText color={theme.primary}>
           Discover the Latest News
         </MainHeaderText>
         <StyledParagraphCenter>
@@ -327,7 +335,7 @@ export default function HomePage() {
               />
             </Link>
 
-            <h3 style={{ color: "var(--dark-blue)" }}>Tech</h3>
+            <h3 style={{ color: theme.primary }}>Tech</h3>
             <StyledParagraphLeft>
               Get the latest updates on technology and gadgets.
             </StyledParagraphLeft>
@@ -340,7 +348,7 @@ export default function HomePage() {
               }}
             >
               <Link href={"/login"}>
-                <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
+                <Button bgColor={theme.primary} clr={theme.primaryContrast}>
                   Explore Tech News
                 </Button>
               </Link>
@@ -359,7 +367,7 @@ export default function HomePage() {
               />
             </Link>
 
-            <h3 style={{ color: "var(--dark-blue)" }}>World</h3>
+            <h3 style={{ color: theme.primary }}>World</h3>
             <StyledParagraphLeft>
               Find breaking stories from across the globe.
             </StyledParagraphLeft>
@@ -372,7 +380,7 @@ export default function HomePage() {
               }}
             >
               <Link href={"/login"}>
-                <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
+                <Button bgColor={theme.primary} clr={theme.primaryContrast}>
                   Explore World News
                 </Button>
               </Link>
@@ -389,7 +397,7 @@ export default function HomePage() {
                 style={{ borderRadius: "14px", objectFit: "cover" }}
               />
             </Link>
-            <h3 style={{ color: "var(--dark-blue)" }}>Entertainment</h3>
+            <h3 style={{ color: theme.primary }}>Entertainment</h3>
             <StyledParagraphLeft>
               Stay updated on movies, TV shows, and celebrities.
             </StyledParagraphLeft>
@@ -402,7 +410,7 @@ export default function HomePage() {
               }}
             >
               <Link href={"/login"}>
-                <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
+                <Button bgColor={theme.primary} clr={theme.primaryContrast}>
                   Explore Entertainment News
                 </Button>
               </Link>
@@ -419,7 +427,7 @@ export default function HomePage() {
                 style={{ borderRadius: "14px", objectFit: "cover" }}
               />
             </Link>
-            <h3 style={{ color: "var(--dark-blue)" }}>Weather</h3>
+            <h3 style={{ color: theme.primary }}>Weather</h3>
             <StyledParagraphLeft>
               Follow developing storms and weather forecasts across the globe.
             </StyledParagraphLeft>
@@ -432,7 +440,7 @@ export default function HomePage() {
               }}
             >
               <Link href={"/login"}>
-                <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
+                <Button bgColor={theme.primary} clr={theme.primaryContrast}>
                   Explore Weather News
                 </Button>
               </Link>

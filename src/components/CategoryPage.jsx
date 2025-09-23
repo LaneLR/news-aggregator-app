@@ -9,7 +9,7 @@ import Loading from "@/app/loading";
 const SearchBarHeader = styled.div`
   font-size: 3rem;
   font-weight: 600;
-  color: var(--deep-blue);
+  color: ${(props) => props.theme.cardBackground};
   padding: 20px 0 0 0;
   text-align: center;
   width: 100%;
@@ -29,7 +29,7 @@ async function fetchCategoryArticles(category) {
     "http://localhost:3000";
 
   const res = await fetch(`${baseUrl}/api/articles/${category}`, {
-    next: { revalidate: 3600 }, 
+    next: { revalidate: 3600 },
   });
 
   if (!res.ok) throw new Error("Failed to fetch news for category");

@@ -5,7 +5,7 @@ import NavTab from "./NavTab";
 const SideBarNavWrapper = styled.div`
   width: 200px;
   height: 100%;
-  background-color: var(--deep-blue);
+  background-color: ${(props) => props.theme.primary};
   border: 1px solid transparent;
   border-radius: 8px;
 `;

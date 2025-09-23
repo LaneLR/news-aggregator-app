@@ -49,7 +49,7 @@ export default function ThemeSelector({ sessionData}) {
       <SwatchGrid>
         <Swatch
           $bgColor={themes.default.background}
-          $textColor={themes.default.text}
+          $textColor={themes.default.textTertiary}
           $isActive={currentTheme === "default"}
           onClick={() => handleThemeChange("default")}
         >

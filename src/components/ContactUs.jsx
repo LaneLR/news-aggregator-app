@@ -1,8 +1,7 @@
-
 export default function ContactUsComponent() {
-return (
+  return (
     <>
-        <h1>Contus uc</h1>
+      <h1>Contus uc</h1>
     </>
-)
+  );
 }

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import Button from "./Button";
 import { useSession } from "next-auth/react";
+import { useTheme } from "styled-components";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -19,6 +20,7 @@ export default function SubscribeButton({
   const { data: session, update: updateSession } = useSession({
     data: sessionData,
   });
+  const theme = useTheme();
   const [error, setError] = useState(null);
 
   const handleSubscribe = async () => {
@@ -91,7 +93,7 @@ export default function SubscribeButton({
   return (
     <div>
       <Button
-        bgColor={isCurrentPlan ? "#757575" : bgColor}
+        bgColor={isCurrentPlan ? theme.textSecondary : bgColor}
         clr={clr}
         onClick={handleSubscribe}
       >

@@ -29,7 +29,7 @@ const LeftContainer = styled.div`
   // width: 327px;
   height: 100%;
   padding: 0 0 0 20px;
-  background-color: transparent;
+  background-color: ${(props) => props.theme.primary};
 
   @media (max-width: 1000px) {
     width: auto;
@@ -70,7 +70,7 @@ const RightContainer = styled.div`
   // width: 327px;
   height: 100%;
   padding: 0 20px 0 0;
-  background-color: inherit;
+  background-color: transparent;
   user-select: none;
 
   @media (max-width: 1000px) {
@@ -173,13 +173,13 @@ const LogoText = styled.p`
   background-color: transparent;
 
   span:first-child {
-    color: #eba613ff;
+    color: ${(props) => props.theme.titleContrast};
     font-weight: 700;
     background-color: transparent;
   }
 
   span:last-child {
-    color: ${(props) => props.theme.primaryContrast};
+    color: ${(props) => props.theme.text};
     font-weight: 400;
     background-color: transparent;
   }

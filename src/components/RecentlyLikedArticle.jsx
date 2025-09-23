@@ -12,7 +12,7 @@ const ItemLink = styled(Link)`
   text-decoration: none;
   color: inherit;
   &:not(:last-child) {
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid ${(props) => props.theme.border};
   }
 `;
 
@@ -32,7 +32,7 @@ const Info = styled.div`
   p {
     margin: 0;
     font-size: 0.9rem;
-    color: #666;
+    color: ${(props) => props.theme.textSecondary};
   }
 `;
 

@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 
 const SaveButton = styled.div`
-  // background-color: var(--primary-blue);
-  color: #fff;
+  //   background-color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.text};
   // padding: 12px 20px;
   border-radius: 6px;
   font-size: 1rem;

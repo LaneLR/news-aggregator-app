@@ -5,14 +5,8 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import styled from "styled-components";
 
-// In this self-contained component, we'll use a temporary hook
-// for the router refresh functionality. In a real Next.js app,
-// you would use the useRouter hook.
 function useTemporaryRouter() {
   const routerRefresh = () => {
-    // This is a placeholder for the router.refresh() functionality.
-    // In a real application, a parent component that displays the archives
-    // would need to fetch the data again after the archive is created.
     console.log(
       "Mock router refresh triggered. A parent component would now re-fetch data."
     );
@@ -20,7 +14,8 @@ function useTemporaryRouter() {
   return { refresh: routerRefresh };
 }
 
-const CardContainer = styled.div`
+
+export const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -29,30 +24,33 @@ const CardContainer = styled.div`
   max-width: 350px;
   height: 220px;
   border-radius: 16px;
-  border: 2px dashed #cccccc;
+  // Use themed colors for the border and text
+  border: 2px dashed ${(props) => props.theme.border};
   cursor: pointer;
-  color: #888888;
+  color: ${(props) => props.theme.textSecondary};
   transition: all 0.2s ease-in-out;
   &:hover {
-    border-color: #3b82f6;
-    color: #3b82f6;
-    background-color: #f9fafb;
+    // Use themed colors for the hover state
+    border-color: ${(props) => props.theme.primary};
+    color: ${(props) => props.theme.primary};
+    background-color: ${(props) => props.theme.cardBackground};
+    filter: brightness(0.95);
   }
 `;
 
-const PlusIcon = styled.div`
+export const PlusIcon = styled.div`
   font-size: 4rem;
   font-weight: 200;
   line-height: 1;
 `;
 
-const CreateText = styled.p`
+export const CreateText = styled.p`
   font-size: 1.125rem;
   font-weight: 600;
   margin-top: 0.5rem;
 `;
 
-const ModalBackdrop = styled.div`
+export const ModalBackdrop = styled.div`
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
@@ -63,8 +61,8 @@ const ModalBackdrop = styled.div`
   transition: opacity 0.3s;
 `;
 
-const ModalContent = styled.div`
-  background-color: white;
+export const ModalContent = styled.div`
+  background-color: ${(props) => props.theme.cardBackground};
   padding: 24px;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -86,33 +84,34 @@ const ModalContent = styled.div`
   }
 `;
 
-const ModalHeader = styled.h2`
+export const ModalHeader = styled.h2`
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 1rem;
+  color: ${(props) => props.theme.textTertiary};
 `;
 
-const Input = styled.input`
+export const Input = styled.input`
   padding: 12px;
   font-size: 1rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid ${(props) => props.theme.border};
   border-radius: 8px;
   margin-bottom: 1rem;
   width: 100%;
 `;
 
-const ErrorText = styled.p`
-  color: #ef4444;
+export const ErrorText = styled.p`
+  color: ${(props) => props.theme.warning};
   margin-bottom: 0.5rem;
 `;
 
-const ButtonContainer = styled.div`
+export const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 12px;
 `;
 
-const Button = styled.button`
+export const Button = styled.button`
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 600;
@@ -121,25 +120,27 @@ const Button = styled.button`
 
   &.cancel {
     background-color: transparent;
-    border: 1px solid #d1d5db;
-    color: #4b5563;
+    border: 1px solid ${(props) => props.theme.border};
+    color: ${(props) => props.theme.textSecondary};
     &:hover {
-      background-color: #f3f4f6;
+      background-color: ${(props) => props.theme.cardBackground};
+      filter: brightness(0.95);
     }
   }
 
   &.create {
-    background-color: #2563eb;
-    color: white;
+    background-color: ${(props) => props.theme.primary};
+    color: ${(props) => props.theme.primaryContrast};
     &:hover {
-      background-color: #1d4ed8;
+      filter: brightness(0.85);
     }
   }
 `;
 
-const Card = styled.div`
+export const Card = styled.div`
   margin-bottom: 10px;
 `;
+
 
 export default function CreateNewArchiveCard({ sessionData }) {
   const { data: session, status, update } = useSession({ data: sessionData });

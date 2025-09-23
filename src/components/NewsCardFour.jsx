@@ -18,7 +18,7 @@ const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   border: 1px solid gray;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   &:hover {
     transform: translateY(-3px);
@@ -144,7 +144,7 @@ export default function NewsCardFour({
   article,
   archiveId,
   viewOnly = false,
-  sessionData
+  sessionData,
 }) {
   const { data: session, status, update } = useSession({ data: sessionData });
 
@@ -161,7 +161,7 @@ export default function NewsCardFour({
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
   const [likeCount, setLikeCount] = useState(article.likeCount || 0);
 
-  const FALLBACK_IMAGE_URL = "/images/blurimage.png";
+  const FALLBACK_IMAGE_URL = "/images/morningfeedsplaceholder.png";
 
   const rawUrl =
     typeof article?.urlToImage === "string" ? article.urlToImage.trim() : "";
@@ -286,7 +286,7 @@ export default function NewsCardFour({
                 />
               </span>
             )}
-            <ShareButton article={article}/>
+            <ShareButton article={article} />
             <ArchiveToggleButton
               article={article}
               archiveId={archiveId}

@@ -20,12 +20,12 @@ const Header = styled.div`
 const Headline = styled.h1`
   font-size: 3rem;
   font-weight: 700;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.text};
 `;
 
 const Subheadline = styled.p`
   font-size: 1.2rem;
-  color: #555;
+  color: ${(props) => props.theme.textSecondary};
   max-width: 600px;
   margin: 0.5rem auto 0;
 `;
@@ -38,11 +38,11 @@ const PricingGrid = styled.div`
 `;
 
 const PricingCard = styled.div`
-  background: var(--white);
+  background: ${(props) => props.theme.background};
   border-radius: 12px;
   padding: 2rem;
   text-align: center;
-  border: 2px solid #e0e0e0;
+  border: 2px solid ${(props) => props.theme.border};
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -50,7 +50,7 @@ const PricingCard = styled.div`
   ${(props) =>
     props.$highlighted &&
     `
-    border-color: var(--primary-blue);
+    border-color: ${(props) => props.theme.border};
     transform: scale(1);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     padding-top: 12px;
@@ -66,12 +66,12 @@ const Price = styled.p`
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0.5rem 0;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.primary};
 
   span {
     font-size: 1rem;
     font-weight: 400;
-    color: #666;
+    color: ${(props) => props.theme.textSecondary};
   }
 `;
 
@@ -106,7 +106,7 @@ const ReferralInputContainer = styled.div`
 const ReferralMessage = styled.p`
   margin-top: 0.5rem;
   font-weight: 500;
-  color: ${(props) => (props.type === "success" ? "#28a745" : "#dc3545")};
+  color: ${(props) => (props.type === "success" ? "#28a745" : "#C53030")};
 `;
 
 const stripePromise = loadStripe(

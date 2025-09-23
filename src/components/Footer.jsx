@@ -5,7 +5,7 @@ import styled from "styled-components";
 const FooterWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  color: var(--white);
+  color: ${(props) => props.theme.text};
 `;
 
 const LinkWrapper = styled.div`
@@ -14,8 +14,8 @@ const LinkWrapper = styled.div`
   justify-content: center;
   height: 70px;
   width: 100%;
-  background-color: var(--dark-blue);
-  color: white;
+  background: ${(props) => props.theme.cardBackground};
+  color: ${(props) => props.theme.text};
   font-size: 0.9rem;
 `;
 
@@ -39,7 +39,7 @@ const Disclaimer = styled.p`
 
 const Underline = styled.div`
   margin-top: 2px;
-  border-top: 1px solid #fff;
+  border-top: 1px solid ${(props) => props.theme.border};
   width: 100%;
 `;
 
@@ -47,9 +47,7 @@ const LinkContainer = styled.div`
   width: auto;
 `;
 
-const Paragraph = styled.p`
-
-`
+const Paragraph = styled.p``;
 
 export default function Footer() {
   return (

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import Loading from "@/app/loading";
 import HeroArticleCard from "@/components/HeroArticleCard";
 import CarouselArticleCard from "@/components/CarouselArticleCard";
-import NewsCardFour from "./NewsCardFour";
+
 
 const NewsPageWrapper = styled.div`
   max-width: 96vw;
@@ -29,9 +29,9 @@ const Section = styled.section`
 const SectionTitle = styled.h2`
   font-size: 2rem;
   font-weight: 700;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.primary};
   margin-bottom: 1.5rem;
-  border-bottom: 2px solid #eee;
+  border-bottom: 2px solid ${(props) => props.theme.border};
 
   @media (max-width: 440px) {
     font-size: 1.5rem;
@@ -48,14 +48,13 @@ const CarouselWrapper = styled.div`
   width: auto;
 
   &::-webkit-scrollbar-thumb {
-    background-color: var(--primary-blue);
+    background-color: ${(props) => props.theme.primary};
   }
-  //   -ms-overflow-style: none;
-  //   scrollbar-width: none;
   @media (max-width: 440px) {
-    gap: 1rem; 
+    gap: 1rem;
   }
 `;
+
 
 export default function NewsPage() {
   const [categorizedArticles, setCategorizedArticles] = useState(null);

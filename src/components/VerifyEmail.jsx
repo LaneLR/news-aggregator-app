@@ -17,7 +17,7 @@ const TextWrapper = styled.div`
 `;
 
 const Text = styled.p`
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.primary};
   font-weight: 600;
   font-size: 1.1rem;
   text-align: left;

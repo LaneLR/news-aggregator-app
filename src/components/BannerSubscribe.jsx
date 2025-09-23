@@ -11,12 +11,12 @@ const Wrapper = styled.div`
   align-items: center;
   flex-direction: column;
   border-radius: 12px;
-  background-color: var(--primary-blue);
-  color: var(--white);
+  background-color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.text};
   background-image: linear-gradient(
     to bottom,
-    var(--secondary-blue),
-    var(--primary-blue)
+    ${(props) => props.theme.secondaryContrast},
+    ${(props) => props.theme.primary}
   );
 `;
 
@@ -52,7 +52,7 @@ const PlanBody = styled.div`
       content: "✔";
       position: absolute;
       left: -16px;
-      color: var(--white);
+      color: ${(props) => props.theme.text};
       font-weight: bold;
     }
   }
@@ -78,12 +78,7 @@ const ButtonContainer = styled.div`
   align-items: center;
 `;
 
-export default function BannerSubscribe({
-  title,
-  features,
-  cost,
-  children
-}) {
+export default function BannerSubscribe({ title, features, cost, children }) {
   return (
     <Wrapper>
       <PlanTitle>{title}</PlanTitle>
@@ -94,9 +89,7 @@ export default function BannerSubscribe({
         ))}
       </PlanBody>
       <Cost>{cost}</Cost>
-      <ButtonContainer>
-        {children} 
-      </ButtonContainer>
+      <ButtonContainer>{children}</ButtonContainer>
     </Wrapper>
   );
 }

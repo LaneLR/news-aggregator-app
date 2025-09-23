@@ -3,10 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import { useSession, signIn } from "next-auth/react";
 import Button from "@/components/Button";
-import LoadingDots from "./Loading";
 import Loading from "@/app/loading";
 import GoogleSignInButton from "./GoogleSignInButton";
 
@@ -18,7 +17,7 @@ const PageWrapper = styled.div`
   width: 100vw;
   overflow-y: hidden;
   flex-flow: column nowrap;
-  background-color: var(--light-white);
+  background-color: ${(props) => props.theme.background};
   padding: 0 0 10px 0;
 
   @media (min-width: 955px) {
@@ -36,7 +35,7 @@ const Wrapper = styled.div`
   width: auto;
   overflow-y: hidden;
   flex-flow: column nowrap;
-  background-color: var(--light-white);
+  background-color: ${(props) => props.theme.background};
   padding: 0 0 10px 0;
 `;
 
@@ -61,7 +60,7 @@ const LoginFormInput = styled.input`
   width: 300px;
   padding: 10px;
   margin: 10px 0;
-  border: 1px solid #ccc;
+  border: 1px solid ${(props) => props.theme.border};
   border-radius: 4px;
 
   &:last-of-type {
@@ -72,7 +71,7 @@ const LoginFormInput = styled.input`
 const Header = styled.div`
   font-size: 2rem;
   font-weight: 600;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.primary};
   padding: 10px 0;
   text-align: center;
   width: 100%;
@@ -90,7 +89,7 @@ const SignInButtonWrapper = styled.div`
   justify-content: center;
   row-gap: 8px;
   padding: 20px;
-  // background-color: var(--white);
+  background-color: ${(props) => props.theme.cardBackground};
   border-radius: 8px;
   height: auto;
   margin-bottom: 220px;
@@ -104,7 +103,7 @@ const SignInButtonWrapper = styled.div`
 const SSOText = styled.div`
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.primary};
   text-align: center;
   margin-bottom: 20px;
   width: 100%;
@@ -119,6 +118,7 @@ export default function LoginPage({ sessionData }) {
   const [user, setUser] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const theme = useTheme();
 
   const router = useRouter();
   const { data: session, status, update } = useSession({ data: sessionData });
@@ -191,8 +191,8 @@ export default function LoginPage({ sessionData }) {
             />
           </InputWrapper>
           <Button
-            bgColor={"var(--primary-blue)"}
-            clr={"var(--white)"}
+            bgColor={theme.primary}
+            clr={theme.primaryContrast}
             type="submit"
             disabled={loading}
           >
@@ -202,7 +202,7 @@ export default function LoginPage({ sessionData }) {
           {error && (
             <>
               <br />
-              <p style={{ color: "red" }}>{error}</p>
+              <p style={{ color: theme.error }}>{error}</p>
             </>
           )}
 
@@ -216,7 +216,7 @@ export default function LoginPage({ sessionData }) {
             <br />
             <div
               style={{
-                color: "var(--dark-blue)",
+                color: theme.primary,
                 textAlign: "center",
                 display: "flex",
                 gap: "5px",
@@ -238,7 +238,7 @@ export default function LoginPage({ sessionData }) {
             <br />
             <div
               style={{
-                color: "var(--dark-blue)",
+                color: theme.primary,
                 textAlign: "center",
                 display: "flex",
                 gap: "5px",

@@ -13,7 +13,7 @@ const CardLink = styled(Link)`
   border-radius: 16px;
   overflow: hidden;
   text-decoration: none;
-  background-color: #e0e0e0; // Fallback for archives with 0 images
+  background-color: ${(props) => props.theme.border}; // Fallback for archives with 0 images
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease-in-out;
 
@@ -50,7 +50,7 @@ const Overlay = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   padding: 1.25rem;
-  color: white;
+  color: ${(props) => props.theme.text};
   transition: background 0.2s ease-in-out;
 
   ${CardLink}:hover & {
@@ -71,13 +71,9 @@ const ArchiveMeta = styled.p`
   opacity: 0.8;
 `;
 
-// --- The React Component ---
-
 export default function ArchiveCard2({ archive }) {
   const { name, articleCount, lastUpdated, articleImages = [] } = archive;
 
-  // Create a padded array to ensure we always have 4 elements for the grid
-  // This gracefully handles archives with 0, 1, 2, or 3 articles.
   const displayImages = [...articleImages.slice(0, 4), ...Array(4 - articleImages.length).fill(null)];
 
   return (
