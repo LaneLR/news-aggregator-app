@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📰 News Aggregator App
 
-## Getting Started
+This is a full-featured news aggregation web app built with Next.js and React. It collects open-source articles from multiple sources and RSS feeds, indexes and serves them in a responsive UI, and provides user accounts, saved-article archives, Stripe subscriptions and payments, and background processing for feed updates and maintenance.
 
-First, run the development server:
+## 🗝️ Key features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Feed retrieval and ingestion
+  - Periodic article retrieval via cron jobs and background workers that poll external feeds (RSS, JSON APIs, Reddit) and create normalized article records.
+  - Background workers/processes handle parsing, deduplication, enrichment and indexing of incoming articles so the web app remains responsive.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- User accounts & authentication
+  - Email/password registration and login flows, password reset and email verification.
+  - OAuth (Google sign-in) and session management via a session provider.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- Articles, archives & likes
+  - Users can save articles to personal archives (collections) for later reading.
+  - Like and quickly access recently liked or saved articles.
+  - Archive management UI to create, delete and organize saved articles.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Search & discovery
+  - Full site search with filters and paginated results.
+  - Category and tag pages, curated home feeds and related-article widgets.
 
-## Learn More
+- Reddit integration
+  - Special handling for Reddit-sourced content and cards/components to display Reddit posts.
 
-To learn more about Next.js, take a look at the following resources:
+- Subscription billing & payments
+  - Pricing page, tier cards, and subscription management UI.
+  - Stripe integration with webhook handling for payment events and subscription lifecycle updates.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Admin / maintenance utilities
+  - Scheduled scripts (e.g., cleanup of expired users, fetch new articles)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🏗️ Architecture & tech stack
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Next.js (App Router) + React
+- Server-side API routes (Next.js API routes) for webhooks, auth and feeds
+- Sequelize (or another ORM) for relational DB access 
+- Stripe for payments and webhooks 
+- Background workers / sagas for feed ingestion and long-running tasks
+- Cron/scheduled jobs for periodic maintenance 
