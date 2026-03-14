@@ -1,9 +1,9 @@
-// src/components/CancelSubscriptionButton.js
 "use client";
 
 import { useState } from "react";
-import Button from "./Button"; // Assuming you have a generic Button component
+import Button from "./Button"; 
 import { useSession } from "next-auth/react";
+import { useTheme } from "styled-components";
 
 export default function CancelSubscriptionButton({
   subscriptionEndDate,
@@ -13,6 +13,7 @@ export default function CancelSubscriptionButton({
   const { data: session, status, update } = useSession({ data: sessionData });
 
   const [error, setError] = useState(null);
+  const theme = useTheme();
 
   const handleCancel = async () => {
     setError(null);
@@ -61,7 +62,7 @@ export default function CancelSubscriptionButton({
       <Button onClick={handleCancel} bgColor={"#b40000"} clr={"var(--white)"}>
         Cancel Subscription
       </Button>
-      {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+      {error && <p style={{ color: theme.warning, marginTop: "10px" }}>{error}</p>}
     </div>
   );
 }

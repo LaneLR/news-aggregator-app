@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import { themes } from "@/styles/themes";
 
 const SwatchGrid = styled.div`
@@ -24,19 +24,23 @@ const Swatch = styled.button`
   font-weight: bold;
 `;
 
+const SelectThemeText = styled.p`
+  margin-bottom: 14px;
+  color: ${(props) => props.theme.text};
+`
+
 export default function ThemeSelector({ sessionData}) {
   const { data: session, update } = useSession({ data: sessionData });
   const currentTheme = session?.user?.selectedTheme || "default";
+  const theme = useTheme();
 
   const handleThemeChange = async (themeName) => {
     try {
-      // 1. Save the new theme to the backend
       await fetch("/api/users/theme", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ themeName }),
       });
-      // 2. Trigger a session update to apply the theme instantly
       await update({ selectedTheme: themeName });
     } catch (err) {
       console.error("Failed to update theme", err);
@@ -45,7 +49,7 @@ export default function ThemeSelector({ sessionData}) {
 
   return (
     <div>
-      <p>Select your preferred theme:</p>
+      <SelectThemeText>Select your preferred theme:</SelectThemeText>
       <SwatchGrid>
         <Swatch
           $bgColor={themes.default.background}
@@ -63,14 +67,14 @@ export default function ThemeSelector({ sessionData}) {
         >
           Dark
         </Swatch>
-        <Swatch
+        {/* <Swatch
           $bgColor={themes.forest.background}
           $textColor={themes.forest.text}
           $isActive={currentTheme === "forest"}
           onClick={() => handleThemeChange("forest")}
         >
           Forest
-        </Swatch>
+        </Swatch> */}
       </SwatchGrid>
     </div>
   );

@@ -20,7 +20,7 @@ const ProfileWrapper = styled.div`
 `;
 
 const Card = styled.div`
-  background-color: ${(props) => props.theme.primary};
+  background-color: ${(props) => props.theme.cardBackground};
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   border: 1px solid ${(props) => props.theme.border};
@@ -35,6 +35,7 @@ const ProfileHeader = styled.div`
   padding: 2rem;
   border-radius: 12px;
   background-color: ${(props) => props.theme.cardBackground};
+  border: 1px solid ${(props) => props.theme.border};
 `;
 
 const Avatar = styled.div`
@@ -59,7 +60,7 @@ const UserName = styled.h1`
 
 const UserEmail = styled.p`
   font-size: 1rem;
-  color: ${(props) => props.theme.text};
+  color: ${(props) => props.theme.textSecondary};
   margin: 0.25rem 0 0 0;
 `;
 
@@ -68,9 +69,9 @@ const TierBadge = styled.span`
   font-weight: bold;
   padding: 4px 12px;
   border-radius: 16px;
-  color: ${(props) => props.theme.text};
+  color: ${(props) => props.theme.buttonText};
   background-color: ${(props) =>
-    props.tier === "Free" ? props.theme.textSecondary : props.theme.primary};
+    props.tier === "Free" ? props.theme.card : props.theme.primary};
 `;
 
 const CardHeader = styled.h2`
@@ -78,6 +79,7 @@ const CardHeader = styled.h2`
   padding: 1rem 1.5rem;
   margin: 0;
   border-bottom: 1px solid ${(props) => props.theme.border};
+  color: ${(props) => props.theme.darkBlue}
 `;
 
 const CardContent = styled.div`
@@ -85,6 +87,7 @@ const CardContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  color: ${(props) => props.theme.darkBlue}
 `;
 
 const InfoRow = styled.div`
@@ -109,7 +112,7 @@ const CardFooter = styled.div`
 
 const DangerCardHeader = styled(CardHeader)`
   background-color: ${(props) => props.theme.cardBackground};
-  color: #c53030;
+  color: ${(props) => props.theme.warning};
   border-bottom-color: ${(props) => props.theme.border};
 `;
 
@@ -134,7 +137,6 @@ export default function ProfilePage({ sessionData }) {
   const [imageSrc, setImageSrc] = useState(FALLBACK_IMAGE_URL);
 
   useEffect(() => {
-    // This fetch logic is correct
     const fetchRecentlyLiked = async () => {
       try {
         const res = await fetch("/api/articles/liked?limit=3");
@@ -281,8 +283,8 @@ export default function ProfilePage({ sessionData }) {
         <CardFooter>
           {user.tier === "Free" ? (
             <Button
-              bgColor="var(--primary-blue)"
-              clr="white"
+              bgColor={theme.primary}
+              clr={theme.buttonText}
               onClick={() => (window.location.href = "/pricing")}
             >
               Upgrade to Pro
@@ -290,7 +292,7 @@ export default function ProfilePage({ sessionData }) {
           ) : (
             <Button
               bgColor={theme.primary}
-              clr={theme.text}
+              clr={theme.buttonText}
               onClick={handleManageSubscription}
             >
               Manage Subscription
@@ -354,7 +356,7 @@ export default function ProfilePage({ sessionData }) {
                     fontSize: "1.6rem",
                     fontWeight: "500",
                     letterSpacing: "2px",
-                    backgroundColor: theme.background,
+                    backgroundColor: theme.layoutBackground,
                     padding: "9px",
                     borderTopLeftRadius: "10px",
                     borderBottomLeftRadius: "10px",
@@ -388,7 +390,7 @@ export default function ProfilePage({ sessionData }) {
         </CardContent>
         <CardFooter>
           <Link href="/liked" passHref>
-            <Button bgColor={theme.primary} clr={theme.text}>
+            <Button bgColor={theme.primary} clr={theme.buttonText}>
               View Liked Articles
             </Button>
           </Link>
@@ -424,13 +426,17 @@ export default function ProfilePage({ sessionData }) {
         </CardContent>
         <CardFooter>
           {user.isPendingDeletion ? (
-            <Button bgColor="#333" clr="white" onClick={handleCancelDeletion}>
+            <Button
+              bgColor={theme.primary}
+              clr={theme.buttonText}
+              onClick={handleCancelDeletion}
+            >
               Cancel Deletion
             </Button>
           ) : (
             <Button
               bgColor={theme.warning}
-              clr={theme.primaryContrast}
+              clr={theme.buttonText}
               onClick={handleRequestDeletion}
             >
               Delete Account

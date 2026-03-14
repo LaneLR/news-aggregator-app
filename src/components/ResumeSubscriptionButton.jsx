@@ -12,7 +12,6 @@ export default function ResumeSubscriptionButton({
 }) {
   const theme = useTheme();
   const [error, setError] = useState(null);
-
   const { data: session, status, update } = useSession({ data: sessionData });
 
   const handleResume = async () => {
@@ -40,7 +39,7 @@ export default function ResumeSubscriptionButton({
     <div
       style={{
         textAlign: "center",
-        color: theme.primary,
+        color: theme.darkBlue,
         padding: "10px 50px",
       }}
     >
@@ -61,12 +60,12 @@ export default function ResumeSubscriptionButton({
       </div>
       <Button
         onClick={handleResume}
-        bgColor={theme.secondaryContrast}
+        bgColor={theme.primary}
         clr={theme.text}
       >
         Resume Subscription
       </Button>
-      {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+      {error && <p style={{ color: theme.warning, marginTop: "10px" }}>{error}</p>}
     </div>
   );
 }

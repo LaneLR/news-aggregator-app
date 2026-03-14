@@ -3,8 +3,7 @@ import Button from "@/components/Button";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import styled from "styled-components";
-import { signIn } from "next-auth/react";
+import styled, { useTheme } from "styled-components";
 
 const Wrapper = styled.div`
   flex-grow: 1;
@@ -48,7 +47,7 @@ const RegisterFormInput = styled.input`
 const Header = styled.div`
   font-size: 2rem;
   font-weight: 600;
-  color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.darkBlue};
   padding: 10px 0;
   text-align: center;
   width: 100%;
@@ -63,12 +62,12 @@ const CheckboxWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px; /* Space between checkbox and text */
+  gap: 10px; 
   margin: 0 0 25px 0;
   max-width: 320px;
   text-align: left;
   font-size: 0.85rem;
-  color: ${(props) => props.theme.textTertiary};
+  color: ${(props) => props.theme.slate};
 
   a {
     color: ${(props) => props.theme.primary};
@@ -83,6 +82,7 @@ const StyledInput = styled.input`
 export default function RegisterPage() {
   const [error, setError] = useState(null);
   const router = useRouter();
+  const theme = useTheme();
 
   async function handleCreateUser(e) {
     e.preventDefault();
@@ -161,8 +161,8 @@ export default function RegisterPage() {
           </label>
         </CheckboxWrapper>
         <Button
-          bgColor={"var(--primary-blue)"}
-          clr={"var(--white)"}
+          bgColor={theme.primary}
+          clr={theme.buttonText}
           type="submit"
         >
           Create Account
@@ -171,15 +171,17 @@ export default function RegisterPage() {
         {error && (
           <>
             <br />
-            <p style={{ color: "red" }}>{error}</p>
+            <p style={{ color: theme.warning }}>{error}</p>
           </>
         )}
 
-        <h4
+        <div
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            fontWeight: "600",
+            fontSize: "0.83rem",
           }}
         >
           <br />
@@ -187,7 +189,7 @@ export default function RegisterPage() {
             style={{
               display: "flex",
               gap: "5px",
-              color: "var(--dark-blue)",
+              color: theme.text,
               textAlign: "center",
             }}
           >
@@ -196,7 +198,7 @@ export default function RegisterPage() {
               <u>Log in!</u>
             </Link>
           </div>
-        </h4>
+        </div>
       </FormWrapper>
     </Wrapper>
   );

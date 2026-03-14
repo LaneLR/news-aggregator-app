@@ -2,8 +2,6 @@
 import styled from "styled-components";
 import Link from 'next/link';
 
-// --- Styled Components ---
-
 const CardLink = styled(Link)`
   display: block;
   position: relative;
@@ -13,7 +11,7 @@ const CardLink = styled(Link)`
   border-radius: 16px;
   overflow: hidden;
   text-decoration: none;
-  background-color: ${(props) => props.theme.border}; // Fallback for archives with 0 images
+  background-color: ${(props) => props.theme.border}; 
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease-in-out;
 
@@ -50,7 +48,7 @@ const Overlay = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   padding: 1.25rem;
-  color: ${(props) => props.theme.text};
+  color: ${(props) => props.theme.buttonText};
   transition: background 0.2s ease-in-out;
 
   ${CardLink}:hover & {

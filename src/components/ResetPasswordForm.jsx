@@ -50,7 +50,7 @@ const ResetPasswordFormInput = styled.input`
 const Header = styled.div`
   font-size: 2rem;
   font-weight: 600;
-  color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.darkBlue};
   padding: 10px 0;
   text-align: center;
   width: 100%;
@@ -64,12 +64,12 @@ const Header = styled.div`
 export default function ResetPasswordComponent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
-
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const theme = useTheme();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -122,7 +122,7 @@ export default function ResetPasswordComponent() {
           <p>You can now log in with your new password.</p>
           <br />
           <Link href="/login">
-            <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
+            <Button bgColor={theme.primary} clr={theme.text}>
               Go to Log in
             </Button>
           </Link>
@@ -154,8 +154,8 @@ export default function ResetPasswordComponent() {
           />
         </InputWrapper>
         <Button
-          bgColor={"var(--primary-blue)"}
-          clr={"var(--white)"}
+          bgColor={theme.primary}
+          clr={theme.text}
           type="submit"
           disabled={loading}
         >
@@ -164,7 +164,7 @@ export default function ResetPasswordComponent() {
         {error && (
           <>
             <br />
-            <p style={{ color: "red" }}>{error}</p>
+            <p style={{ color: theme.warning }}>{error}</p>
           </>
         )}
       </FormWrapper>

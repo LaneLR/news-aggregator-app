@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 
 const SaveButton = styled.div`
   //   background-color: ${(props) => props.theme.primary};
@@ -44,7 +44,7 @@ export default function ArchiveToggleButton({
   const [isSaved, setIsSaved] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const pathname = usePathname();
+  const theme = useTheme();
 
   useEffect(() => {
     const fetchArchives = async () => {
@@ -178,15 +178,15 @@ export default function ArchiveToggleButton({
                 left: 0,
                 zIndex: 10,
                 userSelect: "none",
-                background: "#fff",
-                border: "1px solid #ccc",
+                background: `${(props) => props.theme.background}`,
+                border: `1px solid ${(props) => props.theme.border}`,
                 padding: "0.5rem",
                 listStyle: "none",
-                borderBottom: "1px solid #ccc",
+                borderBottom: `1px solid ${(props) => props.theme.border}`,
               }}
             >
               {archives.map((archive) => (
-                <li key={archive.id} style={{ borderBottom: "1px solid #ccc" }}>
+                <li key={archive.id} style={{ borderBottom: `1px solid ${(props) => props.theme.border}` }}>
                   <button
                     style={{
                       all: "unset",

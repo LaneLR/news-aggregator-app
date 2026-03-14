@@ -71,7 +71,7 @@ const LoginFormInput = styled.input`
 const Header = styled.div`
   font-size: 2rem;
   font-weight: 600;
-  color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.darkBlue};
   padding: 10px 0;
   text-align: center;
   width: 100%;
@@ -89,7 +89,7 @@ const SignInButtonWrapper = styled.div`
   justify-content: center;
   row-gap: 8px;
   padding: 20px;
-  background-color: ${(props) => props.theme.cardBackground};
+  // background-color: ${(props) => props.theme.cardBackground};
   border-radius: 8px;
   height: auto;
   margin-bottom: 220px;
@@ -103,7 +103,7 @@ const SignInButtonWrapper = styled.div`
 const SSOText = styled.div`
   font-size: 1.5rem;
   font-weight: 600;
-  color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.darkBlue};
   text-align: center;
   margin-bottom: 20px;
   width: 100%;
@@ -216,7 +216,7 @@ export default function LoginPage({ sessionData }) {
             <br />
             <div
               style={{
-                color: theme.primary,
+                color: theme.text,
                 textAlign: "center",
                 display: "flex",
                 gap: "5px",
@@ -238,7 +238,7 @@ export default function LoginPage({ sessionData }) {
             <br />
             <div
               style={{
-                color: theme.primary,
+                color: theme.text,
                 textAlign: "center",
                 display: "flex",
                 gap: "5px",

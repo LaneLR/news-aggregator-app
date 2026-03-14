@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import Button from "./Button"; // Adjust path to your Button component
-import styled from "styled-components";
+import Button from "./Button"; 
+import styled, { useTheme } from "styled-components";
 
-// --- Reuse the same styled-components from your other page ---
 const Wrapper = styled.div`
   flex-grow: 1;
   display: flex;
@@ -39,7 +37,7 @@ const FormInput = styled.input`
   width: 300px;
   padding: 10px;
   margin: 10px 0;
-  border: 1px solid ${(props) => props.theme.textSecondary};
+  border: 1px solid ${(props) => props.theme.border};
   border-radius: 4px;
   margin-bottom: 25px;
 `;
@@ -47,18 +45,18 @@ const FormInput = styled.input`
 const Header = styled.div`
   font-size: 2rem;
   font-weight: 600;
-  color: ${(props) => props.theme.text};
+  color: ${(props) => props.theme.darkBlue};
   padding: 10px 0;
   text-align: center;
   width: 100%;
 `;
-// --- End of reused styles ---
 
 export default function ForgotPasswordComponent() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const theme = useTheme();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,7 +77,6 @@ export default function ForgotPasswordComponent() {
         throw new Error(data.error || "Something went wrong.");
       }
 
-      // Show the confirmation message from the API
       setMessage(data.message);
     } catch (err) {
       setError(err.message);
@@ -88,7 +85,6 @@ export default function ForgotPasswordComponent() {
     }
   };
 
-  // If a message is set (on success), hide the form and show the message.
   if (message) {
     return (
       <Wrapper>
@@ -101,7 +97,7 @@ export default function ForgotPasswordComponent() {
   return (
     <Wrapper>
       <Header>Forgot Your Password?</Header>
-      <p style={{ color: "var(--slate)" }}>
+      <p style={{ color: theme.slate, }}>
         Enter the email address of the account
       </p>
 
@@ -117,14 +113,14 @@ export default function ForgotPasswordComponent() {
           />
         </InputWrapper>
         <Button
-          bgColor={"var(--primary-blue)"}
-          clr={"var(--white)"}
+          bgColor={theme.primary}
+          clr={theme.text}
           type="submit"
           disabled={loading}
         >
           {loading ? "Sending..." : "Send Reset Link"}
         </Button>
-        {error && <p style={{ color: "red", marginTop: "20px" }}>{error}</p>}
+        {error && <p style={{ color: theme.warning, marginTop: "20px" }}>{error}</p>}
       </FormWrapper>
     </Wrapper>
   );

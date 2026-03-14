@@ -32,11 +32,9 @@ export default function SubscribeButton({
     }
 
     try {
-      // Determine if the user has an existing subscription
       const hasExistingSubscription = !!session?.user?.stripeSubscriptionId;
 
       if (hasExistingSubscription) {
-        // This is an upgrade/downgrade. Call the API to update the subscription.
         const response = await fetch("/api/stripe/create-checkout-session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -48,10 +46,8 @@ export default function SubscribeButton({
           throw new Error(data.error || "Failed to update subscription.");
         }
 
-        // Update the session to reflect the new subscription status
         await updateSession();
       } else {
-        // This is a new subscription. Create a checkout session.
         const response = await fetch("/api/stripe/create-checkout-session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -94,12 +90,12 @@ export default function SubscribeButton({
     <div>
       <Button
         bgColor={isCurrentPlan ? theme.textSecondary : bgColor}
-        clr={clr}
+        clr={clr || theme.text}
         onClick={handleSubscribe}
       >
         {isCurrentPlan ? "Current Plan" : "Subscribe"}
       </Button>
-      {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+      {error && <p style={{ color: theme.warning, marginTop: "10px" }}>{error}</p>}
     </div>
   );
 }

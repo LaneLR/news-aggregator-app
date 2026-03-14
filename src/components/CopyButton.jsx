@@ -20,13 +20,13 @@ const StyledButton = styled.button`
 
   background-color: ${(props) =>
     props.status === "Copied"
-      ? props.theme.secondaryContrast
+      ? props.theme.darkBlue
       : props.theme.primary};
-  color: ${(props) => props.theme.primaryContrast};
+  color: ${(props) => props.theme.buttonText};
 
-  &:hover {
-    filter: brightness(0.85);
-  }
+  // &:hover {
+  //   filter: brightness(0.95);
+  // }
 `;
 
 export default function CopyButton({ textToCopy }) {

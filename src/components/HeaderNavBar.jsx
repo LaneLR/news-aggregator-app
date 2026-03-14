@@ -5,14 +5,14 @@ import styled from "styled-components";
 
 const Wrapper = styled.div`
   width: 100%;
-  background-color: ${(props) => props.theme.background};
+  background-color: ${(props) => props.theme.primary};
   display: flex;
   justify-content: center;
   align-items: center;
   height: auto;
   padding: 10px 15px;
   font-size: 1.2rem;
-  color: ${(props) => props.theme.text};
+  color: ${(props) => props.theme.buttonText};
   gap: 25px;
   overflow-x: auto;
 

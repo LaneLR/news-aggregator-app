@@ -16,8 +16,8 @@ const SearchInput = styled.input`
   padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid ${(props) => props.theme.border};
-  color: ${(props) => props.theme.primary};
-  background-color: ${(props) => props.theme.background};
+  color: ${(props) => props.theme.darkBlue};
+  background-color: ${(props) => props.theme.searchBackground};
 
   &:focus {
     outline: none;

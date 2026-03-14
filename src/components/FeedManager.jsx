@@ -6,7 +6,7 @@ import Button from "./Button";
 import styled from "styled-components";
 import { useSession } from "next-auth/react";
 
-export const FeedSelectorWrapper = styled.div`
+const FeedSelectorWrapper = styled.div`
   display: flex;
   gap: 10px;
   align-items: center;
@@ -14,7 +14,7 @@ export const FeedSelectorWrapper = styled.div`
   padding: 0 20px;
 `;
 
-export const UpgradePrompt = styled.div`
+const UpgradePrompt = styled.div`
   position: relative;
   padding: 35px 1rem 1rem 1rem;
   background-color: ${(props) => props.theme.cardBackground};
@@ -34,17 +34,17 @@ export const UpgradePrompt = styled.div`
     font-size: 15px;
     margin: auto;
     border: none;
-    background-color: ${(props) => props.theme.secondaryContrast};
+    background-color: ${(props) => props.theme.darkBlue};
     border-radius: 0px;
-    color: ${(props) => props.theme.primaryContrast};
+    color: ${(props) => props.theme.text};
   }
 `;
 
-export const UpgradePromptText = styled.div`
+const UpgradePromptText = styled.div`
   padding: 0 30px 10px 0;
 `;
 
-export const CloseButton = styled.button`
+const CloseButton = styled.button`
   position: absolute;
   top: 8px;
   right: 12px;
@@ -52,13 +52,13 @@ export const CloseButton = styled.button`
   border: none;
   font-size: 1.5rem;
   font-weight: bold;
-  color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.darkBlue};
   cursor: pointer;
   padding: 0;
   line-height: 1;
 
   &:hover {
-    filter: brightness(0.85);
+    filter: brightness(0.95);
   }
 `;
 

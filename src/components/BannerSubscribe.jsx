@@ -1,6 +1,5 @@
 "use client";
 import styled from "styled-components";
-import SubscribeButton from "./SubscribeButton";
 
 const Wrapper = styled.div`
   width: 220px;
@@ -15,7 +14,7 @@ const Wrapper = styled.div`
   color: ${(props) => props.theme.text};
   background-image: linear-gradient(
     to bottom,
-    ${(props) => props.theme.secondaryContrast},
+    ${(props) => props.theme.secondaryBlue},
     ${(props) => props.theme.primary}
   );
 `;

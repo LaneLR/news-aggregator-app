@@ -3,19 +3,19 @@ import styled from "styled-components";
 import Link from "next/link";
 import Image from "next/image";
 
-export const CardLink = styled(Link)`
+const CardLink = styled(Link)`
   display: block;
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
   border-radius: 16px;
   overflow: hidden;
-  color: white; 
+  color: ${(props) => props.theme.text}; 
   text-decoration: none;
   margin: 0 0 30px 0;
 `;
 
-export const Overlay = styled.div`
+const Overlay = styled.div`
   position: absolute;
   top: 0;
   left: 0;
@@ -39,11 +39,11 @@ export const Overlay = styled.div`
   }
 `;
 
-export const Title = styled.h2`
+const Title = styled.h2`
   font-size: 2.5rem;
   font-weight: 700;
   line-height: 1.2;
-  color: white; 
+  color: ${(props) => props.theme.text}; 
 
   @media (max-width: 768px) {
     font-size: 2rem;
@@ -53,12 +53,12 @@ export const Title = styled.h2`
   }
 `;
 
-export const Source = styled.p`
+const Source = styled.p`
   font-size: 1rem;
   font-weight: 500;
   margin: 0.5rem 0 0;
   opacity: 0.9;
-  color: white; 
+  color: ${(props) => props.theme.text}; 
   @media (max-width: 440px) {
     font-size: 0.9rem;
   }

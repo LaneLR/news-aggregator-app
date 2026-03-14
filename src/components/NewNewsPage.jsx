@@ -29,7 +29,7 @@ const Section = styled.section`
 const SectionTitle = styled.h2`
   font-size: 2rem;
   font-weight: 700;
-  color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.darkBlue};
   margin-bottom: 1.5rem;
   border-bottom: 2px solid ${(props) => props.theme.border};
 

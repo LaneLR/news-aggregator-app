@@ -12,10 +12,10 @@ const Wrapper = styled.div`
   flex-direction: column;
   border-radius: 12px;
   background-color: ${(props) => props.theme.primary};
-  color: ${(props) => props.theme.text};
+  color: ${(props) => props.theme.buttonText};
   background-image: linear-gradient(
     to bottom,
-    ${(props) => props.theme.secondaryContrast},
+    ${(props) => props.theme.secondaryBlue},
     ${(props) => props.theme.primary}
   );
 `;
@@ -52,7 +52,7 @@ const PlanBody = styled.div`
       content: "✔";
       position: absolute;
       left: -16px;
-      color: ${(props) => props.theme.text};
+      color: ${(props) => props.theme.success};
       font-weight: bold;
     }
   }

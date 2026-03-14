@@ -5,7 +5,7 @@ import styled from "styled-components";
 const FooterWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  color: ${(props) => props.theme.text};
+  color: ${(props) => props.theme.buttonText};
 `;
 
 const LinkWrapper = styled.div`
@@ -14,8 +14,8 @@ const LinkWrapper = styled.div`
   justify-content: center;
   height: 70px;
   width: 100%;
-  background: ${(props) => props.theme.cardBackground};
-  color: ${(props) => props.theme.text};
+  background: ${(props) => props.theme.PrimaryDark};
+  color: ${(props) => props.theme.buttonText};
   font-size: 0.9rem;
 `;
 
@@ -35,11 +35,12 @@ const Disclaimer = styled.p`
   justify-content: center;
   align-item: center;
   text-align: left;
+  background-color: ${(props) => props.theme.PrimaryDark};
 `;
 
 const Underline = styled.div`
   margin-top: 2px;
-  border-top: 1px solid ${(props) => props.theme.border};
+  border-top: 1px solid ${(props) => props.theme.buttonText};
   width: 100%;
 `;
 

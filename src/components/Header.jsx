@@ -1,5 +1,5 @@
 "use client";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "./Button";
@@ -16,8 +16,8 @@ const Wrapper = styled.div`
   justify-content: space-between;
   height: 80px;
   width: 100%;
-  background-color: ${(props) => props.theme.primary};
-  color: ${(props) => props.theme.primaryContrast};
+  background-color: ${(props) => props.theme.SecondaryDark};
+  color: ${(props) => props.theme.text};
 `;
 
 const LeftContainer = styled.div`
@@ -29,7 +29,7 @@ const LeftContainer = styled.div`
   // width: 327px;
   height: 100%;
   padding: 0 0 0 20px;
-  background-color: ${(props) => props.theme.primary};
+  background-color: transparent;
 
   @media (max-width: 1000px) {
     width: auto;
@@ -46,7 +46,7 @@ const CenterContainer = styled.div`
   width: 50%;
   height: 100%;
   padding: 0 50px;
-  background-color: inherit;
+  background-color: transparent;
 
   @media (max-width: 860px) {
     justify-content: center;
@@ -86,7 +86,7 @@ const UserAccountIcon = styled.div`
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
-  color: ${(props) => props.theme.primaryContrast};
+  color: ${(props) => props.theme.text};
 `;
 
 const HeaderLogoBox = styled.div`
@@ -103,11 +103,12 @@ const MenuIcon = styled.div`
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
+  color: ${(props) => props.theme.text};
   span {
     display: block;
     width: 100%;
     height: 2px;
-    background-color: ${(props) => props.theme.primaryContrast};
+    background-color: ${(props) => props.theme.dropdownMenu};
   }
 `;
 
@@ -122,8 +123,8 @@ const DropdownMenu = styled.ul`
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  background-color: ${(props) => props.theme.cardBackground};
-  border: 1px solid ${(props) => props.theme.border};
+  background-color: ${(props) => props.theme.background};
+  border: 1px solid ${(props) => props.theme.text};
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   width: auto;
@@ -145,7 +146,7 @@ const DropdownMenuItem = styled.li`
   white-space: nowrap;
 
   &:hover {
-    background-color: ${(props) => props.theme.border};
+    background-color: ${(props) => props.theme.layoutBackground};
     color: ${(props) => props.theme.text};
   }
 
@@ -179,7 +180,7 @@ const LogoText = styled.p`
   }
 
   span:last-child {
-    color: ${(props) => props.theme.text};
+    color: ${(props) => props.theme.buttonText};
     font-weight: 400;
     background-color: transparent;
   }
@@ -199,6 +200,8 @@ export default function Header({ priceId, sessionData, }) {
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const theme = useTheme();
 
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -454,7 +457,7 @@ export default function Header({ priceId, sessionData, }) {
             <RightContainer>
               <nav style={{ display: "flex", columnGap: "10px" }}>
                 <Link style={{ display: "flex" }} href={"/login"}>
-                  <Button bgColor={"var(--orange)"} clr={"var(--white)"}>
+                  <Button bgColor={theme.titleContrast} clr={theme.buttonText}>
                     Log in
                   </Button>
                 </Link>

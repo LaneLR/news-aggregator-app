@@ -15,7 +15,7 @@ const LikedPageWrapper = styled.div`
 const Header = styled.h1`
   font-size: 2.5rem;
   font-weight: 700;
-  color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.darkBlue};
   text-align: center;
   margin-bottom: 2rem;
 `;

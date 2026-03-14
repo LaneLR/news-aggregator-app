@@ -1,5 +1,5 @@
 "use client";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import ArchiveToggleButton from "./ArchiveToggleButton.jsx";
 import Link from "next/link.js";
 import Image from "next/image.js";
@@ -10,7 +10,7 @@ import { redirect } from "next/navigation.js";
 const CardContainer = styled.div`
   background-color: ${(props) => props.theme.cardBackground};
   border-radius: 12px;
-  box-shadow: ${(props) => props.theme.boxShadow};
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   width: 100%;
   max-width: 400px;
   margin-bottom: 15px;
@@ -35,7 +35,7 @@ const CardHeader = styled.div`
 const BrandText = styled.span`
   font-size: 1rem;
   font-weight: bold;
-  color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.darkBlue};
 `;
 
 const ContentArea = styled.div`
@@ -50,7 +50,7 @@ const ContentArea = styled.div`
 const ArticleTitle = styled.h3`
   font-size: 1.2rem;
   font-weight: 700;
-  color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.darkBlue};
   line-height: 1.3;
   margin-bottom: 8px;
   display: -webkit-box;
@@ -62,7 +62,7 @@ const ArticleTitle = styled.h3`
 
 const ArticleSnippet = styled.div`
   font-size: 1rem;
-  color: ${(props) => props.theme.textSecondary};
+  color: ${(props) => props.theme.darkBlue};
   line-height: 1.5;
   font-weight: 700;
   margin-bottom: 20px;
@@ -74,16 +74,16 @@ const ArticleSnippet = styled.div`
 `;
 
 const ArticleSnippetText = styled.p`
-  background-color: ${(props) => props.theme.highlight};
+  // background-color: ${(props) => props.theme.primary};
   width: fit-content;
   padding: 3px 6px;
   border-radius: 6px;
-  color: ${(props) => props.theme.primaryContrast};
+  // color: ${(props) => props.theme.textTertiary};
 `;
 
 const ReadMoreButton = styled.a`
   background-color: ${(props) => props.theme.primary};
-  color: ${(props) => props.theme.primaryContrast};
+  color: white;
   padding: 8px 15px;
   border-radius: 6px;
   font-size: 1rem;
@@ -95,7 +95,7 @@ const ReadMoreButton = styled.a`
   cursor: pointer;
   transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
   &:hover {
-    background-color: ${(props) => props.theme.secondary};
+    background-color: ${(props) => props.theme.darkBlue};
     transform: translateY(-1px);
   }
   &:active {
@@ -114,7 +114,7 @@ const LikeButton = styled.button`
   gap: 6px;
   font-size: 1rem;
   color: ${(props) =>
-    props.$isLiked ? props.theme.primary : props.theme.textTertiary};
+    props.$isLiked ? props.theme.primary : props.theme.textSecondary};
 `;
 
 const LikeOrUnlikedButton = styled.img`
@@ -125,7 +125,7 @@ const LikeOrUnlikedButton = styled.img`
 const LikeCountCounter = styled.div`
   font-weight: 500;
   font-size: 1.3rem;
-  color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.darkBlue};
 `;
 
 const LockedArticleSVG = styled.img`
@@ -140,6 +140,7 @@ export default function NewsCardThree({
   sessionData,
 }) {
   const { data: session, status, update } = useSession({ data: sessionData });
+  const theme = useTheme();
 
   const PAYWALLED_SOURCES = new Set([
     "The Washington Post",
@@ -223,7 +224,7 @@ export default function NewsCardThree({
           style={{
             objectFit: "cover",
             objectPosition: "top",
-            borderBottom: "1px solid #eee",
+            borderBottom: `1px solid ${theme.border}`,
             minWidth: "398px",
           }}
         />

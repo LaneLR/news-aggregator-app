@@ -15,7 +15,7 @@ function useTemporaryRouter() {
 }
 
 
-export const CardContainer = styled.div`
+const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -25,7 +25,7 @@ export const CardContainer = styled.div`
   height: 220px;
   border-radius: 16px;
   // Use themed colors for the border and text
-  border: 2px dashed ${(props) => props.theme.border};
+  border: 2px dashed ${(props) => props.theme.textSecondary};
   cursor: pointer;
   color: ${(props) => props.theme.textSecondary};
   transition: all 0.2s ease-in-out;
@@ -38,19 +38,19 @@ export const CardContainer = styled.div`
   }
 `;
 
-export const PlusIcon = styled.div`
+const PlusIcon = styled.div`
   font-size: 4rem;
   font-weight: 200;
   line-height: 1;
 `;
 
-export const CreateText = styled.p`
+const CreateText = styled.p`
   font-size: 1.125rem;
   font-weight: 600;
   margin-top: 0.5rem;
 `;
 
-export const ModalBackdrop = styled.div`
+const ModalBackdrop = styled.div`
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
@@ -61,8 +61,8 @@ export const ModalBackdrop = styled.div`
   transition: opacity 0.3s;
 `;
 
-export const ModalContent = styled.div`
-  background-color: ${(props) => props.theme.cardBackground};
+const ModalContent = styled.div`
+  background-color: ${(props) => props.theme.background};
   padding: 24px;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -84,14 +84,14 @@ export const ModalContent = styled.div`
   }
 `;
 
-export const ModalHeader = styled.h2`
+const ModalHeader = styled.h2`
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 1rem;
-  color: ${(props) => props.theme.textTertiary};
+  // color: ${(props) => props.theme.textTertiary};
 `;
 
-export const Input = styled.input`
+const Input = styled.input`
   padding: 12px;
   font-size: 1rem;
   border: 1px solid ${(props) => props.theme.border};
@@ -100,18 +100,18 @@ export const Input = styled.input`
   width: 100%;
 `;
 
-export const ErrorText = styled.p`
+const ErrorText = styled.p`
   color: ${(props) => props.theme.warning};
   margin-bottom: 0.5rem;
 `;
 
-export const ButtonContainer = styled.div`
+const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 12px;
 `;
 
-export const Button = styled.button`
+const Button = styled.button`
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 600;
@@ -121,23 +121,23 @@ export const Button = styled.button`
   &.cancel {
     background-color: transparent;
     border: 1px solid ${(props) => props.theme.border};
-    color: ${(props) => props.theme.textSecondary};
+    color: ${(props) => props.theme.text};
     &:hover {
-      background-color: ${(props) => props.theme.cardBackground};
+      // background-color: ${(props) => props.theme.background};
       filter: brightness(0.95);
     }
   }
 
   &.create {
     background-color: ${(props) => props.theme.primary};
-    color: ${(props) => props.theme.primaryContrast};
+    color: ${(props) => props.theme.darkBlue};
     &:hover {
       filter: brightness(0.85);
     }
   }
 `;
 
-export const Card = styled.div`
+const Card = styled.div`
   margin-bottom: 10px;
 `;
 

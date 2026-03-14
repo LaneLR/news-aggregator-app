@@ -7,11 +7,11 @@ import Image from "next/image";
 import ShareButton from "./ShareButton";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 
-export const CardWrapper = styled.div`
+const CardWrapper = styled.div`
   display: inline-block;
   width: 320px;
   flex-shrink: 0;
-  background: ${(props) => props.theme.cardBackground};
+  background: ${(props) => props.theme.background};
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   border: 1px solid ${(props) => props.theme.border};
@@ -29,21 +29,21 @@ export const CardWrapper = styled.div`
   }
 `;
 
-export const ImageLink = styled(Link)`
+const ImageLink = styled(Link)`
   display: block;
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
 `;
 
-export const ContentArea = styled.div`
+const ContentArea = styled.div`
   padding: 1rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 `;
 
-export const Source = styled.p`
+const Source = styled.p`
   font-size: 0.85rem;
   font-weight: 600;
   color: ${(props) => props.theme.textSecondary};
@@ -56,21 +56,21 @@ export const Source = styled.p`
   }
 `;
 
-export const LockIcon = styled.img`
+const LockIcon = styled.img`
   width: 16px;
   height: 16px;
   margin-left: 8px;
 `;
 
-export const TitleLink = styled(Link)`
+const TitleLink = styled(Link)`
   text-decoration: none;
-  color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.darkBlue};
   &:hover {
     text-decoration: underline;
   }
 `;
 
-export const Title = styled.h3`
+const Title = styled.h3`
   font-size: 1.15rem;
   font-weight: 700;
   line-height: 1.4;
@@ -80,14 +80,14 @@ export const Title = styled.h3`
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  color: ${(props) => props.theme.primary};
+  // color: ${(props) => props.theme.primary};
 
   @media (max-width: 440px) {
     font-size: 1.05rem;
   }
 `;
 
-export const ActionsRow = styled.div`
+const ActionsRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -96,7 +96,7 @@ export const ActionsRow = styled.div`
   padding-top: 0.75rem;
 `;
 
-export const LikeButton = styled.button`
+const LikeButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
@@ -109,14 +109,14 @@ export const LikeButton = styled.button`
     props.$isLiked ? props.theme.primary : props.theme.textSecondary};
 `;
 
-export const LikeIcon = styled.img`
+const LikeIcon = styled.img`
   height: 24px;
   width: 24px;
 `;
 
-export const ReadMoreButton = styled.a`
+const ReadMoreButton = styled.a`
   background-color: ${(props) => props.theme.primary};
-  color: ${(props) => props.theme.primaryContrast};
+  color: ${(props) => props.theme.text};
   padding: 8px;
   border-radius: 6px;
   font-size: 0.85rem;

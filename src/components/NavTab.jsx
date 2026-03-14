@@ -12,8 +12,8 @@ const NavBarWrapper = styled(Link)`
   border: 1px solid black;
   margin: 15px 0;
   font-size: 1.3rem;
-  color: ${(props) => props.theme.primary};
-  background-color: ${(props) => props.theme.cardBackground};
+  color: ${(props) => props.theme.deepBlue};
+  background-color: ${(props) => props.theme.background};
 `;
 
 export default function NavTab({ href, children }) {
