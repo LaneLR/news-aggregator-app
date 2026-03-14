@@ -3,15 +3,15 @@ const nextConfig = {
   images: {
     remotePatterns: [],
   },
+  // This tells Next.js 16 you know you're using Webpack
   webpack: (config, { isServer }) => {
     if (isServer) {
-      config.externals = config.externals || [];
-      config.externals.push("sequelize", "pg");
+      config.externals = [...(config.externals || []), "sequelize", "pg"];
     }
     return config;
   },
   compiler: {
-    styledComponents: true, //enable the styled-components SWC compiler
+    styledComponents: true,
   },
 };
 
