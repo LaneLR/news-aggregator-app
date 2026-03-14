@@ -1,9 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    remotePatterns: [],
+    localPatterns: [
+      {
+        pathname: '/images/**',
+        search: '', 
+      },
+      {
+        pathname: '/api/image-proxy/**',
+      }
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
-  // This tells Next.js 16 you know you're using Webpack
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.externals = [...(config.externals || []), "sequelize", "pg"];
