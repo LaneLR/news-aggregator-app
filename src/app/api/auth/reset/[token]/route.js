@@ -7,7 +7,7 @@ export async function POST(req, { params }) {
   const db = await initializeDbAndModels();
   const { User } = db;
   try {
-    const { token } = params;
+    const { token } = await params;
     const { newPassword } = await req.json();
     const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
     const user = await User.findByPk(decoded.id);
