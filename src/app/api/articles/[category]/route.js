@@ -7,7 +7,7 @@ export async function GET(req, { params }) {
   const { NewsArticle, MarketArticle, JournalArticle, Podcast } =
     await initializeDbAndModels();
 
-  const { category } = params;
+  const { category } = await params;
   const { searchParams } = new URL(req.url);
   const page = parseInt(searchParams.get("page") || "1");
   const limit = 20;
@@ -32,9 +32,9 @@ export async function GET(req, { params }) {
     // We add a 'type' property to each item to distinguish its source model, which can be useful on the frontend.
     const allContent = [
       ...results[0].map(item => ({ ...item.toJSON(), type: 'News' })),
-      ...results[1].map(item => ({ ...item.toJSON(), type: 'Market' })),
-      ...results[2].map(item => ({ ...item.toJSON(), type: 'Journal' })),
-      ...results[3].map(item => ({ ...item.toJSON(), type: 'Podcast' })),
+      // ...results[1].map(item => ({ ...item.toJSON(), type: 'Market' })),
+      // ...results[2].map(item => ({ ...item.toJSON(), type: 'Journal' })),
+      // ...results[3].map(item => ({ ...item.toJSON(), type: 'Podcast' })),
     ];
 
 
