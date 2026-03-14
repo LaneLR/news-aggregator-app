@@ -68,7 +68,7 @@ async function initializeDbAndModels() {
       // await sequelize.query(`ALTER TABLE "SavedArticles" DROP CONSTRAINT IF EXISTS "SavedArticles_url_key";`);
 
       // Uncomment the line below to alter tables without wiping data
-      // await sequelize.sync({ alter: true });
+      await sequelize.sync({ alter: true });
 
       //DO NOT REMOVE COMMENTS FROM BELOW LINE
       //Wipes all data from the database and re-creates tables
@@ -77,7 +77,7 @@ async function initializeDbAndModels() {
       //1. delete tables in this order on PgAdmin4: SavedArticles, then Archives, then users
       //2. uncomment the sync line, then create a new account to repopulate the tables
 
-      await sequelize.sync({ force: true });
+      // await sequelize.sync({ force: true });
       // console.log("All models were synchronized and created successfully.");
     } catch (error) {
       console.error("----------------------------------------------------");
