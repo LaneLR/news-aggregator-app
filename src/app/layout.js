@@ -9,6 +9,7 @@ import AuthProvider from "@/components/SessionProvider";
 import Footer from "@/components/Footer";
 import HeaderNavBar from "@/components/HeaderNavBar";
 import ThemeProvider from "@/components/ThemeProvider";
+import { useTheme } from "styled-components";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
