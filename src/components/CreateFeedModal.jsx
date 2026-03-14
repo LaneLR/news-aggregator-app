@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import Button from "./Button";
 
 const ModalBackdrop = styled.div`
@@ -14,10 +14,11 @@ const ModalBackdrop = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  color: var(--deep-blue);
+  color: ${(props) => props.theme.darkBlue};
 `;
+
 const ModalContent = styled.div`
-  background: white;
+  background: ${(props) => props.theme.background};
   padding: 24px 40px;
   border-radius: 8px;
   width: 90%;
@@ -25,6 +26,7 @@ const ModalContent = styled.div`
   max-height: 80vh;
   overflow-y: auto;
 `;
+
 const FilterList = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -33,22 +35,25 @@ const FilterList = styled.div`
   padding-bottom: 8px;
   max-height: 400px;
   overflow-y: auto;
-  $:last-child {
-    border-bottom: 1px solid gray;
+  &:last-child {
+    border-bottom: 1px solid ${(props) => props.theme.border};
   }
 `;
+
 const FilterCheckbox = styled.label`
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 16px;
-  border: 1px solid #ccc;
-  background: ${(props) => (props.checked ? "var(--primary-blue)" : "white")};
-  color: ${(props) => (props.checked ? "white" : "black")};
+  border: 1px solid ${(props) => props.theme.border};
   transition: all 0.2s ease-in-out;
+  background: ${(props) => (props.checked ? props.theme.primary : props.theme.background)};
+  color: ${(props) => (props.checked ? props.theme.text : props.theme.textTertiary)};
+
   &:hover {
-    background: #f0f0f0;
+    filter: brightness(0.95);
   }
 `;
+
 const ButtonWrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -58,10 +63,12 @@ const ButtonWrapper = styled.div`
 
 const FormTitle = styled.h2`
   padding: 0 0 3px 0;
+  // color: ${(props) => props.theme.textTertiary};
 `;
 
 const CategoryNames = styled.h4`
   padding: 0 0 6px 0;
+  // color: ${(props) => props.theme.textTertiary};
 `;
 
 export default function CreateFeedModal({
@@ -75,6 +82,7 @@ export default function CreateFeedModal({
   const [availableCategories, setAvailableCategories] = useState([]);
   const [selectedSources, setSelectedSources] = useState(new Set());
   const [selectedCategories, setSelectedCategories] = useState(new Set());
+  const theme = useTheme();
 
   const isEditMode = !!feedToEdit;
 
@@ -210,16 +218,16 @@ export default function CreateFeedModal({
               {" "}
               <Button
                 onClick={handleSave}
-                bgColor="var(--primary-blue)"
-                clr="white"
+                bgColor={theme.primary}
+                clr={theme.text}
                 style={{ marginLeft: "auto" }}
               >
                 Save Feed
               </Button>
               <Button
                 onClick={handleDelete}
-                bgColor="var(--primary-blue)"
-                clr="var(--white)"
+                bgColor={theme.warning}
+                clr={theme.textTertiary}
               >
                 Delete Feed
               </Button>
@@ -227,8 +235,8 @@ export default function CreateFeedModal({
           ) : (
             <Button
               onClick={handleSave}
-              bgColor="var(--primary-blue)"
-              clr="white"
+              bgColor={theme.primary}
+              clr={theme.text}
               style={{ marginLeft: "auto" }}
             >
               Create Feed

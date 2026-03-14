@@ -1,13 +1,6 @@
-// src/lib/db.js
 import getSequelizeInstance from "./sequelize.js";
-import User from "./models/User.js";
-import Archive from "./models/Archive.js";
-import SavedArticle from "./models/SavedArticle.js";
 import defineJournalArticle from "./models/JournalArticle.js";
 import defineNewsArticle from "./models/NewsArticle.js";
-import { DataTypes, Op } from "sequelize";
-import bcrypt from "bcryptjs";
-import UserInteraction from "./models/UserInteraction.js";
 import defineMarketArticle from "./models/MarketArticle.js";
 import definePodcast from "./models/Podcast.js";
 import defineFeed from "./models/Feed.js";
@@ -15,7 +8,6 @@ import defineArticleLike from "./models/ArticleLike.js";
 import defineUser from "./models/User.js";
 import defineArchive from "./models/Archive.js";
 import defineSavedArticle from "./models/SavedArticle.js";
-import { nanoid } from "nanoid";
 
 if (!global.db) {
   global.db = {};
@@ -85,8 +77,8 @@ async function initializeDbAndModels() {
       //1. delete tables in this order on PgAdmin4: SavedArticles, then Archives, then users
       //2. uncomment the sync line, then create a new account to repopulate the tables
 
-      await sequelize.sync({ force: true });
-      console.log("All models were synchronized and created successfully.");
+      // await sequelize.sync({ force: true });
+      // console.log("All models were synchronized and created successfully.");
     } catch (error) {
       console.error("----------------------------------------------------");
       console.error(

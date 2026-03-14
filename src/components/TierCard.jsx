@@ -2,19 +2,17 @@ import Image from "next/image";
 import React from "react";
 import styled from "styled-components";
 
-// Outer wrapper
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 300px;
   width: 200px;
-  background-color: var(--primary-blue);
+  background-color: ${(props) => props.theme.primary};
   padding: 20px 8px;
   border-radius: 12px;
 `;
 
-// Inner wrapper for the cards
 const CardsWrapper = styled.div`
   display: flex;
   gap: 2rem;
@@ -23,7 +21,6 @@ const CardsWrapper = styled.div`
   justify-content: center;
 `;
 
-// Individual card
 const Card = styled.div`
   flex: 1;
   border-radius: 12px;
@@ -33,14 +30,12 @@ const Card = styled.div`
   text-align: center;
 `;
 
-// Title
 const Title = styled.h2`
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 1rem;
 `;
 
-// Content placeholder
 const ContentPlaceholder = styled.div`
   width: 100%;
   height: auto;
@@ -54,7 +49,6 @@ const ContentPlaceholder = styled.div`
   font-weight: 500;
 `;
 
-// Description
 const Description = styled.p`
   font-size: 1rem;
 `;
@@ -80,7 +74,7 @@ const BulletList = styled.div`
       content: "•";
       position: absolute;
       left: -15px;
-      color: var(--dark-blue);
+      color: ${(props) => props.theme.primary};
       font-weight: bold;
     }
   }

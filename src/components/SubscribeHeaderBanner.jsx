@@ -1,7 +1,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -9,10 +9,10 @@ const Wrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 9px 13px;
-  color: var(--primary-blue);
+  color: ${(props) => props.theme.primary};
   font-weight: 600;
   font-size: 1.1rem;
-  background-color: var(--white);
+  background-color: ${(props) => props.theme.background};
 `;
 
 const LeftContainer = styled.div``;
@@ -50,12 +50,13 @@ const CloseButton = styled.button`
 `;
 
 const Underline = styled.div`
-  border: 1px solid var(--primary-blue);
+  border: 1px solid ${(props) => props.theme.primary};
 `;
 
 export default function HeaderSubscribeBanner({ sessionData }) {
   const { data: session, status, update } = useSession({ data: sessionData });
   const isNotSubscribed = session?.user?.tier === "Free";
+  const theme = useTheme();
 
   const [isCtaVisible, setIsCtaVisible] = useState(true);
 
@@ -97,7 +98,7 @@ export default function HeaderSubscribeBanner({ sessionData }) {
                 src="/images/close.svg"
                 width={16}
                 height={16}
-                color="white"
+                color={theme.text}
               />
             </CloseButton>
           </RightContainer>

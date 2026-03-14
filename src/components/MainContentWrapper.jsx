@@ -6,7 +6,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  background-color: var(--light-white);
+  background-color: ${(props) => props.theme.background};
 `;
 
 export default function MainContentWrapper({ children }) {

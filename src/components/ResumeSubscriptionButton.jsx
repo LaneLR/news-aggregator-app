@@ -3,14 +3,15 @@
 import { useState } from "react";
 import Button from "./Button";
 import { useSession } from "next-auth/react";
+import { useTheme } from "styled-components";
 
 export default function ResumeSubscriptionButton({
   updateSession,
   subscriptionEndDate,
   sessionData,
 }) {
+  const theme = useTheme();
   const [error, setError] = useState(null);
-
   const { data: session, status, update } = useSession({ data: sessionData });
 
   const handleResume = async () => {
@@ -38,7 +39,7 @@ export default function ResumeSubscriptionButton({
     <div
       style={{
         textAlign: "center",
-        color: "var(--dark-blue)",
+        color: theme.darkBlue,
         padding: "10px 50px",
       }}
     >
@@ -59,12 +60,12 @@ export default function ResumeSubscriptionButton({
       </div>
       <Button
         onClick={handleResume}
-        bgColor="var(--deep-blue)"
-        clr={"var(--white)"}
+        bgColor={theme.primary}
+        clr={theme.text}
       >
         Resume Subscription
       </Button>
-      {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+      {error && <p style={{ color: theme.warning, marginTop: "10px" }}>{error}</p>}
     </div>
   );
 }

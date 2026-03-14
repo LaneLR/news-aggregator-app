@@ -11,12 +11,12 @@ const Wrapper = styled.div`
   align-items: center;
   flex-direction: column;
   border-radius: 12px;
-  background-color: var(--primary-blue);
-  color: var(--white);
+  background-color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.buttonText};
   background-image: linear-gradient(
     to bottom,
-    var(--secondary-blue),
-    var(--primary-blue)
+    ${(props) => props.theme.secondaryBlue},
+    ${(props) => props.theme.primary}
   );
 `;
 
@@ -52,7 +52,7 @@ const PlanBody = styled.div`
       content: "✔";
       position: absolute;
       left: -16px;
-      color: var(--white);
+      color: ${(props) => props.theme.success};
       font-weight: bold;
     }
   }
@@ -85,7 +85,13 @@ const PromoCodeText = styled.p`
   width: 100%;
 `;
 
-export default function Banner3({ title, features, cost, children, promoCode }) {
+export default function Banner3({
+  title,
+  features,
+  cost,
+  children,
+  promoCode,
+}) {
   return (
     <>
       <Wrapper>

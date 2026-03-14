@@ -3,8 +3,7 @@ import Button from "@/components/Button";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import styled from "styled-components";
-import { signIn } from "next-auth/react";
+import styled, { useTheme } from "styled-components";
 
 const Wrapper = styled.div`
   flex-grow: 1;
@@ -12,7 +11,7 @@ const Wrapper = styled.div`
   align-items: flex-start;
   justify-content: space-evenly;
   width: 100vw;
-  background-color: var(--light-white);
+  background-color: ${(props) => props.theme.background};
   box-sizing: border-box;
   padding: 80px 0 40px 0;
 `;
@@ -37,7 +36,7 @@ const RegisterFormInput = styled.input`
   width: 300px;
   padding: 10px;
   margin: 10px 0;
-  border: 1px solid #ccc;
+  border: 1px solid ${(props) => props.theme.border};
   border-radius: 4px;
 
   &:last-of-type {
@@ -48,7 +47,7 @@ const RegisterFormInput = styled.input`
 const Header = styled.div`
   font-size: 2rem;
   font-weight: 600;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.darkBlue};
   padding: 10px 0;
   text-align: center;
   width: 100%;
@@ -63,27 +62,27 @@ const CheckboxWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px; /* Space between checkbox and text */
+  gap: 10px; 
   margin: 0 0 25px 0;
   max-width: 320px;
   text-align: left;
   font-size: 0.85rem;
-  color: var(--slate);
+  color: ${(props) => props.theme.slate};
 
-  /* Style for the links within the checkbox label */
   a {
-    color: var(--primary-blue);
+    color: ${(props) => props.theme.primary};
     text-decoration: underline;
   }
 `;
 
 const StyledInput = styled.input`
-  accent-color: var(--primary-blue);
-`
+  accent-color: ${(props) => props.theme.primary};
+`;
 
 export default function RegisterPage() {
   const [error, setError] = useState(null);
   const router = useRouter();
+  const theme = useTheme();
 
   async function handleCreateUser(e) {
     e.preventDefault();
@@ -162,8 +161,8 @@ export default function RegisterPage() {
           </label>
         </CheckboxWrapper>
         <Button
-          bgColor={"var(--primary-blue)"}
-          clr={"var(--white)"}
+          bgColor={theme.primary}
+          clr={theme.buttonText}
           type="submit"
         >
           Create Account
@@ -172,15 +171,17 @@ export default function RegisterPage() {
         {error && (
           <>
             <br />
-            <p style={{ color: "red" }}>{error}</p>
+            <p style={{ color: theme.warning }}>{error}</p>
           </>
         )}
 
-        <h4
+        <div
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            fontWeight: "600",
+            fontSize: "0.83rem",
           }}
         >
           <br />
@@ -188,7 +189,7 @@ export default function RegisterPage() {
             style={{
               display: "flex",
               gap: "5px",
-              color: "var(--dark-blue)",
+              color: theme.text,
               textAlign: "center",
             }}
           >
@@ -197,7 +198,7 @@ export default function RegisterPage() {
               <u>Log in!</u>
             </Link>
           </div>
-        </h4>
+        </div>
       </FormWrapper>
     </Wrapper>
   );

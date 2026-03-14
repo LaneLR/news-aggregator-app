@@ -19,13 +19,14 @@ const StyledButton = styled.button`
   gap: 3px;
 
   background-color: ${(props) =>
-    props.status === "Copied" ? "var(--deep-blue)" : "var(--primary-blue)"};
-  color: ${(props) => (props.status === "Copied" ? "white" : "var(--white)")};
+    props.status === "Copied"
+      ? props.theme.darkBlue
+      : props.theme.primary};
+  color: ${(props) => props.theme.buttonText};
 
-  &:hover {
-    background-color: ${(props) =>
-      props.status === "Copied" ? "var(--deep-blue)" : "var(--deep-blue)"};
-  }
+  // &:hover {
+  //   filter: brightness(0.95);
+  // }
 `;
 
 export default function CopyButton({ textToCopy }) {
@@ -53,16 +54,28 @@ export default function CopyButton({ textToCopy }) {
   return (
     <StyledButton onClick={handleCopy} status={copyStatus.toUpperCase()}>
       {copyStatus === "Copy" ? (
-        <img src="/images/copy-unfilled-white.svg" height={29} width={29} alt="Copy referral code" />
+        <img
+          src="/images/copy-unfilled-white.svg"
+          height={29}
+          width={29}
+          alt="Copy referral code"
+        />
       ) : copyStatus === "Copied" ? (
-        <img src="/images/copy-filled-white.svg" height={29} width={29} alt="Referral code copied"/>
+        <img
+          src="/images/copy-filled-white.svg"
+          height={29}
+          width={29}
+          alt="Referral code copied"
+        />
       ) : (
-        <img src="/images/copy-unfilled.svg" height={29} width={29} alt="Copy referral code"/>
+        <img
+          src="/images/copy-unfilled.svg"
+          height={29}
+          width={29}
+          alt="Copy referral code"
+        />
       )}
-      <div style={{width: '100%'}}>
-        {copyStatus}
-      </div>
-      
+      <div style={{ width: "100%" }}>{copyStatus}</div>
     </StyledButton>
   );
 }

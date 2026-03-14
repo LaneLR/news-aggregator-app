@@ -2,8 +2,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-// --- Styled Components ---
-
 const ShareWrapper = styled.div`
   position: relative;
   display: inline-block;
@@ -17,20 +15,20 @@ const Button = styled.button`
   align-items: center;
   gap: 6px;
   font-size: 1rem;
-  color: #555;
+  color: ${(props) => props.theme.text};
   border-radius: 50%;
   transition: background-color 0.2s ease-in-out;
 
   &:hover {
-    background-color: #f0f0f0;
+    background-color: ${(props) => props.theme.background};
   }
 `;
 
 const FallbackMenu = styled.div`
   position: absolute;
-  bottom: 100%; /* Position above the button */
+  bottom: 100%; 
   right: 0;
-  background-color: white;
+  background-color: ${(props) => props.theme.background};
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
   overflow: hidden;
@@ -41,24 +39,22 @@ const FallbackMenu = styled.div`
 const FallbackOption = styled.a`
   display: block;
   padding: 12px 16px;
-  color: #333;
+  color: ${(props) => props.theme.text};
   text-decoration: none;
   cursor: pointer;
   font-size: 0.95rem;
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: ${(props) => props.theme.background};
   }
 `;
 
-// --- The React Component ---
 
 export default function ShareButton({ article }) {
   const [showFallback, setShowFallback] = useState(false);
   const [copySuccess, setCopySuccess] = useState('');
   const wrapperRef = useRef(null);
   
-  // Close the fallback menu if clicking outside of it
   useEffect(() => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -76,7 +72,6 @@ export default function ShareButton({ article }) {
       url: article.url,
     };
 
-    // Check if the Web Share API is supported
     if (navigator.share) {
       try {
         await navigator.share(shareData);
@@ -84,16 +79,15 @@ export default function ShareButton({ article }) {
         console.error("Error sharing:", err);
       }
     } else {
-      // If not supported, show our custom fallback menu
       setShowFallback(!showFallback);
-      setCopySuccess(''); // Reset copy success message
+      setCopySuccess(''); 
     }
   };
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(article.url).then(() => {
       setCopySuccess('Copied!');
-      setTimeout(() => setShowFallback(false), 800); // Close menu after a delay
+      setTimeout(() => setShowFallback(false), 800); 
     }, (err) => {
       console.error('Failed to copy text: ', err);
       setCopySuccess('Failed');
@@ -107,7 +101,6 @@ export default function ShareButton({ article }) {
   return (
     <ShareWrapper ref={wrapperRef}>
       <Button onClick={handleShare} title="Share article">
-        {/* You can use an SVG icon here for a cleaner look */}
         <img src="/images/share2.svg" style={{width: "30px", height: "30px"}} alt='Share this article'/>
       </Button>
 

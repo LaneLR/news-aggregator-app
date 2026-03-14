@@ -6,6 +6,7 @@ export default function CreateArchiveClient() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const theme = useTheme();
 
   const handleCreate = async () => {
     if (!name.trim()) return;
@@ -35,7 +36,7 @@ export default function CreateArchiveClient() {
         style={{ padding: "4px 8px", marginRight: "6px" }}
       />
       <button onClick={handleCreate}>Create</button>
-      {error && <p style={{ color: "red", marginTop: "4px" }}>{error}</p>}
+      {error && <p style={{ color: theme.warning, marginTop: "4px" }}>{error}</p>}
     </div>
   );
 }

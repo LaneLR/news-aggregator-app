@@ -4,7 +4,6 @@ import styled from "styled-components";
 import NewsCard from "./NewsCard";
 import NewsGridWrapper from "../NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
-import { usePathname } from "next/navigation";
 
 const FeedWrapper = styled.div`
   display: flex;

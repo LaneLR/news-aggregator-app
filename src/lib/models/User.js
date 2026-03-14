@@ -16,6 +16,12 @@ export default function defineUser(sequelize) {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
+      name: {
+        type: DataTypes.STRING,
+      },
+      image: {
+        type: DataTypes.TEXT,
+      },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -71,7 +77,7 @@ export default function defineUser(sequelize) {
       referralCode: {
         type: DataTypes.STRING(8),
         unique: true,
-        allowNull: false,
+        allowNull: true,
       },
       usedReferralCode: {
         type: DataTypes.STRING,
@@ -87,6 +93,11 @@ export default function defineUser(sequelize) {
         defaultValue: false,
         allowNull: false,
       },
+      selectedTheme: {
+        type: DataTypes.STRING,
+        defaultValue: "default",
+        allowNull: false,
+      },
     },
     {
       sequelize,
@@ -94,7 +105,6 @@ export default function defineUser(sequelize) {
       timestamps: true,
       hooks: {
         beforeCreate: async (user) => {
-          // Generate a unique referral code before the user is created
           user.referralCode = nanoid(8).toUpperCase();
           if (user.password) {
             const salt = await bcrypt.genSalt(10);
@@ -107,7 +117,7 @@ export default function defineUser(sequelize) {
             user.password = await bcrypt.hash(user.password, salt);
           }
         },
-        afterCreate: async (user, options) => {
+        afterCreate: async (user) => {
           const { Archive } = user.sequelize.models;
           await Archive.findOrCreate({
             where: {

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { loadStripe } from "@stripe/stripe-js";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import Button from "./Button";
 import Loading from "@/app/loading";
 
@@ -20,12 +20,12 @@ const Header = styled.div`
 const Headline = styled.h1`
   font-size: 3rem;
   font-weight: 700;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.text};
 `;
 
 const Subheadline = styled.p`
   font-size: 1.2rem;
-  color: #555;
+  color: ${(props) => props.theme.textSecondary};
   max-width: 600px;
   margin: 0.5rem auto 0;
 `;
@@ -38,19 +38,19 @@ const PricingGrid = styled.div`
 `;
 
 const PricingCard = styled.div`
-  background: var(--white);
+  background: ${(props) => props.theme.background};
   border-radius: 12px;
   padding: 2rem;
   text-align: center;
-  border: 2px solid #e0e0e0;
+  border: 2px solid ${(props) => props.theme.border};
   display: flex;
   flex-direction: column;
   height: 100%;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.darkBlue};
   ${(props) =>
     props.$highlighted &&
     `
-    border-color: var(--primary-blue);
+    border-color: ${(props) => props.theme.primary};
     transform: scale(1);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     padding-top: 12px;
@@ -66,12 +66,12 @@ const Price = styled.p`
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0.5rem 0;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.darkBlue};
 
   span {
     font-size: 1rem;
     font-weight: 400;
-    color: #666;
+    color: ${(props) => props.theme.textSecondary};
   }
 `;
 
@@ -106,7 +106,7 @@ const ReferralInputContainer = styled.div`
 const ReferralMessage = styled.p`
   margin-top: 0.5rem;
   font-weight: 500;
-  color: ${(props) => (props.type === "success" ? "#28a745" : "#dc3545")};
+  color: ${(props) => (props.type === "success" ? `${(props) => props.theme.success}` : `${(props) => props.theme.darkBlue}`)};
 `;
 
 const stripePromise = loadStripe(
@@ -124,6 +124,8 @@ export default function PricingPage({ sessionData }) {
     type: "",
     text: "",
   });
+  const theme = useTheme();
+
   const userTier = session?.user?.tier;
 
   if (status === "loading") {
@@ -213,7 +215,7 @@ export default function PricingPage({ sessionData }) {
               Subscribe
             </Button>
           </div> */}
-          <Button onClick={handleManage} disabled={isLoading}>
+          <Button onClick={handleManage} disabled={isLoading} bgColor={theme.primary} clr={theme.buttonText}>
             Manage Subscription
           </Button>{" "}
         </>
@@ -225,8 +227,8 @@ export default function PricingPage({ sessionData }) {
         <Button
           onClick={() => handleSubscribe(priceId)}
           disabled={isLoading}
-          bgColor="var(--primary-blue)"
-          clr="white"
+          bgColor={theme.primary}
+          clr={theme.text}
         >
           Upgrade to Pro
         </Button>
@@ -234,7 +236,7 @@ export default function PricingPage({ sessionData }) {
     }
     // Already subscribed, wants to switch plans (handled by portal)
     return (
-      <Button onClick={handleManage} disabled={isLoading}>
+      <Button onClick={handleManage} disabled={isLoading} bgColor={theme.primary} clr={theme.buttonText}>
         Switch Plan
       </Button>
     );
@@ -287,7 +289,7 @@ export default function PricingPage({ sessionData }) {
           <FeatureList>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>
@@ -297,33 +299,33 @@ export default function PricingPage({ sessionData }) {
             </li>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>
               <p>Unlimited number of Archives to save your favorite articles</p>
             </li>
             <li>
-              <span style={{ color: "#e20000ff", fontSize: "1.5rem" }}>✖</span>
+              <span style={{ color: theme.warning, fontSize: "1.5rem" }}>✖</span>
               <p>Access to journals, daily market data, and podcasts</p>
             </li>
             <li>
-              <span style={{ color: "#e20000ff", fontSize: "1.5rem" }}>✖</span>
+              <span style={{ color: theme.warning, fontSize: "1.5rem" }}>✖</span>
               <p> Create and customize your own news feeds</p>
             </li>
             <li>
-              <span style={{ color: "#e20000ff", fontSize: "1.5rem" }}>✖</span>
+              <span style={{ color: theme.warning, fontSize: "1.5rem" }}>✖</span>
               <p>Priority support</p>
             </li>
             <li>
-              <span style={{ color: "#e20000ff", fontSize: "1.5rem" }}>✖</span>
+              <span style={{ color: theme.warning, fontSize: "1.5rem" }}>✖</span>
               <p>Exclusive content and features</p>
             </li>
           </FeatureList>
           {userTier === "Free" ? (
             <Button disabled>Your Current Plan</Button>
           ) : (
-            <Button disabled>Free Plan</Button> // Or a 'downgrade' button handled in Stripe portal
+            <Button disabled bgColor={theme.primary} clr={theme.buttonText}>Free Plan</Button> 
           )}
         </PricingCard>
 
@@ -336,7 +338,7 @@ export default function PricingPage({ sessionData }) {
           <FeatureList>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>
@@ -346,7 +348,7 @@ export default function PricingPage({ sessionData }) {
             </li>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>
@@ -354,7 +356,7 @@ export default function PricingPage({ sessionData }) {
             </li>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>
@@ -362,7 +364,7 @@ export default function PricingPage({ sessionData }) {
             </li>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>
@@ -370,7 +372,7 @@ export default function PricingPage({ sessionData }) {
             </li>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>
@@ -378,7 +380,7 @@ export default function PricingPage({ sessionData }) {
             </li>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>
@@ -392,7 +394,7 @@ export default function PricingPage({ sessionData }) {
         <PricingCard $highlighted>
           <span
             style={{
-              color: "var(--primary-blue)",
+              color: theme.primary,
               fontWeight: "800",
               fontSize: "2rem",
             }}
@@ -406,7 +408,7 @@ export default function PricingPage({ sessionData }) {
           <FeatureList>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>
@@ -416,7 +418,7 @@ export default function PricingPage({ sessionData }) {
             </li>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>
@@ -424,7 +426,7 @@ export default function PricingPage({ sessionData }) {
             </li>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>
@@ -432,7 +434,7 @@ export default function PricingPage({ sessionData }) {
             </li>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>
@@ -440,7 +442,7 @@ export default function PricingPage({ sessionData }) {
             </li>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>
@@ -448,7 +450,7 @@ export default function PricingPage({ sessionData }) {
             </li>
             <li>
               <span
-                style={{ color: "var(--primary-blue)", fontSize: "1.5rem" }}
+                style={{ color: theme.primary, fontSize: "1.5rem" }}
               >
                 ✔
               </span>

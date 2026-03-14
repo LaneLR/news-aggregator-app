@@ -10,7 +10,7 @@ const CardLink = styled(Link)`
   aspect-ratio: 16 / 9;
   border-radius: 16px;
   overflow: hidden;
-  color: white;
+  color: ${(props) => props.theme.text}; 
   text-decoration: none;
   margin: 0 0 30px 0;
 `;
@@ -43,6 +43,7 @@ const Title = styled.h2`
   font-size: 2.5rem;
   font-weight: 700;
   line-height: 1.2;
+  color: ${(props) => props.theme.text}; 
 
   @media (max-width: 768px) {
     font-size: 2rem;
@@ -57,10 +58,12 @@ const Source = styled.p`
   font-weight: 500;
   margin: 0.5rem 0 0;
   opacity: 0.9;
+  color: ${(props) => props.theme.text}; 
   @media (max-width: 440px) {
     font-size: 0.9rem;
   }
 `;
+
 
 export default function HeroArticleCard({ article }) {
   const proxiedImageUrl = article.urlToImage

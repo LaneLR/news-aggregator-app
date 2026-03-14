@@ -3,7 +3,7 @@ import { signOut } from "next-auth/react";
 import styled from "styled-components";
 
 const LogoutButton = styled.button`
-  background-color: rgb(179, 40, 31);
+  background-color: ${(props) => props.theme.primary};
   color: white;
   border: none;
   border-radius: 5px;
@@ -11,7 +11,7 @@ const LogoutButton = styled.button`
   cursor: pointer;
   font-size: 1rem;
   &:hover {
-    background-color: rgb(139, 15, 15);
+    background-color: ${(props) => props.theme.primary};
   }
 `;
 

@@ -4,7 +4,6 @@ import styled from "styled-components";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
-
 import ShareButton from "./ShareButton";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 
@@ -12,10 +11,10 @@ const CardWrapper = styled.div`
   display: inline-block;
   width: 320px;
   flex-shrink: 0;
-  background: var(--white);
+  background: ${(props) => props.theme.background};
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  border: 1px solid #eee;
+  border: 1px solid ${(props) => props.theme.border};
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -47,7 +46,7 @@ const ContentArea = styled.div`
 const Source = styled.p`
   font-size: 0.85rem;
   font-weight: 600;
-  color: #555;
+  color: ${(props) => props.theme.textSecondary};
   margin: 0 0 0.5rem 0;
   display: flex;
   align-items: center;
@@ -65,7 +64,7 @@ const LockIcon = styled.img`
 
 const TitleLink = styled(Link)`
   text-decoration: none;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.darkBlue};
   &:hover {
     text-decoration: underline;
   }
@@ -81,6 +80,7 @@ const Title = styled.h3`
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  // color: ${(props) => props.theme.primary};
 
   @media (max-width: 440px) {
     font-size: 1.05rem;
@@ -92,7 +92,7 @@ const ActionsRow = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-top: 1rem;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid ${(props) => props.theme.border};
   padding-top: 0.75rem;
 `;
 
@@ -105,7 +105,8 @@ const LikeButton = styled.button`
   gap: 6px;
   font-size: 1.1rem;
   font-weight: 500;
-  color: ${(props) => (props.$isLiked ? "var(--primary-blue)" : "#555")};
+  color: ${(props) =>
+    props.$isLiked ? props.theme.primary : props.theme.textSecondary};
 `;
 
 const LikeIcon = styled.img`
@@ -114,8 +115,8 @@ const LikeIcon = styled.img`
 `;
 
 const ReadMoreButton = styled.a`
-  background-color: var(--primary-blue);
-  color: #fff;
+  background-color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.text};
   padding: 8px;
   border-radius: 6px;
   font-size: 0.85rem;
@@ -128,7 +129,7 @@ const ReadMoreButton = styled.a`
   width: 120px;
   transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
   &:hover {
-    background-color: var(--deep-blue);
+    filter: brightness(0.85);
     transform: translateY(-1px);
   }
   &:active {

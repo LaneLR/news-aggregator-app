@@ -15,7 +15,7 @@ const LikedPageWrapper = styled.div`
 const Header = styled.h1`
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.darkBlue};
   text-align: center;
   margin-bottom: 2rem;
 `;
@@ -23,7 +23,7 @@ const Header = styled.h1`
 const EmptyState = styled.div`
   text-align: center;
   padding: 4rem;
-  background-color: #f9f9f9;
+  background-color: ${(props) => props.theme.background};
   border-radius: 12px;
 `;
 

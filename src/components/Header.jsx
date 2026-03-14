@@ -1,5 +1,5 @@
 "use client";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "./Button";
@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import SearchBar from "./SearchBar";
 import HeaderNavBar from "./HeaderNavBar";
-import SubscribeButton from "./SubscribeButton";
 import HeaderSubscribeBanner from "./SubscribeHeaderBanner";
 
 const Wrapper = styled.div`
@@ -17,9 +16,8 @@ const Wrapper = styled.div`
   justify-content: space-between;
   height: 80px;
   width: 100%;
-  // background-image: url("images/BronzeHeaderBackground.png");
-  background-color: var(--dark-blue);
-  color: white;
+  background-color: ${(props) => props.theme.SecondaryDark};
+  color: ${(props) => props.theme.text};
 `;
 
 const LeftContainer = styled.div`
@@ -31,7 +29,7 @@ const LeftContainer = styled.div`
   // width: 327px;
   height: 100%;
   padding: 0 0 0 20px;
-  background-color: inherit;
+  background-color: transparent;
 
   @media (max-width: 1000px) {
     width: auto;
@@ -48,7 +46,7 @@ const CenterContainer = styled.div`
   width: 50%;
   height: 100%;
   padding: 0 50px;
-  background-color: inherit;
+  background-color: transparent;
 
   @media (max-width: 860px) {
     justify-content: center;
@@ -72,7 +70,7 @@ const RightContainer = styled.div`
   // width: 327px;
   height: 100%;
   padding: 0 20px 0 0;
-  background-color: inherit;
+  background-color: transparent;
   user-select: none;
 
   @media (max-width: 1000px) {
@@ -88,7 +86,7 @@ const UserAccountIcon = styled.div`
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
-  color: var(--light-white);
+  color: ${(props) => props.theme.text};
 `;
 
 const HeaderLogoBox = styled.div`
@@ -105,11 +103,12 @@ const MenuIcon = styled.div`
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
+  color: ${(props) => props.theme.text};
   span {
     display: block;
     width: 100%;
     height: 2px;
-    background-color: var(--white);
+    background-color: ${(props) => props.theme.dropdownMenu};
   }
 `;
 
@@ -124,8 +123,8 @@ const DropdownMenu = styled.ul`
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  background-color: var(--white);
-  border: 1px solid var(--light-gray);
+  background-color: ${(props) => props.theme.background};
+  border: 1px solid ${(props) => props.theme.text};
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   width: auto;
@@ -140,15 +139,15 @@ const DropdownMenu = styled.ul`
 
 const DropdownMenuItem = styled.li`
   padding: 12px 18px;
-  color: var(--dark-blue);
+  color: ${(props) => props.theme.text};
   font-size: 0.95rem;
   cursor: pointer;
   transition: background-color 0.15s ease-in-out;
   white-space: nowrap;
 
   &:hover {
-    background-color: var(--light-gray);
-    color: var(--dark-blue);
+    background-color: ${(props) => props.theme.layoutBackground};
+    color: ${(props) => props.theme.text};
   }
 
   a {
@@ -172,24 +171,23 @@ const LogoText = styled.p`
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background-color: var(--dark-blue);
+  background-color: transparent;
 
   span:first-child {
-    // color: var(--secondary-blue);
-    color: #eba613ff;
+    color: ${(props) => props.theme.titleContrast};
     font-weight: 700;
-    background-color: var(--dark-blue);
+    background-color: transparent;
   }
 
   span:last-child {
-    color: #fff;
+    color: ${(props) => props.theme.buttonText};
     font-weight: 400;
-    background-color: var(--dark-blue);
+    background-color: transparent;
   }
 
   @media (max-width: 860px) {
     width: auto;
-    background-color: var(--dark-blue);
+    background-color: transparent;
 
     span {
       display: none;
@@ -197,11 +195,13 @@ const LogoText = styled.p`
   }
 `;
 
-export default function Header({ priceId, sessionData }) {
+export default function Header({ priceId, sessionData, }) {
   const { data: session, status, update } = useSession({ data: sessionData });
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const theme = useTheme();
 
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -259,8 +259,8 @@ export default function Header({ priceId, sessionData }) {
                   </div>
                 </LogoContainer>
                 <LogoText>
-                  <span>MORNING</span>
-                  <span>FEEDS</span>
+                  <span>morning</span>
+                  <span>feeds</span>
                 </LogoText>
               </Link>
             </LeftContainer>
@@ -419,7 +419,10 @@ export default function Header({ priceId, sessionData }) {
         <>
           <Wrapper>
             <LeftContainer>
-              <Link style={{ display: "inherit" }} href={"/"}>
+              <Link
+                style={{ display: "inherit", backgroundColor: "transparent" }}
+                href={"/"}
+              >
                 <LogoContainer
                   style={{
                     display: "flex",
@@ -454,7 +457,7 @@ export default function Header({ priceId, sessionData }) {
             <RightContainer>
               <nav style={{ display: "flex", columnGap: "10px" }}>
                 <Link style={{ display: "flex" }} href={"/login"}>
-                  <Button bgColor={"var(--primary-blue)"} clr={"var(--white)"}>
+                  <Button bgColor={theme.titleContrast} clr={theme.buttonText}>
                     Log in
                   </Button>
                 </Link>

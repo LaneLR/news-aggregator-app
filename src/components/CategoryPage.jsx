@@ -2,14 +2,14 @@
 import { useEffect, useState } from "react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import Button from "./Button";
 import Loading from "@/app/loading";
 
 const SearchBarHeader = styled.div`
   font-size: 3rem;
   font-weight: 600;
-  color: var(--deep-blue);
+  color: ${(props) => props.theme.darkBlue};
   padding: 20px 0 0 0;
   text-align: center;
   width: 100%;
@@ -29,7 +29,7 @@ async function fetchCategoryArticles(category) {
     "http://localhost:3000";
 
   const res = await fetch(`${baseUrl}/api/articles/${category}`, {
-    next: { revalidate: 3600 }, 
+    next: { revalidate: 3600 },
   });
 
   if (!res.ok) throw new Error("Failed to fetch news for category");
@@ -45,6 +45,7 @@ export default function CategoryPage({ category, archiveId }) {
   const [newAvailable, setNewAvailable] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const theme = useTheme();
 
   const categoryNameForDisplay =
     category.charAt(0).toUpperCase() + category.slice(1);
@@ -144,8 +145,8 @@ export default function CategoryPage({ category, archiveId }) {
           >
             <div style={{ fontSize: "1.6rem" }}>🔄</div>
             <Button
-              bgColor={"var(--primary-blue)"}
-              clr={"var(--white)"}
+              bgColor={theme.primary}
+              clr={theme.text}
               onClick={refreshArticles}
             >
               New articles available
