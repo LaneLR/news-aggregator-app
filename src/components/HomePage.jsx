@@ -570,6 +570,14 @@ const FeaturesSectionBlack = styled.div`
   text-align: center;
 `;
 
+const FeaturesSectionWhite = styled.div`
+  padding: 60px 5%;
+  background-color: ${(props) => props.theme.TextWhite};
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+`;
+
 const FeatureBlock = styled.div`
   width: 30%;
   padding: 20px;
@@ -649,11 +657,10 @@ export default function LandingPage({}) {
         </FeatureBlock>
       </FeaturesSection>
 
-      <FeaturesSectionBlack></FeaturesSectionBlack>
+      <FeaturesSectionWhite></FeaturesSectionWhite>
 
-      <FeaturesSection>
+      {/* <FeaturesSection>
         <FeatureBlock>
-          {/* Placeholder Icon */}
           <h3>Curated Feeds</h3>
           <p>
             Tired of noise? We only bring you the most essential articles and
@@ -661,21 +668,21 @@ export default function LandingPage({}) {
           </p>
         </FeatureBlock>
         <FeatureBlock>
-          {/* Placeholder Icon */}
+          Placeholder Icon
           <h3>Deep Dive Journals</h3>
           <p>
             Access exclusive market analysis and in-depth academic publications.
           </p>
         </FeatureBlock>
         <FeatureBlock>
-          {/* Placeholder Icon */}
+          Placeholder Icon
           <h3>Market Intelligence</h3>
           <p>
             Your trusted lens to spot trends and movements before they become
             headlines.
           </p>
         </FeatureBlock>
-      </FeaturesSection>
+      </FeaturesSection> */}
 
       {/* 4. REMAINING SECTIONS (Testimonials, Articles, Sign-up Block) */}
       {/* ... (These would be similar styled components for structure and layout) ... */}
