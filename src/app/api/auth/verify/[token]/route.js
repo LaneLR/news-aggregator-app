@@ -8,7 +8,7 @@ export async function GET(req, { params }) {
     const { User } = await initializeDbAndModels();
 
     // 2. Access the 'token' from the 'params' object.
-    const { token } = params;
+    const { token } = await params;
 
     // 3. Verify the token.
     const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
