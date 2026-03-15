@@ -2,6 +2,10 @@
 
 This is a full-featured news aggregation web app built with Next.js and React. It collects open-source articles from multiple sources and RSS feeds, indexes and serves them in a responsive UI, and provides user accounts, saved-article archives, Stripe subscriptions and payments, and background processing for feed updates and maintenance.
 
+## Deployed link
+https://news-aggregator-app-ecru.vercel.app/
+
+
 ## 🗝️ Key features
 
 - Feed retrieval and ingestion
