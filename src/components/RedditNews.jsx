@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import NewsCard from "@/components/NewsCard";
 import NewsGridWrapper from "./NewsGridWrapper";
 import SearchBar from "./SearchBar";
 import RedditCard from "./RedditCard";
@@ -69,7 +68,6 @@ export default function RedditNews({
       </div>
 
       <NewsGridWrapper>
-        {console.log("Articles to render:", articles)}
         {articles.map((article, i) => (
           <RedditCard
             key={article.url || i} // fallback to `i` if needed
