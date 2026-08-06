@@ -1,62 +1,58 @@
 import initializeDbAndModels from "@/lib/db";
 import { NextResponse } from "next/server";
 import { Op } from "sequelize";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { SUBSCRIBER_ONLY_CATEGORIES } from "@/lib/subscriberOnlyCategories";
 
 export async function GET(req, { params }) {
-  // Initialize all the models you need to search through.
-  const { NewsArticle, MarketArticle, JournalArticle, Podcast } =
-    await initializeDbAndModels();
-
   const { category } = await params;
+
+  // Market/Finance/Journal are subscriber-only. This mirrors the page-level
+  // redirect in src/app/category/{market,finance,journal}/page.js, but has
+  // to be enforced here too — otherwise the paywall is just a UI redirect
+  // that anyone can bypass by calling this endpoint directly.
+  if (SUBSCRIBER_ONLY_CATEGORIES.has(category.toLowerCase())) {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.tier === "Free") {
+      return NextResponse.json(
+        { error: "This content is for subscribers only." },
+        { status: 403 }
+      );
+    }
+  }
+
+  const { Article } = await initializeDbAndModels();
+
   const { searchParams } = new URL(req.url);
-  const page = parseInt(searchParams.get("page") || "1");
+  const page = Math.max(1, parseInt(searchParams.get("page"), 10) || 1);
   const limit = 20;
   const offset = (page - 1) * limit;
+
+  const sortParam = searchParams.get("sort");
+  const sortColumn =
+    sortParam === "liked"
+      ? "likeCount"
+      : sortParam === "trending"
+      ? "clickCount"
+      : "publishedAt";
 
   // Prepare the category name for the query.
   const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
 
   try {
-    // An array to hold promises for fetching data from each model.
-    const promises = [
-      NewsArticle.findAll({ where: { category: { [Op.contains]: [categoryName] } } }),
-      MarketArticle.findAll({ where: { category: { [Op.contains]: [categoryName] } } }),
-      JournalArticle.findAll({ where: { category: { [Op.contains]: [categoryName] } } }),
-      Podcast.findAll({ where: { category: { [Op.contains]: [categoryName] } } }),
-    ];
+    const { rows, count } = await Article.findAndCountAll({
+      where: { category: { [Op.contains]: [categoryName] } },
+      order: [[sortColumn, "DESC"]],
+      limit,
+      offset,
+    });
 
-    // Execute all find operations in parallel.
-    const results = await Promise.all(promises);
-
-    // Combine all the results into a single flat array.
-    // We add a 'type' property to each item to distinguish its source model, which can be useful on the frontend.
-    const allContent = [
-      ...results[0].map(item => ({ ...item.toJSON(), type: 'News' })),
-      // ...results[1].map(item => ({ ...item.toJSON(), type: 'Market' })),
-      // ...results[2].map(item => ({ ...item.toJSON(), type: 'Journal' })),
-      // ...results[3].map(item => ({ ...item.toJSON(), type: 'Podcast' })),
-    ];
-
-
-    // Shuffle the combined array randomly using the Fisher-Yates algorithm.
-    // This replaces the previous date-based sorting.
-    for (let i = allContent.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [allContent[i], allContent[j]] = [allContent[j], allContent[i]];
-    }
-
-    // Get the total count of all items before pagination.
-    const total = allContent.length;
-
-    // Apply pagination to the now-shuffled array.
-    const paginatedContent = allContent.slice(offset, offset + limit);
-
-    // Return the paginated content and pagination metadata.
     return NextResponse.json({
-      articles: paginatedContent,
-      total: total,
+      articles: rows.map((item) => item.toJSON()),
+      total: count,
       page,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(count / limit),
     });
   } catch (err) {
     console.error(

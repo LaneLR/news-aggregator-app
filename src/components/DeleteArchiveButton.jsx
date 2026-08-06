@@ -6,7 +6,9 @@ export default function DeleteArchiveButton({ archiveId }) {
   const router = useRouter();
   const theme = useTheme();
 
-  const handleDelete = async () => {
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!confirm("Are you sure you want to delete this archive?")) return;
 
     const res = await fetch(`/api/archives/${archiveId}`, {
@@ -23,7 +25,15 @@ export default function DeleteArchiveButton({ archiveId }) {
   return (
     <button
       onClick={handleDelete}
-      style={{ marginLeft: "10px", color: theme.primary, fontSize: "0.8rem" }}
+      style={{
+        color: theme.buttonText,
+        backgroundColor: "rgba(0, 0, 0, 0.55)",
+        border: "none",
+        borderRadius: "6px",
+        padding: "4px 10px",
+        fontSize: "0.8rem",
+        cursor: "pointer",
+      }}
     >
       Delete
     </button>

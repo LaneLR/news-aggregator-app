@@ -3,6 +3,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
+import { trackArticleClick } from "@/lib/trackClick";
 
 const ItemLink = styled(Link)`
   display: flex;
@@ -51,7 +52,12 @@ export default function RecentlyLikedItem({ article }) {
 
   return (
     <li>
-      <ItemLink href={article.url} target="_blank" rel="noopener noreferrer">
+      <ItemLink
+        href={article.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => trackArticleClick(article.url)}
+      >
         <Thumbnail
           src={imageSrc}
           width={70}

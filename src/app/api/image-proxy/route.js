@@ -1,4 +1,56 @@
 import { NextResponse } from "next/server";
+import dns from "node:dns/promises";
+import net from "node:net";
+
+// Blocks SSRF: refuses to proxy requests to loopback/private/link-local
+// addresses, whether given directly as the hostname or reached via DNS.
+function isBlockedIp(ip) {
+  const type = net.isIP(ip);
+  if (type === 4) {
+    const [a, b] = ip.split(".").map(Number);
+    if (a === 127) return true; // loopback
+    if (a === 10) return true; // private
+    if (a === 172 && b >= 16 && b <= 31) return true; // private
+    if (a === 192 && b === 168) return true; // private
+    if (a === 169 && b === 254) return true; // link-local / cloud metadata
+    if (a === 0) return true;
+    return false;
+  }
+  if (type === 6) {
+    const lower = ip.toLowerCase();
+    if (lower === "::1") return true; // loopback
+    if (lower.startsWith("fe80:")) return true; // link-local
+    if (lower.startsWith("fc") || lower.startsWith("fd")) return true; // unique local
+    return false;
+  }
+  return true; // couldn't determine — fail closed
+}
+
+async function assertSafeUrl(urlString) {
+  let parsed;
+  try {
+    parsed = new URL(urlString);
+  } catch {
+    throw new Error("Invalid URL");
+  }
+
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("Unsupported protocol");
+  }
+
+  const hostname = parsed.hostname;
+  if (hostname === "localhost") throw new Error("Blocked host");
+
+  if (net.isIP(hostname)) {
+    if (isBlockedIp(hostname)) throw new Error("Blocked host");
+    return;
+  }
+
+  const records = await dns.lookup(hostname, { all: true, verbatim: true });
+  if (records.length === 0 || records.some((r) => isBlockedIp(r.address))) {
+    throw new Error("Blocked host");
+  }
+}
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
@@ -7,6 +59,12 @@ export async function GET(req) {
 
   if (!imageUrl) {
     return NextResponse.json({ error: "No URL provided" }, { status: 400 });
+  }
+
+  try {
+    await assertSafeUrl(imageUrl);
+  } catch (err) {
+    return NextResponse.json({ error: "Invalid image URL" }, { status: 400 });
   }
 
   const controller = new AbortController();
@@ -24,6 +82,7 @@ export async function GET(req) {
     const response = await fetch(imageUrl, {
       headers: fetchHeaders,
       signal: controller.signal, // Connect the AbortController signal
+      redirect: "error", // Don't follow redirects — prevents redirect-based SSRF bypass
     });
 
     clearTimeout(timeoutId); // Clear the timeout if the fetch succeeds
@@ -33,7 +92,11 @@ export async function GET(req) {
       return NextResponse.json({ error: "Image fetch failed" }, { status: response.status });
     }
 
-    const contentType = response.headers.get("content-type") || "image/jpeg";
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.startsWith("image/")) {
+      return NextResponse.json({ error: "URL did not return an image" }, { status: 415 });
+    }
+
     const buffer = Buffer.from(await response.arrayBuffer());
 
     return new Response(buffer, {

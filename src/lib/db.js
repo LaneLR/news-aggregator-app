@@ -1,13 +1,11 @@
 import getSequelizeInstance from "./sequelize.js";
-import defineJournalArticle from "./models/JournalArticle.js";
-import defineNewsArticle from "./models/NewsArticle.js";
-import defineMarketArticle from "./models/MarketArticle.js";
-import definePodcast from "./models/Podcast.js";
+import defineArticle from "./models/Article.js";
 import defineFeed from "./models/Feed.js";
 import defineArticleLike from "./models/ArticleLike.js";
 import defineUser from "./models/User.js";
 import defineArchive from "./models/Archive.js";
 import defineSavedArticle from "./models/SavedArticle.js";
+import defineProcessedStripeEvent from "./models/ProcessedStripeEvent.js";
 
 if (!global.db) {
   global.db = {};
@@ -22,30 +20,22 @@ async function initializeDbAndModels() {
       const sequelize = await getSequelizeInstance();
       console.log("Sequelize instance obtained, initializing User model...");
 
-      const NewsArticle = defineNewsArticle(sequelize);
-      const JournalArticle = defineJournalArticle(sequelize);
-      const MarketArticle = defineMarketArticle(sequelize);
-      const Podcast = definePodcast(sequelize);
+      const Article = defineArticle(sequelize);
       const Feed = defineFeed(sequelize);
       const ArticleLike = defineArticleLike(sequelize);
       const User = defineUser(sequelize);
       const Archive = defineArchive(sequelize);
       const SavedArticle = defineSavedArticle(sequelize);
+      const ProcessedStripeEvent = defineProcessedStripeEvent(sequelize);
 
-    
       global.db.sequelize = sequelize;
       global.db.User = User;
       global.db.Archive = Archive;
       global.db.SavedArticle = SavedArticle;
-      global.db.NewsArticle = NewsArticle;
-      global.db.JournalArticle = JournalArticle;
-      global.db.MarketArticle = MarketArticle;
-      global.db.Podcast = Podcast;
+      global.db.Article = Article;
       global.db.Feed = Feed;
       global.db.ArticleLike = ArticleLike;
-      global.db.User = User;
-      global.db.SavedArticle = SavedArticle;
-      global.db.Archive = Archive;
+      global.db.ProcessedStripeEvent = ProcessedStripeEvent;
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -65,20 +55,18 @@ async function initializeDbAndModels() {
       User.hasMany(ArticleLike, { foreignKey: "userId" });
       ArticleLike.belongsTo(User, { foreignKey: "userId" });
 
-      // await sequelize.query(`ALTER TABLE "SavedArticles" DROP CONSTRAINT IF EXISTS "SavedArticles_url_key";`);
+      // There's no formal migration tooling in this project yet, so `alter`
+      // is what actually applies model changes to the database. This is a
+      // known risk once there's real production data (ALTER can lock large
+      // tables or, if Sequelize misreads a diff, drop/recreate a column) —
+      // set DISABLE_DB_SYNC=true to turn it off once migrations replace it.
+      if (process.env.DISABLE_DB_SYNC !== "true") {
+        await sequelize.sync({ alter: true });
+      }
 
-      // Uncomment the line below to alter tables without wiping data
-      await sequelize.sync({ alter: true });
-
-      //DO NOT REMOVE COMMENTS FROM BELOW LINE
-      //Wipes all data from the database and re-creates tables
-
-      //to reset data, follow these steps:
-      //1. delete tables in this order on PgAdmin4: SavedArticles, then Archives, then users
-      //2. uncomment the sync line, then create a new account to repopulate the tables
-
-      // await sequelize.sync({ force: true });
-      // console.log("All models were synchronized and created successfully.");
+      // To fully reset data: drop tables in this order in PgAdmin (or via
+      // psql) — SavedArticles, then Archives, then Users — and let the sync
+      // above recreate them on the next request.
     } catch (error) {
       console.error("----------------------------------------------------");
       console.error(

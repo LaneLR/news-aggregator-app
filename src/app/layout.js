@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Roboto } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import Providers from "@/Provider";
 import Header from "@/components/Header";
@@ -7,13 +7,7 @@ import AppWrapper from "@/components/AppWrapper";
 import MainContentWrapper from "@/components/MainContentWrapper";
 import AuthProvider from "@/components/SessionProvider";
 import Footer from "@/components/Footer";
-import HeaderNavBar from "@/components/HeaderNavBar";
 import ThemeProvider from "@/components/ThemeProvider";
-import { useTheme } from "styled-components";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 const roboto = Roboto({
   weight: ["400", "700"],
@@ -21,11 +15,6 @@ const roboto = Roboto({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-roboto",
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
 });
 
 export const metadata = {
@@ -41,8 +30,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        style={{ backgroundColor: "var(--dark-blue)", color: "black" }}
-        // className={`${geistSans.variable} ${geistMono.variable}`}
+        style={{ backgroundColor: "var(--dark-blue)", color: "var(--light-white)" }}
         className={`${roboto.variable}`}
       >
         <Providers>

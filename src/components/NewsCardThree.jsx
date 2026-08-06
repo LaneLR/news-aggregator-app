@@ -5,7 +5,9 @@ import Link from "next/link.js";
 import Image from "next/image.js";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation.js";
+import { useRouter } from "next/navigation.js";
+import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
+import { trackArticleClick } from "@/lib/trackClick";
 
 const CardContainer = styled.div`
   background-color: ${(props) => props.theme.cardBackground};
@@ -141,16 +143,7 @@ export default function NewsCardThree({
 }) {
   const { data: session, status, update } = useSession({ data: sessionData });
   const theme = useTheme();
-
-  const PAYWALLED_SOURCES = new Set([
-    "The Washington Post",
-    "Financial Times",
-    "The Wall Street Journal",
-    "The New York Times",
-    "Bloomberg",
-    "The Economist",
-    "Reuters",
-  ]);
+  const router = useRouter();
 
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
   const [likeCount, setLikeCount] = useState(article.likeCount || 0);
@@ -171,7 +164,8 @@ export default function NewsCardThree({
   const handleLike = async () => {
     if (!session) {
       alert("You must be signed in to like articles.");
-      redirect("/login");
+      router.push("/login");
+      return;
     }
 
     const originalLikedState = isLiked;
@@ -212,6 +206,7 @@ export default function NewsCardThree({
       <Link
         href={article.url}
         target={"_blank"}
+        onClick={() => trackArticleClick(article.url)}
         style={{ position: "relative", width: "100%", height: "200px" }}
       >
         <Image
@@ -225,14 +220,17 @@ export default function NewsCardThree({
             objectFit: "cover",
             objectPosition: "top",
             borderBottom: `1px solid ${theme.border}`,
-            minWidth: "398px",
           }}
         />
       </Link>
       <ContentArea>
         <div>
           <ArticleTitle>
-            <Link href={article.url} target={"_blank"}>
+            <Link
+              href={article.url}
+              target={"_blank"}
+              onClick={() => trackArticleClick(article.url)}
+            >
               {cleanTitle}
             </Link>
           </ArticleTitle>
@@ -255,7 +253,11 @@ export default function NewsCardThree({
               alignItems: "center",
             }}
           >
-            <ReadMoreButton href={article.url} target="_blank">
+            <ReadMoreButton
+              href={article.url}
+              target="_blank"
+              onClick={() => trackArticleClick(article.url)}
+            >
               Read article
             </ReadMoreButton>
           </div>

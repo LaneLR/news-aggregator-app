@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/delete-users",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/send-digests",
+      "schedule": "0 13 * * *"
+    }
+  ]
+}

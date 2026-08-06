@@ -17,9 +17,11 @@ export async function POST(req) {
       return Response.json({ error: "Already verified" }, { status: 400 });
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.NEXTAUTH_SECRET, {
-      expiresIn: "24h",
-    });
+    const token = jwt.sign(
+      { id: user.id, purpose: "verify-email" },
+      process.env.NEXTAUTH_SECRET,
+      { expiresIn: "24h" }
+    );
     const verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/verify/${token}`;
 
     await sendEmail({

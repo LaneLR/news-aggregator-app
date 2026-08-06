@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Loading from "@/app/loading";
 import HeroArticleCard from "@/components/HeroArticleCard";
 import CarouselArticleCard from "@/components/CarouselArticleCard";
+import TrendingSection from "@/components/TrendingSection";
 
 
 const NewsPageWrapper = styled.div`
@@ -96,6 +97,8 @@ export default function NewsPage() {
           <HeroArticleCard article={topStory} />
         </Section>
       )}
+
+      <TrendingSection />
 
       {otherCategories.map(([category, articles]) => (
         <Section key={category}>

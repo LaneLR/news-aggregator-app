@@ -20,6 +20,12 @@ export async function GET(req, context) {
 
   try {
     const db = await initializeDbAndModels();
+
+    const archive = await db.Archive.findOne({
+      where: { id: archiveId, userId: session.user.id },
+    });
+    if (!archive) return NextResponse.json({ saved: false }, { status: 404 });
+
     const existing = await db.SavedArticle.findOne({
       where: {
         archiveId,

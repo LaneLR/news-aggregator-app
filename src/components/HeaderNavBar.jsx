@@ -87,10 +87,12 @@ export default function HeaderNavBar({ sessionData }) {
           <StyledLink href={"/category/us"}>US</StyledLink>
           {/* <Underline /> */}
         </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/finance"}>Finance</StyledLink>
-          {/* <Underline /> */}
-        </div>
+        {isNotSubscribed ? null : (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <StyledLink href={"/category/finance"}>Finance</StyledLink>
+            {/* <Underline /> */}
+          </div>
+        )}
         <div style={{ display: "flex", flexDirection: "column" }}>
           <StyledLink href={"/category/weather"}>Weather</StyledLink>
           {/* <Underline /> */}

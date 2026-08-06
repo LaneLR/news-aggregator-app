@@ -57,7 +57,8 @@ const InputWrapper = styled.div`
 `;
 
 const LoginFormInput = styled.input`
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
   padding: 10px;
   margin: 10px 0;
   border: 1px solid ${(props) => props.theme.border};
@@ -202,7 +203,7 @@ export default function LoginPage({ sessionData }) {
           {error && (
             <>
               <br />
-              <p style={{ color: theme.error }}>{error}</p>
+              <p style={{ color: theme.warning }}>{error}</p>
             </>
           )}
 

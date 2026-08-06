@@ -13,6 +13,10 @@ export async function GET(req, { params }) {
     // 3. Verify the token.
     const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
 
+    if (decoded.purpose !== "verify-email") {
+      return NextResponse.json({ error: "Invalid token" }, { status: 400 });
+    }
+
     // 4. Find the user by primary key (ID).
     const user = await User.findByPk(decoded.id);
 

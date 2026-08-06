@@ -19,53 +19,54 @@ export async function POST(req) {
       );
     }
 
-    const { ArticleLike, NewsArticle, JournalArticle, MarketArticle } =
-      await initializeDbAndModels();
+    const { sequelize, ArticleLike, Article } = await initializeDbAndModels();
     const userId = session.user.id;
 
-    const existingLike = await ArticleLike.findOne({
-      where: { userId, articleUrl },
-    });
-
-    // A helper function to update the like count on all article tables
-    const updateLikeCount = async (increment) => {
+    const updateLikeCount = async (increment, transaction) => {
       const operator = increment
         ? Sequelize.literal('"likeCount" + 1')
         : Sequelize.literal('"likeCount" - 1');
-      await NewsArticle.update(
+      await Article.update(
         { likeCount: operator },
-        { where: { url: articleUrl } }
-      );
-      await JournalArticle.update(
-        { likeCount: operator },
-        { where: { url: articleUrl } }
-      );
-      await MarketArticle.update(
-        { likeCount: operator },
-        { where: { url: articleUrl } }
+        { where: { url: articleUrl }, transaction }
       );
     };
 
-    if (existingLike) {
-      // User is "unliking" the article
-      await existingLike.destroy();
-      await updateLikeCount(false); // Decrement
-      return NextResponse.json({
-        success: true,
-        liked: false,
-        message: "Article unliked.",
+    const liked = await sequelize.transaction(async (transaction) => {
+      // Locking the row (or its absence) for the duration of the transaction
+      // prevents a rapid double-click from racing past this check twice.
+      const existingLike = await ArticleLike.findOne({
+        where: { userId, articleUrl },
+        transaction,
+        lock: transaction.LOCK.UPDATE,
       });
-    } else {
-      // User is "liking" the article
-      await ArticleLike.create({ userId, articleUrl });
-      await updateLikeCount(true); // Increment
+
+      if (existingLike) {
+        await existingLike.destroy({ transaction });
+        await updateLikeCount(false, transaction); // Decrement
+        return false;
+      }
+
+      await ArticleLike.create({ userId, articleUrl }, { transaction });
+      await updateLikeCount(true, transaction); // Increment
+      return true;
+    });
+
+    return NextResponse.json({
+      success: true,
+      liked,
+      message: liked ? "Article liked." : "Article unliked.",
+    });
+  } catch (err) {
+    if (err.name === "SequelizeUniqueConstraintError") {
+      // Lost a race to another concurrent request for the same like — the
+      // article is already in the desired "liked" state, so treat as a no-op.
       return NextResponse.json({
         success: true,
         liked: true,
         message: "Article liked.",
       });
     }
-  } catch (err) {
     console.error("Error liking article:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }

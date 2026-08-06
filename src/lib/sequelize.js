@@ -8,17 +8,8 @@ let sequelizeInstance;
 async function getSequelizeInstance() {
   if (!sequelizeInstance) {
     try {
-      if (!pg || Object.keys(pg).length === 0) {
-        console.error("DEBUG: pg import seems empty or failed.");
-      } else {
-        console.log("DEBUG: pg imported successfully. Keys:", Object.keys(pg));
-      }
-
       if (!process.env.DATABASE_URL) {
-        console.error(
-          "DATABASE_URL is not set in environment variables. Current env:",
-          process.env
-        );
+        console.error("DATABASE_URL is not set in environment variables.");
         throw new Error("Database URL is missing.");
       }
       console.log(

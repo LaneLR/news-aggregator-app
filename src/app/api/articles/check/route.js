@@ -16,6 +16,14 @@ export async function GET(req) {
   const db = await initializeDbAndModels();
   const saved = await db.SavedArticle.findOne({
     where: { url },
+    include: [
+      {
+        model: db.Archive,
+        where: { userId: session.user.id },
+        required: true,
+        attributes: [],
+      },
+    ],
   });
 
   if (saved) {

@@ -2,6 +2,7 @@
 import styled from "styled-components";
 import Link from "next/link";
 import Image from "next/image";
+import { trackArticleClick } from "@/lib/trackClick";
 
 const CardLink = styled(Link)`
   display: block;
@@ -71,7 +72,12 @@ export default function HeroArticleCard({ article }) {
     : "/images/blurimage.png";
 
   return (
-    <CardLink href={article.url} target="_blank" rel="noopener noreferrer">
+    <CardLink
+      href={article.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => trackArticleClick(article.url)}
+    >
       <Image
         src={proxiedImageUrl}
         alt={article.title}

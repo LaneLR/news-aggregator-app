@@ -33,7 +33,7 @@ export default function defineUser(sequelize) {
       },
       password: { type: DataTypes.STRING, allowNull: true },
       tier: {
-        type: DataTypes.ENUM("Free", "Pro", "Pro Annual"),
+        type: DataTypes.ENUM("Free", "Subscribed"),
         defaultValue: "Free",
       },
       stripeCustomerId: {
@@ -98,6 +98,25 @@ export default function defineUser(sequelize) {
         defaultValue: "default",
         allowNull: false,
       },
+      tokenVersion: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+      },
+      digestEnabled: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      digestFrequency: {
+        type: DataTypes.ENUM("daily", "weekly"),
+        defaultValue: "weekly",
+        allowNull: false,
+      },
+      lastDigestSentAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       sequelize,
@@ -117,13 +136,18 @@ export default function defineUser(sequelize) {
             user.password = await bcrypt.hash(user.password, salt);
           }
         },
-        afterCreate: async (user) => {
+        afterCreate: async (user, options) => {
+          // Must reuse the same transaction as the User insert — on a
+          // pooled connection (e.g. Neon's pgbouncer endpoint), a query on
+          // a different connection can't see this row until it commits,
+          // causing a foreign-key failure on the Archive insert below.
           const { Archive } = user.sequelize.models;
           await Archive.findOrCreate({
             where: {
               name: "Saved for later",
               userId: user.id,
             },
+            transaction: options.transaction,
           });
         },
       },

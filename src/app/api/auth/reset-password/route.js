@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import User from "@/lib/models/User";
 import initializeDbAndModels from "@/lib/db";
 
 export async function POST(req) {
@@ -10,11 +9,25 @@ export async function POST(req) {
 
     const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
 
+    if (decoded.purpose !== "reset-password") {
+      return Response.json({ error: "Invalid or expired token." }, { status: 400 });
+    }
+
     const user = await User.findByPk(decoded.id);
     if (!user) {
       return Response.json({ error: "User not found." }, { status: 404 });
     }
+
+    if (decoded.v !== user.tokenVersion) {
+      return Response.json(
+        { error: "This reset link has already been used or is no longer valid." },
+        { status: 400 }
+      );
+    }
+
     user.password = newPassword;
+    // Invalidate this (and any other outstanding) reset link immediately.
+    user.tokenVersion += 1;
 
     await user.save();
 

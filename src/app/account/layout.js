@@ -1,34 +1,38 @@
 "use client";
 import { Suspense } from "react";
+import styled from "styled-components";
 import Loading from "../loading";
-import { useTheme } from "styled-components";
+import SideBarNav from "@/components/SideNavBar";
+
+const LayoutRow = styled.div`
+  display: flex;
+  gap: 15px;
+  height: 100%;
+  padding: 15px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: ${(props) => props.theme.layoutBackground};
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const Main = styled.main`
+  flex-grow: 1;
+  min-width: 0;
+  width: 100%;
+  background-color: ${(props) => props.theme.layoutBackground};
+  color: ${(props) => props.theme.text};
+`;
 
 export default function AccountLayout({ children }) {
-  const theme = useTheme();
   return (
-    <>
-      <Suspense fallback={<Loading />}>
-        <div
-          style={{
-            display: "flex",
-            height: "100%",
-            padding: "15px",
-            width: "100%",
-            backgroundColor: theme.layoutBackground,
-          }}
-        >
-          <main
-            style={{
-              flexGrow: "1",
-              width: "100%",
-              backgroundColor: theme.layoutBackground,
-              color: theme.text,
-            }}
-          >
-            {children}
-          </main>
-        </div>
-      </Suspense>
-    </>
+    <Suspense fallback={<Loading />}>
+      <LayoutRow>
+        <SideBarNav />
+        <Main>{children}</Main>
+      </LayoutRow>
+    </Suspense>
   );
 }

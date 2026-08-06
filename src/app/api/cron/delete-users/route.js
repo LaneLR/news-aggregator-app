@@ -1,7 +1,10 @@
 // src/app/api/cron/delete-users/route.js
 import { deleteExpiredUsers } from "@/utils/deleteExpiredUsers.mjs";
 
-export async function POST(req) {
+// Vercel Cron triggers via GET (and automatically sends CRON_SECRET as the
+// Authorization header when that env var is set on the project); POST is
+// kept too in case this is triggered manually or from a different scheduler.
+async function handler(req) {
   const authHeader = req.headers.get("authorization");
 
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -22,3 +25,5 @@ export async function POST(req) {
     });
   }
 }
+
+export { handler as GET, handler as POST };
