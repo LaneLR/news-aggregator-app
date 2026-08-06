@@ -1,83 +1,35 @@
 "use client";
 import Link from "next/link";
-import styled from "styled-components";
-
-const FooterWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  color: ${(props) => props.theme.buttonText};
-`;
-
-const LinkWrapper = styled.div`
-  display: flex;
-  align-items: end;
-  justify-content: center;
-  height: 70px;
-  width: 100%;
-  background: ${(props) => props.theme.PrimaryDark};
-  color: ${(props) => props.theme.buttonText};
-  font-size: 0.9rem;
-`;
-
-const TextContainer = styled.div`
-  width: auto;
-  gap: 15px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-`;
-
-const Disclaimer = styled.p`
-  font-size: 0.8rem;
-  padding: 0 30px 20px;
-  display: flex;
-  justify-content: center;
-  align-item: center;
-  text-align: left;
-  background-color: ${(props) => props.theme.PrimaryDark};
-`;
-
-const Underline = styled.div`
-  margin-top: 2px;
-  border-top: 1px solid ${(props) => props.theme.buttonText};
-  width: 100%;
-`;
-
-const LinkContainer = styled.div`
-  width: auto;
-`;
-
-const Paragraph = styled.p``;
+import styles from "./Footer.module.scss";
 
 export default function Footer() {
   return (
-    <FooterWrapper>
-      <LinkWrapper>
-        <TextContainer>
-          <Paragraph>© 2025</Paragraph>
-          <Paragraph>|</Paragraph>
-          <LinkContainer>
+    <div className={styles.footerWrapper}>
+      <div className={styles.linkWrapper}>
+        <div className={styles.textContainer}>
+          <p>© 2025</p>
+          <p>|</p>
+          <div className={styles.linkContainer}>
             <Link href={"/privacy"}>Privacy</Link>
-            <Underline />
-          </LinkContainer>
-          <Paragraph> | </Paragraph>
-          <LinkContainer>
+            <div className={styles.underline} />
+          </div>
+          <p> | </p>
+          <div className={styles.linkContainer}>
             <Link href={"/about"}>About us</Link>
-            <Underline />
-          </LinkContainer>
-          <Paragraph> | </Paragraph>
-          <LinkContainer>
+            <div className={styles.underline} />
+          </div>
+          <p> | </p>
+          <div className={styles.linkContainer}>
             <Link href={"/contact-us"}>Contact us</Link>
-            <Underline />
-          </LinkContainer>
-        </TextContainer>
-      </LinkWrapper>
-      <Disclaimer>
+            <div className={styles.underline} />
+          </div>
+        </div>
+      </div>
+      <p className={styles.disclaimer}>
         This site displays publicly available RSS content for informational
         purposes. All articles link to their original publishers and remain the
         intellectual property of their respective owners.
-      </Disclaimer>
-    </FooterWrapper>
+      </p>
+    </div>
   );
 }

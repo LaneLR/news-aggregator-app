@@ -3,29 +3,10 @@ import Loading from "@/app/loading";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect } from "react";
-import styled from "styled-components";
+import styles from "./VerifyEmail.module.scss";
 
-const TextWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px 20px;
-  flex-direction: column;
-  gap: 20px;
-  height: 100%;
-  width: 100vw;
-`;
-
-const Text = styled.p`
-  color: ${(props) => props.theme.darkBlue};
-  font-weight: 600;
-  font-size: 1.1rem;
-  text-align: left;
-  width: 100%;
-`;
-
-export default function VerifyEmailComponent({ sessionData }) {
-  const { data: session, status } = useSession({ data: sessionData });
+export default function VerifyEmailComponent() {
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     if (session && session.user.emailIsVerified) {
@@ -39,7 +20,7 @@ export default function VerifyEmailComponent({ sessionData }) {
 
   return (
     <>
-      <TextWrapper>
+      <div className={styles.textWrapper}>
         <Image
           style={{ margin: "20px 0 40px 0" }}
           src={"/images/send-email.png"}
@@ -47,11 +28,11 @@ export default function VerifyEmailComponent({ sessionData }) {
           height={112}
           alt={"Image of an email being sent"}
         />
-        <Text>A verification email has been sent to your email.</Text>
-        <Text>
+        <p className={styles.text}>A verification email has been sent to your email.</p>
+        <p className={styles.text}>
           Check your spam folder if you don&apos;t see the email in your inbox.
-        </Text>
-      </TextWrapper>
+        </p>
+      </div>
     </>
   );
 }

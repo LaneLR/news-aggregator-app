@@ -1,25 +1,9 @@
 "use client";
-import styled from "styled-components";
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  width: 100%;
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 20px 40px;
-  gap: 12px;
-
-  @media (max-width: 440px) {
-    padding: 10px 30px;
-  }
-`;
+import styles from "./ContactUs.module.scss";
 
 export default function ContactUsComponent({ contactEmail }) {
   return (
-    <Wrapper>
+    <div className={styles.wrapper}>
       <h1>Contact Us</h1>
       <p>
         Have a question, found a bug, or want to report an issue with an
@@ -35,6 +19,6 @@ export default function ContactUsComponent({ contactEmail }) {
         displayed from a third-party source, please include the article URL
         and the publication you represent so we can look into it promptly.
       </p>
-    </Wrapper>
+    </div>
   );
 }

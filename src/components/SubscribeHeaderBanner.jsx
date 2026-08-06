@@ -1,62 +1,11 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import styled, { useTheme } from "styled-components";
+import styles from "./SubscribeHeaderBanner.module.scss";
 
-const Wrapper = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 9px 13px;
-  color: ${(props) => props.theme.primary};
-  font-weight: 600;
-  font-size: 1.1rem;
-  background-color: ${(props) => props.theme.background};
-`;
-
-const LeftContainer = styled.div``;
-
-const CenterContainer = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  gap: 6px;
-
-  @media (max-width: 618px) {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    width: 100%;
-  }
-
-  @media (max-width: 440px) {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    width: 100%;
-    font-size: 0.95rem;
-  }
-`;
-
-const RightContainer = styled.div``;
-
-const CloseButton = styled.button`
-  border: none;
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-`;
-
-const Underline = styled.div`
-  border: 1px solid ${(props) => props.theme.primary};
-`;
-
-export default function HeaderSubscribeBanner({ sessionData }) {
-  const { data: session, status, update } = useSession({ data: sessionData });
+export default function HeaderSubscribeBanner() {
+  const { data: session } = useSession();
   const isNotSubscribed = session?.user?.tier === "Free";
-  const theme = useTheme();
 
   const [isCtaVisible, setIsCtaVisible] = useState(true);
 
@@ -75,9 +24,9 @@ export default function HeaderSubscribeBanner({ sessionData }) {
   return (
     <>
       {isNotSubscribed && isCtaVisible && (
-        <Wrapper>
-          <LeftContainer />
-          <CenterContainer>
+        <div className={styles.wrapper}>
+          <div className={styles.leftContainer} />
+          <div className={styles.centerContainer}>
             Want to create and customize your own feeds?
             <Link
               href="/pricing"
@@ -88,21 +37,21 @@ export default function HeaderSubscribeBanner({ sessionData }) {
               }}
             >
               <p>Become a member!</p>
-              <Underline />
+              <div className={styles.underline} />
             </Link>
-          </CenterContainer>
-          <RightContainer>
-            <CloseButton onClick={handleDismissCta}>
+          </div>
+          <div className={styles.rightContainer}>
+            <button className={styles.closeButton} onClick={handleDismissCta}>
               <img
                 alt="Close button"
                 src="/images/close.svg"
                 width={16}
                 height={16}
-                color={theme.text}
+                color={"var(--theme-text)"}
               />
-            </CloseButton>
-          </RightContainer>
-        </Wrapper>
+            </button>
+          </div>
+        </div>
       )}
     </>
   );

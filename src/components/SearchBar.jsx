@@ -1,29 +1,7 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import styled from "styled-components";
-
-const SearchBarWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const SearchInput = styled.input`
-  font-size: 1.2rem;
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid ${(props) => props.theme.border};
-  color: ${(props) => props.theme.darkBlue};
-  background-color: ${(props) => props.theme.searchBackground};
-
-  &:focus {
-    outline: none;
-    border-color: ${(props) => props.theme.border};
-  }
-`;
+import styles from "./SearchBar.module.scss";
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
@@ -46,20 +24,20 @@ export default function SearchBar() {
 
       router.push(newUrl);
       setQuery("");
-      router.refresh();
     }
   };
   return (
     <>
-      <SearchBarWrapper>
-        <SearchInput
+      <div className={styles.wrapper}>
+        <input
+          className={styles.input}
           type="text"
           placeholder={isNarrow ? "Search..." : "Search by title, topic, or author..."}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-      </SearchBarWrapper>
+      </div>
     </>
   );
 }

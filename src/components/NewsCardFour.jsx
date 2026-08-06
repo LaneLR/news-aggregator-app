@@ -1,5 +1,4 @@
 "use client";
-import styled, { useTheme } from "styled-components";
 import ArchiveToggleButton from "./ArchiveToggleButton.jsx";
 import Link from "next/link.js";
 import Image from "next/image.js";
@@ -9,147 +8,14 @@ import { useRouter } from "next/navigation.js";
 import ShareButton from "./ShareButton.jsx";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
-
-const CardContainer = styled.div`
-  background-color: ${(props) => props.theme.primary};
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  width: 100%;
-  max-width: 400px;
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid ${(props) => props.theme.border};
-  font-family: "Inter", sans-serif;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-  }
-`;
-
-const CardHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  border-bottom: 1px solid ${(props) => props.theme.border};
-`;
-
-const BrandText = styled.span`
-  font-size: 1rem;
-  font-weight: bold;
-  color: ${(props) => props.theme.darkBlue};
-`;
-
-const ContentArea = styled.div`
-  padding: 0px 20px 0px 20px;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  max-height: 150px;
-  justify-content: space-between;
-`;
-
-const ArticleTitle = styled.h3`
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: ${(props) => props.theme.darkBlue};
-  line-height: 1.3;
-  margin-bottom: 8px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const ArticleSnippet = styled.div`
-  font-size: 0.95rem;
-  color: ${(props) => props.theme.darkBlue};
-  line-height: 1.5;
-  font-weight: 500;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 8px 0 3px 0;
-  color: ${(props) => props.theme.text};
-`;
-
-const ArticleSnippetText = styled.p`
-  // background-color: ${(props) => props.theme.background};
-  width: fit-content;
-  border-radius: 6px;
-`;
-
-const ReadMoreButton = styled.a`
-  background-color: ${(props) => props.theme.primary};
-  color: #fff;
-  padding: 8px 15px;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  align-self: flex-start;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-  &:hover {
-    background-color: var(--deep-blue);
-    transform: translateY(-1px);
-  }
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-const LikeButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-  gap: 6px;
-  font-size: 1rem;
-  color: ${(props) => (props.$isLiked ? props.theme.primary : props.theme.border)};
-`;
-
-const LikeOrUnlikedButton = styled.img`
-  height: 30px;
-  width: 30px;
-  // &:hover {
-  //   transform: translateY(-1px);
-  // }
-
-  // &:active {
-  //   transform: translateY(0);
-  // }
-`;
-
-const LikeCountCounter = styled.div`
-  font-weight: 500;
-  font-size: 1.3rem;
-  color: ${(props) => props.theme.darkBlue};
-`;
-
-const LockedArticleSVG = styled.img`
-  height: 30px;
-  width: 30px;
-`;
+import styles from "./NewsCardFour.module.scss";
 
 export default function NewsCardFour({
   article,
   archiveId,
   viewOnly = false,
-  sessionData,
 }) {
-  const { data: session, status, update } = useSession({ data: sessionData });
-  const theme = useTheme();
+  const { data: session } = useSession();
   const router = useRouter();
 
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
@@ -206,11 +72,11 @@ export default function NewsCardFour({
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
 
   return (
-    <CardContainer>
+    <div className={styles.cardContainer}>
       <Link
         href={article.url}
         target={"_blank"}
-        onClick={() => trackArticleClick(article.url)}
+        onClick={() => trackArticleClick(article)}
         style={{ position: "relative", width: "100%", height: "250px" }}
       >
         <Image
@@ -223,28 +89,28 @@ export default function NewsCardFour({
           style={{
             objectFit: "cover",
             objectPosition: "top",
-            borderBottom: `1px solid ${theme.border}`,
+            borderBottom: `1px solid var(--theme-border)`,
             minWidth: "100%",
             borderTopLeftRadius: "10px",
             borderTopRightRadius: "10px",
           }}
         />
       </Link>
-      <ContentArea>
+      <div className={styles.contentArea}>
         <div>
           {" "}
-          <ArticleSnippet>
-            <ArticleSnippetText>{cleanSourceName}</ArticleSnippetText>
-          </ArticleSnippet>
-          <ArticleTitle>
+          <div className={styles.articleSnippet}>
+            <p className={styles.articleSnippetText}>{cleanSourceName}</p>
+          </div>
+          <h3 className={styles.articleTitle}>
             <Link
               href={article.url}
               target={"_blank"}
-              onClick={() => trackArticleClick(article.url)}
+              onClick={() => trackArticleClick(article)}
             >
               {cleanTitle}
             </Link>
-          </ArticleTitle>
+          </h3>
         </div>
         <div
           style={{
@@ -261,13 +127,14 @@ export default function NewsCardFour({
               alignItems: "center",
             }}
           >
-            <ReadMoreButton
+            <a
+              className={styles.readMoreButton}
               href={article.url}
               target="_blank"
-              onClick={() => trackArticleClick(article.url)}
+              onClick={() => trackArticleClick(article)}
             >
               Read article
-            </ReadMoreButton>
+            </a>
           </div>
 
           <div
@@ -280,7 +147,8 @@ export default function NewsCardFour({
           >
             {isPaywalled && (
               <span title="This article may be behind a paywall">
-                <LockedArticleSVG
+                <img
+                  className={styles.lockedArticleSvg}
                   src="/images/lock.svg"
                   alt="Image may be behind a paywall"
                 />
@@ -292,23 +160,28 @@ export default function NewsCardFour({
               archiveId={archiveId}
               viewOnly={viewOnly}
             />
-            <LikeButton onClick={handleLike} $isLiked={isLiked}>
+            <button
+              className={`${styles.likeButton} ${isLiked ? styles.liked : ""}`}
+              onClick={handleLike}
+            >
               {isLiked ? (
-                <LikeOrUnlikedButton
+                <img
+                  className={styles.likeOrUnlikedButton}
                   src="/images/like-button-liked.svg"
                   alt="Article liked button"
                 />
               ) : (
-                <LikeOrUnlikedButton
+                <img
+                  className={styles.likeOrUnlikedButton}
                   src="/images/like-button-unliked.svg"
                   alt="Article not liked button"
                 />
               )}
-              <LikeCountCounter>{likeCount}</LikeCountCounter>
-            </LikeButton>
+              <div className={styles.likeCountCounter}>{likeCount}</div>
+            </button>
           </div>
         </div>
-      </ContentArea>
-    </CardContainer>
+      </div>
+    </div>
   );
 }

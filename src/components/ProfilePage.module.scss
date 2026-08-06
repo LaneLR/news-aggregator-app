@@ -1,0 +1,114 @@
+.profileWrapper {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.card {
+  background-color: var(--theme-card-background);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--theme-border);
+  overflow: hidden;
+}
+
+.profileHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  border-radius: 12px;
+  background-color: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  border: 4px solid var(--theme-border);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  user-select: none;
+}
+
+.userName {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.userEmail {
+  font-size: 1rem;
+  color: var(--theme-text-secondary);
+  margin: 0.25rem 0 0 0;
+}
+
+.tierBadge {
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 16px;
+  color: var(--theme-button-text);
+  background-color: var(--theme-primary);
+
+  &.free {
+    background-color: var(--theme-card);
+  }
+}
+
+.cardHeader {
+  font-size: 1.25rem;
+  padding: 1rem 1.5rem;
+  margin: 0;
+  border-bottom: 1px solid var(--theme-border);
+  color: var(--theme-dark-blue);
+}
+
+.cardContent {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: var(--theme-dark-blue);
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  color: var(--theme-text);
+
+  & span:first-child {
+    color: var(--theme-text);
+  }
+}
+
+.cardFooter {
+  padding: 1rem 1.5rem;
+  background-color: inherit;
+  border: 1px solid var(--theme-border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dangerCardHeader {
+  background-color: var(--theme-card-background);
+  color: var(--theme-warning);
+  border-bottom-color: var(--theme-border);
+}
+
+.recentlyLikedList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

@@ -1,0 +1,28 @@
+.saveButton {
+  //   background-color: var(--theme-primary);
+  color: var(--theme-text);
+  // padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  cursor: pointer;
+  height: 100%;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.savedOrUnsavedButton {
+  height: 30px;
+  width: 30px;
+  // &:hover {
+  //   transform: translateY(-1px);
+  // }
+
+  // &:active {
+  //   transform: translateY(0);
+  // }
+}

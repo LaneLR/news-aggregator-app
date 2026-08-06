@@ -1,53 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
-
-const ShareWrapper = styled.div`
-  position: relative;
-  display: inline-block;
-`;
-
-const Button = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 1rem;
-  color: ${(props) => props.theme.text};
-  border-radius: 50%;
-  transition: background-color 0.2s ease-in-out;
-
-  &:hover {
-    background-color: ${(props) => props.theme.background};
-  }
-`;
-
-const FallbackMenu = styled.div`
-  position: absolute;
-  bottom: 100%; 
-  right: 0;
-  background-color: ${(props) => props.theme.background};
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  z-index: 10;
-  width: 180px;
-`;
-
-const FallbackOption = styled.a`
-  display: block;
-  padding: 12px 16px;
-  color: ${(props) => props.theme.text};
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 0.95rem;
-
-  &:hover {
-    background-color: ${(props) => props.theme.background};
-  }
-`;
+import styles from './ShareButton.module.scss';
 
 
 export default function ShareButton({ article }) {
@@ -99,24 +52,24 @@ export default function ShareButton({ article }) {
   const emailSubject = encodeURIComponent(`Interesting Article: ${article.title}`);
 
   return (
-    <ShareWrapper ref={wrapperRef}>
-      <Button onClick={handleShare} title="Share article">
+    <div className={styles.shareWrapper} ref={wrapperRef}>
+      <button className={styles.button} onClick={handleShare} title="Share article">
         <img src="/images/share2.svg" style={{width: "30px", height: "30px"}} alt='Share this article'/>
-      </Button>
+      </button>
 
       {showFallback && (
-        <FallbackMenu>
-          <FallbackOption as="button" onClick={handleCopyLink}>
+        <div className={styles.fallbackMenu}>
+          <button className={styles.fallbackOption} onClick={handleCopyLink}>
             {copySuccess || '🔗 Copy Link'}
-          </FallbackOption>
-          <FallbackOption href={`mailto:?subject=${emailSubject}&body=${encodedText}`}>
+          </button>
+          <a className={styles.fallbackOption} href={`mailto:?subject=${emailSubject}&body=${encodedText}`}>
             ✉️ Share via Email
-          </FallbackOption>
-          <FallbackOption href={`sms:?&body=${encodedText}`}>
+          </a>
+          <a className={styles.fallbackOption} href={`sms:?&body=${encodedText}`}>
             💬 Share via Text
-          </FallbackOption>
-        </FallbackMenu>
+          </a>
+        </div>
       )}
-    </ShareWrapper>
+    </div>
   );
 }

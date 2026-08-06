@@ -1,10 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useTheme } from "styled-components";
 
 export default function DeleteArchiveButton({ archiveId }) {
   const router = useRouter();
-  const theme = useTheme();
 
   const handleDelete = async (e) => {
     e.preventDefault();
@@ -26,7 +24,7 @@ export default function DeleteArchiveButton({ archiveId }) {
     <button
       onClick={handleDelete}
       style={{
-        color: theme.buttonText,
+        color: "var(--theme-button-text)",
         backgroundColor: "rgba(0, 0, 0, 0.55)",
         border: "none",
         borderRadius: "6px",

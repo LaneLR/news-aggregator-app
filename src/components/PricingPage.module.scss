@@ -1,0 +1,134 @@
+.pricingWrapper {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem 1rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.headline {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--theme-text);
+}
+
+.subheadline {
+  font-size: 1.2rem;
+  color: var(--theme-text-secondary);
+  max-width: 600px;
+  margin: 0.5rem auto 0;
+}
+
+.intervalToggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0 2.5rem;
+}
+
+.toggleOption {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 2px solid var(--theme-border);
+  background: var(--theme-background);
+  color: var(--theme-text);
+  font-weight: 600;
+  cursor: pointer;
+
+  &.active {
+    background: var(--theme-primary);
+    color: var(--theme-button-text);
+  }
+}
+
+.savingsBadge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--theme-success);
+}
+
+.pricingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  align-items: stretch;
+}
+
+.pricingCard {
+  background: var(--theme-background);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  border: 2px solid var(--theme-border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: var(--theme-dark-blue);
+
+  &.highlighted {
+    border-color: var(--theme-primary);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.planName {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.price {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+  color: var(--theme-dark-blue);
+
+  span {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--theme-text-secondary);
+  }
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  text-align: left;
+  flex-grow: 1;
+
+  li {
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+  }
+
+  span {
+    margin-right: 10px;
+  }
+}
+
+.referralWrapper {
+  max-width: 500px;
+  margin: 0 auto 3rem;
+  text-align: center;
+}
+
+.referralInputContainer {
+  display: flex;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.referralMessage {
+  margin-top: 0.5rem;
+  font-weight: 500;
+  color: var(--theme-dark-blue);
+
+  &.success {
+    color: var(--theme-success);
+  }
+}

@@ -1,38 +1,11 @@
 "use client";
 import { useSession } from "next-auth/react";
-import styled, { useTheme } from "styled-components";
 import { themes } from "@/styles/themes";
+import styles from "./ThemeSelector.module.scss";
 
-const SwatchGrid = styled.div`
-  display: flex;
-  gap: 1rem;
-`;
-
-const Swatch = styled.button`
-  width: 100px;
-  height: 60px;
-  border-radius: 8px;
-  border: 3px solid
-    ${(props) => (props.$isActive ? props.theme.primary : "transparent")};
-  cursor: pointer;
-  background-color: ${(props) => props.$bgColor};
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${(props) => props.$textColor};
-  font-weight: bold;
-`;
-
-const SelectThemeText = styled.p`
-  margin-bottom: 14px;
-  color: ${(props) => props.theme.text};
-`
-
-export default function ThemeSelector({ sessionData}) {
-  const { data: session, update } = useSession({ data: sessionData });
+export default function ThemeSelector() {
+  const { data: session, update } = useSession();
   const currentTheme = session?.user?.selectedTheme || "default";
-  const theme = useTheme();
 
   const handleThemeChange = async (themeName) => {
     try {
@@ -49,33 +22,31 @@ export default function ThemeSelector({ sessionData}) {
 
   return (
     <div>
-      <SelectThemeText>Select your preferred theme:</SelectThemeText>
-      <SwatchGrid>
-        <Swatch
-          $bgColor={themes.default.background}
-          $textColor={themes.default.textTertiary}
-          $isActive={currentTheme === "default"}
+      <p className={styles.selectThemeText}>Select your preferred theme:</p>
+      <div className={styles.swatchGrid}>
+        <button
+          type="button"
+          className={`${styles.swatch} ${currentTheme === "default" ? styles.active : ""}`}
+          style={{
+            backgroundColor: themes.default.background,
+            color: themes.default.textTertiary,
+          }}
           onClick={() => handleThemeChange("default")}
         >
           Light
-        </Swatch>
-        <Swatch
-          $bgColor={themes.dark.background}
-          $textColor={themes.dark.text}
-          $isActive={currentTheme === "dark"}
+        </button>
+        <button
+          type="button"
+          className={`${styles.swatch} ${currentTheme === "dark" ? styles.active : ""}`}
+          style={{
+            backgroundColor: themes.dark.background,
+            color: themes.dark.text,
+          }}
           onClick={() => handleThemeChange("dark")}
         >
           Dark
-        </Swatch>
-        {/* <Swatch
-          $bgColor={themes.forest.background}
-          $textColor={themes.forest.text}
-          $isActive={currentTheme === "forest"}
-          onClick={() => handleThemeChange("forest")}
-        >
-          Forest
-        </Swatch> */}
-      </SwatchGrid>
+        </button>
+      </div>
     </div>
   );
 }

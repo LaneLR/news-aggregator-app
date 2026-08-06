@@ -1,0 +1,19 @@
+.sideBarNavWrapper {
+  width: 200px;
+  flex-shrink: 0;
+  height: fit-content;
+  background-color: var(--theme-primary);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+  }
+}

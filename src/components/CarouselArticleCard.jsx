@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import styled from "styled-components";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -9,139 +8,10 @@ import ShareButton from "./ShareButton";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
+import styles from "./CarouselArticleCard.module.scss";
 
-const CardWrapper = styled.div`
-  display: inline-block;
-  width: 320px;
-  flex-shrink: 0;
-  background: ${(props) => props.theme.background};
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  border: 1px solid ${(props) => props.theme.border};
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-  }
-
-  @media (max-width: 440px) {
-    width: 280px;
-  }
-`;
-
-const ImageLink = styled(Link)`
-  display: block;
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-`;
-
-const ContentArea = styled.div`
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-`;
-
-const Source = styled.p`
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: ${(props) => props.theme.textSecondary};
-  margin: 0 0 0.5rem 0;
-  display: flex;
-  align-items: center;
-
-  @media (max-width: 440px) {
-    font-size: 0.8rem;
-  }
-`;
-
-const LockIcon = styled.img`
-  width: 16px;
-  height: 16px;
-  margin-left: 8px;
-`;
-
-const TitleLink = styled(Link)`
-  text-decoration: none;
-  color: ${(props) => props.theme.darkBlue};
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const Title = styled.h3`
-  font-size: 1.15rem;
-  font-weight: 700;
-  line-height: 1.4;
-  margin: 0;
-  flex-grow: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  // color: ${(props) => props.theme.primary};
-
-  @media (max-width: 440px) {
-    font-size: 1.05rem;
-  }
-`;
-
-const ActionsRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 1rem;
-  border-top: 1px solid ${(props) => props.theme.border};
-  padding-top: 0.75rem;
-`;
-
-const LikeButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: ${(props) =>
-    props.$isLiked ? props.theme.primary : props.theme.textSecondary};
-`;
-
-const LikeIcon = styled.img`
-  height: 24px;
-  width: 24px;
-`;
-
-const ReadMoreButton = styled.a`
-  background-color: ${(props) => props.theme.primary};
-  color: ${(props) => props.theme.text};
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  align-self: flex-start;
-  cursor: pointer;
-  width: 120px;
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-  &:hover {
-    filter: brightness(0.85);
-    transform: translateY(-1px);
-  }
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-export default function CarouselCard({ article, archiveId, sessionData }) {
-  const { data: session } = useSession({ data: sessionData });
+export default function CarouselCard({ article, archiveId }) {
+  const { data: session } = useSession();
   const router = useRouter();
 
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
@@ -183,12 +53,13 @@ export default function CarouselCard({ article, archiveId, sessionData }) {
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
 
   return (
-    <CardWrapper>
-      <ImageLink
+    <div className={styles.cardWrapper}>
+      <Link
+        className={styles.imageLink}
         href={article.url}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() => trackArticleClick(article.url)}
+        onClick={() => trackArticleClick(article)}
       >
         <Image
           src={proxiedImageUrl}
@@ -197,28 +68,30 @@ export default function CarouselCard({ article, archiveId, sessionData }) {
           sizes="320px"
           style={{ objectFit: "cover" }}
         />
-      </ImageLink>
-      <ContentArea>
-        <Source>
+      </Link>
+      <div className={styles.contentArea}>
+        <p className={styles.source}>
           {cleanSourceName}
           {isPaywalled && (
-            <LockIcon
+            <img
+              className={styles.lockIcon}
               src="/images/lock.svg"
               title="This source could be behind a paywall."
             />
           )}
-        </Source>
-        <Title>
-          <TitleLink
+        </p>
+        <h3 className={styles.title}>
+          <Link
+            className={styles.titleLink}
             href={article.url}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => trackArticleClick(article.url)}
+            onClick={() => trackArticleClick(article)}
           >
             {article.title}
-          </TitleLink>
-        </Title>
-        <ActionsRow>
+          </Link>
+        </h3>
+        <div className={styles.actionsRow}>
           <div
             style={{
               display: "flex",
@@ -226,13 +99,14 @@ export default function CarouselCard({ article, archiveId, sessionData }) {
               alignItems: "center",
             }}
           >
-            <ReadMoreButton
+            <a
+              className={styles.readMoreButton}
               href={article.url}
               target="_blank"
-              onClick={() => trackArticleClick(article.url)}
+              onClick={() => trackArticleClick(article)}
             >
               Read article
-            </ReadMoreButton>
+            </a>
           </div>
 
           <div
@@ -246,8 +120,12 @@ export default function CarouselCard({ article, archiveId, sessionData }) {
           >
             <ArchiveToggleButton article={article} archiveId={archiveId} />
             <ShareButton article={article} />
-            <LikeButton onClick={handleLike} $isLiked={isLiked}>
-              <LikeIcon
+            <button
+              className={`${styles.likeButton} ${isLiked ? styles.liked : ""}`}
+              onClick={handleLike}
+            >
+              <img
+                className={styles.likeIcon}
                 src={
                   isLiked
                     ? "/images/like-button-liked.svg"
@@ -255,10 +133,10 @@ export default function CarouselCard({ article, archiveId, sessionData }) {
                 }
               />
               {likeCount}
-            </LikeButton>
+            </button>
           </div>
-        </ActionsRow>
-      </ContentArea>
-    </CardWrapper>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,69 +1,9 @@
 "use client";
-import styled from "styled-components";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 import { trackArticleClick } from "@/lib/trackClick";
-
-const Wrapper = styled.div`
-  flex-flow: column nowrap;
-  justify-content: center;
-  align-items: flex-start;
-  color: black;
-  background-color: white;
-  border-bottom-left-radius: 15px;
-  border-bottom-right-radius: 20px;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 15px;
-  max-width: 350px;
-`;
-
-const CardWrapper = styled.div`
-  // width: 100%;
-  aspect-ratio: 16 / 9;
-  position: relative;
-  // overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  height: 100%;
-  width: 100%;
-  row-gap: 14px;
-`;
-
-const DescriptionSection = styled.div`
-  width: 100%;
-  min-height: 70px;
-  display: flex;
-  flex-flow: column nowrap;
-  padding: 5px 7px 7px;
-  align-items: flex-start;
-  justify-content: space-between;
-  background-color: var(--white);
-  border-bottom-left-radius: 15px;
-  border-bottom-right-radius: 20px;
-`;
-
-const TitleSection = styled.div`
-  width: 100%;
-  height: auto;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  font-size: 1rem;
-`;
-
-const AuthorSection = styled.div`
-  width: 100%;
-  height: auto;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  font-weight: 600;
-  font-size: 0.9rem;
-`;
+import styles from "./NewsCard.module.scss";
 
 export default function NewsCard({ article, archiveId, viewOnly = false }) {
   const FALLBACK_IMAGE_URL = "/images/NoImage.png";
@@ -100,13 +40,13 @@ export default function NewsCard({ article, archiveId, viewOnly = false }) {
 
   return (
     <>
-      <Wrapper>
-        <CardWrapper>
+      <div className={styles.wrapper}>
+        <div className={styles.cardWrapper}>
           <a
             href={article.url}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => trackArticleClick(article.url)}
+            onClick={() => trackArticleClick(article)}
           >
             <Image
               style={{
@@ -127,9 +67,9 @@ export default function NewsCard({ article, archiveId, viewOnly = false }) {
               blurDataURL="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
             />
           </a>
-        </CardWrapper>
-        <DescriptionSection>
-          <TitleSection>{cleanTitle}</TitleSection>
+        </div>
+        <div className={styles.descriptionSection}>
+          <div className={styles.titleSection}>{cleanTitle}</div>
           <div
             style={{
               display: "flex",
@@ -137,17 +77,17 @@ export default function NewsCard({ article, archiveId, viewOnly = false }) {
               width: "95%",
             }}
           >
-            <AuthorSection>
+            <div className={styles.authorSection}>
               {article.sourceName || article.source?.name || "Unknown source"}
-            </AuthorSection>
+            </div>
             <ArchiveToggleButton
               article={article}
               archiveId={archiveId}
               viewOnly={viewOnly}
             />
           </div>
-        </DescriptionSection>
-      </Wrapper>
+        </div>
+      </div>
     </>
   );
 }

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import CancelSubscriptionButton from "@/components/CancelSubscriptionButton";
+import ResumeSubscriptionButton from "@/components/ResumeSubscriptionButton";
 
 export default async function SubscriptionPage() {
   const session = await getServerSession(authOptions);
@@ -37,12 +38,13 @@ export default async function SubscriptionPage() {
           <p>
             <b>Subscribed</b>
           </p>
-          <CancelSubscriptionButton
-            subscriptionEndDate={
-              user.subscriptionWillCancel ? user.stripeSubscriptionEndsAt : null
-            }
-            sessionData={session}
-          />
+          {user.subscriptionWillCancel ? (
+            <ResumeSubscriptionButton
+              subscriptionEndDate={user.stripeSubscriptionEndsAt}
+            />
+          ) : (
+            <CancelSubscriptionButton />
+          )}
         </div>
       ) : (
         <div

@@ -1,0 +1,80 @@
+// CSS custom-property mirror of themes.js, keyed by the `data-theme`
+// attribute set server-side in layout.js (from session.user.selectedTheme).
+// This is what every component .module.scss reads via var(--theme-x) —
+// themes.js itself stays around only because ThemeSelector needs the raw
+// JS values to render its swatch previews of *both* themes at once.
+//
+// Keep this in sync with src/styles/themes.js by hand; colors aren't
+// expected to change often. A key intentionally absent from one theme here
+// mirrors it being absent from that theme's object in themes.js.
+
+[data-theme="default"] {
+  --theme-primary: var(--primary-blue);
+  --theme-primary-contrast: #ffffff;
+  --theme-dark-blue: var(--dark-blue);
+  --theme-deep-blue: var(--deep-blue);
+  --theme-secondary-blue: var(--secondary-blue);
+  --theme-title-contrast: #ff7a00;
+  --theme-header-background: var(--dark-blue);
+  --theme-footer-background: var(--dark-blue);
+  --theme-background: #ffffff;
+  --theme-layout-background: var(--light-gray);
+  --theme-card-background: var(--white);
+  --theme-button-background: var(--dark-blue);
+  --theme-text: #181818ff;
+  --theme-button-text: #fff;
+  --theme-text-secondary: #555;
+  --theme-text-tertiary: #181818ff;
+  --theme-border: #ccc;
+  --theme-warning: #c53030;
+  --theme-tier-badge: #354cb1ff;
+  --theme-card: #999999ff;
+  --theme-archive-background: #f9fafb;
+  --theme-slate: var(--slate);
+  --theme-success: #0bd83bff;
+  --theme-dropdown-menu: #fff;
+  --theme-search-background: #f0f0f0;
+  --theme-primary-dark: #1a2333;
+  --theme-accent-orange: #ff7a00;
+  --theme-accent-hover: #e66f00;
+  --theme-text-light: #e0e0e0;
+  --theme-text-white: #ffffff;
+  --theme-section-gray: #f7f7f7;
+  --theme-border-gray: #cccccc;
+}
+
+[data-theme="dark"] {
+  --theme-primary: #1a1a1aff;
+  --theme-primary-contrast: var(--white);
+  --theme-dark-blue: #f5f5f5ff;
+  --theme-deep-blue: #f5f5f5ff;
+  --theme-secondary-blue: var(--secondary-blue);
+  --theme-title-contrast: #ff7a00;
+  --theme-header-background: #1a1a1aff;
+  --theme-footer-background: #1a1a1aff;
+  --theme-secondary-dark: #1a1a1aff;
+  --theme-background: #27292cff;
+  --theme-layout-background: #121212;
+  --theme-card-background: #000000ff;
+  --theme-button-background: #000000ff;
+  --theme-text: #f5f5f5ff;
+  --theme-button-text: var(--white);
+  --theme-text-secondary: #bbbbbb;
+  --theme-text-tertiary: #181818ff;
+  --theme-border: #4a4b4eff;
+  --theme-warning: #c53030;
+  --theme-tier-badge: #354cb1ff;
+  --theme-card: #1a1a1aff;
+  --theme-archive-background: #1a1a1aff;
+  --theme-slate: #94a3b8ff;
+  --theme-success: #0bd83bff;
+  --theme-dropdown-menu: #fff;
+  --theme-search-background: #f0f0f0;
+  --theme-primary-dark: #0d0d0d;
+  --theme-accent-orange: #ff7a00;
+  --theme-accent-hover: #e66f00;
+  --theme-text-light: #f5f5f5;
+  --theme-text-white: #ffffff;
+  --theme-section-gray: #2a2f3d;
+  --theme-border-gray: #e0e0e0;
+}

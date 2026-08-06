@@ -6,6 +6,7 @@ import defineUser from "./models/User.js";
 import defineArchive from "./models/Archive.js";
 import defineSavedArticle from "./models/SavedArticle.js";
 import defineProcessedStripeEvent from "./models/ProcessedStripeEvent.js";
+import defineUserInteraction from "./models/UserInteraction.js";
 
 if (!global.db) {
   global.db = {};
@@ -27,6 +28,7 @@ async function initializeDbAndModels() {
       const Archive = defineArchive(sequelize);
       const SavedArticle = defineSavedArticle(sequelize);
       const ProcessedStripeEvent = defineProcessedStripeEvent(sequelize);
+      const UserInteraction = defineUserInteraction(sequelize);
 
       global.db.sequelize = sequelize;
       global.db.User = User;
@@ -36,6 +38,7 @@ async function initializeDbAndModels() {
       global.db.Feed = Feed;
       global.db.ArticleLike = ArticleLike;
       global.db.ProcessedStripeEvent = ProcessedStripeEvent;
+      global.db.UserInteraction = UserInteraction;
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -54,6 +57,12 @@ async function initializeDbAndModels() {
 
       User.hasMany(ArticleLike, { foreignKey: "userId" });
       ArticleLike.belongsTo(User, { foreignKey: "userId" });
+
+      User.hasMany(UserInteraction, {
+        foreignKey: "userId",
+        onDelete: "CASCADE",
+      });
+      UserInteraction.belongsTo(User, { foreignKey: "userId" });
 
       // There's no formal migration tooling in this project yet, so `alter`
       // is what actually applies model changes to the database. This is a

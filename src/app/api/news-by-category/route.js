@@ -33,14 +33,7 @@ export async function GET(req) {
       ? []
       : [{ category: { [Op.not]: { [Op.overlap]: GATED_TAGS } } }];
 
-    // 1. Fetch the absolute latest articles for a "Top Stories" section
-    const topStories = await Article.findAll({
-      where: { [Op.and]: visibilityConditions },
-      limit: 10,
-      order: [["publishedAt", "DESC"]],
-    });
-
-    // 2. Fetch latest articles for each specific category
+    // Fetch latest articles for each specific category
     const categoryResults = await Promise.all(
       CATEGORIES_TO_DISPLAY.map(async (category) => ({
         category,
@@ -57,10 +50,8 @@ export async function GET(req) {
       }))
     );
 
-    // 3. Combine everything into a structured object
-    const categorizedArticles = {
-      "Top Stories": topStories,
-    };
+    // Combine everything into a structured object
+    const categorizedArticles = {};
     categoryResults.forEach((result) => {
       if (result.articles.length > 0) {
         categorizedArticles[result.category] = result.articles;

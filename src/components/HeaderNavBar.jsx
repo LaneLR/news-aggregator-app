@@ -1,103 +1,72 @@
 "use client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import styled from "styled-components";
+import styles from "./HeaderNavBar.module.scss";
 
-const Wrapper = styled.div`
-  width: 100%;
-  background-color: ${(props) => props.theme.primary};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: auto;
-  padding: 10px 15px;
-  font-size: 1.2rem;
-  color: ${(props) => props.theme.buttonText};
-  gap: 25px;
-  overflow-x: auto;
-
-  @media (max-width: 1156px) {
-    justify-content: left;
-  }
-`;
-
-const StyledLink = styled(Link)`
-  // text-decoration: underline;
-`;
-
-const Underline = styled.div`
-  border: 1px solid ${(props) => props.theme.text};
-`;
-
-export default function HeaderNavBar({ sessionData }) {
-  const { data: session, status, update } = useSession({ data: sessionData });
+export default function HeaderNavBar() {
+  const { data: session } = useSession();
 
   const isNotSubscribed = session?.user?.tier === "Free";
 
   return (
     <>
-      <Wrapper>
+      <div className={styles.wrapper}>
         {isNotSubscribed ? null : (
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <StyledLink href={"/category/journal"}>Journals</StyledLink>
-            {/* <Underline /> */}
+            <Link href={"/for-you"}>For You</Link>
           </div>
         )}
         {isNotSubscribed ? null : (
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <StyledLink href={"/category/market"}>Market</StyledLink>
-            {/* <Underline /> */}
+            <Link href={"/feeds"}>My Feeds</Link>
+          </div>
+        )}
+        {isNotSubscribed ? null : (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Link href={"/category/journal"}>Journals</Link>
+          </div>
+        )}
+        {isNotSubscribed ? null : (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Link href={"/category/market"}>Market</Link>
           </div>
         )}
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/science"}>Science</StyledLink>
-          {/* <Underline /> */}
+          <Link href={"/category/science"}>Science</Link>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/business"}>Business</StyledLink>
-          {/* <Underline /> */}
+          <Link href={"/category/business"}>Business</Link>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/health"}>Health</StyledLink>
-          {/* <Underline /> */}
+          <Link href={"/category/health"}>Health</Link>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/entertainment"}>
-            Entertainment
-          </StyledLink>
-          {/* <Underline /> */}
+          <Link href={"/category/entertainment"}>Entertainment</Link>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/tech"}>Tech</StyledLink>
-          {/* <Underline /> */}
+          <Link href={"/category/tech"}>Tech</Link>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/politics"}>Politics</StyledLink>
-          {/* <Underline /> */}
+          <Link href={"/category/politics"}>Politics</Link>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/sports"}>Sports</StyledLink>
-          {/* <Underline /> */}
+          <Link href={"/category/sports"}>Sports</Link>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/world"}>World</StyledLink>
-          {/* <Underline /> */}
+          <Link href={"/category/world"}>World</Link>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/us"}>US</StyledLink>
-          {/* <Underline /> */}
+          <Link href={"/category/us"}>US</Link>
         </div>
         {isNotSubscribed ? null : (
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <StyledLink href={"/category/finance"}>Finance</StyledLink>
-            {/* <Underline /> */}
+            <Link href={"/category/finance"}>Finance</Link>
           </div>
         )}
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/weather"}>Weather</StyledLink>
-          {/* <Underline /> */}
+          <Link href={"/category/weather"}>Weather</Link>
         </div>
-      </Wrapper>
+      </div>
     </>
   );
 }

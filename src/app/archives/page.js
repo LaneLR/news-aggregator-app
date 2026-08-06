@@ -11,7 +11,7 @@ import CreateNewArchiveCard from "@/components/CreateNewArchiveCard";
 export default async function ArchivesPage() {
   const session = await getServerSession(authOptions);
   if (!session) {
-    return redirect("/");
+    return redirect("/login");
   }
 
   const db = await initializeDbAndModels();

@@ -1,36 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
-import styled from "styled-components";
 import AccordionItem from "./AccordionItem";
-
-const Wrapper = styled.div`
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  text-align: left;
-  width: 100%;
-  flex-direction: column;
-  padding: 20px 40px;
-  gap: 8px;
-
-  @media (max-width: 440px) {
-    padding: 10px 30px;
-  }
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  max-width: 500px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  border: 1px solid ${(props) => props.theme.border};
-  font-size: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const NoResults = styled.p`
-  color: ${(props) => props.theme.textSecondary};
-`;
+import styles from "./AboutPage.module.scss";
 
 const FAQ_ITEMS = [
   {
@@ -119,8 +90,9 @@ export default function AboutPageComponent() {
   }, [query]);
 
   return (
-    <Wrapper>
-      <SearchInput
+    <div className={styles.wrapper}>
+      <input
+        className={styles.searchInput}
         type="search"
         placeholder="Search the FAQ (e.g. subscription, email, password)"
         value={query}
@@ -128,10 +100,10 @@ export default function AboutPageComponent() {
         aria-label="Search frequently asked questions"
       />
       {filteredItems.length === 0 ? (
-        <NoResults>
+        <p className={styles.noResults}>
           No matches for &quot;{query}&quot;. Try a different word, or reach
           out from the Contact page.
-        </NoResults>
+        </p>
       ) : (
         filteredItems.map((item) => (
           <AccordionItem
@@ -141,6 +113,6 @@ export default function AboutPageComponent() {
           />
         ))
       )}
-    </Wrapper>
+    </div>
   );
 }

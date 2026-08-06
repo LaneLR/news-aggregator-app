@@ -1,0 +1,21 @@
+.wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input {
+  font-size: 1.2rem;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--theme-border);
+  color: var(--theme-dark-blue);
+  background-color: var(--theme-search-background);
+
+  &:focus {
+    outline: none;
+    border-color: var(--theme-border);
+  }
+}

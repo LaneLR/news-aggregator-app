@@ -1,15 +1,9 @@
 'use client'
-import styled from "styled-components"
-
-const Wrapper = styled.div`
-display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-`
+import styles from "./AppWrapper.module.scss"
 
 export default function AppWrapper({children}) {
   return (
-    <Wrapper>{children}</Wrapper>
+    <div className={styles.wrapper}>{children}</div>
   )
 }
 

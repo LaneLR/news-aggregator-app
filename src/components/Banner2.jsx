@@ -1,20 +1,9 @@
-import styled from "styled-components";
-
-const Wrapper = styled.div`
-  width: 100%;
-  height: 320px;
-  background-color: var(--secondary-blue);
-  background-image: linear-gradient(
-    to right,
-    var(--primary-blue),
-    var(--secondary-blue)
-  );
-`;
+import styles from "./Banner2.module.scss";
 
 export default function Banner2() {
   return (
     <>
-      <Wrapper></Wrapper>
+      <div className={styles.wrapper}></div>
     </>
   );
 }

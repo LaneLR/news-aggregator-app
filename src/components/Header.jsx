@@ -1,5 +1,4 @@
 "use client";
-import styled, { useTheme } from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "./Button";
@@ -9,199 +8,13 @@ import { useEffect, useRef, useState } from "react";
 import SearchBar from "./SearchBar";
 import HeaderNavBar from "./HeaderNavBar";
 import HeaderSubscribeBanner from "./SubscribeHeaderBanner";
+import styles from "./Header.module.scss";
 
-const Wrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 80px;
-  width: 100%;
-  background-color: ${(props) => props.theme.SecondaryDark};
-  color: ${(props) => props.theme.text};
-`;
-
-const LeftContainer = styled.div`
-  display: flex;
-  align-items: center;
-  text-align: left;
-  justify-content: left;
-  width: 33%;
-  // width: 327px;
-  height: 100%;
-  padding: 0 0 0 20px;
-  background-color: transparent;
-
-  @media (max-width: 1000px) {
-    width: auto;
-    padding: 0 0 0 20px;
-  }
-`;
-
-const CenterContainer = styled.div`
-  display: flex;
-  align-items: center;
-  text-align: right;
-  justify-content: space-evenly;
-  // max-width: 33%;
-  width: 50%;
-  height: 100%;
-  padding: 0 50px;
-  background-color: transparent;
-
-  @media (max-width: 860px) {
-    justify-content: center;
-    width: 100%;
-    padding: 0 10px;
-  }
-
-  @media (max-width: 440px) {
-    justify-content: center;
-    width: 65%;
-    padding: 0 10px;
-  }
-`;
-
-const RightContainer = styled.div`
-  display: flex;
-  align-items: center;
-  text-align: right;
-  justify-content: right;
-  width: 33%;
-  // width: 327px;
-  height: 100%;
-  padding: 0 20px 0 0;
-  background-color: transparent;
-  user-select: none;
-
-  @media (max-width: 1000px) {
-    width: auto;
-    padding: 0 20px 0 0;
-  }
-`;
-
-const UserAccountIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  color: ${(props) => props.theme.text};
-`;
-
-const HeaderLogoBox = styled.div`
-  display: flex;
-  background-color: inherit;
-  font-size: 2.5rem;
-  font-weight: 700;
-`;
-
-const MenuIcon = styled.div`
-  width: 20px;
-  height: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  cursor: pointer;
-  color: ${(props) => props.theme.text};
-  span {
-    display: block;
-    width: 100%;
-    height: 2px;
-    background-color: ${(props) => props.theme.dropdownMenu};
-  }
-`;
-
-const DropdownContainer = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-  height: 100%;
-`;
-
-const DropdownMenu = styled.ul`
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  background-color: ${(props) => props.theme.background};
-  border: 1px solid ${(props) => props.theme.text};
-  border-radius: 8px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-  width: auto;
-  padding: 8px 0;
-  list-style: none;
-  z-index: 1000;
-
-  @media (max-width: 430px) {
-    right: calc(-20%);
-  }
-`;
-
-const DropdownMenuItem = styled.li`
-  padding: 12px 18px;
-  color: ${(props) => props.theme.text};
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: background-color 0.15s ease-in-out;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: ${(props) => props.theme.layoutBackground};
-    color: ${(props) => props.theme.text};
-  }
-
-  a {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-  }
-`;
-
-const LogoContainer = styled.div`
-  display: "flex";
-  alignitems: "center";
-  columngap: "10px";
-  background-color: transparent;
-  width: 100%;
-`;
-
-const LogoText = styled.p`
-  font-size: 2.1rem;
-  padding: 0 0 0 10px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  background-color: transparent;
-
-  span:first-child {
-    color: ${(props) => props.theme.titleContrast};
-    font-weight: 700;
-    background-color: transparent;
-  }
-
-  span:last-child {
-    color: ${(props) => props.theme.buttonText};
-    font-weight: 400;
-    background-color: transparent;
-  }
-
-  @media (max-width: 860px) {
-    width: auto;
-    background-color: transparent;
-
-    span {
-      display: none;
-    }
-  }
-`;
-
-export default function Header({ priceId, sessionData, }) {
-  const { data: session, status, update } = useSession({ data: sessionData });
+export default function Header() {
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-
-  const theme = useTheme();
 
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -236,10 +49,10 @@ export default function Header({ priceId, sessionData, }) {
     <>
       {!!session ? (
         <div style={{ width: "100%" }}>
-          <Wrapper>
-            <LeftContainer>
+          <div className={styles.wrapper}>
+            <div className={styles.leftContainer}>
               <Link style={{ display: "inherit" }} href={"/news"}>
-                <LogoContainer>
+                <div className={styles.logoContainer}>
                   <div
                     style={{
                       display: "flex",
@@ -257,28 +70,31 @@ export default function Header({ priceId, sessionData, }) {
                       height={60}
                     />
                   </div>
-                </LogoContainer>
-                <LogoText>
+                </div>
+                <div className={styles.logoText}>
                   <span>morning</span>
                   <span>feeds</span>
-                </LogoText>
+                </div>
               </Link>
-            </LeftContainer>
-            <CenterContainer>
+            </div>
+            <div className={styles.centerContainer}>
               <SearchBar />
-            </CenterContainer>
-            <RightContainer>
-              <DropdownContainer ref={dropdownRef}>
-                <UserAccountIcon onClick={toggleDropdown}>
-                  <MenuIcon>
+            </div>
+            <div className={styles.rightContainer}>
+              <div className={styles.dropdownContainer} ref={dropdownRef}>
+                <div className={styles.userAccountIcon} onClick={toggleDropdown}>
+                  <div className={styles.menuIcon}>
                     <span></span>
                     <span></span>
                     <span></span>
-                  </MenuIcon>
-                </UserAccountIcon>
+                  </div>
+                </div>
                 {isDropdownOpen && (
-                  <DropdownMenu>
-                    <DropdownMenuItem onClick={() => handleNavigation("/news")}>
+                  <ul className={styles.dropdownMenu}>
+                    <li
+                      className={styles.dropdownMenuItem}
+                      onClick={() => handleNavigation("/news")}
+                    >
                       <div
                         style={{
                           display: "flex",
@@ -297,8 +113,9 @@ export default function Header({ priceId, sessionData, }) {
                           src="/images/newspaper.svg"
                         />
                       </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
+                    </li>
+                    <li
+                      className={styles.dropdownMenuItem}
                       onClick={() => handleNavigation("/archives")}
                     >
                       <div
@@ -320,8 +137,9 @@ export default function Header({ priceId, sessionData, }) {
                           style={{ filter: "grayscale(100%)" }}
                         />
                       </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
+                    </li>
+                    <li
+                      className={styles.dropdownMenuItem}
                       onClick={() => handleNavigation("/account")}
                     >
                       <div
@@ -342,8 +160,9 @@ export default function Header({ priceId, sessionData, }) {
                           src="/images/profile.svg"
                         />
                       </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
+                    </li>
+                    <li
+                      className={styles.dropdownMenuItem}
                       onClick={() => handleNavigation("/pricing")}
                     >
                       <div
@@ -364,8 +183,9 @@ export default function Header({ priceId, sessionData, }) {
                           src="/images/subscribe.svg"
                         />
                       </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
+                    </li>
+                    <li
+                      className={styles.dropdownMenuItem}
                       onClick={() => handleNavigation("/settings")}
                     >
                       <div
@@ -386,8 +206,8 @@ export default function Header({ priceId, sessionData, }) {
                           src="/images/gear.svg"
                         />
                       </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleLogout}>
+                    </li>
+                    <li className={styles.dropdownMenuItem} onClick={handleLogout}>
                       <div
                         style={{
                           display: "flex",
@@ -406,24 +226,25 @@ export default function Header({ priceId, sessionData, }) {
                           src="/images/logout.svg"
                         />
                       </div>
-                    </DropdownMenuItem>
-                  </DropdownMenu>
+                    </li>
+                  </ul>
                 )}
-              </DropdownContainer>
-            </RightContainer>
-          </Wrapper>
+              </div>
+            </div>
+          </div>
           <HeaderSubscribeBanner />
           <HeaderNavBar />
         </div>
       ) : (
         <>
-          <Wrapper>
-            <LeftContainer>
+          <div className={styles.wrapper}>
+            <div className={styles.leftContainer}>
               <Link
                 style={{ display: "inherit", backgroundColor: "transparent" }}
                 href={"/"}
               >
-                <LogoContainer
+                <div
+                  className={styles.logoContainer}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -447,23 +268,23 @@ export default function Header({ priceId, sessionData, }) {
                       height={60}
                     />
                   </div>
-                </LogoContainer>
-                <LogoText>
+                </div>
+                <div className={styles.logoText}>
                   <span>morning</span>
                   <span>feeds</span>
-                </LogoText>
+                </div>
               </Link>
-            </LeftContainer>
-            <RightContainer>
+            </div>
+            <div className={styles.rightContainer}>
               <nav style={{ display: "flex", columnGap: "10px" }}>
                 <Link style={{ display: "flex" }} href={"/login"}>
-                  <Button bgColor={theme.titleContrast} clr={theme.buttonText}>
+                  <Button bgColor={"var(--theme-title-contrast)"} clr={"var(--theme-button-text)"}>
                     Log in
                   </Button>
                 </Link>
               </nav>
-            </RightContainer>
-          </Wrapper>
+            </div>
+          </div>
         </>
       )}
     </>

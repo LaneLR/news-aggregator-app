@@ -1,0 +1,131 @@
+.cardWrapper {
+  display: inline-block;
+  width: 320px;
+  flex-shrink: 0;
+  background: var(--theme-background);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--theme-border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  }
+
+  @media (max-width: 440px) {
+    width: 280px;
+  }
+}
+
+.imageLink {
+  display: block;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+}
+
+.contentArea {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.source {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--theme-text-secondary);
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+
+  @media (max-width: 440px) {
+    font-size: 0.8rem;
+  }
+}
+
+.lockIcon {
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+}
+
+.titleLink {
+  text-decoration: none;
+  color: var(--theme-dark-blue);
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0;
+  flex-grow: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  @media (max-width: 440px) {
+    font-size: 1.05rem;
+  }
+}
+
+.actionsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  border-top: 1px solid var(--theme-border);
+  padding-top: 0.75rem;
+}
+
+.likeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--theme-text-secondary);
+
+  &.liked {
+    color: var(--theme-primary);
+  }
+}
+
+.likeIcon {
+  height: 24px;
+  width: 24px;
+}
+
+.readMoreButton {
+  background-color: var(--theme-primary);
+  color: var(--theme-text);
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  align-self: flex-start;
+  cursor: pointer;
+  width: 120px;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+  &:hover {
+    filter: brightness(0.85);
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: translateY(0);
+  }
+}

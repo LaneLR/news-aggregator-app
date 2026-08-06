@@ -1,0 +1,38 @@
+.searchBarHeader {
+  font-size: 3rem;
+  font-weight: 600;
+  color: var(--theme-dark-blue);
+  padding: 20px 0 0 0;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @media (max-width: 440px) {
+    font-size: 1.8rem;
+  }
+}
+
+.sortToggle {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.sortOption {
+  padding: 6px 14px;
+  border-radius: 16px;
+  border: 2px solid var(--theme-border);
+  background: transparent;
+  color: var(--theme-text);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+
+  &.active {
+    background: var(--theme-primary);
+    color: var(--theme-button-text);
+  }
+}

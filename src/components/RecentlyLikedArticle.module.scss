@@ -1,0 +1,31 @@
+.itemLink {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 5px 0;
+  text-decoration: none;
+  color: inherit;
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--theme-border);
+  }
+}
+
+.thumbnail {
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.info {
+  flex-grow: 1;
+  h4 {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--theme-text-secondary);
+  }
+}

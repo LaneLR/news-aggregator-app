@@ -1,33 +1,6 @@
 "use client";
 import { useState } from "react";
-import styled from "styled-components";
-
-const StyledButton = styled.button`
-  padding: 8px 16px;
-  font-size: 1rem;
-  font-weight: 600;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-  height: 100%;
-  width: 150px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 3px;
-
-  background-color: ${(props) =>
-    props.status === "Copied"
-      ? props.theme.darkBlue
-      : props.theme.primary};
-  color: ${(props) => props.theme.buttonText};
-
-  // &:hover {
-  //   filter: brightness(0.95);
-  // }
-`;
+import styles from "./CopyButton.module.scss";
 
 export default function CopyButton({ textToCopy }) {
   const [copyStatus, setCopyStatus] = useState("Copy");
@@ -51,8 +24,13 @@ export default function CopyButton({ textToCopy }) {
     }
   };
 
+  const status = copyStatus.toUpperCase();
+
   return (
-    <StyledButton onClick={handleCopy} status={copyStatus.toUpperCase()}>
+    <button
+      className={`${styles.wrapper} ${status === "Copied" ? styles.copied : ""}`}
+      onClick={handleCopy}
+    >
       {copyStatus === "Copy" ? (
         <img
           src="/images/copy-unfilled-white.svg"
@@ -76,6 +54,6 @@ export default function CopyButton({ textToCopy }) {
         />
       )}
       <div style={{ width: "100%" }}>{copyStatus}</div>
-    </StyledButton>
+    </button>
   );
 }

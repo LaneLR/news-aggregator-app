@@ -26,7 +26,7 @@ export default async function SettingsPage() {
 
         <Divider />
 
-        <DigestSettings sessionData={session} />
+        <DigestSettings />
 
         <Divider />
 
