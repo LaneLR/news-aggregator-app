@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styled, { useTheme } from "styled-components";
 import { useSession, signIn } from "next-auth/react";
@@ -121,14 +120,17 @@ export default function LoginPage({ sessionData }) {
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
 
-  const router = useRouter();
-  const { data: session, status, update } = useSession({ data: sessionData });
+  const { data: session, status } = useSession({ data: sessionData });
 
   useEffect(() => {
+    // Safety net for landing on /login while already signed in (e.g. via
+    // back/forward navigation serving a cached page). A hard navigation
+    // here avoids Next's client router cache showing stale logged-out
+    // content — see handleLoginUser below for why that matters.
     if (status === "authenticated") {
-      router.replace("/");
+      window.location.href = "/news";
     }
-  }, [status, router]);
+  }, [status]);
 
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
@@ -143,19 +145,19 @@ export default function LoginPage({ sessionData }) {
       email: user.email,
       password: user.password,
       redirect: false,
-      callbackUrl: "/",
     });
 
-    setLoading(false);
-
     if (res.error) {
+      setLoading(false);
       setError(`${res.error}`);
-    } else {
-      setTimeout(() => {
-        router.push("/");
-        location.reload();
-      }, 100);
+      return;
     }
+
+    // A full navigation (not router.push) so the freshly-set session
+    // cookie is guaranteed to be picked up on the next request, instead
+    // of Next's client-side router cache potentially serving a
+    // pre-login cached version of the page.
+    window.location.href = "/news";
   }
 
   if (status === "loading") {
@@ -167,7 +169,7 @@ export default function LoginPage({ sessionData }) {
       <SignInButtonWrapper>
         {/* <SSOText>Sign in with</SSOText> */}
         <GoogleSignInButton
-          onClick={() => signIn("google", { callbackUrl: "/" })}
+          onClick={() => signIn("google", { callbackUrl: "/news" })}
         />
       </SignInButtonWrapper>
       <Wrapper>

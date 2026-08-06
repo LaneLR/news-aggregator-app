@@ -2,7 +2,7 @@
 import Loading from "@/app/loading";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import styled from "styled-components";
 
 const TextWrapper = styled.div`
@@ -25,16 +25,16 @@ const Text = styled.p`
 `;
 
 export default function VerifyEmailComponent({ sessionData }) {
-  const router = useRouter();
-  const { data: session, status, update } = useSession({ data: sessionData });
+  const { data: session, status } = useSession({ data: sessionData });
+
+  useEffect(() => {
+    if (session && session.user.emailIsVerified) {
+      window.location.replace("/account");
+    }
+  }, [session]);
 
   if (status === "loading") {
     return <Loading />;
-  }
-
-  if (session && session.user.emailIsVerified) {
-    // router.push("/news");
-    window.location.replace("/account");
   }
 
   return (

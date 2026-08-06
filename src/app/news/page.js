@@ -1,12 +1,10 @@
-export const dynamic = "force-dynamic"; // <-- ADD THIS LINE TEMPORARILY
+export const dynamic = "force-dynamic";
 
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { Suspense } from "react";
-import News from "@/components/NewsFeed";
 import Loading from "../loading";
-import FeedManager from "@/components/FeedManager";
 import NewsPage from "@/components/NewNewsPage";
 
 export default async function Home() {
@@ -17,12 +15,8 @@ export default async function Home() {
   }
 
   return (
-    <>
-      <Suspense fallback={<Loading />}>
-        {/* <News /> */}
-        {/* <FeedManager /> */}
+    <Suspense fallback={<Loading />}>
       <NewsPage />
-      </Suspense>
-    </>
+    </Suspense>
   );
 }
