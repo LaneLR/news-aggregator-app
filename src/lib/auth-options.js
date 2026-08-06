@@ -57,6 +57,8 @@ export const authOptions = {
           status: user.status,
           subscriptionWillCancel: user.subscriptionWillCancel,
           selectedTheme: user.selectedTheme,
+          digestEnabled: user.digestEnabled,
+          digestFrequency: user.digestFrequency,
         };
       },
     }),
@@ -100,23 +102,8 @@ export const authOptions = {
         user.status = dbUser.status;
         user.subscriptionWillCancel = dbUser.subscriptionWillCancel;
         user.selectedTheme = dbUser.selectedTheme;
-
-        // if (dbUser) {
-        //   if (dbUser.status === "inactive") {
-        //     return "/login?error=AccountInactive";
-        //   }
-        //   user.id = dbUser.id;
-        // } else if (account.provider === "google") {
-        //   const { email, name, image } = user;
-        //   const newDbUser = await User.create({
-        //     email,
-        //     name,
-        //     image,
-        //     password: null,
-        //     emailIsVerified: true,
-        //   });
-        //   user.id = newDbUser.id;
-        // }
+        user.digestEnabled = dbUser.digestEnabled;
+        user.digestFrequency = dbUser.digestFrequency;
 
         return true;
       } catch (error) {
@@ -140,6 +127,8 @@ export const authOptions = {
         token.status = user.status;
         token.subscriptionWillCancel = user.subscriptionWillCancel;
         token.selectedTheme = user.selectedTheme;
+        token.digestEnabled = user.digestEnabled;
+        token.digestFrequency = user.digestFrequency;
         return token;
       }
 
@@ -164,6 +153,8 @@ export const authOptions = {
         status: dbUser.status,
         subscriptionWillCancel: dbUser.subscriptionWillCancel,
         selectedTheme: dbUser.selectedTheme,
+        digestEnabled: dbUser.digestEnabled,
+        digestFrequency: dbUser.digestFrequency,
       };
     },
 
@@ -174,8 +165,6 @@ export const authOptions = {
         session.user.name = token.name;
         session.user.image = token.image;
         session.user.tier = token.tier;
-        session.user.name = token.name;
-        session.user.image = token.picture;
         session.user.isPendingDeletion = token.isPendingDeletion;
         session.user.emailIsVerified = token.emailIsVerified;
         session.user.stripeSubscriptionStatus = token.stripeSubscriptionStatus;
@@ -186,6 +175,8 @@ export const authOptions = {
         session.user.status = token.status;
         session.user.subscriptionWillCancel = token.subscriptionWillCancel;
         session.user.selectedTheme = token.selectedTheme;
+        session.user.digestEnabled = token.digestEnabled;
+        session.user.digestFrequency = token.digestFrequency;
       }
       return session;
     },

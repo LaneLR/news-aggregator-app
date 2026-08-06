@@ -22,15 +22,34 @@ const SearchBarHeader = styled.div`
   }
 `;
 
-async function fetchCategoryArticles(category) {
+const SortToggle = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+`;
+
+const SortOption = styled.button`
+  padding: 6px 14px;
+  border-radius: 16px;
+  border: 2px solid ${(props) => props.theme.border};
+  background: ${(props) => (props.$active ? props.theme.primary : "transparent")};
+  color: ${(props) => (props.$active ? props.theme.buttonText : props.theme.text)};
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+`;
+
+async function fetchCategoryArticles(category, sort) {
   const baseUrl =
     process.env.RENDER_EXTERNAL_URL ||
     process.env.NEXT_PUBLIC_BASE_URL ||
     "http://localhost:3000";
 
-  const res = await fetch(`${baseUrl}/api/articles/${category}`, {
-    next: { revalidate: 3600 },
-  });
+  const res = await fetch(
+    `${baseUrl}/api/articles/${category}?sort=${sort}`,
+    { next: { revalidate: 3600 } }
+  );
 
   if (!res.ok) throw new Error("Failed to fetch news for category");
 
@@ -45,6 +64,7 @@ export default function CategoryPage({ category, archiveId }) {
   const [newAvailable, setNewAvailable] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sort, setSort] = useState("latest");
   const theme = useTheme();
 
   const categoryNameForDisplay =
@@ -54,7 +74,7 @@ export default function CategoryPage({ category, archiveId }) {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await fetchCategoryArticles(category.toLowerCase());
+      const data = await fetchCategoryArticles(category.toLowerCase(), sort);
       setArticles(data);
       if (data.length > 0) {
         const newest = new Date(data[0].publishedAt || data[0].updatedAt);
@@ -75,7 +95,7 @@ export default function CategoryPage({ category, archiveId }) {
     const handleFocus = async () => {
       if (!category) return;
       try {
-        const latest = await fetchCategoryArticles(category.toLowerCase());
+        const latest = await fetchCategoryArticles(category.toLowerCase(), sort);
         const latestArticle = latest[0];
         if (latestArticle) {
           const latestDate = new Date(
@@ -92,7 +112,7 @@ export default function CategoryPage({ category, archiveId }) {
 
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
-  }, [category]);
+  }, [category, sort]);
 
   const refreshArticles = async () => {
     setNewAvailable(false);
@@ -135,6 +155,17 @@ export default function CategoryPage({ category, archiveId }) {
         }}
       >
         <SearchBarHeader>{categoryNameForDisplay} Headlines</SearchBarHeader>
+        <SortToggle>
+          <SortOption type="button" $active={sort === "latest"} onClick={() => setSort("latest")}>
+            Latest
+          </SortOption>
+          <SortOption type="button" $active={sort === "trending"} onClick={() => setSort("trending")}>
+            Trending
+          </SortOption>
+          <SortOption type="button" $active={sort === "liked"} onClick={() => setSort("liked")}>
+            Most Liked
+          </SortOption>
+        </SortToggle>
         {newAvailable && (
           <div
             style={{

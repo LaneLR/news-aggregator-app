@@ -1,13 +1,13 @@
 import CategoryPageComponent from "@/components/CategoryPage";
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
-import { redirect } from "next/dist/server/api-utils";
+import { redirect } from "next/navigation";
 
-export default async function HealthNewsPage() {
+export default async function MarketNewsPage() {
   const session = await getServerSession(authOptions);
-  const isNotSubscribed = session?.user?.tier === "Free";
+  const isNotSubscribed = session?.user?.tier === "Free" || !session;
   if (isNotSubscribed) {
-    return redirect("/account");
+    return redirect("/pricing");
   }
 
   return (

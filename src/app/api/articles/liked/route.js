@@ -14,12 +14,12 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")) : null;
 
-    const { ArticleLike, NewsArticle, JournalArticle, MarketArticle } = await initializeDbAndModels();
+    const { ArticleLike, Article } = await initializeDbAndModels();
 
     const userLikes = await ArticleLike.findAll({
       where: { userId: session.user.id },
       order: [["createdAt", "DESC"]],
-      limit: limit, 
+      limit: limit,
     });
 
     if (userLikes.length === 0) {
@@ -29,13 +29,9 @@ export async function GET(req) {
     const likedUrls = userLikes.map(like => like.articleUrl);
     const likedOrderMap = new Map(userLikes.map((like, index) => [like.articleUrl, index]));
 
-    const [newsArticles, journalArticles, marketArticles] = await Promise.all([
-      NewsArticle.findAll({ where: { url: { [Op.in]: likedUrls } } }),
-      JournalArticle.findAll({ where: { url: { [Op.in]: likedUrls } } }),
-      MarketArticle.findAll({ where: { url: { [Op.in]: likedUrls } } }),
-    ]);
-    
-    const combinedArticles = [...newsArticles, ...journalArticles, ...marketArticles];
+    const combinedArticles = await Article.findAll({
+      where: { url: { [Op.in]: likedUrls } },
+    });
 
     const sortedArticles = combinedArticles.sort((a, b) => {
         return likedOrderMap.get(a.url) - likedOrderMap.get(b.url);

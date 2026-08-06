@@ -13,7 +13,13 @@ export async function GET(_req, { params }) {
     return NextResponse.json({ error: "Invalid archive ID" }, { status: 400 });
 
   const db = await initializeDbAndModels();
-  const { SavedArticle } = db;
+  const { SavedArticle, Archive } = db;
+
+  const archive = await Archive.findOne({
+    where: { id: archiveId, userId: session.user.id },
+  });
+  if (!archive)
+    return NextResponse.json({ error: "Archive not found" }, { status: 404 });
 
   const articles = await SavedArticle.findAll({
     where: { archiveId },
@@ -40,7 +46,13 @@ export async function POST(req, { params }) {
     );
 
   const db = await initializeDbAndModels();
-  const { SavedArticle } = db;
+  const { SavedArticle, Archive } = db;
+
+  const archive = await Archive.findOne({
+    where: { id: archiveId, userId: session.user.id },
+  });
+  if (!archive)
+    return NextResponse.json({ error: "Archive not found" }, { status: 404 });
 
   const existing = await SavedArticle.findOne({ where: { archiveId, url } });
   if (existing) {

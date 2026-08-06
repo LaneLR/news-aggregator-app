@@ -234,11 +234,7 @@ export default function ProfilePage({ sessionData }) {
         <UserName>
           {user.name}
           <TierBadge tier={user.tier}>
-            {user.tier === "Free"
-              ? "Free Tier"
-              : user.tier === "Pro"
-              ? "Pro Tier"
-              : "Pro Annual Tier"}
+            {user.tier === "Free" ? "Free Tier" : "Subscribed"}
           </TierBadge>
         </UserName>
         <UserEmail>{user.email}</UserEmail>

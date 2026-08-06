@@ -1,4 +1,5 @@
 import initializeDbAndModels from "@/lib/db";
+import { QueryTypes } from "sequelize";
 
 export async function GET(req) {
   const { sequelize } = await initializeDbAndModels();
@@ -8,35 +9,37 @@ export async function GET(req) {
   const category = searchParams.get("category");
 
   try {
-    const terms = query
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((word) => word.replace(/'/g, "''")); 
+    const terms = query.split(/\s+/).filter(Boolean);
 
     const whereParts = [];
+    const replacements = {};
 
-    for (const word of terms) {
-      whereParts.push(`(
-        "title" ILIKE '%${word}%' OR
-        "sourceName" ILIKE '%${word}%'
-      )`);
-    }
+    terms.forEach((word, i) => {
+      const key = `term${i}`;
+      replacements[key] = `%${word}%`;
+      whereParts.push(`("title" ILIKE :${key} OR "sourceName" ILIKE :${key})`);
+    });
 
     if (category) {
-      whereParts.push(`"category"::text ILIKE '%${category}%'`);
+      replacements.category = `%${category}%`;
+      whereParts.push(`"category"::text ILIKE :category`);
     }
 
-    const whereClauseSQL = whereParts.length
-      ? `WHERE ${whereParts.join(" AND ")}`
-      : "";
+    // Only "news" articles here — Market/Finance/Journal content is
+    // subscriber-only and this endpoint has no auth check, so it must never
+    // include gated sourceTypes.
+    whereParts.push(`"sourceType" = 'news'`);
 
-    const [articles] = await sequelize.query(`
-      SELECT DISTINCT ON ("sourceName") *
-      FROM "NewsArticles"
-      ${whereClauseSQL}
-      ORDER BY "sourceName", "publishedAt" DESC
-      LIMIT 50;
-    `);
+    const whereClauseSQL = `WHERE ${whereParts.join(" AND ")}`;
+
+    const articles = await sequelize.query(
+      `SELECT DISTINCT ON ("sourceName") *
+       FROM "Articles"
+       ${whereClauseSQL}
+       ORDER BY "sourceName", "publishedAt" DESC
+       LIMIT 50;`,
+      { replacements, type: QueryTypes.SELECT }
+    );
 
     return Response.json({ articles });
   } catch (err) {

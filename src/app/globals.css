@@ -1,7 +1,4 @@
 :root {
-  --background: #022665;
-  --foreground: #022665;
-
   --dark-blue: #0a1430;
   --light-white: #f1f1f1;
   --white: #fefefe;
@@ -14,9 +11,6 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #022665;
-    --foreground: #022665;
-
     --dark-blue: #0a1430;
     --light-gray: #e1e5e9;
     --primary-blue: #004cd2;
@@ -35,8 +29,8 @@ body {
   overflow-x: hidden;
   margin: 0;
   padding: 0;
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--light-white);
+  font-family: var(--font-roboto), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--dark-blue);

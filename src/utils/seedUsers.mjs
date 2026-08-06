@@ -1,222 +1,72 @@
-[
+// Seeds test accounts into the database for manual testing.
+// Usage: npm run seed
+//
+// Refuses to run unless NODE_ENV is "development" so it can't accidentally
+// be pointed at a production DATABASE_URL.
+import "dotenv/config";
+import initializeDbAndModels from "../lib/db.js";
+
+const TEST_PASSWORD = "TestPass123!";
+
+const DEMO_USERS = [
   {
-    "id": "f9e2f330-74d4-4ff2-beb4-64a5d9a51a01",
-    "email": "alice@example.com",
-    "password": "$2b$10$S92cBAH4nKX2hXxvM05DXeN5N5eD4lXHjyI9NTYOGKqq9DrC8XInK",
-    "tier": "Pro",
-    "paymentProvider": "stripe",
-    "providerCustomerId": null,
-    "subscriptionId": null,
-    "subscriptionStatus": "inactive",
-    "subscriptionPlanId": null,
-    "cardLast4": null,
-    "cardBrand": null,
-    "subscriptionStart": null,
-    "subscriptionExpiresAt": null,
-    "isTrial": false,
-    "trialEnd": null,
-    "lastPaymentAttempt": null,
-    "lastPaymentStatus": null,
-    "isPendingDeletion": false,
-    "deletionRequestedAt": null,
-    "emailIsVerified": true
+    email: "abc123@email.com",
+    password: TEST_PASSWORD,
+    tier: "Subscribed",
+    name: "Test Subscriber",
   },
   {
-    "id": "28c17af7-249a-4e39-b469-58b255fb3c46",
-    "email": "bob@example.com",
-    "password": "$2b$10$S92cBAH4nKX2hXxvM05DXeN5N5eD4lXHjyI9NTYOGKqq9DrC8XInK",
-    "tier": "Pro",
-    "paymentProvider": "stripe",
-    "providerCustomerId": null,
-    "subscriptionId": null,
-    "subscriptionStatus": "inactive",
-    "subscriptionPlanId": null,
-    "cardLast4": null,
-    "cardBrand": null,
-    "subscriptionStart": null,
-    "subscriptionExpiresAt": null,
-    "isTrial": false,
-    "trialEnd": null,
-    "lastPaymentAttempt": null,
-    "lastPaymentStatus": null,
-    "isPendingDeletion": false,
-    "deletionRequestedAt": null,
-    "emailIsVerified": true
+    email: "free-test@email.com",
+    password: TEST_PASSWORD,
+    tier: "Free",
+    name: "Test Free User",
   },
-  {
-    "id": "d42020c0-4df1-42b8-a7ff-f0f2fdc4d3b2",
-    "email": "charlie@example.com",
-    "password": "$2b$10$S92cBAH4nKX2hXxvM05DXeN5N5eD4lXHjyI9NTYOGKqq9DrC8XInK",
-    "tier": "Free",
-    "paymentProvider": "stripe",
-    "providerCustomerId": null,
-    "subscriptionId": null,
-    "subscriptionStatus": "inactive",
-    "subscriptionPlanId": null,
-    "cardLast4": null,
-    "cardBrand": null,
-    "subscriptionStart": null,
-    "subscriptionExpiresAt": null,
-    "isTrial": false,
-    "trialEnd": null,
-    "lastPaymentAttempt": null,
-    "lastPaymentStatus": null,
-    "isPendingDeletion": false,
-    "deletionRequestedAt": null,
-    "emailIsVerified": true
-  },
-  {
-    "id": "ddee20b2-24a6-4e7a-92a2-d23221a7f08a",
-    "email": "dana@example.com",
-    "password": "$2b$10$S92cBAH4nKX2hXxvM05DXeN5N5eD4lXHjyI9NTYOGKqq9DrC8XInK",
-    "tier": "Pro",
-    "paymentProvider": "stripe",
-    "providerCustomerId": null,
-    "subscriptionId": null,
-    "subscriptionStatus": "inactive",
-    "subscriptionPlanId": null,
-    "cardLast4": null,
-    "cardBrand": null,
-    "subscriptionStart": null,
-    "subscriptionExpiresAt": null,
-    "isTrial": false,
-    "trialEnd": null,
-    "lastPaymentAttempt": null,
-    "lastPaymentStatus": null,
-    "isPendingDeletion": false,
-    "deletionRequestedAt": null,
-    "emailIsVerified": true
-  },
-  {
-    "id": "e3ff0134-0910-4746-84d7-f7cfe2d91a07",
-    "email": "eric@example.com",
-    "password": "$2b$10$S92cBAH4nKX2hXxvM05DXeN5N5eD4lXHjyI9NTYOGKqq9DrC8XInK",
-    "tier": "Free",
-    "paymentProvider": "stripe",
-    "providerCustomerId": null,
-    "subscriptionId": null,
-    "subscriptionStatus": "inactive",
-    "subscriptionPlanId": null,
-    "cardLast4": null,
-    "cardBrand": null,
-    "subscriptionStart": null,
-    "subscriptionExpiresAt": null,
-    "isTrial": false,
-    "trialEnd": null,
-    "lastPaymentAttempt": null,
-    "lastPaymentStatus": null,
-    "isPendingDeletion": false,
-    "deletionRequestedAt": null,
-    "emailIsVerified": true
-  },
-  {
-    "id": "aaf56b2c-9c7d-4b8d-ae02-bb4d94c50a0b",
-    "email": "fiona@example.com",
-    "password": "$2b$10$S92cBAH4nKX2hXxvM05DXeN5N5eD4lXHjyI9NTYOGKqq9DrC8XInK",
-    "tier": "Free",
-    "paymentProvider": "stripe",
-    "providerCustomerId": null,
-    "subscriptionId": null,
-    "subscriptionStatus": "inactive",
-    "subscriptionPlanId": null,
-    "cardLast4": null,
-    "cardBrand": null,
-    "subscriptionStart": null,
-    "subscriptionExpiresAt": null,
-    "isTrial": false,
-    "trialEnd": null,
-    "lastPaymentAttempt": null,
-    "lastPaymentStatus": null,
-    "isPendingDeletion": false,
-    "deletionRequestedAt": null,
-    "emailIsVerified": true
-  },
-  {
-    "id": "d3925d89-cc89-4a90-b23c-a7c6391fc3f6",
-    "email": "george@example.com",
-    "password": "$2b$10$S92cBAH4nKX2hXxvM05DXeN5N5eD4lXHjyI9NTYOGKqq9DrC8XInK",
-    "tier": "Pro",
-    "paymentProvider": "stripe",
-    "providerCustomerId": null,
-    "subscriptionId": null,
-    "subscriptionStatus": "inactive",
-    "subscriptionPlanId": null,
-    "cardLast4": null,
-    "cardBrand": null,
-    "subscriptionStart": null,
-    "subscriptionExpiresAt": null,
-    "isTrial": false,
-    "trialEnd": null,
-    "lastPaymentAttempt": null,
-    "lastPaymentStatus": null,
-    "isPendingDeletion": false,
-    "deletionRequestedAt": null,
-    "emailIsVerified": true
-  },
-  {
-    "id": "6d1e6c43-ff7c-4d53-9e49-6a9305e5b44f",
-    "email": "hannah@example.com",
-    "password": "$2b$10$S92cBAH4nKX2hXxvM05DXeN5N5eD4lXHjyI9NTYOGKqq9DrC8XInK",
-    "tier": 1,
-    "paymentProvider": "stripe",
-    "providerCustomerId": null,
-    "subscriptionId": null,
-    "subscriptionStatus": "inactive",
-    "subscriptionPlanId": null,
-    "cardLast4": null,
-    "cardBrand": null,
-    "subscriptionStart": null,
-    "subscriptionExpiresAt": null,
-    "isTrial": false,
-    "trialEnd": null,
-    "lastPaymentAttempt": null,
-    "lastPaymentStatus": null,
-    "isPendingDeletion": false,
-    "deletionRequestedAt": null,
-    "emailIsVerified": true
-  },
-  {
-    "id": "e490dd55-dc1b-4f8b-a7a1-022401e9ff2a",
-    "email": "ian@example.com",
-    "password": "$2b$10$S92cBAH4nKX2hXxvM05DXeN5N5eD4lXHjyI9NTYOGKqq9DrC8XInK",
-    "tier": "Free",
-    "paymentProvider": "stripe",
-    "providerCustomerId": null,
-    "subscriptionId": null,
-    "subscriptionStatus": "inactive",
-    "subscriptionPlanId": null,
-    "cardLast4": null,
-    "cardBrand": null,
-    "subscriptionStart": null,
-    "subscriptionExpiresAt": null,
-    "isTrial": false,
-    "trialEnd": null,
-    "lastPaymentAttempt": null,
-    "lastPaymentStatus": null,
-    "isPendingDeletion": false,
-    "deletionRequestedAt": null,
-    "emailIsVerified": true
-  },
-  {
-    "id": "4d118569-3d16-4f9f-8c34-a1579153cd78",
-    "email": "julia@example.com",
-    "password": "$2b$10$S92cBAH4nKX2hXxvM05DXeN5N5eD4lXHjyI9NTYOGKqq9DrC8XInK",
-    "tier": "Pro",
-    "paymentProvider": "stripe",
-    "providerCustomerId": null,
-    "subscriptionId": null,
-    "subscriptionStatus": "inactive",
-    "subscriptionPlanId": null,
-    "cardLast4": null,
-    "cardBrand": null,
-    "subscriptionStart": null,
-    "subscriptionExpiresAt": null,
-    "isTrial": false,
-    "trialEnd": null,
-    "lastPaymentAttempt": null,
-    "lastPaymentStatus": null,
-    "isPendingDeletion": false,
-    "deletionRequestedAt": null,
-    "emailIsVerified": true
+];
+
+async function seed() {
+  if (process.env.NODE_ENV !== "development") {
+    console.error(
+      "Refusing to seed: NODE_ENV is not 'development'. " +
+        "Set NODE_ENV=development if you really want to seed this database."
+    );
+    process.exit(1);
   }
-]
+
+  const { User, sequelize } = await initializeDbAndModels();
+
+  for (const demoUser of DEMO_USERS) {
+    const [user, created] = await User.findOrCreate({
+      where: { email: demoUser.email },
+      defaults: {
+        password: demoUser.password,
+        tier: demoUser.tier,
+        name: demoUser.name,
+        emailIsVerified: true,
+      },
+    });
+
+    // findOrCreate only applies defaults on creation — force these test
+    // accounts into a known-good state even if they already existed
+    // (e.g. re-running the seed after a schema change).
+    if (!created) {
+      user.tier = demoUser.tier;
+      user.emailIsVerified = true;
+      user.status = "active";
+      user.isPendingDeletion = false;
+      await user.save();
+    }
+
+    console.log(
+      created ? `Created ${user.email}` : `Reset existing account: ${user.email}`
+    );
+  }
+
+  await sequelize.close();
+  console.log("Done.");
+  console.log(`\nTest login (all seeded accounts): password is "${TEST_PASSWORD}"`);
+}
+
+seed().catch((err) => {
+  console.error("Seeding failed:", err);
+  process.exit(1);
+});

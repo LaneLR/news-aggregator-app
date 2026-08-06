@@ -1,9 +1,9 @@
 import ContactUsComponent from "@/components/ContactUs";
 
-export default function PrivacyPage() {
+export default function ContactUsPage() {
   return (
     <>
-      <ContactUsComponent />
+      <ContactUsComponent contactEmail={process.env.CONTACT_EMAIL} />
     </>
   );
 }

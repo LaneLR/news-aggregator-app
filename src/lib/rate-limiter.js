@@ -12,12 +12,17 @@ const RATE_LIMIT_INTERVAL_MS = 60 * 1000; // 1 minute
 const MAX_REQUESTS_PER_INTERVAL = 5; // Allow 5 requests per minute from a single IP
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000; // Run cleanup every 5 minutes
 
-// Function to get the client's IP address from the request
+// Function to get the client's IP address from the request.
+// Next.js App Router route handlers receive a Web API `Request`, whose
+// `headers` is a `Headers` instance — it must be read with `.get()`,
+// not bracket/property access (which silently returns undefined).
 const getClientIp = (req) => {
-  // Check common headers for IP address, useful when behind proxies (like Vercel)
-  return req.headers['x-forwarded-for']?.split(',').shift() ||
-         req.socket?.remoteAddress || // For direct connections
-         'unknown_ip'; // Fallback for local development if IP is truly undefined
+  const forwardedFor = req.headers?.get?.("x-forwarded-for");
+  return (
+    forwardedFor?.split(",").shift()?.trim() ||
+    req.headers?.get?.("x-real-ip") ||
+    "unknown_ip"
+  );
 };
 
 // --- Cleanup function for expired entries ---
@@ -46,10 +51,9 @@ setInterval(cleanupExpiredRequests, CLEANUP_INTERVAL_MS);
  * Middleware function for rate limiting Next.js App Router API routes.
  *
  * @param {Request} req The Next.js Request object.
- * @param {Response} res The Next.js NextResponse object (used for type hint).
  * @throws {Error} Throws an error with status 429 if the rate limit is exceeded.
  */
-export const authRateLimitMiddleware = async (req, NextResponse) => {
+export const authRateLimitMiddleware = async (req) => {
   const ip = getClientIp(req);
   const now = Date.now();
 

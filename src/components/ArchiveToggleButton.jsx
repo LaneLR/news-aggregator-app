@@ -178,15 +178,15 @@ export default function ArchiveToggleButton({
                 left: 0,
                 zIndex: 10,
                 userSelect: "none",
-                background: `${(props) => props.theme.background}`,
-                border: `1px solid ${(props) => props.theme.border}`,
+                background: theme.background,
+                border: `1px solid ${theme.border}`,
                 padding: "0.5rem",
                 listStyle: "none",
-                borderBottom: `1px solid ${(props) => props.theme.border}`,
+                borderBottom: `1px solid ${theme.border}`,
               }}
             >
               {archives.map((archive) => (
-                <li key={archive.id} style={{ borderBottom: `1px solid ${(props) => props.theme.border}` }}>
+                <li key={archive.id} style={{ borderBottom: `1px solid ${theme.border}` }}>
                   <button
                     style={{
                       all: "unset",

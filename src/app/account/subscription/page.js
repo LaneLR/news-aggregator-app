@@ -1,75 +1,68 @@
-import SideBarNav from "@/components/SideNavBar";
-import UnsubscribeComponent from "@/components/Unsubscribe";
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import Link from "next/link";
+import CancelSubscriptionButton from "@/components/CancelSubscriptionButton";
 
-export default async function SubcriptionPage() {
+export default async function SubscriptionPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect("/login");
   }
 
+  const { user } = session;
+  const isSubscribed = user.tier !== "Free";
+
   return (
-    <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "auto",
-          height: "auto",
-        }}
-      >
-        Your subscription tier:
-        {session.user.tier === 'Free' ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              width: "auto",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <p>
-              <b>Free tier</b>
-            </p>
-            <br />
-            <p>
-              Want to upgrade?
-              <Link href={"/subscribe"}>
-                <u>Click here to subscribe!</u>
-              </Link>
-            </p>
-          </div>
-        ) : session.user.tier === 'Pro' ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              width: "auto",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <p>
-              <b>Subscribed</b>
-            </p>
-            <br />
-            <div>
-              Want to cancel your subscription?
-              <UnsubscribeComponent />
-            </div>
-          </div>
-        ) : (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "1rem",
+        width: "100%",
+      }}
+    >
+      <p>Your subscription status:</p>
+      {isSubscribed ? (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.5rem",
+          }}
+        >
           <p>
-            <b>Admin</b>
+            <b>Subscribed</b>
           </p>
-        )}
-      </div>
-    </>
+          <CancelSubscriptionButton
+            subscriptionEndDate={
+              user.subscriptionWillCancel ? user.stripeSubscriptionEndsAt : null
+            }
+            sessionData={session}
+          />
+        </div>
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <p>
+            <b>Free tier</b>
+          </p>
+          <p>
+            Want to upgrade?{" "}
+            <Link href="/pricing">
+              <u>View plans</u>
+            </Link>
+          </p>
+        </div>
+      )}
+    </div>
   );
 }

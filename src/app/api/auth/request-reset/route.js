@@ -16,9 +16,16 @@ export async function POST(req) {
       });
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.NEXTAUTH_SECRET, {
-      expiresIn: "1h",
-    });
+    // Bumping tokenVersion invalidates any previously issued reset links
+    // for this user, so only the most recently requested link works.
+    user.tokenVersion += 1;
+    await user.save();
+
+    const token = jwt.sign(
+      { id: user.id, purpose: "reset-password", v: user.tokenVersion },
+      process.env.NEXTAUTH_SECRET,
+      { expiresIn: "1h" }
+    );
 
     const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/password-reset?token=${token}`;
 

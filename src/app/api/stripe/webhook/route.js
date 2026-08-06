@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import initializeDbAndModels from "@/lib/db";
 import { sendEmail } from "@/utils/emailer";
+import { billingIntervalForPrice } from "@/lib/stripePrices";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -25,7 +26,20 @@ export async function POST(req) {
     );
   }
 
-  const { User } = await initializeDbAndModels();
+  const { User, ProcessedStripeEvent } = await initializeDbAndModels();
+
+  // Stripe retries webhook deliveries and may send the same event more than
+  // once; recording the event ID before processing keeps retries/duplicates
+  // from double-crediting referrals or double-sending emails.
+  try {
+    await ProcessedStripeEvent.create({ id: event.id, type: event.type });
+  } catch (err) {
+    if (err.name === "SequelizeUniqueConstraintError") {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+    console.error("Failed to record webhook event:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
 
   try {
     switch (event.type) {
@@ -41,21 +55,19 @@ export async function POST(req) {
           const subscriptionItem = subscription.items.data[0];
           const priceId = subscriptionItem.price.id;
 
-          let newTier = "Free";
-          if (priceId === "price_1Ry0mKFlSQA8kdoEj98uKzPj") newTier = "Pro";
-          else if (priceId === "price_1Ry0oNFlSQA8kdoEdZzVvegu")
-            newTier = "Pro Annual";
+          // Stripe moved current_period_end from the subscription object to
+          // the subscription item in newer API versions; support either.
+          const periodEnd =
+            subscriptionItem.current_period_end ??
+            subscription.current_period_end;
 
           const updateFields = {
-            tier: newTier,
+            tier: "Subscribed",
             stripeCustomerId: subscription.customer,
             stripeSubscriptionId: subscription.id,
             stripePriceId: priceId,
             stripeSubscriptionStatus: subscription.status,
-            // Access current_period_end from the subscription item
-            stripeSubscriptionEndsAt: new Date(
-              subscriptionItem.current_period_end * 1000
-            ),
+            stripeSubscriptionEndsAt: periodEnd ? new Date(periodEnd * 1000) : null,
           };
 
           const { usedReferralCode, referrerId } = session.metadata;
@@ -81,10 +93,11 @@ export async function POST(req) {
             }
           }
 
+          const interval = billingIntervalForPrice(priceId);
           await sendEmail({
             to: user.email,
-            subject: `Welcome to Your ${newTier} Subscription!`,
-            html: `<p>You are receiving this email because you have subscribed to the ${newTier} plan. Your account has been upgraded, and you now have access to all premium features.</p><p>If this was a mistake, please reach out to us at ---EmailForInquires@domain.com---.</p>`,
+            subject: "Welcome to MorningFeeds Subscribed!",
+            html: `<p>You are receiving this email because you have subscribed to MorningFeeds${interval ? ` (${interval} billing)` : ""}. Your account has been upgraded, and you now have access to Market, Finance, and Journal content plus custom feeds.</p><p>If this was a mistake, please reach out to us at ${process.env.CONTACT_EMAIL}.</p>`,
           });
         }
         break;
@@ -98,19 +111,21 @@ export async function POST(req) {
         if (!user) break;
 
         const priceId = subscription.items.data[0].price.id;
-        let newTier = user.tier;
-        if (priceId === "price_1Ry0mKFlSQA8kdoEj98uKzPj") newTier = "Pro";
-        else if (priceId === "price_1Ry0oNFlSQA8kdoEdZzVvegu")
-          newTier = "Pro Annual";
+
+        const periodEnd =
+          subscription.items.data[0].current_period_end ??
+          subscription.current_period_end;
 
         const updateFields = {
-          tier: newTier,
+          tier: "Subscribed",
           stripeSubscriptionStatus: subscription.status,
           stripePriceId: priceId,
           subscriptionWillCancel: subscription.cancel_at_period_end,
           stripeSubscriptionEndsAt: subscription.cancel_at
             ? new Date(subscription.cancel_at * 1000)
-            : new Date(subscription.current_period_end * 1000),
+            : periodEnd
+            ? new Date(periodEnd * 1000)
+            : null,
         };
 
         await user.update(updateFields);
@@ -120,12 +135,13 @@ export async function POST(req) {
         );
 
         const previousAttributes = event.data.previous_attributes;
+        const newInterval = billingIntervalForPrice(priceId);
 
-        if (previousAttributes.items && user.tier !== newTier) {
+        if (previousAttributes.items) {
           await sendEmail({
             to: user.email,
             subject: "Your Subscription Has Been Updated",
-            html: `<p>Your subscription has been successfully updated to the ${newTier} plan.</p><p>- MorningFeeds Team</p>`,
+            html: `<p>Your subscription billing has been successfully updated${newInterval ? ` to ${newInterval} billing` : ""}.</p><p>- MorningFeeds Team</p>`,
           });
         } else if (
           subscription.cancel_at_period_end &&
@@ -168,6 +184,29 @@ export async function POST(req) {
         });
 
         console.log(`Subscription canceled for ${user.email}`);
+        break;
+      }
+
+      case "invoice.payment_failed": {
+        const invoice = event.data.object;
+        if (!invoice.subscription) break;
+
+        const user = await User.findOne({
+          where: { stripeSubscriptionId: invoice.subscription },
+        });
+        if (!user) break;
+
+        // Don't downgrade immediately — Stripe's Smart Retries will keep
+        // trying the card, and a subscription that ultimately fails for good
+        // triggers customer.subscription.deleted, which already downgrades
+        // the user. This just warns them so they can fix their payment method.
+        await sendEmail({
+          to: user.email,
+          subject: "We couldn't process your payment",
+          html: `<p>We were unable to process your latest payment. Please update your payment method to avoid losing access to your subscription.</p><p>- MorningFeeds Team</p>`,
+        });
+
+        console.log(`Payment failed for ${user.email}`);
         break;
       }
 

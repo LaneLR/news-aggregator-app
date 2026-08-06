@@ -48,19 +48,6 @@ export default async function ArchiveDetailPage({ params }) {
         >
           <p>No articles have been added to this Archive.</p>
         </div>
-      ) : articles.length === 0 ? (
-        <div
-          style={{
-            display: "flex",
-            padding: "20px 0 0 0",
-            justifyContent: "center",
-            alignContent: "center",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          <p>No articles have been added to this Archive.</p>
-        </div>
       ) : (
         <>
           <NewsGridWrapper>

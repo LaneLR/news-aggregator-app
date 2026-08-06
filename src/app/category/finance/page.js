@@ -1,9 +1,18 @@
 import CategoryPageComponent from "@/components/CategoryPage";
+import { authOptions } from "@/lib/auth-options";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
-export default function FinanceNewsPage() {
+export default async function FinanceNewsPage() {
+  const session = await getServerSession(authOptions);
+  const isNotSubscribed = session?.user?.tier === "Free" || !session;
+  if (isNotSubscribed) {
+    return redirect("/pricing");
+  }
+
   return (
     <>
-      <CategoryPageComponent category={"Finance"}/>
+      <CategoryPageComponent category={"Finance"} />
     </>
   );
 }

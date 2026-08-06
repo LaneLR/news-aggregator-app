@@ -1,14 +1,30 @@
 import { NextResponse } from "next/server";
 import initializeDbAndModels from "@/lib/db.js";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { authRateLimitMiddleware } from "@/lib/rate-limiter";
 import Stripe from "stripe";
 
-// Replace with your actual Stripe secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    try {
+      await authRateLimitMiddleware(req);
+    } catch (err) {
+      return NextResponse.json(
+        { error: err.message },
+        { status: err.status || 429 }
+      );
+    }
+
     const { referralCode } = await req.json();
 
     if (!referralCode) {
@@ -33,6 +49,13 @@ export async function POST(req) {
     if (referringUser.tier === "Free") {
       return NextResponse.json(
         { error: "This referral code is not from an active subscriber." },
+        { status: 400 }
+      );
+    }
+
+    if (referringUser.id === session.user.id) {
+      return NextResponse.json(
+        { error: "You cannot use your own referral code." },
         { status: 400 }
       );
     }

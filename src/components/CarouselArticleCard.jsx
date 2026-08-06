@@ -2,10 +2,13 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import ShareButton from "./ShareButton";
 import ArchiveToggleButton from "./ArchiveToggleButton";
+import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
+import { trackArticleClick } from "@/lib/trackClick";
 
 const CardWrapper = styled.div`
   display: inline-block;
@@ -139,16 +142,8 @@ const ReadMoreButton = styled.a`
 
 export default function CarouselCard({ article, archiveId, sessionData }) {
   const { data: session } = useSession({ data: sessionData });
+  const router = useRouter();
 
-  const PAYWALLED_SOURCES = new Set([
-    "The Washington Post",
-    "Financial Times",
-    "The Wall Street Journal",
-    "The New York Times",
-    "Bloomberg",
-    "The Economist",
-    "Reuters",
-  ]);
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
   const [likeCount, setLikeCount] = useState(article.likeCount || 0);
 
@@ -160,6 +155,7 @@ export default function CarouselCard({ article, archiveId, sessionData }) {
   const handleLike = async () => {
     if (!session) {
       alert("You must be signed in to like articles.");
+      router.push("/login");
       return;
     }
     const originalLikedState = isLiked;
@@ -188,7 +184,12 @@ export default function CarouselCard({ article, archiveId, sessionData }) {
 
   return (
     <CardWrapper>
-      <ImageLink href={article.url} target="_blank" rel="noopener noreferrer">
+      <ImageLink
+        href={article.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => trackArticleClick(article.url)}
+      >
         <Image
           src={proxiedImageUrl}
           alt={article.title}
@@ -212,6 +213,7 @@ export default function CarouselCard({ article, archiveId, sessionData }) {
             href={article.url}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackArticleClick(article.url)}
           >
             {article.title}
           </TitleLink>
@@ -224,7 +226,11 @@ export default function CarouselCard({ article, archiveId, sessionData }) {
               alignItems: "center",
             }}
           >
-            <ReadMoreButton href={article.url} target="_blank">
+            <ReadMoreButton
+              href={article.url}
+              target="_blank"
+              onClick={() => trackArticleClick(article.url)}
+            >
               Read article
             </ReadMoreButton>
           </div>

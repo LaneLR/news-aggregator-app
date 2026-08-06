@@ -14,7 +14,7 @@ export async function DELETE(req, { params }) {
       );
 
     const db = await initializeDbAndModels();
-    const { SavedArticle } = db;
+    const { SavedArticle, Archive } = db;
 
     const archiveId = Number(params.archiveId);
     const articleId = Number(params.articleId);
@@ -23,6 +23,16 @@ export async function DELETE(req, { params }) {
       return NextResponse.json(
         { error: "Invalid archive or article ID" },
         { status: 400 }
+      );
+    }
+
+    const archive = await Archive.findOne({
+      where: { id: archiveId, userId: session.user.id },
+    });
+    if (!archive) {
+      return NextResponse.json(
+        { error: "Archive not found" },
+        { status: 404 }
       );
     }
 

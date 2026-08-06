@@ -8,10 +8,23 @@ const Wrapper = styled.button`
   border: none;
   cursor: pointer;
   font-weight: 600;
+  transition: opacity 0.15s ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 `
 
-export default function Button({ bgColor, clr, wide, children, onClick }) {
+export default function Button({ bgColor, clr, wide, children, onClick, disabled, type }) {
   return (
-    <Wrapper style={{ backgroundColor: `${bgColor}`, color: `${clr}`, width: `${wide}`}} onClick={onClick}>{children}</Wrapper>
+    <Wrapper
+      type={type || "button"}
+      style={{ backgroundColor: bgColor, color: clr, width: wide }}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {children}
+    </Wrapper>
   );
 }

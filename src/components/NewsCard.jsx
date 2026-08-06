@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import ArchiveToggleButton from "./ArchiveToggleButton";
+import { trackArticleClick } from "@/lib/trackClick";
 
 const Wrapper = styled.div`
   flex-flow: column nowrap;
@@ -97,15 +98,16 @@ export default function NewsCard({ article, archiveId, viewOnly = false }) {
     }
   };
 
-  // fixed imageHeight and imageWidth if not using fill
-  // const imageHeight = 250;
-  // const imageWidth = 400;
-
   return (
     <>
       <Wrapper>
         <CardWrapper>
-          <a href={article.url} target="_blank" rel="noopener noreferrer">
+          <a
+            href={article.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackArticleClick(article.url)}
+          >
             <Image
               style={{
                 borderTopLeftRadius: "15px",
@@ -113,7 +115,7 @@ export default function NewsCard({ article, archiveId, viewOnly = false }) {
                 backgroundColor:
                   currentImageSrc === FALLBACK_IMAGE_URL
                     ? "lightgray"
-                    : "f0f0f0",
+                    : "#f0f0f0",
                 objectFit: "cover",
               }}
               src={currentImageSrc}

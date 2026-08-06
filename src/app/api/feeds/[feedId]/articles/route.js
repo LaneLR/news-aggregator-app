@@ -17,8 +17,7 @@ export async function GET(req, context) {
   }
 
   const { feedId } = context.params;
-  const { Feed, NewsArticle, JournalArticle, MarketArticle } =
-    await initializeDbAndModels();
+  const { Feed, Article } = await initializeDbAndModels();
   const { searchParams } = new URL(req.url);
 
   const query = searchParams.get("q")?.trim() || "";
@@ -85,29 +84,11 @@ export async function GET(req, context) {
       return NextResponse.json({ articles: [] });
     }
 
-    const [newsArticles, journalArticles, marketArticles] = await Promise.all([
-      NewsArticle.findAll({
-        where: whereClause,
-        limit: 50,
-        order: [["publishedAt", "DESC"]],
-      }),
-      JournalArticle.findAll({
-        where: whereClause,
-        limit: 50,
-        order: [["publishedAt", "DESC"]],
-      }),
-      MarketArticle.findAll({
-        where: whereClause,
-        limit: 50,
-        order: [["publishedAt", "DESC"]],
-      }),
-    ]);
-
-    const combinedArticles = [
-      ...newsArticles,
-      ...journalArticles,
-      ...marketArticles,
-    ].sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+    const combinedArticles = await Article.findAll({
+      where: whereClause,
+      limit: 100,
+      order: [["publishedAt", "DESC"]],
+    });
 
     if (session?.user?.id) {
       const { ArticleLike } = await initializeDbAndModels();
@@ -125,7 +106,7 @@ export async function GET(req, context) {
       return NextResponse.json({ articles: articlesWithLikes });
     }
 
-    return NextResponse.json({ articles: combinedArticles.slice(0, 100) });
+    return NextResponse.json({ articles: combinedArticles });
   } catch (err) {
     console.error("Error fetching articles for feed:", err);
     return NextResponse.json(

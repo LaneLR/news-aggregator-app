@@ -5,8 +5,10 @@ import Link from "next/link.js";
 import Image from "next/image.js";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation.js";
+import { useRouter } from "next/navigation.js";
 import ShareButton from "./ShareButton.jsx";
+import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
+import { trackArticleClick } from "@/lib/trackClick";
 
 const CardContainer = styled.div`
   background-color: ${(props) => props.theme.primary};
@@ -114,7 +116,7 @@ const LikeButton = styled.button`
   flex-direction: row;
   gap: 6px;
   font-size: 1rem;
-  color: ${(props) => (props.$isLiked ? `${(props) => props.theme.primary}` : `${(props) => props.theme.border}`)};
+  color: ${(props) => (props.$isLiked ? props.theme.primary : props.theme.border)};
 `;
 
 const LikeOrUnlikedButton = styled.img`
@@ -148,16 +150,7 @@ export default function NewsCardFour({
 }) {
   const { data: session, status, update } = useSession({ data: sessionData });
   const theme = useTheme();
-
-  const PAYWALLED_SOURCES = new Set([
-    "The Washington Post",
-    "Financial Times",
-    "The Wall Street Journal",
-    "The New York Times",
-    "Bloomberg",
-    "The Economist",
-    "Reuters",
-  ]);
+  const router = useRouter();
 
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
   const [likeCount, setLikeCount] = useState(article.likeCount || 0);
@@ -178,7 +171,8 @@ export default function NewsCardFour({
   const handleLike = async () => {
     if (!session) {
       alert("You must be signed in to like articles.");
-      redirect("/login");
+      router.push("/login");
+      return;
     }
 
     const originalLikedState = isLiked;
@@ -213,12 +207,10 @@ export default function NewsCardFour({
 
   return (
     <CardContainer>
-      {/* <CardHeader>
-        <BrandText>MorningFeeds</BrandText>
-      </CardHeader> */}
       <Link
         href={article.url}
         target={"_blank"}
+        onClick={() => trackArticleClick(article.url)}
         style={{ position: "relative", width: "100%", height: "250px" }}
       >
         <Image
@@ -235,7 +227,6 @@ export default function NewsCardFour({
             minWidth: "100%",
             borderTopLeftRadius: "10px",
             borderTopRightRadius: "10px",
-            // height: '100px'
           }}
         />
       </Link>
@@ -246,7 +237,11 @@ export default function NewsCardFour({
             <ArticleSnippetText>{cleanSourceName}</ArticleSnippetText>
           </ArticleSnippet>
           <ArticleTitle>
-            <Link href={article.url} target={"_blank"}>
+            <Link
+              href={article.url}
+              target={"_blank"}
+              onClick={() => trackArticleClick(article.url)}
+            >
               {cleanTitle}
             </Link>
           </ArticleTitle>
@@ -266,7 +261,11 @@ export default function NewsCardFour({
               alignItems: "center",
             }}
           >
-            <ReadMoreButton href={article.url} target="_blank">
+            <ReadMoreButton
+              href={article.url}
+              target="_blank"
+              onClick={() => trackArticleClick(article.url)}
+            >
               Read article
             </ReadMoreButton>
           </div>

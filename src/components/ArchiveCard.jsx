@@ -2,16 +2,21 @@
 import styled from "styled-components";
 import Link from 'next/link';
 
+const CardWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+`;
+
 const CardLink = styled(Link)`
   display: block;
   position: relative;
   width: 100%;
-  max-width: 350px;
   height: 220px;
   border-radius: 16px;
   overflow: hidden;
   text-decoration: none;
-  background-color: ${(props) => props.theme.border}; 
+  background-color: ${(props) => props.theme.border};
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease-in-out;
 
@@ -19,6 +24,16 @@ const CardLink = styled(Link)`
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   }
+`;
+
+// Rendered as a sibling of the card's anchor (not nested inside it) so
+// interactive children like a delete button don't end up as an <a><button>
+// (invalid HTML — nested interactive elements) and don't trigger navigation.
+const CardControls = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
 `;
 
 const ImageGrid = styled.div`
@@ -69,22 +84,29 @@ const ArchiveMeta = styled.p`
   opacity: 0.8;
 `;
 
-export default function ArchiveCard2({ archive }) {
+export default function ArchiveCard({ archive, children }) {
   const { name, articleCount, lastUpdated, articleImages = [] } = archive;
 
-  const displayImages = [...articleImages.slice(0, 4), ...Array(4 - articleImages.length).fill(null)];
+  const shownImages = articleImages.slice(0, 4);
+  const displayImages = [
+    ...shownImages,
+    ...Array(4 - shownImages.length).fill(null),
+  ];
 
   return (
-    <CardLink href={`/archives/${archive.id}`}>
-      <ImageGrid>
-        {displayImages.map((src, index) =>
-          src ? <GridImage key={index} src={src} /> : <div key={index} />
-        )}
-      </ImageGrid>
-      <Overlay>
-        <ArchiveTitle>{name}</ArchiveTitle>
-        <ArchiveMeta>{articleCount} Articles • {lastUpdated}</ArchiveMeta>
-      </Overlay>
-    </CardLink>
+    <CardWrapper>
+      <CardLink href={`/archives/${archive.id}`}>
+        <ImageGrid>
+          {displayImages.map((src, index) =>
+            src ? <GridImage key={index} src={src} /> : <div key={index} />
+          )}
+        </ImageGrid>
+        <Overlay>
+          <ArchiveTitle>{name}</ArchiveTitle>
+          <ArchiveMeta>{articleCount} Articles • {lastUpdated}</ArchiveMeta>
+        </Overlay>
+      </CardLink>
+      {children && <CardControls>{children}</CardControls>}
+    </CardWrapper>
   );
 }

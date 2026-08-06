@@ -33,7 +33,8 @@ const InputWrapper = styled.div`
 `;
 
 const RegisterFormInput = styled.input`
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
   padding: 10px;
   margin: 10px 0;
   border: 1px solid ${(props) => props.theme.border};
