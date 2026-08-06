@@ -1,44 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Newspaper, RefreshCw } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
-import styled, { useTheme } from "styled-components";
 import Button from "./Button";
 import Loading from "@/app/loading";
-
-const SearchBarHeader = styled.div`
-  font-size: 3rem;
-  font-weight: 600;
-  color: ${(props) => props.theme.darkBlue};
-  padding: 20px 0 0 0;
-  text-align: center;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  @media (max-width: 440px) {
-    font-size: 1.8rem;
-  }
-`;
-
-const SortToggle = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 1rem 0;
-`;
-
-const SortOption = styled.button`
-  padding: 6px 14px;
-  border-radius: 16px;
-  border: 2px solid ${(props) => props.theme.border};
-  background: ${(props) => (props.$active ? props.theme.primary : "transparent")};
-  color: ${(props) => (props.$active ? props.theme.buttonText : props.theme.text)};
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-`;
+import styles from "./CategoryPage.module.scss";
 
 async function fetchCategoryArticles(category, sort) {
   const baseUrl =
@@ -65,7 +32,6 @@ export default function CategoryPage({ category, archiveId }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sort, setSort] = useState("latest");
-  const theme = useTheme();
 
   const categoryNameForDisplay =
     category.charAt(0).toUpperCase() + category.slice(1);
@@ -146,38 +112,40 @@ export default function CategoryPage({ category, archiveId }) {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        <SearchBarHeader>{categoryNameForDisplay} Headlines</SearchBarHeader>
-        <SortToggle>
-          <SortOption type="button" $active={sort === "latest"} onClick={() => setSort("latest")}>
-            Latest
-          </SortOption>
-          <SortOption type="button" $active={sort === "trending"} onClick={() => setSort("trending")}>
-            Trending
-          </SortOption>
-          <SortOption type="button" $active={sort === "liked"} onClick={() => setSort("liked")}>
-            Most Liked
-          </SortOption>
-        </SortToggle>
-        {newAvailable && (
-          <div
-            style={{
-              margin: "20px 0 0 0",
-              display: "flex",
-              alignItems: "center",
-            }}
+      <div className={styles.pageHeader}>
+        <h1 className={`${styles.searchBarHeader} headline`}>
+          <Newspaper size={30} />
+          {categoryNameForDisplay} Headlines
+        </h1>
+        <div className={styles.sortToggle}>
+          <button
+            type="button"
+            className={`${styles.sortOption} ${sort === "latest" ? styles.active : ""}`}
+            onClick={() => setSort("latest")}
           >
-            <div style={{ fontSize: "1.6rem" }}>🔄</div>
+            Latest
+          </button>
+          <button
+            type="button"
+            className={`${styles.sortOption} ${sort === "trending" ? styles.active : ""}`}
+            onClick={() => setSort("trending")}
+          >
+            Trending
+          </button>
+          <button
+            type="button"
+            className={`${styles.sortOption} ${sort === "liked" ? styles.active : ""}`}
+            onClick={() => setSort("liked")}
+          >
+            Most Liked
+          </button>
+        </div>
+        {newAvailable && (
+          <div className={styles.refreshBanner}>
+            <RefreshCw size={18} />
             <Button
-              bgColor={theme.primary}
-              clr={theme.text}
+              bgColor={"var(--theme-primary)"}
+              clr={"var(--theme-primary-contrast)"}
               onClick={refreshArticles}
             >
               New articles available

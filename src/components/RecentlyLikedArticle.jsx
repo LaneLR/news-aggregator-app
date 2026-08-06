@@ -1,41 +1,9 @@
 "use client";
 import { useState } from "react";
-import styled from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
 import { trackArticleClick } from "@/lib/trackClick";
-
-const ItemLink = styled(Link)`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 5px 0;
-  text-decoration: none;
-  color: inherit;
-  &:not(:last-child) {
-    border-bottom: 1px solid ${(props) => props.theme.border};
-  }
-`;
-
-const Thumbnail = styled(Image)`
-  border-radius: 8px;
-  object-fit: cover;
-`;
-
-const Info = styled.div`
-  flex-grow: 1;
-  h4 {
-    margin: 0 0 4px 0;
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.3;
-  }
-  p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: ${(props) => props.theme.textSecondary};
-  }
-`;
+import styles from "./RecentlyLikedArticle.module.scss";
 
 const FALLBACK_IMAGE_URL = "/images/blurimage.png";
 
@@ -52,24 +20,26 @@ export default function RecentlyLikedItem({ article }) {
 
   return (
     <li>
-      <ItemLink
+      <Link
+        className={styles.itemLink}
         href={article.url}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() => trackArticleClick(article.url)}
+        onClick={() => trackArticleClick(article)}
       >
-        <Thumbnail
+        <Image
+          className={styles.thumbnail}
           src={imageSrc}
           width={70}
           height={70}
           alt={article.title}
           onError={handleImageError}
         />
-        <Info>
+        <div className={styles.info}>
           <h4>{article.title}</h4>
           <p>{article.sourceName}</p>
-        </Info>
-      </ItemLink>
+        </div>
+      </Link>
     </li>
   );
 }

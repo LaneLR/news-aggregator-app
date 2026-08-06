@@ -1,0 +1,31 @@
+.wrapper {
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-top-right-radius: var(--radius-sm);
+  border-bottom-right-radius: var(--radius-sm);
+  height: 100%;
+  width: 150px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  background-color: var(--theme-primary);
+  color: var(--theme-button-text);
+
+  &:hover {
+    filter: brightness(0.95);
+  }
+
+  &.copied {
+    background-color: var(--theme-success);
+  }
+
+  &.failed {
+    background-color: var(--theme-warning);
+  }
+}

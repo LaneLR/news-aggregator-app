@@ -1,0 +1,124 @@
+.cardContainer {
+  background-color: var(--theme-card-background);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--theme-border);
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.imageLink {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background-color: var(--theme-layout-background);
+}
+
+.contentArea {
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.articleTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--theme-dark-blue);
+  line-height: 1.35;
+  margin: 0 0 0.5rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  a:hover {
+    color: var(--theme-primary);
+  }
+}
+
+.articleSnippetText {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--theme-text-secondary);
+  margin: 0 0 1rem 0;
+}
+
+.actionsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--theme-border);
+}
+
+.actionsGroup {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.likeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  height: 36px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--theme-text-secondary);
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: var(--theme-layout-background);
+  }
+
+  &.liked {
+    color: var(--theme-warning);
+  }
+}
+
+.lockedArticleIcon {
+  color: var(--theme-text-secondary);
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+}
+
+.readMoreButton {
+  background-color: var(--theme-primary);
+  color: var(--theme-primary-contrast);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  transition: filter 0.15s ease-in-out, transform 0.1s ease-in-out;
+  &:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: translateY(0);
+  }
+}

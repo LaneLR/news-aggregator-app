@@ -4,63 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Button from "./Button";
-import styled from "styled-components";
-
-const Wrapper = styled.div`
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100vw;
-  overflow-y: hidden;
-  flex-flow: column nowrap;
-  background-color: ${(props) => props.theme.background};
-  padding: 0 0 10px 0;
-`;
-
-const FormWrapper = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 100%;
-  background-color: inherit;
-`;
-
-const InputWrapper = styled.div`
-  height: fit-content;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const ResetPasswordFormInput = styled.input`
-  width: 100%;
-  max-width: 300px;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid ${(props) => props.theme.border};
-  border-radius: 4px;
-
-  &:last-of-type {
-    margin-bottom: 25px;
-  }
-`;
-
-const Header = styled.div`
-  font-size: 2rem;
-  font-weight: 600;
-  color: ${(props) => props.theme.darkBlue};
-  padding: 10px 0;
-  text-align: center;
-  width: 100%;
-
-  @media (max-width: 440px) {
-    font-size: 1.8rem;
-    font-weight: 700;
-  }
-`;
+import styles from "./ResetPasswordForm.module.scss";
 
 export default function ResetPasswordComponent() {
   const searchParams = useSearchParams();
@@ -70,7 +14,6 @@ export default function ResetPasswordComponent() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const theme = useTheme();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -117,27 +60,28 @@ export default function ResetPasswordComponent() {
 
   if (success) {
     return (
-      <Wrapper>
-        <Header>Your password has been reset</Header>
+      <div className={styles.wrapper}>
+        <div className={styles.header}>Your password has been reset</div>
         <div style={{ textAlign: "center" }}>
           <p>You can now log in with your new password.</p>
           <br />
           <Link href="/login">
-            <Button bgColor={theme.primary} clr={theme.text}>
+            <Button bgColor={"var(--theme-primary)"} clr={"var(--theme-text)"}>
               Go to Log in
             </Button>
           </Link>
         </div>
-      </Wrapper>
+      </div>
     );
   }
 
   return (
-    <Wrapper>
-      <Header>Reset Your Password</Header>
-      <FormWrapper onSubmit={handleSubmit}>
-        <InputWrapper>
-          <ResetPasswordFormInput
+    <div className={styles.wrapper}>
+      <div className={styles.header}>Reset Your Password</div>
+      <form className={styles.formWrapper} onSubmit={handleSubmit}>
+        <div className={styles.inputWrapper}>
+          <input
+            className={styles.resetPasswordFormInput}
             type="password"
             id="password"
             placeholder="New Password"
@@ -145,7 +89,8 @@ export default function ResetPasswordComponent() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <ResetPasswordFormInput
+          <input
+            className={styles.resetPasswordFormInput}
             type="password"
             id="confirmPassword"
             placeholder="Confirm New Password"
@@ -153,10 +98,10 @@ export default function ResetPasswordComponent() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
-        </InputWrapper>
+        </div>
         <Button
-          bgColor={theme.primary}
-          clr={theme.text}
+          bgColor={"var(--theme-primary)"}
+          clr={"var(--theme-text)"}
           type="submit"
           disabled={loading}
         >
@@ -165,10 +110,10 @@ export default function ResetPasswordComponent() {
         {error && (
           <>
             <br />
-            <p style={{ color: theme.warning }}>{error}</p>
+            <p style={{ color: "var(--theme-warning)" }}>{error}</p>
           </>
         )}
-      </FormWrapper>
-    </Wrapper>
+      </form>
+    </div>
   );
 }

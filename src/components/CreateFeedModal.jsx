@@ -1,75 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import styled, { useTheme } from "styled-components";
 import Button from "./Button";
-
-const ModalBackdrop = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  color: ${(props) => props.theme.darkBlue};
-`;
-
-const ModalContent = styled.div`
-  background: ${(props) => props.theme.background};
-  padding: 24px 40px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-`;
-
-const FilterList = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  max-height: 400px;
-  overflow-y: auto;
-  &:last-child {
-    border-bottom: 1px solid ${(props) => props.theme.border};
-  }
-`;
-
-const FilterCheckbox = styled.label`
-  cursor: pointer;
-  padding: 5px 10px;
-  border-radius: 16px;
-  border: 1px solid ${(props) => props.theme.border};
-  transition: all 0.2s ease-in-out;
-  background: ${(props) => (props.checked ? props.theme.primary : props.theme.background)};
-  color: ${(props) => (props.checked ? props.theme.text : props.theme.textTertiary)};
-
-  &:hover {
-    filter: brightness(0.95);
-  }
-`;
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 1.5rem;
-`;
-
-const FormTitle = styled.h2`
-  padding: 0 0 3px 0;
-  // color: ${(props) => props.theme.textTertiary};
-`;
-
-const CategoryNames = styled.h4`
-  padding: 0 0 6px 0;
-  // color: ${(props) => props.theme.textTertiary};
-`;
+import styles from "./CreateFeedModal.module.scss";
 
 export default function CreateFeedModal({
   isOpen,
@@ -82,7 +14,6 @@ export default function CreateFeedModal({
   const [availableCategories, setAvailableCategories] = useState([]);
   const [selectedSources, setSelectedSources] = useState(new Set());
   const [selectedCategories, setSelectedCategories] = useState(new Set());
-  const theme = useTheme();
 
   const isEditMode = !!feedToEdit;
 
@@ -170,9 +101,11 @@ export default function CreateFeedModal({
   if (!isOpen) return null;
 
   return (
-    <ModalBackdrop onClick={onClose}>
-      <ModalContent onClick={(e) => e.stopPropagation()}>
-        <FormTitle>{isEditMode ? "Edit Feed" : "Create a New Feed"}</FormTitle>
+    <div className={styles.modalBackdrop} onClick={onClose}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <h2 className={styles.formTitle}>
+          {isEditMode ? "Edit Feed" : "Create a New Feed"}
+        </h2>
         <input
           type="text"
           placeholder="Feed Name (e.g., 'Tech News')"
@@ -181,10 +114,15 @@ export default function CreateFeedModal({
           style={{ width: "100%", padding: "10px", marginBottom: "1rem" }}
         />
 
-        <CategoryNames>Select Sources</CategoryNames>
-        <FilterList>
+        <h4 className={styles.categoryNames}>Select Sources</h4>
+        <div className={styles.filterList}>
           {availableSources.map((source) => (
-            <FilterCheckbox key={source} checked={selectedSources.has(source)}>
+            <label
+              key={source}
+              className={`${styles.filterCheckbox} ${
+                selectedSources.has(source) ? styles.checked : ""
+              }`}
+            >
               <input
                 type="checkbox"
                 hidden
@@ -193,14 +131,19 @@ export default function CreateFeedModal({
                 }
               />
               {source}
-            </FilterCheckbox>
+            </label>
           ))}
-        </FilterList>
+        </div>
 
-        <CategoryNames>Select Categories</CategoryNames>
-        <FilterList>
+        <h4 className={styles.categoryNames}>Select Categories</h4>
+        <div className={styles.filterList}>
           {availableCategories.map((cat) => (
-            <FilterCheckbox key={cat} checked={selectedCategories.has(cat)}>
+            <label
+              key={cat}
+              className={`${styles.filterCheckbox} ${
+                selectedCategories.has(cat) ? styles.checked : ""
+              }`}
+            >
               <input
                 type="checkbox"
                 hidden
@@ -209,25 +152,25 @@ export default function CreateFeedModal({
                 }
               />
               {cat}
-            </FilterCheckbox>
+            </label>
           ))}
-        </FilterList>
-        <ButtonWrapper>
+        </div>
+        <div className={styles.buttonWrapper}>
           {isEditMode ? (
             <>
               {" "}
               <Button
                 onClick={handleSave}
-                bgColor={theme.primary}
-                clr={theme.text}
+                bgColor={"var(--theme-primary)"}
+                clr={"var(--theme-text)"}
                 style={{ marginLeft: "auto" }}
               >
                 Save Feed
               </Button>
               <Button
                 onClick={handleDelete}
-                bgColor={theme.warning}
-                clr={theme.textTertiary}
+                bgColor={"var(--theme-warning)"}
+                clr={"var(--theme-text-tertiary)"}
               >
                 Delete Feed
               </Button>
@@ -235,15 +178,15 @@ export default function CreateFeedModal({
           ) : (
             <Button
               onClick={handleSave}
-              bgColor={theme.primary}
-              clr={theme.text}
+              bgColor={"var(--theme-primary)"}
+              clr={"var(--theme-text)"}
               style={{ marginLeft: "auto" }}
             >
               Create Feed
             </Button>
           )}
-        </ButtonWrapper>
-      </ModalContent>
-    </ModalBackdrop>
+        </div>
+      </div>
+    </div>
   );
 }

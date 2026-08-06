@@ -3,16 +3,10 @@
 import { useState } from "react";
 import Button from "./Button";
 import { useSession } from "next-auth/react";
-import { useTheme } from "styled-components";
 
-export default function ResumeSubscriptionButton({
-  updateSession,
-  subscriptionEndDate,
-  sessionData,
-}) {
-  const theme = useTheme();
+export default function ResumeSubscriptionButton({ subscriptionEndDate }) {
+  const { update } = useSession();
   const [error, setError] = useState(null);
-  const { data: session, status, update } = useSession({ data: sessionData });
 
   const handleResume = async () => {
     setError(null);
@@ -28,7 +22,7 @@ export default function ResumeSubscriptionButton({
         throw new Error(data.error || "Failed to resume subscription.");
       }
 
-      await updateSession();
+      await update();
     } catch (err) {
       setError(err.message);
       console.error(err);
@@ -39,33 +33,27 @@ export default function ResumeSubscriptionButton({
     <div
       style={{
         textAlign: "center",
-        color: theme.darkBlue,
+        color: "var(--theme-dark-blue)",
         padding: "10px 50px",
       }}
     >
       <div style={{ marginBottom: "1rem" }}>
-        <p style={{padding: "0 0 5px 0"}}>
+        <p style={{ padding: "0 0 5px 0" }}>
           <i>
-            You have scheduled your subscription to cancel. You can resume it at
-            any time before the period ends.{" "}
+            You have scheduled your subscription to cancel. You can resume it
+            at any time before the period ends.
           </i>
         </p>
-        <strong>
-          {" "}
-          Access ends on:{" "}
-          {new Date(
-            session?.user?.stripeSubscriptionEndsAt
-          ).toLocaleDateString()}
-        </strong>{" "}
+        {subscriptionEndDate && (
+          <strong>
+            Access ends on: {new Date(subscriptionEndDate).toLocaleDateString()}
+          </strong>
+        )}
       </div>
-      <Button
-        onClick={handleResume}
-        bgColor={theme.primary}
-        clr={theme.text}
-      >
+      <Button onClick={handleResume} bgColor={"var(--theme-primary)"} clr={"var(--theme-button-text)"}>
         Resume Subscription
       </Button>
-      {error && <p style={{ color: theme.warning, marginTop: "10px" }}>{error}</p>}
+      {error && <p style={{ color: "var(--theme-warning)", marginTop: "10px" }}>{error}</p>}
     </div>
   );
 }

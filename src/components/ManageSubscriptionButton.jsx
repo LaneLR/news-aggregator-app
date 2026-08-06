@@ -1,9 +1,7 @@
 "use client";
 import Button from "./Button";
-import { useTheme } from "styled-components";
 
 export default function ManageSubscriptionButton() {
-  const theme = useTheme();
   const handleManage = async () => {
     try {
       const response = await fetch("/api/stripe/manage-subscription", {
@@ -26,8 +24,8 @@ export default function ManageSubscriptionButton() {
     <div>
       <Button
         wide={"fit-content"}
-        bgColor={theme.primary}
-        clr={theme.text}
+        bgColor={"var(--theme-primary)"}
+        clr={"var(--theme-text)"}
         onClick={handleManage}
       >
         Manage Subscription

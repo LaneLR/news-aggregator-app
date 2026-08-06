@@ -2,25 +2,9 @@
 import { useEffect, useState } from "react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardFour from "./NewsCardFour";
-import styled from "styled-components";
 import Button from "./Button";
 import Loading from "@/app/loading";
-
-const SearchBarHeader = styled.div`
-  font-size: 3rem;
-  font-weight: 600;
-  color: var(--deep-blue);
-  padding: 20px 0 0 0;
-  text-align: center;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  @media (max-width: 440px) {
-    font-size: 1.8rem;
-  }
-`;
+import styles from "./NewsFeed.module.scss";
 
 async function fetchArticles(feedId) {
   const baseUrl =
@@ -133,7 +117,7 @@ export default function News({ archiveId, feedId }) {
           width: "100%",
         }}
       >
-        <SearchBarHeader>The most recent headlines</SearchBarHeader>
+        <div className={styles.searchBarHeader}>The most recent headlines</div>
         {newAvailable && (
           <div
             style={{

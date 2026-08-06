@@ -1,0 +1,21 @@
+.layoutRow {
+  display: flex;
+  gap: 15px;
+  height: 100%;
+  padding: 15px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--theme-layout-background);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.main {
+  flex-grow: 1;
+  min-width: 0;
+  width: 100%;
+  background-color: var(--theme-layout-background);
+  color: var(--theme-text);
+}

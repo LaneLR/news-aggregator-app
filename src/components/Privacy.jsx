@@ -1,29 +1,9 @@
 "use client";
-import styled from "styled-components";
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px 40px 60px;
-  gap: 12px;
-
-  h2 {
-    margin-top: 1.5rem;
-  }
-
-  @media (max-width: 440px) {
-    padding: 10px 30px 40px;
-  }
-`;
+import styles from "./Privacy.module.scss";
 
 export default function PrivacyPageComponent({ contactEmail }) {
   return (
-    <Wrapper>
+    <div className={styles.wrapper}>
       <h1>Privacy Policy</h1>
       <p>Last updated: {new Date().toLocaleDateString()}</p>
 
@@ -86,6 +66,6 @@ export default function PrivacyPageComponent({ contactEmail }) {
         Questions about this policy or your data can be sent to{" "}
         <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
       </p>
-    </Wrapper>
+    </div>
   );
 }

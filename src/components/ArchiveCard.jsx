@@ -1,88 +1,7 @@
 "use client";
-import styled from "styled-components";
-import Link from 'next/link';
-
-const CardWrapper = styled.div`
-  position: relative;
-  width: 100%;
-  max-width: 350px;
-`;
-
-const CardLink = styled(Link)`
-  display: block;
-  position: relative;
-  width: 100%;
-  height: 220px;
-  border-radius: 16px;
-  overflow: hidden;
-  text-decoration: none;
-  background-color: ${(props) => props.theme.border};
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease-in-out;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-// Rendered as a sibling of the card's anchor (not nested inside it) so
-// interactive children like a delete button don't end up as an <a><button>
-// (invalid HTML — nested interactive elements) and don't trigger navigation.
-const CardControls = styled.div`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-`;
-
-const ImageGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  width: 100%;
-  height: 100%;
-`;
-
-const GridImage = styled.div`
-  width: 100%;
-  height: 100%;
-  background-image: url(${(props) => props.src});
-  background-size: cover;
-  background-position: center;
-`;
-
-const Overlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 60%);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 1.25rem;
-  color: ${(props) => props.theme.buttonText};
-  transition: background 0.2s ease-in-out;
-
-  ${CardLink}:hover & {
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.1) 60%);
-  }
-`;
-
-const ArchiveTitle = styled.h3`
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin: 0;
-  line-height: 1.2;
-`;
-
-const ArchiveMeta = styled.p`
-  font-size: 0.9rem;
-  margin: 4px 0 0 0;
-  opacity: 0.8;
-`;
+import Link from "next/link";
+import { Image as ImageIcon, FileText } from "lucide-react";
+import styles from "./ArchiveCard.module.scss";
 
 export default function ArchiveCard({ archive, children }) {
   const { name, articleCount, lastUpdated, articleImages = [] } = archive;
@@ -94,19 +13,32 @@ export default function ArchiveCard({ archive, children }) {
   ];
 
   return (
-    <CardWrapper>
-      <CardLink href={`/archives/${archive.id}`}>
-        <ImageGrid>
+    <div className={styles.cardWrapper}>
+      <Link className={styles.cardLink} href={`/archives/${archive.id}`}>
+        <div className={styles.imageGrid}>
           {displayImages.map((src, index) =>
-            src ? <GridImage key={index} src={src} /> : <div key={index} />
+            src ? (
+              <div
+                key={index}
+                className={styles.gridImage}
+                style={{ backgroundImage: `url(${src})` }}
+              />
+            ) : (
+              <div key={index} className={styles.emptySlot}>
+                <ImageIcon size={20} strokeWidth={1.5} />
+              </div>
+            )
           )}
-        </ImageGrid>
-        <Overlay>
-          <ArchiveTitle>{name}</ArchiveTitle>
-          <ArchiveMeta>{articleCount} Articles • {lastUpdated}</ArchiveMeta>
-        </Overlay>
-      </CardLink>
-      {children && <CardControls>{children}</CardControls>}
-    </CardWrapper>
+        </div>
+        <div className={styles.overlay}>
+          <h3 className={`${styles.archiveTitle} headline`}>{name}</h3>
+          <p className={styles.archiveMeta}>
+            <FileText size={14} />
+            {articleCount} Articles • {lastUpdated}
+          </p>
+        </div>
+      </Link>
+      {children && <div className={styles.cardControls}>{children}</div>}
+    </div>
   );
 }

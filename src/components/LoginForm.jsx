@@ -2,125 +2,18 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import styled, { useTheme } from "styled-components";
 import { useSession, signIn } from "next-auth/react";
 import Button from "@/components/Button";
 import Loading from "@/app/loading";
 import GoogleSignInButton from "./GoogleSignInButton";
+import styles from "./LoginForm.module.scss";
 
-const PageWrapper = styled.div`
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: left;
-  width: 100vw;
-  overflow-y: hidden;
-  flex-flow: column nowrap;
-  background-color: ${(props) => props.theme.background};
-  padding: 0 0 10px 0;
-
-  @media (min-width: 955px) {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    align-items: center;
-  }
-`;
-
-const Wrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: auto;
-  overflow-y: hidden;
-  flex-flow: column nowrap;
-  background-color: ${(props) => props.theme.background};
-  padding: 0 0 10px 0;
-`;
-
-const FormWrapper = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 100%;
-  background-color: inherit;
-`;
-
-const InputWrapper = styled.div`
-  height: fit-content;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const LoginFormInput = styled.input`
-  width: 100%;
-  max-width: 300px;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid ${(props) => props.theme.border};
-  border-radius: 4px;
-
-  &:last-of-type {
-    margin-bottom: 25px;
-  }
-`;
-
-const Header = styled.div`
-  font-size: 2rem;
-  font-weight: 600;
-  color: ${(props) => props.theme.darkBlue};
-  padding: 10px 0;
-  text-align: center;
-  width: 100%;
-
-  @media (max-width: 440px) {
-    font-size: 1.8rem;
-    font-weight: 700;
-  }
-`;
-
-const SignInButtonWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  row-gap: 8px;
-  padding: 20px;
-  // background-color: ${(props) => props.theme.cardBackground};
-  border-radius: 8px;
-  height: auto;
-  margin-bottom: 220px;
-
-  @media (max-width: 955px) {
-    margin-bottom: 0;
-    margin: 20px;
-  }
-`;
-
-const SSOText = styled.div`
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: ${(props) => props.theme.darkBlue};
-  text-align: center;
-  margin-bottom: 20px;
-  width: 100%;
-
-  @media (max-width: 440px) {
-    font-size: 1.8rem;
-    font-weight: 700;
-  }
-`;
-
-export default function LoginPage({ sessionData }) {
+export default function LoginPage() {
   const [user, setUser] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const theme = useTheme();
 
-  const { data: session, status } = useSession({ data: sessionData });
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     // Safety net for landing on /login while already signed in (e.g. via
@@ -165,18 +58,19 @@ export default function LoginPage({ sessionData }) {
   }
 
   return (
-    <PageWrapper>
-      <SignInButtonWrapper>
-        {/* <SSOText>Sign in with</SSOText> */}
+    <div className={styles.pageWrapper}>
+      <div className={styles.signInButtonWrapper}>
+        {/* <div className={styles.ssoText}>Sign in with</div> */}
         <GoogleSignInButton
           onClick={() => signIn("google", { callbackUrl: "/news" })}
         />
-      </SignInButtonWrapper>
-      <Wrapper>
-        <Header>Login</Header>
-        <FormWrapper onSubmit={handleLoginUser}>
-          <InputWrapper>
-            <LoginFormInput
+      </div>
+      <div className={styles.wrapper}>
+        <div className={styles.header}>Login</div>
+        <form className={styles.formWrapper} onSubmit={handleLoginUser}>
+          <div className={styles.inputWrapper}>
+            <input
+              className={styles.loginFormInput}
               name="email"
               type="email"
               placeholder="Email"
@@ -184,7 +78,8 @@ export default function LoginPage({ sessionData }) {
               value={user.email}
               onChange={handleChange}
             />
-            <LoginFormInput
+            <input
+              className={styles.loginFormInput}
               name="password"
               type="password"
               placeholder="Password"
@@ -192,10 +87,10 @@ export default function LoginPage({ sessionData }) {
               value={user.password}
               onChange={handleChange}
             />
-          </InputWrapper>
+          </div>
           <Button
-            bgColor={theme.primary}
-            clr={theme.primaryContrast}
+            bgColor={"var(--theme-primary)"}
+            clr={"var(--theme-primary-contrast)"}
             type="submit"
             disabled={loading}
           >
@@ -205,7 +100,7 @@ export default function LoginPage({ sessionData }) {
           {error && (
             <>
               <br />
-              <p style={{ color: theme.warning }}>{error}</p>
+              <p style={{ color: "var(--theme-warning)" }}>{error}</p>
             </>
           )}
 
@@ -219,7 +114,7 @@ export default function LoginPage({ sessionData }) {
             <br />
             <div
               style={{
-                color: theme.text,
+                color: "var(--theme-text)",
                 textAlign: "center",
                 display: "flex",
                 gap: "5px",
@@ -241,7 +136,7 @@ export default function LoginPage({ sessionData }) {
             <br />
             <div
               style={{
-                color: theme.text,
+                color: "var(--theme-text)",
                 textAlign: "center",
                 display: "flex",
                 gap: "5px",
@@ -253,10 +148,10 @@ export default function LoginPage({ sessionData }) {
               </Link>
             </div>
           </h5>
-        </FormWrapper>
+        </form>
         <br />
         <br />
-      </Wrapper>
-    </PageWrapper>
+      </div>
+    </div>
   );
 }

@@ -1,33 +1,19 @@
+"use client";
 import Link from "next/link";
-import styled from "styled-components";
+import { usePathname } from "next/navigation";
+import styles from "./NavTab.module.scss";
 
-const NavBarWrapper = styled(Link)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  width: 100%;
-  height: auto;
-  padding: 3px 10px;
-  border: 1px solid black;
-  margin: 15px 0;
-  font-size: 1.3rem;
-  color: ${(props) => props.theme.deepBlue};
-  background-color: ${(props) => props.theme.background};
-  white-space: nowrap;
+export default function NavTab({ href, children, Icon }) {
+  const pathname = usePathname();
+  const isActive = pathname === href;
 
-  @media (max-width: 768px) {
-    width: auto;
-    flex-shrink: 0;
-    margin: 0;
-    font-size: 1rem;
-  }
-`;
-
-export default function NavTab({ href, children }) {
   return (
-    <>
-      <NavBarWrapper href={`${href}`}>{children}</NavBarWrapper>
-    </>
+    <Link
+      className={`${styles.navBarWrapper} ${isActive ? styles.active : ""}`}
+      href={`${href}`}
+    >
+      {Icon && <Icon size={17} strokeWidth={2} />}
+      {children}
+    </Link>
   );
 }

@@ -1,0 +1,33 @@
+.wrapper {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.question {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--light-white);
+  cursor: pointer;
+  padding: 15px 20px;
+  background: var(--dark-blue);
+  border-radius: 8px;
+  user-select: none;
+  transition: background-color 0.3s;
+}
+
+.answerWrapper {
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  will-change: max-height;
+}
+
+.answerInner {
+  padding: 15px 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  position: relative;
+
+  &.expanded {
+    opacity: 1;
+  }
+}

@@ -1,31 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import styled from "styled-components";
 import NewsCardFour from "@/components/NewsCardFour";
 import NewsGridWrapper from "@/components/NewsGridWrapper";
 import Loading from "@/app/loading";
-
-const LikedPageWrapper = styled.div`
-  max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-`;
-
-const Header = styled.h1`
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: ${(props) => props.theme.darkBlue};
-  text-align: center;
-  margin-bottom: 2rem;
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 4rem;
-  background-color: ${(props) => props.theme.background};
-  border-radius: 12px;
-`;
+import styles from "./LikedArticlesPage.module.scss";
 
 export default function LikedArticlesPage() {
   const { data: session, status } = useSession();
@@ -64,8 +43,8 @@ export default function LikedArticlesPage() {
   }
 
   return (
-    <LikedPageWrapper>
-      <Header>Your Liked Articles</Header>
+    <div className={styles.likedPageWrapper}>
+      <h1 className={styles.header}>Your Liked Articles</h1>
       {likedArticles.length > 0 ? (
         <NewsGridWrapper>
           {likedArticles.map((article) => (
@@ -77,10 +56,10 @@ export default function LikedArticlesPage() {
           ))}
         </NewsGridWrapper>
       ) : (
-        <EmptyState>
+        <div className={styles.emptyState}>
           <p>You haven't liked any articles yet.</p>
-        </EmptyState>
+        </div>
       )}
-    </LikedPageWrapper>
+    </div>
   );
 }

@@ -1,103 +1,62 @@
 "use client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import styled from "styled-components";
+import { usePathname } from "next/navigation";
+import { Sparkles, Layers } from "lucide-react";
+import styles from "./HeaderNavBar.module.scss";
 
-const Wrapper = styled.div`
-  width: 100%;
-  background-color: ${(props) => props.theme.primary};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: auto;
-  padding: 10px 15px;
-  font-size: 1.2rem;
-  color: ${(props) => props.theme.buttonText};
-  gap: 25px;
-  overflow-x: auto;
+const PERSONAL_LINKS = [
+  { label: "For You", href: "/for-you", Icon: Sparkles },
+  { label: "My Feeds", href: "/feeds", Icon: Layers },
+];
 
-  @media (max-width: 1156px) {
-    justify-content: left;
-  }
-`;
+const CATEGORY_LINKS = [
+  { label: "Journals", href: "/category/journal", subscriberOnly: true },
+  { label: "Market", href: "/category/market", subscriberOnly: true },
+  { label: "Science", href: "/category/science" },
+  { label: "Business", href: "/category/business" },
+  { label: "Health", href: "/category/health" },
+  { label: "Entertainment", href: "/category/entertainment" },
+  { label: "Tech", href: "/category/tech" },
+  { label: "Politics", href: "/category/politics" },
+  { label: "Sports", href: "/category/sports" },
+  { label: "World", href: "/category/world" },
+  { label: "US", href: "/category/us" },
+  { label: "Finance", href: "/category/finance", subscriberOnly: true },
+  { label: "Weather", href: "/category/weather" },
+];
 
-const StyledLink = styled(Link)`
-  // text-decoration: underline;
-`;
+export default function HeaderNavBar() {
+  const { data: session } = useSession();
+  const pathname = usePathname();
 
-const Underline = styled.div`
-  border: 1px solid ${(props) => props.theme.text};
-`;
-
-export default function HeaderNavBar({ sessionData }) {
-  const { data: session, status, update } = useSession({ data: sessionData });
-
-  const isNotSubscribed = session?.user?.tier === "Free";
+  const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
 
   return (
-    <>
-      <Wrapper>
-        {isNotSubscribed ? null : (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <StyledLink href={"/category/journal"}>Journals</StyledLink>
-            {/* <Underline /> */}
-          </div>
-        )}
-        {isNotSubscribed ? null : (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <StyledLink href={"/category/market"}>Market</StyledLink>
-            {/* <Underline /> */}
-          </div>
-        )}
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/science"}>Science</StyledLink>
-          {/* <Underline /> */}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/business"}>Business</StyledLink>
-          {/* <Underline /> */}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/health"}>Health</StyledLink>
-          {/* <Underline /> */}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/entertainment"}>
-            Entertainment
-          </StyledLink>
-          {/* <Underline /> */}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/tech"}>Tech</StyledLink>
-          {/* <Underline /> */}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/politics"}>Politics</StyledLink>
-          {/* <Underline /> */}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/sports"}>Sports</StyledLink>
-          {/* <Underline /> */}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/world"}>World</StyledLink>
-          {/* <Underline /> */}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/us"}>US</StyledLink>
-          {/* <Underline /> */}
-        </div>
-        {isNotSubscribed ? null : (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <StyledLink href={"/category/finance"}>Finance</StyledLink>
-            {/* <Underline /> */}
-          </div>
-        )}
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <StyledLink href={"/category/weather"}>Weather</StyledLink>
-          {/* <Underline /> */}
-        </div>
-      </Wrapper>
-    </>
+    <div className={styles.wrapper}>
+      {isSubscribed &&
+        PERSONAL_LINKS.map(({ label, href, Icon }) => (
+          <Link
+            key={href}
+            href={href}
+            className={`${styles.link} ${pathname === href ? styles.active : ""}`}
+          >
+            <Icon size={15} strokeWidth={2.25} />
+            {label}
+          </Link>
+        ))}
+      {isSubscribed && <span className={styles.divider} />}
+      {CATEGORY_LINKS.filter((link) => isSubscribed || !link.subscriberOnly).map(
+        ({ label, href }) => (
+          <Link
+            key={href}
+            href={href}
+            className={`${styles.link} ${pathname === href ? styles.active : ""}`}
+          >
+            {label}
+          </Link>
+        )
+      )}
+    </div>
   );
 }

@@ -1,105 +1,11 @@
 "use client";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import styled, { useTheme } from "styled-components";
+import styles from "./DigestSettings.module.scss";
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-const Row = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-`;
-
-const Label = styled.div`
-  font-weight: 600;
-  color: ${(props) => props.theme.text};
-`;
-
-const SubLabel = styled.p`
-  margin: 4px 0 0;
-  font-size: 0.85rem;
-  color: ${(props) => props.theme.textSecondary};
-`;
-
-// A standard sliding toggle switch.
-const SwitchWrapper = styled.label`
-  position: relative;
-  display: inline-block;
-  width: 46px;
-  height: 26px;
-  flex-shrink: 0;
-`;
-
-const SwitchInput = styled.input`
-  opacity: 0;
-  width: 0;
-  height: 0;
-
-  &:checked + span {
-    background-color: ${(props) => props.theme.primary};
-  }
-  &:checked + span:before {
-    transform: translateX(20px);
-  }
-  &:disabled + span {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const SwitchSlider = styled.span`
-  position: absolute;
-  cursor: pointer;
-  inset: 0;
-  background-color: ${(props) => props.theme.border};
-  transition: background-color 0.2s ease;
-  border-radius: 26px;
-
-  &:before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: transform 0.2s ease;
-    border-radius: 50%;
-  }
-`;
-
-const FrequencyToggle = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const FrequencyOption = styled.button`
-  padding: 6px 14px;
-  border-radius: 16px;
-  border: 2px solid ${(props) => props.theme.border};
-  background: ${(props) => (props.$active ? props.theme.primary : "transparent")};
-  color: ${(props) => (props.$active ? props.theme.buttonText : props.theme.text)};
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-export default function DigestSettings({ sessionData }) {
-  const { data: session, update } = useSession({ data: sessionData });
+export default function DigestSettings() {
+  const { data: session, update } = useSession();
   const [saving, setSaving] = useState(false);
-  const theme = useTheme();
 
   const enabled = !!session?.user?.digestEnabled;
   const frequency = session?.user?.digestFrequency || "weekly";
@@ -123,51 +29,59 @@ export default function DigestSettings({ sessionData }) {
   };
 
   return (
-    <Wrapper>
-      <Row>
+    <div className={styles.wrapper}>
+      <div className={styles.row}>
         <div>
-          <Label>Email Digest</Label>
-          <SubLabel>
+          <div className={styles.label}>Email Digest</div>
+          <p className={styles.subLabel}>
             Get trending headlines and picks based on what you&apos;ve liked
             and saved, sent to your inbox.
-          </SubLabel>
+          </p>
         </div>
-        <SwitchWrapper>
-          <SwitchInput
+        <label className={styles.switchWrapper}>
+          <input
+            className={styles.switchInput}
             type="checkbox"
             checked={enabled}
             disabled={saving}
             onChange={(e) => savePreferences({ digestEnabled: e.target.checked })}
           />
-          <SwitchSlider />
-        </SwitchWrapper>
-      </Row>
+          <span className={styles.switchSlider} />
+        </label>
+      </div>
 
       {enabled && (
-        <Row>
-          <Label style={{ fontWeight: 400, color: theme.textSecondary }}>
+        <div className={styles.row}>
+          <div
+            className={styles.label}
+            style={{ fontWeight: 400, color: "var(--theme-text-secondary)" }}
+          >
             How often?
-          </Label>
-          <FrequencyToggle>
-            <FrequencyOption
+          </div>
+          <div className={styles.frequencyToggle}>
+            <button
               type="button"
+              className={`${styles.frequencyOption} ${
+                frequency === "daily" ? styles.active : ""
+              }`}
               disabled={saving}
-              $active={frequency === "daily"}
               onClick={() => savePreferences({ digestFrequency: "daily" })}
             >
               Daily
-            </FrequencyOption>
-            <FrequencyOption
+            </button>
+            <button
               type="button"
+              className={`${styles.frequencyOption} ${
+                frequency === "weekly" ? styles.active : ""
+              }`}
               disabled={saving}
-              $active={frequency === "weekly"}
               onClick={() => savePreferences({ digestFrequency: "weekly" })}
             >
               Weekly
-            </FrequencyOption>
-          </FrequencyToggle>
-        </Row>
+            </button>
+          </div>
+        </div>
       )}
-    </Wrapper>
+    </div>
   );
 }

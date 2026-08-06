@@ -1,0 +1,94 @@
+.cardWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+}
+
+.cardLink {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 220px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  text-decoration: none;
+  background-color: var(--theme-border);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  &:hover .overlay {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.15) 60%);
+  }
+}
+
+// Rendered as a sibling of the card's anchor (not nested inside it) so
+// interactive children like a delete button don't end up as an <a><button>
+// (invalid HTML — nested interactive elements) and don't trigger navigation.
+.cardControls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+}
+
+.imageGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  width: 100%;
+  height: 100%;
+}
+
+.gridImage {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.emptySlot {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--theme-layout-background);
+  color: var(--theme-text-secondary);
+  opacity: 0.5;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 60%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.25rem;
+  color: #fff;
+  transition: background 0.2s ease-in-out;
+}
+
+.archiveTitle {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.archiveMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  margin: 6px 0 0 0;
+  opacity: 0.85;
+}

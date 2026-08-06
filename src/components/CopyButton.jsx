@@ -1,33 +1,7 @@
 "use client";
 import { useState } from "react";
-import styled from "styled-components";
-
-const StyledButton = styled.button`
-  padding: 8px 16px;
-  font-size: 1rem;
-  font-weight: 600;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-  height: 100%;
-  width: 150px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 3px;
-
-  background-color: ${(props) =>
-    props.status === "Copied"
-      ? props.theme.darkBlue
-      : props.theme.primary};
-  color: ${(props) => props.theme.buttonText};
-
-  // &:hover {
-  //   filter: brightness(0.95);
-  // }
-`;
+import { Copy, Check, X } from "lucide-react";
+import styles from "./CopyButton.module.scss";
 
 export default function CopyButton({ textToCopy }) {
   const [copyStatus, setCopyStatus] = useState("Copy");
@@ -52,30 +26,16 @@ export default function CopyButton({ textToCopy }) {
   };
 
   return (
-    <StyledButton onClick={handleCopy} status={copyStatus.toUpperCase()}>
-      {copyStatus === "Copy" ? (
-        <img
-          src="/images/copy-unfilled-white.svg"
-          height={29}
-          width={29}
-          alt="Copy referral code"
-        />
-      ) : copyStatus === "Copied" ? (
-        <img
-          src="/images/copy-filled-white.svg"
-          height={29}
-          width={29}
-          alt="Referral code copied"
-        />
-      ) : (
-        <img
-          src="/images/copy-unfilled.svg"
-          height={29}
-          width={29}
-          alt="Copy referral code"
-        />
-      )}
-      <div style={{ width: "100%" }}>{copyStatus}</div>
-    </StyledButton>
+    <button
+      className={`${styles.wrapper} ${copyStatus === "Copied" ? styles.copied : ""} ${
+        copyStatus === "Failed!" ? styles.failed : ""
+      }`}
+      onClick={handleCopy}
+    >
+      {copyStatus === "Copy" && <Copy size={18} strokeWidth={2} />}
+      {copyStatus === "Copied" && <Check size={18} strokeWidth={2} />}
+      {copyStatus === "Failed!" && <X size={18} strokeWidth={2} />}
+      <div>{copyStatus}</div>
+    </button>
   );
 }

@@ -23,9 +23,6 @@ const nextConfig = {
     }
     return config;
   },
-  compiler: {
-    styledComponents: true,
-  },
 };
 
 module.exports = nextConfig;

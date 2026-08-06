@@ -1,22 +1,8 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import styled from "styled-components";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
-
-const FeedWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  padding: 20px;
-`;
-
-const SearchBarHeader = styled.h2`
-  font-size: 1.8rem;
-  margin-bottom: 10px;
-  text-align: center;
-`;
+import styles from "./SearchFeed.module.scss";
 
 export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
   const [query, setQuery] = useState(initialQuery);
@@ -89,7 +75,7 @@ export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
   return (
     <>
       <div style={{ textAlign: "center", width: "100%" }}>
-        <SearchBarHeader>What&apos;s making the news</SearchBarHeader>
+        <h2 className={styles.searchBarHeader}>What&apos;s making the news</h2>
         <p>{query ? `Results for: '${query}'` : "Results"}</p>
       </div>
 
