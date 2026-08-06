@@ -1,28 +1,58 @@
 .saveButton {
-  //   background-color: var(--theme-primary);
-  color: var(--theme-text);
-  // padding: 12px 20px;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
+  color: var(--theme-text-secondary);
+  border-radius: 999px;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   cursor: pointer;
-  height: 100%;
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+  width: 36px;
+  height: 36px;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: var(--theme-layout-background);
+  }
+
+  &.saved {
+    color: var(--theme-primary);
+  }
 }
 
-.savedOrUnsavedButton {
-  height: 30px;
-  width: 30px;
-  // &:hover {
-  //   transform: translateY(-1px);
-  // }
+.dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 10;
+  user-select: none;
+  background: var(--theme-background);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  padding: 6px;
+  list-style: none;
+  min-width: 160px;
+}
 
-  // &:active {
-  //   transform: translateY(0);
-  // }
+.dropdownItem {
+  border-radius: 6px;
+
+  &:not(:last-child) {
+    margin-bottom: 2px;
+  }
+
+  button {
+    all: unset;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+    color: var(--theme-text);
+    border-radius: 6px;
+
+    &:hover {
+      background-color: var(--theme-layout-background);
+    }
+  }
 }

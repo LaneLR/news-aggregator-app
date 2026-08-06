@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { Heart, Lock } from "lucide-react";
 import ShareButton from "./ShareButton";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
@@ -73,14 +74,15 @@ export default function CarouselCard({ article, archiveId }) {
         <p className={styles.source}>
           {cleanSourceName}
           {isPaywalled && (
-            <img
+            <Lock
               className={styles.lockIcon}
-              src="/images/lock.svg"
+              size={12}
+              strokeWidth={2.5}
               title="This source could be behind a paywall."
             />
           )}
         </p>
-        <h3 className={styles.title}>
+        <h3 className={`${styles.title} headline`}>
           <Link
             className={styles.titleLink}
             href={article.url}
@@ -92,46 +94,23 @@ export default function CarouselCard({ article, archiveId }) {
           </Link>
         </h3>
         <div className={styles.actionsRow}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "left",
-              alignItems: "center",
-            }}
+          <a
+            className={styles.readMoreButton}
+            href={article.url}
+            target="_blank"
+            onClick={() => trackArticleClick(article)}
           >
-            <a
-              className={styles.readMoreButton}
-              href={article.url}
-              target="_blank"
-              onClick={() => trackArticleClick(article)}
-            >
-              Read article
-            </a>
-          </div>
+            Read article
+          </a>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "right",
-              alignItems: "center",
-              width: "100%",
-              gap: "7px",
-            }}
-          >
+          <div className={styles.actionsGroup}>
             <ArchiveToggleButton article={article} archiveId={archiveId} />
             <ShareButton article={article} />
             <button
               className={`${styles.likeButton} ${isLiked ? styles.liked : ""}`}
               onClick={handleLike}
             >
-              <img
-                className={styles.likeIcon}
-                src={
-                  isLiked
-                    ? "/images/like-button-liked.svg"
-                    : "/images/like-button-unliked.svg"
-                }
-              />
+              <Heart size={17} strokeWidth={2} fill={isLiked ? "currentColor" : "none"} />
               {likeCount}
             </button>
           </div>

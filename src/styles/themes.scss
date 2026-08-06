@@ -4,77 +4,80 @@
 // themes.js itself stays around only because ThemeSelector needs the raw
 // JS values to render its swatch previews of *both* themes at once.
 //
-// Keep this in sync with src/styles/themes.js by hand; colors aren't
-// expected to change often. A key intentionally absent from one theme here
-// mirrors it being absent from that theme's object in themes.js.
+// Keep this in sync with src/styles/themes.js by hand.
 
 [data-theme="default"] {
+  color-scheme: light;
+
   --theme-primary: var(--primary-blue);
   --theme-primary-contrast: #ffffff;
   --theme-dark-blue: var(--dark-blue);
   --theme-deep-blue: var(--deep-blue);
   --theme-secondary-blue: var(--secondary-blue);
-  --theme-title-contrast: #ff7a00;
+  --theme-title-contrast: #d97706;
   --theme-header-background: var(--dark-blue);
   --theme-footer-background: var(--dark-blue);
+  --theme-secondary-dark: var(--dark-blue);
   --theme-background: #ffffff;
   --theme-layout-background: var(--light-gray);
   --theme-card-background: var(--white);
   --theme-button-background: var(--dark-blue);
-  --theme-text: #181818ff;
+  --theme-text: #0f172a;
   --theme-button-text: #fff;
-  --theme-text-secondary: #555;
-  --theme-text-tertiary: #181818ff;
-  --theme-border: #ccc;
-  --theme-warning: #c53030;
-  --theme-tier-badge: #354cb1ff;
-  --theme-card: #999999ff;
-  --theme-archive-background: #f9fafb;
+  --theme-text-secondary: #55607a;
+  --theme-text-tertiary: #0f172a;
+  --theme-border: #e2e8f0;
+  --theme-warning: #dc2626;
+  --theme-tier-badge: #2e5ce6;
+  --theme-card: #94a3b8;
+  --theme-archive-background: #f8fafc;
   --theme-slate: var(--slate);
-  --theme-success: #0bd83bff;
+  --theme-success: #16a34a;
   --theme-dropdown-menu: #fff;
-  --theme-search-background: #f0f0f0;
-  --theme-primary-dark: #1a2333;
-  --theme-accent-orange: #ff7a00;
-  --theme-accent-hover: #e66f00;
-  --theme-text-light: #e0e0e0;
+  --theme-search-background: #f1f5f9;
+  --theme-primary-dark: #0b1220;
+  --theme-accent-orange: #d97706;
+  --theme-accent-hover: #b45309;
+  --theme-text-light: #e7eaf0;
   --theme-text-white: #ffffff;
-  --theme-section-gray: #f7f7f7;
-  --theme-border-gray: #cccccc;
+  --theme-section-gray: #f4f6fb;
+  --theme-border-gray: #e2e8f0;
 }
 
 [data-theme="dark"] {
-  --theme-primary: #1a1a1aff;
+  color-scheme: dark;
+
+  --theme-primary: #5b82f0;
   --theme-primary-contrast: var(--white);
-  --theme-dark-blue: #f5f5f5ff;
-  --theme-deep-blue: #f5f5f5ff;
+  --theme-dark-blue: #e7eaf0;
+  --theme-deep-blue: #e7eaf0;
   --theme-secondary-blue: var(--secondary-blue);
-  --theme-title-contrast: #ff7a00;
-  --theme-header-background: #1a1a1aff;
-  --theme-footer-background: #1a1a1aff;
-  --theme-secondary-dark: #1a1a1aff;
-  --theme-background: #27292cff;
-  --theme-layout-background: #121212;
-  --theme-card-background: #000000ff;
-  --theme-button-background: #000000ff;
-  --theme-text: #f5f5f5ff;
+  --theme-title-contrast: #f59e0b;
+  --theme-header-background: #0b0e14;
+  --theme-footer-background: #0b0e14;
+  --theme-secondary-dark: #0b0e14;
+  --theme-background: #151923;
+  --theme-layout-background: #0b0e14;
+  --theme-card-background: #151923;
+  --theme-button-background: #151923;
+  --theme-text: #e7eaf0;
   --theme-button-text: var(--white);
-  --theme-text-secondary: #bbbbbb;
-  --theme-text-tertiary: #181818ff;
-  --theme-border: #4a4b4eff;
-  --theme-warning: #c53030;
-  --theme-tier-badge: #354cb1ff;
-  --theme-card: #1a1a1aff;
-  --theme-archive-background: #1a1a1aff;
-  --theme-slate: #94a3b8ff;
-  --theme-success: #0bd83bff;
+  --theme-text-secondary: #9aa4b8;
+  --theme-text-tertiary: #e7eaf0;
+  --theme-border: #2a3040;
+  --theme-warning: #ef4444;
+  --theme-tier-badge: #5b82f0;
+  --theme-card: #2a3040;
+  --theme-archive-background: #151923;
+  --theme-slate: #94a3b8;
+  --theme-success: #22c55e;
   --theme-dropdown-menu: #fff;
-  --theme-search-background: #f0f0f0;
-  --theme-primary-dark: #0d0d0d;
-  --theme-accent-orange: #ff7a00;
-  --theme-accent-hover: #e66f00;
-  --theme-text-light: #f5f5f5;
+  --theme-search-background: #1d2230;
+  --theme-primary-dark: #0b0e14;
+  --theme-accent-orange: #f59e0b;
+  --theme-accent-hover: #fbbf24;
+  --theme-text-light: #d7dce8;
   --theme-text-white: #ffffff;
-  --theme-section-gray: #2a2f3d;
-  --theme-border-gray: #e0e0e0;
+  --theme-section-gray: #1d2230;
+  --theme-border-gray: #2a3040;
 }

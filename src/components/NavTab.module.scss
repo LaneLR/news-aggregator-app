@@ -1,22 +1,36 @@
 .navBarWrapper {
   display: flex;
-  justify-content: center;
   align-items: center;
-  text-align: center;
+  gap: 10px;
   width: 100%;
-  height: auto;
-  padding: 3px 10px;
-  border: 1px solid black;
-  margin: 15px 0;
-  font-size: 1.3rem;
-  color: var(--theme-deep-blue);
-  background-color: var(--theme-background);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--theme-button-text);
+  background-color: transparent;
   white-space: nowrap;
+  transition: background-color 0.15s ease-in-out;
+
+  svg {
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  &.active {
+    background-color: rgba(255, 255, 255, 0.16);
+
+    svg {
+      opacity: 1;
+    }
+  }
 
   @media (max-width: 768px) {
     width: auto;
     flex-shrink: 0;
-    margin: 0;
-    font-size: 1rem;
   }
 }

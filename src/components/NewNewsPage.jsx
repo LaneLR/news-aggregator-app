@@ -1,10 +1,18 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Briefcase, Cpu, Clapperboard, Trophy, FlaskConical, Newspaper } from "lucide-react";
 import Loading from "@/app/loading";
 import CarouselArticleCard from "@/components/CarouselArticleCard";
 import HeroCarousel from "@/components/HeroCarousel";
 import styles from "./NewNewsPage.module.scss";
 
+const CATEGORY_ICONS = {
+  Business: Briefcase,
+  Technology: Cpu,
+  Entertainment: Clapperboard,
+  Sports: Trophy,
+  Science: FlaskConical,
+};
 
 export default function NewsPage() {
   const [categorizedArticles, setCategorizedArticles] = useState(null);
@@ -38,16 +46,22 @@ export default function NewsPage() {
     <div className={styles.newsPageWrapper}>
       <HeroCarousel />
 
-      {Object.entries(categorizedArticles).map(([category, articles]) => (
-        <section className={styles.section} key={category}>
-          <h2 className={styles.sectionTitle}>{category}</h2>
-          <div className={styles.carouselWrapper}>
-            {articles.map((article) => (
-              <CarouselArticleCard key={article.url} article={article} />
-            ))}
-          </div>
-        </section>
-      ))}
+      {Object.entries(categorizedArticles).map(([category, articles]) => {
+        const CategoryIcon = CATEGORY_ICONS[category] || Newspaper;
+        return (
+          <section className={styles.section} key={category}>
+            <h2 className={styles.sectionTitle}>
+              <CategoryIcon size={22} />
+              {category}
+            </h2>
+            <div className={styles.carouselWrapper}>
+              {articles.map((article) => (
+                <CarouselArticleCard key={article.url} article={article} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }

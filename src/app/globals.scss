@@ -1,27 +1,27 @@
 @use "../styles/themes";
 
 :root {
-  --dark-blue: #0a1430;
-  --light-white: #f1f1f1;
-  --white: #fefefe;
-  --light-gray: #e1e5e9;
-  --primary-blue: #004cd2;
-  --secondary-blue: #3cbae6;
-  --deep-blue: #022665;
-  --orange: #eba613ff;
-}
+  // Core brand palette — refined navy/blue family with a warm amber accent.
+  // These feed the per-theme `--theme-*` variables in styles/themes.scss,
+  // so most components never reference these directly.
+  --dark-blue: #0b1220;
+  --light-white: #eef1f7;
+  --white: #ffffff;
+  --light-gray: #e7eaf0;
+  --primary-blue: #2e5ce6;
+  --secondary-blue: #2aa8d8;
+  --deep-blue: #16234f;
+  --orange: #f59e0b;
+  --slate: #64748b;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --dark-blue: #0a1430;
-    --light-gray: #e1e5e9;
-    --primary-blue: #004cd2;
-    --deep-blue: #022665;
-    --secondary-blue: #20a9f1;
-    --white: #fefefe;
-    --light-white: #f1f1f1;
-    --orange: #eba613ff;
-  }
+  // Shared design tokens: consistent corner radii and elevation across
+  // every card/surface in the app instead of ad-hoc per-component values.
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.08);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.14), 0 4px 10px rgba(15, 23, 42, 0.08);
 }
 
 html,
@@ -45,18 +45,18 @@ body {
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: #888;
+    background-color: var(--slate);
     border-radius: 6px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
 
   ::-webkit-scrollbar-track {
-    background-color: var(--light-white);
+    background-color: transparent;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: #da0000;
+    background-color: var(--primary-blue);
   }
 }
 
@@ -79,8 +79,9 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+// Headline/editorial typeface — used selectively for article titles and
+// section headings via the .headline utility class, layered on top of
+// Roboto for UI chrome. See layout.js for the font loader.
+.headline {
+  font-family: var(--font-lora), Georgia, "Times New Roman", serif;
 }

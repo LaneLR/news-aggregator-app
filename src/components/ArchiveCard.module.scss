@@ -9,20 +9,20 @@
   position: relative;
   width: 100%;
   height: 220px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   text-decoration: none;
   background-color: var(--theme-border);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   transition: all 0.2s ease-in-out;
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-lg);
   }
 
   &:hover .overlay {
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.1) 60%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.15) 60%);
   }
 }
 
@@ -51,6 +51,17 @@
   background-position: center;
 }
 
+.emptySlot {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--theme-layout-background);
+  color: var(--theme-text-secondary);
+  opacity: 0.5;
+}
+
 .overlay {
   position: absolute;
   top: 0;
@@ -62,19 +73,22 @@
   flex-direction: column;
   justify-content: flex-end;
   padding: 1.25rem;
-  color: var(--theme-button-text);
+  color: #fff;
   transition: background 0.2s ease-in-out;
 }
 
 .archiveTitle {
-  font-size: 1.75rem;
+  font-size: 1.6rem;
   font-weight: 700;
   margin: 0;
   line-height: 1.2;
 }
 
 .archiveMeta {
-  font-size: 0.9rem;
-  margin: 4px 0 0 0;
-  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  margin: 6px 0 0 0;
+  opacity: 0.85;
 }

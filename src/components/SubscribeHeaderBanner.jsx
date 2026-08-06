@@ -1,6 +1,8 @@
+"use client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Sparkles, X } from "lucide-react";
 import styles from "./SubscribeHeaderBanner.module.scss";
 
 export default function HeaderSubscribeBanner() {
@@ -25,30 +27,16 @@ export default function HeaderSubscribeBanner() {
     <>
       {isNotSubscribed && isCtaVisible && (
         <div className={styles.wrapper}>
-          <div className={styles.leftContainer} />
+          <div className={styles.leftContainer}>
+            <Sparkles size={18} />
+          </div>
           <div className={styles.centerContainer}>
-            Want to create and customize your own feeds?
-            <Link
-              href="/pricing"
-              style={{
-                display: "flex",
-                flexFlow: "column nowrap",
-                width: "fit-content",
-              }}
-            >
-              <p>Become a member!</p>
-              <div className={styles.underline} />
-            </Link>
+            <span>Want to create and customize your own feeds?</span>
+            <Link href="/pricing">Become a member!</Link>
           </div>
           <div className={styles.rightContainer}>
-            <button className={styles.closeButton} onClick={handleDismissCta}>
-              <img
-                alt="Close button"
-                src="/images/close.svg"
-                width={16}
-                height={16}
-                color={"var(--theme-text)"}
-              />
+            <button className={styles.closeButton} onClick={handleDismissCta} title="Dismiss">
+              <X size={15} strokeWidth={2.5} />
             </button>
           </div>
         </div>

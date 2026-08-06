@@ -5,6 +5,7 @@ import Image from "next/image.js";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation.js";
+import { Heart, Lock } from "lucide-react";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
 import styles from "./NewsCardThree.module.scss";
@@ -72,14 +73,11 @@ export default function NewsCardThree({
 
   return (
     <div className={styles.cardContainer}>
-      <div className={styles.cardHeader}>
-        <span className={styles.brandText}>MorningFeeds</span>
-      </div>
       <Link
+        className={styles.imageLink}
         href={article.url}
         target={"_blank"}
         onClick={() => trackArticleClick(article)}
-        style={{ position: "relative", width: "100%", height: "200px" }}
       >
         <Image
           src={imageSrc}
@@ -91,13 +89,12 @@ export default function NewsCardThree({
           style={{
             objectFit: "cover",
             objectPosition: "top",
-            borderBottom: `1px solid var(--theme-border)`,
           }}
         />
       </Link>
       <div className={styles.contentArea}>
         <div>
-          <h3 className={styles.articleTitle}>
+          <h3 className={`${styles.articleTitle} headline`}>
             <Link
               href={article.url}
               target={"_blank"}
@@ -106,50 +103,22 @@ export default function NewsCardThree({
               {cleanTitle}
             </Link>
           </h3>
-          <div className={styles.articleSnippet}>
-            <p className={styles.articleSnippetText}>{cleanSourceName}</p>
-          </div>
+          <p className={styles.articleSnippetText}>{cleanSourceName}</p>
         </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "0 0 10px 0",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+        <div className={styles.actionsRow}>
+          <a
+            className={styles.readMoreButton}
+            href={article.url}
+            target="_blank"
+            onClick={() => trackArticleClick(article)}
           >
-            <a
-              className={styles.readMoreButton}
-              href={article.url}
-              target="_blank"
-              onClick={() => trackArticleClick(article)}
-            >
-              Read article
-            </a>
-          </div>
+            Read article
+          </a>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "flex-start",
-              gap: "6px",
-            }}
-          >
+          <div className={styles.actionsGroup}>
             {isPaywalled && (
-              <span title="This article may be behind a paywall">
-                <img
-                  className={styles.lockedArticleSvg}
-                  src="/images/lock.svg"
-                  alt="Image may be behind a paywall"
-                />
+              <span className={styles.lockedArticleIcon} title="This article may be behind a paywall">
+                <Lock size={15} strokeWidth={2} />
               </span>
             )}
             <ArchiveToggleButton
@@ -161,20 +130,8 @@ export default function NewsCardThree({
               className={`${styles.likeButton} ${isLiked ? styles.liked : ""}`}
               onClick={handleLike}
             >
-              {isLiked ? (
-                <img
-                  className={styles.likeOrUnlikedButton}
-                  src="/images/like-button-liked.svg"
-                  alt="Article liked button"
-                />
-              ) : (
-                <img
-                  className={styles.likeOrUnlikedButton}
-                  src="/images/like-button-unliked.svg"
-                  alt="Article not liked button"
-                />
-              )}
-              <div className={styles.likeCountCounter}>{likeCount}</div>
+              <Heart size={17} strokeWidth={2} fill={isLiked ? "currentColor" : "none"} />
+              {likeCount}
             </button>
           </div>
         </div>

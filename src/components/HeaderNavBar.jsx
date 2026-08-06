@@ -1,72 +1,62 @@
 "use client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Sparkles, Layers } from "lucide-react";
 import styles from "./HeaderNavBar.module.scss";
+
+const PERSONAL_LINKS = [
+  { label: "For You", href: "/for-you", Icon: Sparkles },
+  { label: "My Feeds", href: "/feeds", Icon: Layers },
+];
+
+const CATEGORY_LINKS = [
+  { label: "Journals", href: "/category/journal", subscriberOnly: true },
+  { label: "Market", href: "/category/market", subscriberOnly: true },
+  { label: "Science", href: "/category/science" },
+  { label: "Business", href: "/category/business" },
+  { label: "Health", href: "/category/health" },
+  { label: "Entertainment", href: "/category/entertainment" },
+  { label: "Tech", href: "/category/tech" },
+  { label: "Politics", href: "/category/politics" },
+  { label: "Sports", href: "/category/sports" },
+  { label: "World", href: "/category/world" },
+  { label: "US", href: "/category/us" },
+  { label: "Finance", href: "/category/finance", subscriberOnly: true },
+  { label: "Weather", href: "/category/weather" },
+];
 
 export default function HeaderNavBar() {
   const { data: session } = useSession();
+  const pathname = usePathname();
 
-  const isNotSubscribed = session?.user?.tier === "Free";
+  const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
 
   return (
-    <>
-      <div className={styles.wrapper}>
-        {isNotSubscribed ? null : (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <Link href={"/for-you"}>For You</Link>
-          </div>
-        )}
-        {isNotSubscribed ? null : (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <Link href={"/feeds"}>My Feeds</Link>
-          </div>
-        )}
-        {isNotSubscribed ? null : (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <Link href={"/category/journal"}>Journals</Link>
-          </div>
-        )}
-        {isNotSubscribed ? null : (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <Link href={"/category/market"}>Market</Link>
-          </div>
-        )}
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <Link href={"/category/science"}>Science</Link>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <Link href={"/category/business"}>Business</Link>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <Link href={"/category/health"}>Health</Link>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <Link href={"/category/entertainment"}>Entertainment</Link>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <Link href={"/category/tech"}>Tech</Link>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <Link href={"/category/politics"}>Politics</Link>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <Link href={"/category/sports"}>Sports</Link>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <Link href={"/category/world"}>World</Link>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <Link href={"/category/us"}>US</Link>
-        </div>
-        {isNotSubscribed ? null : (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <Link href={"/category/finance"}>Finance</Link>
-          </div>
-        )}
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <Link href={"/category/weather"}>Weather</Link>
-        </div>
-      </div>
-    </>
+    <div className={styles.wrapper}>
+      {isSubscribed &&
+        PERSONAL_LINKS.map(({ label, href, Icon }) => (
+          <Link
+            key={href}
+            href={href}
+            className={`${styles.link} ${pathname === href ? styles.active : ""}`}
+          >
+            <Icon size={15} strokeWidth={2.25} />
+            {label}
+          </Link>
+        ))}
+      {isSubscribed && <span className={styles.divider} />}
+      {CATEGORY_LINKS.filter((link) => isSubscribed || !link.subscriberOnly).map(
+        ({ label, href }) => (
+          <Link
+            key={href}
+            href={href}
+            className={`${styles.link} ${pathname === href ? styles.active : ""}`}
+          >
+            {label}
+          </Link>
+        )
+      )}
+    </div>
   );
 }

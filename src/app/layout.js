@@ -1,4 +1,4 @@
-import { Roboto } from "next/font/google";
+import { Roboto, Lora } from "next/font/google";
 import "./globals.scss";
 import Providers from "@/Provider";
 import Header from "@/components/Header";
@@ -15,6 +15,18 @@ const roboto = Roboto({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-roboto",
+});
+
+// Editorial serif used selectively for article titles and section
+// headings (via the `.headline` utility class) — sans-serif everywhere
+// else for UI chrome. This pairing is what most polished news/reader
+// products (and print-derived publications generally) use to read as
+// "a publication" rather than "a generic app."
+const lora = Lora({
+  weight: ["500", "600", "700"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-lora",
 });
 
 export const metadata = {
@@ -37,7 +49,7 @@ export default async function RootLayout({ children }) {
     <html lang="en" data-theme={session?.user?.selectedTheme || "default"}>
       <body
         style={{ backgroundColor: "var(--dark-blue)", color: "var(--light-white)" }}
-        className={`${roboto.variable}`}
+        className={`${roboto.variable} ${lora.variable}`}
       >
         <Providers session={session}>
           <ThemeProvider>

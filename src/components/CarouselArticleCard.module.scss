@@ -1,18 +1,18 @@
 .cardWrapper {
-  display: inline-block;
-  width: 320px;
-  flex-shrink: 0;
-  background: var(--theme-background);
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  border: 1px solid var(--theme-border);
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  width: 320px;
+  flex-shrink: 0;
+  background: var(--theme-card-background);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--theme-border);
+  overflow: hidden;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-md);
   }
 
   @media (max-width: 440px) {
@@ -25,47 +25,46 @@
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
+  background-color: var(--theme-layout-background);
 }
 
 .contentArea {
-  padding: 1rem;
+  padding: 1.1rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 }
 
 .source {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--theme-text-secondary);
   margin: 0 0 0.5rem 0;
   display: flex;
   align-items: center;
-
-  @media (max-width: 440px) {
-    font-size: 0.8rem;
-  }
+  gap: 6px;
 }
 
 .lockIcon {
-  width: 16px;
-  height: 16px;
-  margin-left: 8px;
+  color: var(--theme-text-secondary);
+  flex-shrink: 0;
 }
 
 .titleLink {
   text-decoration: none;
   color: var(--theme-dark-blue);
   &:hover {
-    text-decoration: underline;
+    color: var(--theme-primary);
   }
 }
 
 .title {
   font-size: 1.15rem;
   font-weight: 700;
-  line-height: 1.4;
-  margin: 0;
+  line-height: 1.35;
+  margin: 0 0 1rem 0;
   flex-grow: 1;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -81,9 +80,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1rem;
+  margin-top: auto;
+  padding-top: 0.85rem;
   border-top: 1px solid var(--theme-border);
-  padding-top: 0.75rem;
+}
+
+.actionsGroup {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2px;
 }
 
 .likeButton {
@@ -93,36 +99,37 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 1.1rem;
-  font-weight: 500;
+  padding: 0 8px;
+  height: 36px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
   color: var(--theme-text-secondary);
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: var(--theme-layout-background);
+  }
 
   &.liked {
-    color: var(--theme-primary);
+    color: var(--theme-warning);
   }
-}
-
-.likeIcon {
-  height: 24px;
-  width: 24px;
 }
 
 .readMoreButton {
   background-color: var(--theme-primary);
-  color: var(--theme-text);
-  padding: 8px;
-  border-radius: 6px;
+  color: var(--theme-primary-contrast);
+  padding: 8px 16px;
+  border-radius: 999px;
   font-size: 0.85rem;
-  font-weight: bold;
+  font-weight: 700;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  align-self: flex-start;
   cursor: pointer;
-  width: 120px;
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+  transition: filter 0.15s ease-in-out, transform 0.1s ease-in-out;
   &:hover {
-    filter: brightness(0.85);
+    filter: brightness(1.08);
     transform: translateY(-1px);
   }
   &:active {

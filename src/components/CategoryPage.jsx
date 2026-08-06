@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Newspaper, RefreshCw } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 import Button from "./Button";
@@ -111,15 +112,11 @@ export default function CategoryPage({ category, archiveId }) {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        <div className={styles.searchBarHeader}>{categoryNameForDisplay} Headlines</div>
+      <div className={styles.pageHeader}>
+        <h1 className={`${styles.searchBarHeader} headline`}>
+          <Newspaper size={30} />
+          {categoryNameForDisplay} Headlines
+        </h1>
         <div className={styles.sortToggle}>
           <button
             type="button"
@@ -144,17 +141,11 @@ export default function CategoryPage({ category, archiveId }) {
           </button>
         </div>
         {newAvailable && (
-          <div
-            style={{
-              margin: "20px 0 0 0",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <div style={{ fontSize: "1.6rem" }}>🔄</div>
+          <div className={styles.refreshBanner}>
+            <RefreshCw size={18} />
             <Button
               bgColor={"var(--theme-primary)"}
-              clr={"var(--theme-text)"}
+              clr={"var(--theme-primary-contrast)"}
               onClick={refreshArticles}
             >
               New articles available

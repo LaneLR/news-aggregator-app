@@ -1,6 +1,6 @@
 "use client";
-import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { Bookmark } from "lucide-react";
 import styles from "./ArchiveToggleButton.module.scss";
 
 export default function ArchiveToggleButton({
@@ -114,58 +114,38 @@ export default function ArchiveToggleButton({
   return (
     <div style={{ position: "relative" }}>
       {isSaved && propArchiveId && !viewOnly ? (
-        <div className={styles.saveButton} onClick={handleRemove} disabled={loading}>
-          {loading ? "Removing..." : "Remove"}
+        <div
+          className={`${styles.saveButton} ${styles.saved}`}
+          onClick={handleRemove}
+          disabled={loading}
+          title="Remove from archive"
+        >
+          <Bookmark size={19} strokeWidth={2} fill="currentColor" />
         </div>
       ) : viewOnly && isSaved ? (
         <div
-          style={{
-            border: "none",
-            cursor: "default",
-            background: "transparent",
-          }}
+          className={`${styles.saveButton} ${styles.saved}`}
+          style={{ cursor: "default" }}
+          title="Saved"
         >
-          <img className={styles.savedOrUnsavedButton} src="/images/save-button-saved.svg" />
+          <Bookmark size={19} strokeWidth={2} fill="currentColor" />
         </div>
       ) : (
         <>
           <div
-            className={styles.saveButton}
+            className={`${styles.saveButton} ${isSaved ? styles.saved : ""}`}
             onClick={() => setDropdownVisible(!dropdownVisible)}
             disabled={loading}
+            title={isSaved ? "Saved" : "Save to archive"}
           >
-            {isSaved ? (
-              <img className={styles.savedOrUnsavedButton} src="/images/save-button-saved.svg" alt="Article saved button"/>
-            ) : (
-              <img className={styles.savedOrUnsavedButton} src="/images/save-button-unsaved.svg" alt="Article not saved button"/>
-            )}
+            <Bookmark size={19} strokeWidth={2} fill={isSaved ? "currentColor" : "none"} />
           </div>
 
           {dropdownVisible && (
-            <ul
-              style={{
-                position: "absolute",
-                top: "100%",
-                left: 0,
-                zIndex: 10,
-                userSelect: "none",
-                background: "var(--theme-background)",
-                border: "1px solid var(--theme-border)",
-                padding: "0.5rem",
-                listStyle: "none",
-                borderBottom: "1px solid var(--theme-border)",
-              }}
-            >
+            <ul className={styles.dropdown}>
               {archives.map((archive) => (
-                <li key={archive.id} style={{ borderBottom: "1px solid var(--theme-border)" }}>
-                  <button
-                    style={{
-                      all: "unset",
-                      cursor: "pointer",
-                      padding: "0.2rem 0",
-                    }}
-                    onClick={() => handleArchiveSelect(archive.id)}
-                  >
+                <li key={archive.id} className={styles.dropdownItem}>
+                  <button onClick={() => handleArchiveSelect(archive.id)}>
                     {archive.name}
                   </button>
                 </li>

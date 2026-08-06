@@ -1,13 +1,13 @@
 "use client";
-import { useState, useEffect, useRef } from 'react';
-import styles from './ShareButton.module.scss';
-
+import { useState, useEffect, useRef } from "react";
+import { Share2, Link2, Check, Mail, MessageCircle } from "lucide-react";
+import styles from "./ShareButton.module.scss";
 
 export default function ShareButton({ article }) {
   const [showFallback, setShowFallback] = useState(false);
-  const [copySuccess, setCopySuccess] = useState('');
+  const [copySuccess, setCopySuccess] = useState(false);
   const wrapperRef = useRef(null);
-  
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -17,7 +17,7 @@ export default function ShareButton({ article }) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [wrapperRef]);
-  
+
   const handleShare = async () => {
     const shareData = {
       title: article.title,
@@ -33,40 +33,47 @@ export default function ShareButton({ article }) {
       }
     } else {
       setShowFallback(!showFallback);
-      setCopySuccess(''); 
+      setCopySuccess(false);
     }
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(article.url).then(() => {
-      setCopySuccess('Copied!');
-      setTimeout(() => setShowFallback(false), 800); 
-    }, (err) => {
-      console.error('Failed to copy text: ', err);
-      setCopySuccess('Failed');
-    });
+    navigator.clipboard.writeText(article.url).then(
+      () => {
+        setCopySuccess(true);
+        setTimeout(() => setShowFallback(false), 800);
+      },
+      (err) => {
+        console.error("Failed to copy text: ", err);
+      }
+    );
   };
 
-  const encodedUrl = encodeURIComponent(article.url);
   const encodedText = encodeURIComponent(`Check out this article I found: ${article.url}`);
   const emailSubject = encodeURIComponent(`Interesting Article: ${article.title}`);
 
   return (
     <div className={styles.shareWrapper} ref={wrapperRef}>
       <button className={styles.button} onClick={handleShare} title="Share article">
-        <img src="/images/share2.svg" style={{width: "30px", height: "30px"}} alt='Share this article'/>
+        <Share2 size={18} strokeWidth={2} />
       </button>
 
       {showFallback && (
         <div className={styles.fallbackMenu}>
           <button className={styles.fallbackOption} onClick={handleCopyLink}>
-            {copySuccess || '🔗 Copy Link'}
+            {copySuccess ? <Check size={16} /> : <Link2 size={16} />}
+            {copySuccess ? "Copied!" : "Copy Link"}
           </button>
-          <a className={styles.fallbackOption} href={`mailto:?subject=${emailSubject}&body=${encodedText}`}>
-            ✉️ Share via Email
+          <a
+            className={styles.fallbackOption}
+            href={`mailto:?subject=${emailSubject}&body=${encodedText}`}
+          >
+            <Mail size={16} />
+            Share via Email
           </a>
           <a className={styles.fallbackOption} href={`sms:?&body=${encodedText}`}>
-            💬 Share via Text
+            <MessageCircle size={16} />
+            Share via Text
           </a>
         </div>
       )}

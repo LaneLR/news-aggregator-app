@@ -6,6 +6,7 @@ import Button from "./Button";
 import { useEffect, useState } from "react";
 import CopyButton from "./CopyButton";
 import Link from "next/link";
+import { CreditCard, Gift, Heart, Palette, ShieldAlert } from "lucide-react";
 import RecentlyLikedItem from "./RecentlyLikedArticle";
 import ThemeSelector from "./ThemeSelector";
 import styles from "./ProfilePage.module.scss";
@@ -117,7 +118,7 @@ export default function ProfilePage() {
             onError={handleImageError}
           />
         </div>
-        <h1 className={styles.userName}>
+        <h1 className={`${styles.userName} headline`}>
           {user.name}
           <span className={`${styles.tierBadge} ${user.tier === "Free" ? styles.free : ""}`}>
             {user.tier === "Free" ? "Free Tier" : "Subscribed"}
@@ -126,206 +127,221 @@ export default function ProfilePage() {
         <p className={styles.userEmail}>{user.email}</p>
       </div>
 
-      <div className={styles.card}>
-        <h2 className={styles.cardHeader}>Subscription</h2>
-        <div className={styles.cardContent}>
-          {user.tier === "Free" ? (
-            <p>You are currently on the Free plan.</p>
-          ) : (
-            <>
-              <div className={styles.infoRow}>
-                <span>Current Plan</span>
-                <strong>{user.tier}</strong>
-              </div>
-              <div className={styles.infoRow}>
-                <span>Status</span>
-                <strong style={{ textTransform: "capitalize" }}>
-                  {user.stripeSubscriptionStatus}
-                </strong>
-              </div>
-              {user.stripeSubscriptionEndsAt && (
+      <div className={styles.cardsGrid}>
+        <div className={styles.card}>
+          <h2 className={styles.cardHeader}>
+            <CreditCard size={19} />
+            Subscription
+          </h2>
+          <div className={styles.cardContent}>
+            {user.tier === "Free" ? (
+              <p>You are currently on the Free plan.</p>
+            ) : (
+              <>
                 <div className={styles.infoRow}>
-                  <span>
-                    {user.subscriptionWillCancel ? (
-                      <b>Cancels on</b>
-                    ) : (
-                      <b>Renews on</b>
-                    )}
-                  </span>
-                  <strong>
-                    {new Date(
-                      user.stripeSubscriptionEndsAt
-                    ).toLocaleDateString()}
+                  <span>Current Plan</span>
+                  <strong>{user.tier}</strong>
+                </div>
+                <div className={styles.infoRow}>
+                  <span>Status</span>
+                  <strong style={{ textTransform: "capitalize" }}>
+                    {user.stripeSubscriptionStatus}
                   </strong>
                 </div>
-              )}
-            </>
-          )}
-        </div>
-        <div className={styles.cardFooter}>
-          {user.tier === "Free" ? (
-            <Button
-              bgColor={"var(--theme-primary)"}
-              clr={"var(--theme-button-text)"}
-              onClick={() => (window.location.href = "/pricing")}
-            >
-              Upgrade to Pro
-            </Button>
-          ) : (
-            <Button
-              bgColor={"var(--theme-primary)"}
-              clr={"var(--theme-button-text)"}
-              onClick={handleManageSubscription}
-            >
-              Manage Subscription
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <div className={styles.card}>
-        <h2 className={styles.cardHeader}>Your Referral Code</h2>
-        <div className={styles.cardContent}>
-          {user.tier === "Free" ? (
-            <>
-              <p>
-                Subscribe to Pro to activate your referral code and start
-                earning credits!
-              </p>
-              <div
-                style={{
-                  filter: "blur(5px)",
-                  backgroundColor: "var(--theme-background)",
-                  padding: "9px",
-                  borderRadius: "10px",
-                  textAlign: "center",
-                  userSelect: "none",
-                }}
-              >
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "1.6rem",
-                    letterSpacing: "2px",
-                  }}
-                >
-                  FAKECODE
-                </p>
-              </div>
-            </>
-          ) : (
-            <>
-              <p>
-                Share this code with your friends! They&apos;ll get a discount
-                on their first subscription, and you&apos;ll get a credit on
-                your next bill.
-              </p>
-              <div>
-                {user.referralCount > 0 && (
-                  <p>Users referred: {user.referralCount} </p>
+                {user.stripeSubscriptionEndsAt && (
+                  <div className={styles.infoRow}>
+                    <span>
+                      {user.subscriptionWillCancel ? (
+                        <b>Cancels on</b>
+                      ) : (
+                        <b>Renews on</b>
+                      )}
+                    </span>
+                    <strong>
+                      {new Date(
+                        user.stripeSubscriptionEndsAt
+                      ).toLocaleDateString()}
+                    </strong>
+                  </div>
                 )}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  height: "47px",
-                }}
+              </>
+            )}
+          </div>
+          <div className={styles.cardFooter}>
+            {user.tier === "Free" ? (
+              <Button
+                bgColor={"var(--theme-primary)"}
+                clr={"var(--theme-button-text)"}
+                onClick={() => (window.location.href = "/pricing")}
               >
-                <p
+                Upgrade to Pro
+              </Button>
+            ) : (
+              <Button
+                bgColor={"var(--theme-primary)"}
+                clr={"var(--theme-button-text)"}
+                onClick={handleManageSubscription}
+              >
+                Manage Subscription
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.card}>
+          <h2 className={styles.cardHeader}>
+            <Gift size={19} />
+            Your Referral Code
+          </h2>
+          <div className={styles.cardContent}>
+            {user.tier === "Free" ? (
+              <>
+                <p>
+                  Subscribe to Pro to activate your referral code and start
+                  earning credits!
+                </p>
+                <div
                   style={{
-                    fontSize: "1.6rem",
-                    fontWeight: "500",
-                    letterSpacing: "2px",
-                    backgroundColor: "var(--theme-layout-background)",
+                    filter: "blur(5px)",
+                    backgroundColor: "var(--theme-background)",
                     padding: "9px",
-                    borderTopLeftRadius: "10px",
-                    borderBottomLeftRadius: "10px",
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
+                    borderRadius: "10px",
+                    textAlign: "center",
+                    userSelect: "none",
                   }}
                 >
-                  {user.referralCode}
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "1.6rem",
+                      letterSpacing: "2px",
+                    }}
+                  >
+                    FAKECODE
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <p>
+                  Share this code with your friends! They&apos;ll get a discount
+                  on their first subscription, and you&apos;ll get a credit on
+                  your next bill.
                 </p>
-                <CopyButton textToCopy={user.referralCode} />
-              </div>
-            </>
-          )}
+                <div>
+                  {user.referralCount > 0 && (
+                    <p>Users referred: {user.referralCount} </p>
+                  )}
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    height: "47px",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: "1.6rem",
+                      fontWeight: "500",
+                      letterSpacing: "2px",
+                      backgroundColor: "var(--theme-layout-background)",
+                      padding: "9px",
+                      borderTopLeftRadius: "10px",
+                      borderBottomLeftRadius: "10px",
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {user.referralCode}
+                  </p>
+                  <CopyButton textToCopy={user.referralCode} />
+                </div>
+              </>
+            )}
+          </div>
         </div>
-      </div>
 
-      <div className={styles.card}>
-        <h2 className={styles.cardHeader}>Recently Liked</h2>
-        <div className={styles.cardContent}>
-          {recentlyLiked.length > 0 ? (
-            <ul className={styles.recentlyLikedList}>
-              {recentlyLiked.map((article) => (
-                <RecentlyLikedItem key={article.url} article={article} />
-              ))}
-            </ul>
-          ) : (
-            <p>Your recently liked articles will appear here.</p>
-          )}
+        <div className={styles.card}>
+          <h2 className={styles.cardHeader}>
+            <Heart size={19} />
+            Recently Liked
+          </h2>
+          <div className={styles.cardContent}>
+            {recentlyLiked.length > 0 ? (
+              <ul className={styles.recentlyLikedList}>
+                {recentlyLiked.map((article) => (
+                  <RecentlyLikedItem key={article.url} article={article} />
+                ))}
+              </ul>
+            ) : (
+              <p>Your recently liked articles will appear here.</p>
+            )}
+          </div>
+          <div className={styles.cardFooter}>
+            <Link href="/liked" passHref>
+              <Button bgColor={"var(--theme-primary)"} clr={"var(--theme-button-text)"}>
+                View Liked Articles
+              </Button>
+            </Link>
+          </div>
         </div>
-        <div className={styles.cardFooter}>
-          <Link href="/liked" passHref>
-            <Button bgColor={"var(--theme-primary)"} clr={"var(--theme-button-text)"}>
-              View Liked Articles
-            </Button>
-          </Link>
-        </div>
-      </div>
 
-      <div className={styles.card}>
-        <h2 className={styles.cardHeader}>Appearance</h2>
-        <div className={styles.cardContent}>
-          {user.tier === "Free" ? (
-            <p>Upgrade to Pro to unlock custom themes.</p>
-          ) : (
-            <ThemeSelector />
-          )}
+        <div className={styles.card}>
+          <h2 className={styles.cardHeader}>
+            <Palette size={19} />
+            Appearance
+          </h2>
+          <div className={styles.cardContent}>
+            {user.tier === "Free" ? (
+              <p>Upgrade to Pro to unlock custom themes.</p>
+            ) : (
+              <ThemeSelector />
+            )}
+          </div>
         </div>
-      </div>
 
-      <div className={styles.card}>
-        <h2 className={`${styles.cardHeader} ${styles.dangerCardHeader}`}>
-          Account Settings
-        </h2>
-        <div className={styles.cardContent}>
-          {user.isPendingDeletion ? (
-            <p>
-              Your account is scheduled for deletion on <b>{formattedDate}</b>{" "}
-              at <b>{formattedTime}</b>. You can request to cancel this at any
-              time before the cancellation date.
-            </p>
-          ) : (
-            <p>
-              Deactivate your account and all of your content. This action is
-              irreversible.
-            </p>
-          )}
-        </div>
-        <div className={styles.cardFooter}>
-          {user.isPendingDeletion ? (
-            <Button
-              bgColor={"var(--theme-primary)"}
-              clr={"var(--theme-button-text)"}
-              onClick={handleCancelDeletion}
-            >
-              Cancel Deletion
-            </Button>
-          ) : (
-            <Button
-              bgColor={"var(--theme-warning)"}
-              clr={"var(--theme-button-text)"}
-              onClick={handleRequestDeletion}
-            >
-              Delete Account
-            </Button>
-          )}
+        <div className={`${styles.card} ${styles.spanFull}`}>
+          <h2 className={`${styles.cardHeader} ${styles.dangerCardHeader}`}>
+            <ShieldAlert size={19} />
+            Account Settings
+          </h2>
+          <div className={styles.cardContent}>
+            {user.isPendingDeletion ? (
+              <p>
+                Your account is scheduled for deletion on <b>{formattedDate}</b>{" "}
+                at <b>{formattedTime}</b>. You can request to cancel this at any
+                time before the cancellation date.
+              </p>
+            ) : (
+              <p>
+                Deactivate your account and all of your content. This action is
+                irreversible.
+              </p>
+            )}
+          </div>
+          <div className={styles.cardFooter}>
+            {user.isPendingDeletion ? (
+              <Button
+                bgColor={"var(--theme-primary)"}
+                clr={"var(--theme-button-text)"}
+                onClick={handleCancelDeletion}
+              >
+                Cancel Deletion
+              </Button>
+            ) : (
+              <Button
+                bgColor={"var(--theme-warning)"}
+                clr={"var(--theme-button-text)"}
+                onClick={handleRequestDeletion}
+              >
+                Delete Account
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

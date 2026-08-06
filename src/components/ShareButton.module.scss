@@ -9,38 +9,53 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 1rem;
-  color: var(--theme-text);
-  border-radius: 50%;
-  transition: background-color 0.2s ease-in-out;
+  justify-content: center;
+  color: var(--theme-text-secondary);
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 
   &:hover {
-    background-color: var(--theme-background);
+    background-color: var(--theme-layout-background);
+    color: var(--theme-text);
   }
 }
 
 .fallbackMenu {
   position: absolute;
-  bottom: 100%;
+  bottom: calc(100% + 6px);
   right: 0;
   background-color: var(--theme-background);
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
   z-index: 10;
-  width: 180px;
+  width: 190px;
 }
 
 .fallbackOption {
-  display: block;
-  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
   color: var(--theme-text);
   text-decoration: none;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  background: none;
+  border: none;
+  text-align: left;
+
+  svg {
+    flex-shrink: 0;
+    color: var(--theme-text-secondary);
+  }
 
   &:hover {
-    background-color: var(--theme-background);
+    background-color: var(--theme-layout-background);
   }
 }

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Copy, Check, X } from "lucide-react";
 import styles from "./CopyButton.module.scss";
 
 export default function CopyButton({ textToCopy }) {
@@ -24,36 +25,17 @@ export default function CopyButton({ textToCopy }) {
     }
   };
 
-  const status = copyStatus.toUpperCase();
-
   return (
     <button
-      className={`${styles.wrapper} ${status === "Copied" ? styles.copied : ""}`}
+      className={`${styles.wrapper} ${copyStatus === "Copied" ? styles.copied : ""} ${
+        copyStatus === "Failed!" ? styles.failed : ""
+      }`}
       onClick={handleCopy}
     >
-      {copyStatus === "Copy" ? (
-        <img
-          src="/images/copy-unfilled-white.svg"
-          height={29}
-          width={29}
-          alt="Copy referral code"
-        />
-      ) : copyStatus === "Copied" ? (
-        <img
-          src="/images/copy-filled-white.svg"
-          height={29}
-          width={29}
-          alt="Referral code copied"
-        />
-      ) : (
-        <img
-          src="/images/copy-unfilled.svg"
-          height={29}
-          width={29}
-          alt="Copy referral code"
-        />
-      )}
-      <div style={{ width: "100%" }}>{copyStatus}</div>
+      {copyStatus === "Copy" && <Copy size={18} strokeWidth={2} />}
+      {copyStatus === "Copied" && <Check size={18} strokeWidth={2} />}
+      {copyStatus === "Failed!" && <X size={18} strokeWidth={2} />}
+      <div>{copyStatus}</div>
     </button>
   );
 }

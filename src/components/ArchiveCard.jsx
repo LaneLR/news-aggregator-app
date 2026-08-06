@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { Image as ImageIcon, FileText } from "lucide-react";
 import styles from "./ArchiveCard.module.scss";
 
 export default function ArchiveCard({ archive, children }) {
@@ -23,13 +24,16 @@ export default function ArchiveCard({ archive, children }) {
                 style={{ backgroundImage: `url(${src})` }}
               />
             ) : (
-              <div key={index} />
+              <div key={index} className={styles.emptySlot}>
+                <ImageIcon size={20} strokeWidth={1.5} />
+              </div>
             )
           )}
         </div>
         <div className={styles.overlay}>
-          <h3 className={styles.archiveTitle}>{name}</h3>
+          <h3 className={`${styles.archiveTitle} headline`}>{name}</h3>
           <p className={styles.archiveMeta}>
+            <FileText size={14} />
             {articleCount} Articles • {lastUpdated}
           </p>
         </div>

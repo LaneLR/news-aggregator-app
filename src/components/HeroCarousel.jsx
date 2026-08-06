@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { Sparkles, TrendingUp } from "lucide-react";
 import CarouselArticleCard from "@/components/CarouselArticleCard";
 import styles from "./HeroCarousel.module.scss";
 
@@ -49,7 +50,10 @@ export default function HeroCarousel() {
   return (
     <section className={styles.section}>
       <div className={styles.headerRow}>
-        <h2 className={styles.sectionTitle}>{view === "forYou" ? "For You" : "Trending"}</h2>
+        <h2 className={styles.sectionTitle}>
+          {view === "forYou" ? <Sparkles size={22} /> : <TrendingUp size={22} />}
+          {view === "forYou" ? "For You" : "Trending"}
+        </h2>
         <div className={styles.toggleGroup}>
           {isSubscribed && (
             <div className={styles.toggleRow}>

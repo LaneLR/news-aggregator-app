@@ -1,6 +1,7 @@
 "use client";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Search } from "lucide-react";
 import styles from "./SearchBar.module.scss";
 
 export default function SearchBar() {
@@ -27,17 +28,16 @@ export default function SearchBar() {
     }
   };
   return (
-    <>
-      <div className={styles.wrapper}>
-        <input
-          className={styles.input}
-          type="text"
-          placeholder={isNarrow ? "Search..." : "Search by title, topic, or author..."}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-      </div>
-    </>
+    <div className={styles.wrapper}>
+      <Search className={styles.icon} size={18} strokeWidth={2} />
+      <input
+        className={styles.input}
+        type="text"
+        placeholder={isNarrow ? "Search..." : "Search by title, topic, or author..."}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+    </div>
   );
 }
