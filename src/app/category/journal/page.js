@@ -1,6 +1,7 @@
 import CategoryPageComponent from "@/components/CategoryPage";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { getCategoryArticles } from "@/lib/categoryArticles";
 
 // Subscriber-only — redirects anonymous/Free visitors to /pricing, so a
 // crawler never sees real content here (also disallowed in robots.js).
@@ -15,9 +16,20 @@ export default async function JournalNewsPage() {
   if (isNotSubscribed) {
     return redirect("/pricing");
   }
+
+  let initialArticles;
+  try {
+    ({ articles: initialArticles } = await getCategoryArticles({
+      category: "journal",
+      userId: session.user.id,
+    }));
+  } catch (err) {
+    console.error("Failed to load initial Journal articles:", err);
+  }
+
   return (
     <>
-      <CategoryPageComponent category={"Journal"} />
+      <CategoryPageComponent category={"Journal"} initialArticles={initialArticles} />
     </>
   );
 }

@@ -1,14 +1,27 @@
 import CategoryPageComponent from "@/components/CategoryPage";
+import { auth } from "@/lib/auth";
+import { getCategoryArticles } from "@/lib/categoryArticles";
 
 export const metadata = {
   title: "World News",
   description: "World and international news from a range of sources.",
 };
 
-export default function WorldNewsPage() {
+export default async function WorldNewsPage() {
+  const session = await auth();
+  let initialArticles;
+  try {
+    ({ articles: initialArticles } = await getCategoryArticles({
+      category: "world",
+      userId: session?.user?.id,
+    }));
+  } catch (err) {
+    console.error("Failed to load initial World articles:", err);
+  }
+
   return (
     <>
-      <CategoryPageComponent category={"World"}/>
+      <CategoryPageComponent category={"World"} initialArticles={initialArticles} />
     </>
   );
 }

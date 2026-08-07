@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Newspaper, RefreshCw } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
@@ -21,14 +21,22 @@ async function fetchCategoryArticles(category, sort) {
   return data.articles;
 }
 
-export default function CategoryPage({ category, archiveId }) {
-  const [articles, setArticles] = useState([]);
+export default function CategoryPage({ category, archiveId, initialArticles }) {
+  const hasInitialArticles = Array.isArray(initialArticles);
+  const [articles, setArticles] = useState(initialArticles ?? []);
   const [defaultArchiveId, setDefaultArchiveId] = useState(null);
-  const [latestTimestamp, setLatestTimestamp] = useState(null);
+  const [latestTimestamp, setLatestTimestamp] = useState(
+    hasInitialArticles && initialArticles[0]
+      ? new Date(initialArticles[0].publishedAt || initialArticles[0].updatedAt)
+      : null
+  );
   const [newAvailable, setNewAvailable] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!hasInitialArticles);
   const [error, setError] = useState(null);
   const [sort, setSort] = useState("latest");
+  // Skips exactly one upcoming mount-effect fetch when SSR already provided
+  // the initial "latest" page — any later sort change still fetches normally.
+  const skipNextFetch = useRef(hasInitialArticles);
 
   const categoryNameForDisplay =
     category.charAt(0).toUpperCase() + category.slice(1);
@@ -52,7 +60,11 @@ export default function CategoryPage({ category, archiveId }) {
 
   useEffect(() => {
     if (category) {
-      loadArticles();
+      if (skipNextFetch.current) {
+        skipNextFetch.current = false;
+      } else {
+        loadArticles();
+      }
     }
 
     const handleFocus = async () => {
