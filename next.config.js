@@ -36,4 +36,23 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+const { withSentryConfig } = require("@sentry/nextjs");
+
+module.exports = withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Only print upload logs in CI, not on every local build.
+  silent: !process.env.CI,
+
+  // Wider source map upload for readable stack traces from node_modules
+  // too — increases build time slightly, worth it for a solo-maintained app
+  // where a readable stack trace saves more time than the build costs.
+  widenClientFileUpload: true,
+
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
+});
