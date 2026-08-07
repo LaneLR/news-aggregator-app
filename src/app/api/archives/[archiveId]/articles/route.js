@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import initializeDbAndModels from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { auth } from "@/lib/auth";
 
 export async function GET(_req, { params }) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -30,7 +29,7 @@ export async function GET(_req, { params }) {
 }
 
 export async function POST(req, { params }) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

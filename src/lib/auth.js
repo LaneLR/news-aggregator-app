@@ -4,8 +4,14 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import initializeDbAndModels from "@/lib/db.js";
 
-export const authOptions = {
+export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
+  // v5 checks the incoming request's Host header against a trusted-host
+  // allowlist before proceeding (a hardening change from v4). Vercel infers
+  // this on its own, but setting it explicitly costs nothing and avoids an
+  // opaque UntrustedHost error on sign-in if a custom domain, preview URL,
+  // or future host change ever falls outside Vercel's own auto-detection.
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
@@ -59,6 +65,7 @@ export const authOptions = {
           selectedTheme: user.selectedTheme,
           digestEnabled: user.digestEnabled,
           digestFrequency: user.digestFrequency,
+          onboardingCompleted: user.onboardingCompleted,
         };
       },
     }),
@@ -104,6 +111,7 @@ export const authOptions = {
         user.selectedTheme = dbUser.selectedTheme;
         user.digestEnabled = dbUser.digestEnabled;
         user.digestFrequency = dbUser.digestFrequency;
+        user.onboardingCompleted = dbUser.onboardingCompleted;
 
         return true;
       } catch (error) {
@@ -129,6 +137,7 @@ export const authOptions = {
         token.selectedTheme = user.selectedTheme;
         token.digestEnabled = user.digestEnabled;
         token.digestFrequency = user.digestFrequency;
+        token.onboardingCompleted = user.onboardingCompleted;
         return token;
       }
 
@@ -155,6 +164,7 @@ export const authOptions = {
         selectedTheme: dbUser.selectedTheme,
         digestEnabled: dbUser.digestEnabled,
         digestFrequency: dbUser.digestFrequency,
+        onboardingCompleted: dbUser.onboardingCompleted,
       };
     },
 
@@ -177,11 +187,9 @@ export const authOptions = {
         session.user.selectedTheme = token.selectedTheme;
         session.user.digestEnabled = token.digestEnabled;
         session.user.digestFrequency = token.digestFrequency;
+        session.user.onboardingCompleted = token.onboardingCompleted;
       }
       return session;
     },
   },
-};
-
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+});

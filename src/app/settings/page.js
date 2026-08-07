@@ -1,17 +1,26 @@
 import DigestSettings from "@/components/DigestSettings";
-import { authOptions } from "@/lib/auth-options";
-import { getServerSession } from "next-auth";
+import KeywordFilters from "@/components/KeywordFilters";
+import { auth } from "@/lib/auth";
+import initializeDbAndModels from "@/lib/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Settings as SettingsIcon, Mail, Lock, Info, KeyRound, Shield } from "lucide-react";
+import { Settings as SettingsIcon, Mail, Lock, Info, KeyRound, Shield, VolumeX } from "lucide-react";
 import styles from "./page.module.scss";
 
 export default async function SettingsPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session) {
     redirect("/login");
   }
+
+  // mutedKeywords isn't carried in the session/JWT (keeps the auth cookie
+  // small — it's per-request preference data, not identity data), so it's
+  // fetched directly here instead.
+  const { User } = await initializeDbAndModels();
+  const currentUser = await User.findByPk(session.user.id, {
+    attributes: ["mutedKeywords"],
+  });
 
   return (
     <div className={styles.pageWrapper}>
@@ -36,6 +45,18 @@ export default async function SettingsPage() {
             </h2>
             <div className={styles.cardContent}>
               <DigestSettings />
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <h2 className={styles.cardHeader}>
+              <span className={styles.cardHeaderIcon}>
+                <VolumeX size={17} />
+              </span>
+              Keyword Filters
+            </h2>
+            <div className={styles.cardContent}>
+              <KeywordFilters initialKeywords={currentUser?.mutedKeywords} />
             </div>
           </div>
 

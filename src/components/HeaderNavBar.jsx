@@ -32,8 +32,9 @@ const PERSONAL_LINKS = [
 ];
 
 // `primary` links stay visible in the bar; the rest live behind "More" so
-// the bar doesn't turn into an ever-scrolling wall of 15 pills.
-const CATEGORY_LINKS = [
+// the bar doesn't turn into an ever-scrolling wall of 15 pills. Exported so
+// the onboarding flow can reuse the same category/icon list.
+export const CATEGORY_LINKS = [
   { label: "Journals", href: "/category/journal", Icon: BookOpen, subscriberOnly: true, primary: true },
   { label: "Market", href: "/category/market", Icon: LineChart, subscriberOnly: true, primary: true },
   { label: "Business", href: "/category/business", Icon: Briefcase, primary: true },

@@ -1,0 +1,49 @@
+.wrapper {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--theme-dark-blue);
+  margin: 0;
+
+  svg {
+    color: var(--theme-primary);
+  }
+
+  @media (max-width: 440px) {
+    font-size: 1.5rem;
+  }
+}
+
+.emptyState {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+  color: var(--theme-text-secondary);
+  text-align: center;
+}
+
+.disclaimer {
+  margin: 2rem auto 0;
+  max-width: 600px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--theme-text-secondary);
+}

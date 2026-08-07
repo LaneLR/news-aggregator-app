@@ -19,6 +19,13 @@
     text-decoration: underline;
   }
 
+  &.read {
+    .imageLink img {
+      opacity: 0.6;
+      filter: grayscale(35%);
+    }
+  }
+
   @media (max-width: 440px) {
     width: 280px;
   }

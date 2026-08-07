@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Rss, Plus, SquarePen } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Rss, Plus, SquarePen, Download, Upload } from "lucide-react";
 import News from "./NewsFeed";
 import CreateFeedModal from "./CreateFeedModal";
 import Button from "./Button";
@@ -12,6 +12,9 @@ export default function FeedManager() {
   const [selectedFeedId, setSelectedFeedId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [feedToEdit, setFeedToEdit] = useState(null);
+  const [importStatus, setImportStatus] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef(null);
 
   const { data: session } = useSession();
   const isSubscribed = session?.user?.tier !== "Free";
@@ -48,6 +51,44 @@ export default function FeedManager() {
   const onActionSuccess = () => {
     fetchFeeds();
     setSelectedFeedId(null);
+  };
+
+  const handleImportClick = () => fileInputRef.current?.click();
+
+  const handleImportFile = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    setImporting(true);
+    setImportStatus(null);
+    try {
+      const opmlText = await file.text();
+      const res = await fetch("/api/feeds/import/opml", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ opmlText, title: file.name.replace(/\.opml$/i, "") }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setImportStatus({ type: "error", text: data.error || "Import failed." });
+        return;
+      }
+
+      setImportStatus({
+        type: "success",
+        text: `Imported "${data.feed.title}" — matched ${data.matchedCount} source${
+          data.matchedCount === 1 ? "" : "s"
+        }${data.skippedCount > 0 ? `, skipped ${data.skippedCount} we don't carry` : ""}.`,
+      });
+      fetchFeeds();
+    } catch (err) {
+      console.error("OPML import failed:", err);
+      setImportStatus({ type: "error", text: "Something went wrong reading that file." });
+    } finally {
+      setImporting(false);
+    }
   };
 
   return (
@@ -100,8 +141,40 @@ export default function FeedManager() {
                 Create Feed
               </span>
             </Button>
+            <Button
+              bgColor={"var(--theme-layout-background)"}
+              clr={"var(--theme-text)"}
+              onClick={handleImportClick}
+              disabled={importing}
+            >
+              <span className={styles.buttonContent}>
+                <Upload size={15} strokeWidth={2} />
+                {importing ? "Importing…" : "Import OPML"}
+              </span>
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".opml,.xml,text/x-opml,text/xml"
+              hidden
+              onChange={handleImportFile}
+            />
+            <a href="/api/feeds/opml" className={styles.exportLink}>
+              <Download size={15} strokeWidth={2} />
+              Export OPML
+            </a>
           </div>
         </div>
+      )}
+
+      {importStatus && (
+        <p
+          className={`${styles.importStatus} ${
+            importStatus.type === "error" ? styles.importError : ""
+          }`}
+        >
+          {importStatus.text}
+        </p>
       )}
 
       <CreateFeedModal

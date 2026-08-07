@@ -3,8 +3,10 @@ import { sendEmail } from "@/utils/emailer";
 import {
   getTrendingArticles,
   getPersonalizedPicks,
+  getFeedScopedArticles,
   buildDigestHtml,
 } from "@/lib/digest";
+import { filterByMutedKeywords } from "@/lib/keywordFilter";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -28,7 +30,7 @@ async function handler(req) {
 
   try {
     const db = await initializeDbAndModels();
-    const { User, Article } = db;
+    const { User, Feed, Article } = db;
 
     const subscribers = await User.findAll({
       where: { digestEnabled: true, status: "active" },
@@ -49,12 +51,34 @@ async function handler(req) {
     for (const user of dueUsers) {
       const isSubscribed = user.tier && user.tier !== "Free";
       try {
-        const picks = await getPersonalizedPicks(db, user, { isSubscribed });
-        const trending = isSubscribed ? trendingSubscribed : trendingFree;
+        // A subscriber can scope their digest to one of their own custom
+        // Feeds instead of general trending/personalized content.
+        let feed = null;
+        if (isSubscribed && user.digestFeedId) {
+          feed = await Feed.findOne({
+            where: { id: user.digestFeedId, userId: user.id },
+          });
+        }
+
+        let picks = [];
+        let trending = [];
+        let feedArticles = [];
+
+        if (feed) {
+          feedArticles = await getFeedScopedArticles(Article, feed, {
+            mutedKeywords: user.mutedKeywords,
+          });
+        } else {
+          picks = await getPersonalizedPicks(db, user, { isSubscribed });
+          trending = filterByMutedKeywords(
+            isSubscribed ? trendingSubscribed : trendingFree,
+            user.mutedKeywords
+          );
+        }
 
         // Nothing worth sending — still mark as processed so it isn't
         // retried every run until fresh content shows up.
-        if (picks.length === 0 && trending.length === 0) {
+        if (picks.length === 0 && trending.length === 0 && feedArticles.length === 0) {
           await user.update({ lastDigestSentAt: new Date() });
           continue;
         }
@@ -62,6 +86,8 @@ async function handler(req) {
         const html = buildDigestHtml({
           trending,
           picks,
+          feedTitle: feed?.title,
+          feedArticles,
           frequency: user.digestFrequency,
           baseUrl,
         });

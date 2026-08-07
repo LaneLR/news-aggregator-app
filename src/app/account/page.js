@@ -1,10 +1,9 @@
 import ProfilePage from "@/components/ProfilePage";
-import { authOptions } from "@/lib/auth-options";
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 export default async function AccountPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session) {
     redirect("/login");

@@ -95,3 +95,18 @@
     cursor: not-allowed;
   }
 }
+
+.feedSelect {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--theme-border);
+  background-color: var(--theme-background);
+  color: var(--theme-text);
+  font-size: 0.9rem;
+  min-width: 200px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

@@ -1,8 +1,7 @@
-import { authOptions } from "@/lib/auth-options";
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 export default async function LandingPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   redirect(session ? "/news" : "/login");
 }

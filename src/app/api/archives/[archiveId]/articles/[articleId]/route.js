@@ -1,12 +1,11 @@
 // app/api/archives/[archiveId]/articles/[articleId]/route.js
 import { NextResponse } from "next/server";
 import initializeDbAndModels from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { auth } from "@/lib/auth";
 
 export async function DELETE(req, { params }) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session)
       return NextResponse.json(
         { error: "User not authenticated" },

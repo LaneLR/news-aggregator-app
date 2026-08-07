@@ -1,17 +1,20 @@
 import { Op } from "sequelize";
-import { SUBSCRIBER_ONLY_CATEGORIES } from "./subscriberOnlyCategories";
+import { excludeGatedCategoriesCondition } from "./subscriberOnlyCategories";
+import { buildKeywordExclusion } from "./keywordFilter";
 
-const GATED_TAGS = [...SUBSCRIBER_ONLY_CATEGORIES].map(
-  (slug) => slug.charAt(0).toUpperCase() + slug.slice(1)
-);
+function visibilityCondition(isSubscribed, mutedKeywords) {
+  const conditions = isSubscribed ? [] : [excludeGatedCategoriesCondition()];
 
-function visibilityCondition(isSubscribed) {
-  return isSubscribed
-    ? []
-    : [{ category: { [Op.not]: { [Op.overlap]: GATED_TAGS } } }];
+  const keywordExclusion = buildKeywordExclusion(mutedKeywords);
+  if (keywordExclusion) conditions.push(keywordExclusion);
+
+  return conditions;
 }
 
-export async function getTrendingArticles(Article, { isSubscribed, days = 7, limit = 6 }) {
+export async function getTrendingArticles(
+  Article,
+  { isSubscribed, days = 7, limit = 6, mutedKeywords }
+) {
   const since = new Date();
   since.setDate(since.getDate() - days);
 
@@ -20,7 +23,7 @@ export async function getTrendingArticles(Article, { isSubscribed, days = 7, lim
       [Op.and]: [
         { publishedAt: { [Op.gte]: since } },
         { clickCount: { [Op.gt]: 0 } },
-        ...visibilityCondition(isSubscribed),
+        ...visibilityCondition(isSubscribed, mutedKeywords),
       ],
     },
     order: [["clickCount", "DESC"]],
@@ -80,9 +83,29 @@ export async function getPersonalizedPicks(db, user, { isSubscribed, limit = 6 }
       [Op.and]: [
         { category: { [Op.overlap]: topCategories } },
         { url: { [Op.notIn]: [...seenUrls] } },
-        ...visibilityCondition(isSubscribed),
+        ...visibilityCondition(isSubscribed, user.mutedKeywords),
       ],
     },
+    order: [["publishedAt", "DESC"]],
+    limit,
+  });
+}
+
+// Alternative to getTrendingArticles/getPersonalizedPicks for a user whose
+// digest is scoped to one of their own custom Feeds instead of general
+// trending/personalized content.
+export async function getFeedScopedArticles(Article, feed, { mutedKeywords, limit = 10 } = {}) {
+  const orConditions = [];
+  if (feed.sourceNames?.length) orConditions.push({ sourceName: { [Op.in]: feed.sourceNames } });
+  if (feed.categories?.length) orConditions.push({ category: { [Op.overlap]: feed.categories } });
+  if (orConditions.length === 0) return [];
+
+  const conditions = [{ [Op.or]: orConditions }];
+  const keywordExclusion = buildKeywordExclusion(mutedKeywords);
+  if (keywordExclusion) conditions.push(keywordExclusion);
+
+  return Article.findAll({
+    where: { [Op.and]: conditions },
     order: [["publishedAt", "DESC"]],
     limit,
   });
@@ -111,13 +134,15 @@ function sectionHtml(title, articles) {
     </table>`;
 }
 
-export function buildDigestHtml({ trending, picks, frequency, baseUrl }) {
+export function buildDigestHtml({ trending, picks, frequency, baseUrl, feedTitle, feedArticles }) {
   const cadence = frequency === "daily" ? "Today's" : "This week's";
+  const body = feedTitle
+    ? sectionHtml(`New in "${feedTitle}"`, feedArticles || [])
+    : `${sectionHtml("Picked for you", picks)}${sectionHtml("Trending now", trending)}`;
   return `
     <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;">
       <h1 style="font-size:22px;color:#0a1430;">${cadence} MorningFeeds digest</h1>
-      ${sectionHtml("Picked for you", picks)}
-      ${sectionHtml("Trending now", trending)}
+      ${body}
       <p style="margin-top:28px;font-size:12px;color:#999;">
         You're getting this because you turned on email digests.
         <a href="${baseUrl}/settings">Manage your digest settings</a>.

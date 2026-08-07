@@ -54,6 +54,15 @@ export default function defineArticle(sequelize) {
         allowNull: false,
         defaultValue: "news",
       },
+      // Full article HTML, when the source feed includes it (many WordPress
+      // feeds ship this via <content:encoded>). Populated by the RSS worker
+      // going forward only — existing rows stay null and the reader falls
+      // back to the external link. Always sanitized before rendering
+      // (see /article/[id]) since this is third-party HTML.
+      content: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
     },
     {
       sequelize,

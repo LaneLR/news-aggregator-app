@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import initializeDbAndModels from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { auth } from "@/lib/auth";
 
 // Best-effort view/click counter powering the "Trending" sort. Intentionally
 // unauthenticated (anonymous visitors read articles too) and unrate-limited —
@@ -21,16 +20,21 @@ export async function POST(req) {
       );
     }
 
-    const { Article, UserInteraction } = await initializeDbAndModels();
+    const { Article, UserInteraction, ReadArticle } = await initializeDbAndModels();
     await Article.increment("clickCount", { where: { url: articleUrl } });
 
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (session?.user?.id) {
       await UserInteraction.create({
         userId: session.user.id,
         articleUrl,
         sourceName: sourceName || null,
         category: Array.isArray(category) ? category : null,
+      });
+      // Read state is keyed by articleUrl only, so it's automatically global
+      // across every category/feed/search result the article appears in.
+      await ReadArticle.findOrCreate({
+        where: { userId: session.user.id, articleUrl },
       });
     }
 

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 
 const checkSubscription = (session) => {
@@ -8,7 +7,7 @@ const checkSubscription = (session) => {
 };
 
 export async function PATCH(req, context) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (checkSubscription(session))
@@ -58,7 +57,7 @@ export async function PATCH(req, context) {
 }
 
 export async function DELETE(req, context) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (checkSubscription(session))
@@ -69,7 +68,7 @@ export async function DELETE(req, context) {
 
   try {
     const { feedId } = context.params;
-    const { Feed } = await initializeDbAndModels();
+    const { Feed, User } = await initializeDbAndModels();
 
     const feed = await Feed.findOne({
       where: { id: feedId, userId: session.user.id },
@@ -83,6 +82,12 @@ export async function DELETE(req, context) {
     }
 
     await feed.destroy();
+    // digestFeedId is a soft reference (no DB-level FK), so it needs to be
+    // cleared manually rather than relying on cascade behavior.
+    await User.update(
+      { digestFeedId: null },
+      { where: { id: session.user.id, digestFeedId: feedId } }
+    );
 
     return NextResponse.json(
       { message: "Feed deleted successfully" },

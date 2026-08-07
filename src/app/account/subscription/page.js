@@ -1,5 +1,4 @@
-import { authOptions } from "@/lib/auth-options";
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { CreditCard } from "lucide-react";
@@ -8,7 +7,7 @@ import ResumeSubscriptionButton from "@/components/ResumeSubscriptionButton";
 import styles from "../AccountCard.module.scss";
 
 export default async function SubscriptionPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session) {
     redirect("/login");

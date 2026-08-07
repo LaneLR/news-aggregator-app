@@ -1,0 +1,134 @@
+.pageWrapper {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 2.5rem 1.5rem;
+  background-color: var(--theme-layout-background);
+}
+
+.card {
+  width: 100%;
+  max-width: 560px;
+  background-color: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 2.25rem 2rem;
+}
+
+.stepIndicator {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--theme-primary);
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--theme-text);
+  margin: 0 0 0.5rem;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--theme-text-secondary);
+  margin: 0 0 1.75rem;
+  line-height: 1.5;
+}
+
+.chipGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--theme-border);
+  background-color: var(--theme-background);
+  color: var(--theme-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    color 0.15s ease-in-out;
+
+  &:hover {
+    border-color: var(--theme-primary);
+  }
+
+  &.active {
+    background-color: color-mix(in srgb, var(--theme-primary) 12%, transparent);
+    border-color: var(--theme-primary);
+    color: var(--theme-primary);
+  }
+}
+
+.checkIcon {
+  color: var(--theme-primary);
+}
+
+.loadingText {
+  color: var(--theme-text-secondary);
+  font-size: 0.9rem;
+  margin: 0 0 2rem;
+}
+
+.actionsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skipButton {
+  background: none;
+  border: none;
+  color: var(--theme-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: var(--theme-text);
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.continueButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background-color: var(--theme-primary);
+  color: var(--theme-primary-contrast);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.06);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
