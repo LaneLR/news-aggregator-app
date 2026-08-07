@@ -59,9 +59,10 @@
 }
 
 .moreMenu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
+  // Portaled to <body> (see HeaderNavBar.jsx) so it escapes the nav bar's
+  // own overflow-x: auto scroll box instead of being clipped inside it —
+  // top/right come from the button's measured position via inline style.
+  position: fixed;
   background-color: var(--theme-background);
   border: 1px solid var(--theme-border);
   border-radius: var(--radius-md);
