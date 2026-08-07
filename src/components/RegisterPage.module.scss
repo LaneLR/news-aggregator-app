@@ -1,67 +1,92 @@
-.wrapper {
-  flex-grow: 1;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-evenly;
-  width: 100vw;
-  background-color: var(--theme-background);
-  box-sizing: border-box;
-  padding: 80px 0 40px 0;
+.formBody {
+  padding: 1.75rem 1.75rem 2rem;
 }
 
-.formWrapper {
+.formTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--theme-text);
+  margin: 0 0 1.25rem 0;
+}
+
+.form {
   display: flex;
   flex-direction: column;
+  gap: 1.1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.fieldLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--theme-text);
+}
+
+.inputGroup {
+  position: relative;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  height: 100%;
-  background-color: inherit;
-}
 
-.inputWrapper {
-  height: fit-content;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-}
+  input {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    border: 1px solid var(--theme-border);
+    border-radius: var(--radius-sm);
+    background-color: var(--theme-background);
+    color: var(--theme-text);
+    font-size: 0.95rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 
-.registerFormInput {
-  width: 100%;
-  max-width: 300px;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid var(--theme-border);
-  border-radius: 4px;
+    &:focus {
+      outline: none;
+      border-color: var(--theme-primary);
+      box-shadow: 0 0 0 3px
+        color-mix(in srgb, var(--theme-primary) 15%, transparent);
+    }
+  }
 
-  &:last-of-type {
-    margin-bottom: 25px;
+  &:has(.togglePasswordButton) input {
+    padding-right: 38px;
   }
 }
 
-.header {
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--theme-dark-blue);
-  padding: 10px 0;
-  text-align: center;
-  width: 100%;
+.inputIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--theme-text-secondary);
+  pointer-events: none;
+}
 
-  @media (max-width: 440px) {
-    font-size: 1.8rem;
-    font-weight: 700;
+.togglePasswordButton {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: none;
+  border: none;
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--theme-text);
   }
 }
 
 .checkboxWrapper {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 10px;
-  margin: 0 0 25px 0;
-  max-width: 320px;
   text-align: left;
-  font-size: 0.85rem;
-  color: var(--theme-slate);
+  font-size: 0.82rem;
+  color: var(--theme-text-secondary);
 
   a {
     color: var(--theme-primary);
@@ -71,4 +96,11 @@
 
 .styledInput {
   accent-color: var(--theme-primary);
+  flex-shrink: 0;
+}
+
+.errorText {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--theme-warning);
 }

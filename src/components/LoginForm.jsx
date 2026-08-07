@@ -3,15 +3,18 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import Button from "@/components/Button";
 import Loading from "@/app/loading";
 import GoogleSignInButton from "./GoogleSignInButton";
+import AuthLayout from "./AuthLayout";
 import styles from "./LoginForm.module.scss";
 
 export default function LoginPage() {
   const [user, setUser] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { data: session, status } = useSession();
 
@@ -58,100 +61,76 @@ export default function LoginPage() {
   }
 
   return (
-    <div className={styles.pageWrapper}>
-      <div className={styles.signInButtonWrapper}>
-        {/* <div className={styles.ssoText}>Sign in with</div> */}
-        <GoogleSignInButton
-          onClick={() => signIn("google", { callbackUrl: "/news" })}
-        />
-      </div>
-      <div className={styles.wrapper}>
-        <div className={styles.header}>Login</div>
-        <form className={styles.formWrapper} onSubmit={handleLoginUser}>
-          <div className={styles.inputWrapper}>
-            <input
-              className={styles.loginFormInput}
-              name="email"
-              type="email"
-              placeholder="Email"
-              required
-              value={user.email}
-              onChange={handleChange}
-            />
-            <input
-              className={styles.loginFormInput}
-              name="password"
-              type="password"
-              placeholder="Password"
-              required
-              value={user.password}
-              onChange={handleChange}
-            />
-          </div>
+    <AuthLayout activeTab="signin">
+      <div className={styles.formBody}>
+        <h2 className={styles.formTitle}>Sign In</h2>
+        <form className={styles.form} onSubmit={handleLoginUser}>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Email Address</span>
+            <div className={styles.inputGroup}>
+              <Mail size={17} strokeWidth={2} className={styles.inputIcon} />
+              <input
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+                value={user.email}
+                onChange={handleChange}
+              />
+            </div>
+          </label>
+
+          <label className={styles.field}>
+            <div className={styles.fieldLabelRow}>
+              <span className={styles.fieldLabel}>Password</span>
+              <Link href="/forgot-password" className={styles.inlineLink}>
+                Forgot Password?
+              </Link>
+            </div>
+            <div className={styles.inputGroup}>
+              <Lock size={17} strokeWidth={2} className={styles.inputIcon} />
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                required
+                value={user.password}
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                className={styles.togglePasswordButton}
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+              </button>
+            </div>
+          </label>
+
+          {error && <p className={styles.errorText}>{error}</p>}
+
           <Button
             bgColor={"var(--theme-primary)"}
             clr={"var(--theme-primary-contrast)"}
             type="submit"
             disabled={loading}
+            wide={"100%"}
           >
-            Log in
+            {loading ? "Signing in..." : "Sign In"}
           </Button>
-
-          {error && (
-            <>
-              <br />
-              <p style={{ color: "var(--theme-warning)" }}>{error}</p>
-            </>
-          )}
-
-          <h5
-            style={{
-              display: "flex",
-              alignItems: "center",
-              marginTop: "20px",
-            }}
-          >
-            <br />
-            <div
-              style={{
-                color: "var(--theme-text)",
-                textAlign: "center",
-                display: "flex",
-                gap: "5px",
-              }}
-            >
-              <p>Don&apos;t have an account?</p>
-              <Link href="/register">
-                <u>Create one!</u>
-              </Link>
-            </div>
-          </h5>
-          <h5
-            style={{
-              display: "flex",
-              alignItems: "center",
-              marginTop: "20px",
-            }}
-          >
-            <br />
-            <div
-              style={{
-                color: "var(--theme-text)",
-                textAlign: "center",
-                display: "flex",
-                gap: "5px",
-              }}
-            >
-              <p>Forgot your password?</p>
-              <Link href="/forgot-password">
-                <u>Reset password</u>
-              </Link>
-            </div>
-          </h5>
         </form>
-        <br />
-        <br />
+
+        <div className={styles.divider}>
+          <span>Or continue with</span>
+        </div>
+
+        <div className={styles.socialRow}>
+          <GoogleSignInButton
+            onClick={() => signIn("google", { callbackUrl: "/news" })}
+          />
+        </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

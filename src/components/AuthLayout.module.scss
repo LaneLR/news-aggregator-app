@@ -1,0 +1,151 @@
+.pageWrapper {
+  flex-grow: 1;
+  display: flex;
+  min-height: 100%;
+  width: 100%;
+  background-color: var(--theme-background);
+}
+
+.brandPanel {
+  display: none;
+
+  @media (min-width: 900px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2.5rem;
+    flex: 1 1 45%;
+    padding: 4rem;
+    background-color: var(--theme-layout-background);
+    border-right: 1px solid var(--theme-border);
+  }
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  font-family: var(--font-lora), serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--theme-text);
+  text-transform: capitalize;
+
+  span:last-child {
+    color: var(--theme-primary);
+  }
+}
+
+.brandHeadline {
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--theme-text);
+  margin: 0;
+  max-width: 420px;
+}
+
+.highlightList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 400px;
+}
+
+.highlightItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.highlightIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background-color: color-mix(in srgb, var(--theme-primary) 12%, transparent);
+  color: var(--theme-primary);
+}
+
+.highlightTitle {
+  margin: 0 0 2px 0;
+  font-weight: 600;
+  color: var(--theme-text);
+  font-size: 0.95rem;
+}
+
+.highlightDescription {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--theme-text-secondary);
+  line-height: 1.4;
+}
+
+.formPanel {
+  flex: 1 1 55%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background-color: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.tabRow {
+  display: flex;
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--theme-text-secondary);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out;
+
+  &:hover {
+    color: var(--theme-text);
+    background-color: var(--theme-layout-background);
+  }
+}
+
+.activeTab {
+  color: var(--theme-primary);
+  border-bottom-color: var(--theme-primary);
+
+  &:hover {
+    background-color: transparent;
+  }
+}

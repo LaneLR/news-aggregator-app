@@ -1,105 +1,126 @@
-.pageWrapper {
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: left;
-  width: 100vw;
-  overflow-y: hidden;
-  flex-flow: column nowrap;
-  background-color: var(--theme-background);
-  padding: 0 0 10px 0;
-
-  @media (min-width: 955px) {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    align-items: center;
-  }
+.formBody {
+  padding: 1.75rem 1.75rem 2rem;
 }
 
-.wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: auto;
-  overflow-y: hidden;
-  flex-flow: column nowrap;
-  background-color: var(--theme-background);
-  padding: 0 0 10px 0;
+.formTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--theme-text);
+  margin: 0 0 1.25rem 0;
 }
 
-.formWrapper {
+.form {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 100%;
-  background-color: inherit;
+  gap: 1.1rem;
 }
 
-.inputWrapper {
-  height: fit-content;
-  padding: 10px;
+.field {
   display: flex;
   flex-direction: column;
+  gap: 6px;
+  text-align: left;
 }
 
-.loginFormInput {
-  width: 100%;
-  max-width: 300px;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid var(--theme-border);
-  border-radius: 4px;
-
-  &:last-of-type {
-    margin-bottom: 25px;
-  }
+.fieldLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.header {
-  font-size: 2rem;
+.fieldLabel {
+  font-size: 0.85rem;
   font-weight: 600;
-  color: var(--theme-dark-blue);
-  padding: 10px 0;
-  text-align: center;
-  width: 100%;
+  color: var(--theme-text);
+}
 
-  @media (max-width: 440px) {
-    font-size: 1.8rem;
-    font-weight: 700;
+.inlineLink {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--theme-primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
   }
 }
 
-.signInButtonWrapper {
+.inputGroup {
+  position: relative;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+
+  input {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    border: 1px solid var(--theme-border);
+    border-radius: var(--radius-sm);
+    background-color: var(--theme-background);
+    color: var(--theme-text);
+    font-size: 0.95rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+    &:focus {
+      outline: none;
+      border-color: var(--theme-primary);
+      box-shadow: 0 0 0 3px
+        color-mix(in srgb, var(--theme-primary) 15%, transparent);
+    }
+  }
+
+  &:has(.togglePasswordButton) input {
+    padding-right: 38px;
+  }
+}
+
+.inputIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--theme-text-secondary);
+  pointer-events: none;
+}
+
+.togglePasswordButton {
+  position: absolute;
+  right: 8px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  row-gap: 8px;
-  padding: 20px;
-  // background-color: var(--theme-card-background);
-  border-radius: 8px;
-  height: auto;
-  margin-bottom: 220px;
+  padding: 4px;
+  background: none;
+  border: none;
+  color: var(--theme-text-secondary);
+  cursor: pointer;
 
-  @media (max-width: 955px) {
-    margin-bottom: 0;
-    margin: 20px;
+  &:hover {
+    color: var(--theme-text);
   }
 }
 
-.ssoText {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--theme-dark-blue);
-  text-align: center;
-  margin-bottom: 20px;
-  width: 100%;
+.errorText {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--theme-warning);
+}
 
-  @media (max-width: 440px) {
-    font-size: 1.8rem;
-    font-weight: 700;
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 1.5rem 0 1.25rem;
+  color: var(--theme-text-secondary);
+  font-size: 0.8rem;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: var(--theme-border);
   }
+}
+
+.socialRow {
+  display: flex;
+  justify-content: center;
 }
