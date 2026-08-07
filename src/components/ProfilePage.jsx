@@ -6,16 +6,29 @@ import Button from "./Button";
 import { useEffect, useState } from "react";
 import CopyButton from "./CopyButton";
 import Link from "next/link";
-import { CreditCard, Gift, Heart, Palette, ShieldAlert } from "lucide-react";
+import { CreditCard, Gift, Heart, Palette, ShieldAlert, LayoutGrid, Rows3 } from "lucide-react";
 import RecentlyLikedItem from "./RecentlyLikedArticle";
 import ThemeSelector from "./ThemeSelector";
 import styles from "./ProfilePage.module.scss";
 
 const FALLBACK_IMAGE_URL = "/images/default-avatar.png";
 
+const LAYOUT_STORAGE_KEY = "accountCardLayout";
+
 export default function ProfilePage() {
   const { data: session, status, update } = useSession();
   const [recentlyLiked, setRecentlyLiked] = useState([]);
+  const [layout, setLayout] = useState("grid");
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem(LAYOUT_STORAGE_KEY);
+    if (saved === "grid" || saved === "list") setLayout(saved);
+  }, []);
+
+  const handleSetLayout = (next) => {
+    setLayout(next);
+    window.localStorage.setItem(LAYOUT_STORAGE_KEY, next);
+  };
 
   const proxiedImageUrl = session?.user?.image
     ? `/api/image-proxy?url=${encodeURIComponent(session.user.image)}`
@@ -127,10 +140,33 @@ export default function ProfilePage() {
         <p className={styles.userEmail}>{user.email}</p>
       </div>
 
-      <div className={styles.cardsGrid}>
+      <div className={styles.layoutToggleRow}>
+        <div className={styles.layoutToggle}>
+          <button
+            type="button"
+            className={`${styles.layoutButton} ${layout === "grid" ? styles.active : ""}`}
+            onClick={() => handleSetLayout("grid")}
+            title="Grid view"
+          >
+            <LayoutGrid size={16} strokeWidth={2} />
+          </button>
+          <button
+            type="button"
+            className={`${styles.layoutButton} ${layout === "list" ? styles.active : ""}`}
+            onClick={() => handleSetLayout("list")}
+            title="List view"
+          >
+            <Rows3 size={16} strokeWidth={2} />
+          </button>
+        </div>
+      </div>
+
+      <div className={`${styles.cardsGrid} ${layout === "list" ? styles.listLayout : ""}`}>
         <div className={styles.card}>
           <h2 className={styles.cardHeader}>
-            <CreditCard size={19} />
+            <span className={styles.cardHeaderIcon}>
+              <CreditCard size={17} />
+            </span>
             Subscription
           </h2>
           <div className={styles.cardContent}>
@@ -190,7 +226,9 @@ export default function ProfilePage() {
 
         <div className={styles.card}>
           <h2 className={styles.cardHeader}>
-            <Gift size={19} />
+            <span className={styles.cardHeaderIcon}>
+              <Gift size={17} />
+            </span>
             Your Referral Code
           </h2>
           <div className={styles.cardContent}>
@@ -267,7 +305,9 @@ export default function ProfilePage() {
 
         <div className={styles.card}>
           <h2 className={styles.cardHeader}>
-            <Heart size={19} />
+            <span className={styles.cardHeaderIcon}>
+              <Heart size={17} />
+            </span>
             Recently Liked
           </h2>
           <div className={styles.cardContent}>
@@ -292,7 +332,9 @@ export default function ProfilePage() {
 
         <div className={styles.card}>
           <h2 className={styles.cardHeader}>
-            <Palette size={19} />
+            <span className={styles.cardHeaderIcon}>
+              <Palette size={17} />
+            </span>
             Appearance
           </h2>
           <div className={styles.cardContent}>
@@ -306,7 +348,9 @@ export default function ProfilePage() {
 
         <div className={`${styles.card} ${styles.spanFull}`}>
           <h2 className={`${styles.cardHeader} ${styles.dangerCardHeader}`}>
-            <ShieldAlert size={19} />
+            <span className={styles.cardHeaderIcon}>
+              <ShieldAlert size={17} />
+            </span>
             Account Settings
           </h2>
           <div className={styles.cardContent}>

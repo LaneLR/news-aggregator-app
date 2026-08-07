@@ -16,6 +16,50 @@
   @media (max-width: 1000px) {
     grid-template-columns: 1fr;
   }
+
+  // User-selected list view (persisted in localStorage, see ProfilePage) —
+  // higher specificity than the base rule above so it wins at every
+  // viewport width, not just above the responsive collapse breakpoint.
+  &.listLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.layoutToggleRow {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.layoutToggle {
+  display: flex;
+  gap: 0.3rem;
+  background-color: var(--theme-layout-background);
+  padding: 4px;
+  border-radius: 999px;
+}
+
+.layoutButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+
+  &:hover {
+    color: var(--theme-text);
+  }
+
+  &.active {
+    background-color: var(--theme-card-background);
+    color: var(--theme-primary);
+    box-shadow: var(--shadow-sm);
+  }
 }
 
 // Account Settings (the danger/deletion card) stays full-width — it's a
@@ -27,8 +71,8 @@
 
 .card {
   background-color: var(--theme-card-background);
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   border: 1px solid var(--theme-border);
   overflow: hidden;
 }
@@ -39,7 +83,7 @@
   align-items: center;
   text-align: center;
   padding: 2rem;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background-color: var(--theme-card-background);
   border: 1px solid var(--theme-border);
 }
@@ -86,16 +130,24 @@
 .cardHeader {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.2rem;
-  padding: 1rem 1.5rem;
+  gap: 0.75rem;
+  font-size: 1.1rem;
+  padding: 1.1rem 1.5rem;
   margin: 0;
   border-bottom: 1px solid var(--theme-border);
   color: var(--theme-dark-blue);
+}
 
-  svg {
-    color: var(--theme-primary);
-  }
+.cardHeaderIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background-color: color-mix(in srgb, var(--theme-primary) 12%, transparent);
+  color: var(--theme-primary);
+  flex-shrink: 0;
 }
 
 .cardContent {
@@ -131,7 +183,8 @@
   color: var(--theme-warning);
   border-bottom-color: var(--theme-border);
 
-  svg {
+  .cardHeaderIcon {
+    background-color: color-mix(in srgb, var(--theme-warning) 12%, transparent);
     color: var(--theme-warning);
   }
 }
