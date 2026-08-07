@@ -27,7 +27,7 @@ export async function GET(req, { params }) {
     user.emailIsVerified = true;
     await user.save();
 
-    return NextResponse.redirect(new URL("/verification/verify-success", req.url));
+    return NextResponse.redirect(new URL("/login?verified=1", req.url));
   } catch (err) {
     console.error(err);
     if (err instanceof jwt.JsonWebTokenError) {

@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useSession, signIn } from "next-auth/react";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import Button from "@/components/Button";
 import Loading from "@/app/loading";
 import GoogleSignInButton from "./GoogleSignInButton";
@@ -17,6 +18,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
+  const justVerified = searchParams.get("verified") === "1";
 
   useEffect(() => {
     // Safety net for landing on /login while already signed in (e.g. via
@@ -64,6 +67,14 @@ export default function LoginPage() {
     <AuthLayout activeTab="signin">
       <div className={styles.formBody}>
         <h2 className={styles.formTitle}>Sign In</h2>
+
+        {justVerified && (
+          <div className={styles.verifiedBanner}>
+            <CheckCircle2 size={16} strokeWidth={2} />
+            Email verified — you can now sign in.
+          </div>
+        )}
+
         <form className={styles.form} onSubmit={handleLoginUser}>
           <label className={styles.field}>
             <span className={styles.fieldLabel}>Email Address</span>

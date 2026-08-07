@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { Heart } from "lucide-react";
 import NewsCardFour from "@/components/NewsCardFour";
 import NewsGridWrapper from "@/components/NewsGridWrapper";
 import Loading from "@/app/loading";
@@ -39,25 +40,35 @@ export default function LikedArticlesPage() {
   }
 
   if (!session) {
-    return <p>Please sign in to see your liked articles.</p>;
+    return (
+      <p className={styles.statusText}>
+        Please sign in to see your liked articles.
+      </p>
+    );
   }
 
   return (
     <div className={styles.likedPageWrapper}>
-      <h1 className={styles.header}>Your Liked Articles</h1>
+      <div className={styles.pageHeader}>
+        <h1 className={`${styles.pageTitle} headline`}>
+          <Heart size={26} strokeWidth={2} />
+          Your Liked Articles
+        </h1>
+      </div>
+
       {likedArticles.length > 0 ? (
         <NewsGridWrapper>
           {likedArticles.map((article) => (
-            <NewsCardFour
-              key={article.url}
-              article={article}
-              viewOnly={true}
-            />
+            <NewsCardFour key={article.url} article={article} viewOnly={true} />
           ))}
         </NewsGridWrapper>
       ) : (
         <div className={styles.emptyState}>
-          <p>You haven't liked any articles yet.</p>
+          <Heart size={32} strokeWidth={1.5} />
+          <p>You haven&apos;t liked any articles yet.</p>
+          <p className={styles.emptyStateHint}>
+            Tap the heart on any article to save it here.
+          </p>
         </div>
       )}
     </div>

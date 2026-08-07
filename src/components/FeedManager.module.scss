@@ -1,7 +1,61 @@
-.feedSelectorWrapper {
+.pageHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 2rem 0 1rem;
+  text-align: center;
+}
+
+.pageTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--theme-dark-blue);
+
+  svg {
+    color: var(--theme-primary);
+  }
+
+  @media (max-width: 440px) {
+    font-size: 1.6rem;
+  }
+}
+
+.pageSubtitle {
+  color: var(--theme-text-secondary);
+  max-width: 480px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 0 1.5rem;
+  padding: 0 20px;
+}
+
+.feedSelect {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--theme-border);
+  background-color: var(--theme-background);
+  color: var(--theme-text);
+  font-size: 0.9rem;
+  min-width: 200px;
+}
+
+.toolbarActions {
   display: flex;
   gap: 10px;
+}
+
+.buttonContent {
+  display: flex;
   align-items: center;
-  margin: 20px 0;
-  padding: 0 20px;
+  gap: 6px;
 }

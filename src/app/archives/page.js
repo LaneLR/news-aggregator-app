@@ -2,11 +2,13 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import initializeDbAndModels from "@/lib/db";
+import { Bookmark } from "lucide-react";
 import DeleteArchiveButton from "@/components/DeleteArchiveButton";
 import ArchiveCard from "@/components/ArchiveCard";
 import NewsGridWrapper from "@/components/NewsGridWrapper";
 import { redirect } from "next/navigation";
 import CreateNewArchiveCard from "@/components/CreateNewArchiveCard";
+import styles from "./page.module.scss";
 
 export default async function ArchivesPage() {
   const session = await getServerSession(authOptions);
@@ -48,8 +50,17 @@ export default async function ArchivesPage() {
   });
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Your Archives</h2>
+    <>
+      <div className={styles.pageHeader}>
+        <h1 className={`${styles.pageTitle} headline`}>
+          <Bookmark size={26} strokeWidth={2} />
+          Your Archives
+        </h1>
+        <p className={styles.pageSubtitle}>
+          Articles you&apos;ve saved, organized into folders you control.
+        </p>
+      </div>
+
       <NewsGridWrapper>
         <CreateNewArchiveCard />
         {plainArchives.map((archive) => (
@@ -60,6 +71,6 @@ export default async function ArchivesPage() {
           </ArchiveCard>
         ))}
       </NewsGridWrapper>
-    </div>
+    </>
   );
 }

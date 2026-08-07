@@ -10,13 +10,5 @@ export default async function FeedsPage() {
     return redirect("/pricing");
   }
 
-  return (
-    <div style={{ padding: "20px" }}>
-      <h2 style={{ textAlign: "center" }}>My Feeds</h2>
-      <p style={{ textAlign: "center" }}>
-        Build a feed from specific sources or categories — pick a feed below or create a new one.
-      </p>
-      <FeedManager />
-    </div>
-  );
+  return <FeedManager />;
 }

@@ -1,5 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
+import styles from "./DeleteArchiveButton.module.scss";
 
 export default function DeleteArchiveButton({ archiveId }) {
   const router = useRouter();
@@ -22,18 +24,13 @@ export default function DeleteArchiveButton({ archiveId }) {
 
   return (
     <button
+      type="button"
+      className={styles.deleteButton}
       onClick={handleDelete}
-      style={{
-        color: "var(--theme-button-text)",
-        backgroundColor: "rgba(0, 0, 0, 0.55)",
-        border: "none",
-        borderRadius: "6px",
-        padding: "4px 10px",
-        fontSize: "0.8rem",
-        cursor: "pointer",
-      }}
+      title="Delete archive"
+      aria-label="Delete archive"
     >
-      Delete
+      <Trash2 size={15} strokeWidth={2} />
     </button>
   );
 }

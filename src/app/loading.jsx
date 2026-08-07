@@ -7,7 +7,7 @@ export default function Loading() {
     <>
       <LoadingDots
         size={14}
-        color="var(--primary-blue)"
+        color="var(--theme-primary)"
         duration={1.0}
         gap={10}
         stagger={0.14}

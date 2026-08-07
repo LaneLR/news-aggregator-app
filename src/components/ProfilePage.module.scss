@@ -122,8 +122,16 @@
   color: var(--theme-button-text);
   background-color: var(--theme-primary);
 
+  // The free-tier variant used var(--theme-card) (a mid slate-gray) as a
+  // background with the same white --theme-button-text used for the
+  // primary-colored badge — in light mode that's ~2.6:1 contrast, well
+  // under WCAG's 4.5:1 minimum for text. Swapped for the same muted
+  // secondary treatment used elsewhere (Pricing's "Your Current Plan",
+  // ProfilePage's inactive layout toggle), which contrasts correctly in
+  // both themes.
   &.free {
-    background-color: var(--theme-card);
+    background-color: var(--theme-layout-background);
+    color: var(--theme-text-secondary);
   }
 }
 

@@ -1,9 +1,10 @@
-import Divider from "@/components/Divider";
 import DigestSettings from "@/components/DigestSettings";
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { Settings as SettingsIcon, Mail, Lock, Info, KeyRound, Shield } from "lucide-react";
+import styles from "./page.module.scss";
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
@@ -13,30 +14,76 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        width: "100%",
-        height: "auto",
-      }}
-    >
-      <div style={{ width: "100%", maxWidth: "600px", padding: "0 1rem" }}>
-        <h1>Settings</h1>
-
-        <Divider />
-
-        <DigestSettings />
-
-        <Divider />
-
-        <p>
-          Need to change your password? Use the{" "}
-          <Link href="/forgot-password">
-            <u>reset password</u>
-          </Link>{" "}
-          flow.
+    <div className={styles.pageWrapper}>
+      <div className={styles.pageHeader}>
+        <h1 className={`${styles.pageTitle} headline`}>
+          <SettingsIcon size={26} strokeWidth={2} />
+          Settings
+        </h1>
+        <p className={styles.pageSubtitle}>
+          Manage how MorningFeeds keeps you updated and how you sign in.
         </p>
+      </div>
+
+      <div className={styles.layoutRow}>
+        <div className={styles.mainColumn}>
+          <div className={styles.card}>
+            <h2 className={styles.cardHeader}>
+              <span className={styles.cardHeaderIcon}>
+                <Mail size={17} />
+              </span>
+              Email Digest
+            </h2>
+            <div className={styles.cardContent}>
+              <DigestSettings />
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <h2 className={styles.cardHeader}>
+              <span className={styles.cardHeaderIcon}>
+                <Lock size={17} />
+              </span>
+              Password
+            </h2>
+            <div className={styles.cardContent}>
+              <p className={styles.helperText}>
+                Need to change your password? Use the password reset flow to
+                set a new one.
+              </p>
+            </div>
+            <div className={styles.cardFooter}>
+              <Link href="/forgot-password" className={styles.footerLink}>
+                Reset Password
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <aside className={styles.sideColumn}>
+          <div className={styles.tipCard}>
+            <Info size={18} strokeWidth={2} />
+            <div>
+              <p className={styles.tipTitle}>Settings Tip</p>
+              <p className={styles.tipText}>
+                Keeping your digest preferences up to date makes sure you
+                only get emails you actually want to read.
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.linksCard}>
+            <p className={styles.linksTitle}>Quick Links</p>
+            <Link href="/forgot-password" className={styles.quickLink}>
+              <KeyRound size={15} strokeWidth={2} />
+              Reset Password
+            </Link>
+            <Link href="/account/privacy" className={styles.quickLink}>
+              <Shield size={15} strokeWidth={2} />
+              Privacy &amp; Data
+            </Link>
+          </div>
+        </aside>
       </div>
     </div>
   );
