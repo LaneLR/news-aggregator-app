@@ -7,6 +7,11 @@ import Link from "next/link";
 import { Settings as SettingsIcon, Mail, Lock, Info, KeyRound, Shield, VolumeX } from "lucide-react";
 import styles from "./page.module.scss";
 
+export const metadata = {
+  title: "Settings",
+  robots: { index: false, follow: false },
+};
+
 export default async function SettingsPage() {
   const session = await auth();
 

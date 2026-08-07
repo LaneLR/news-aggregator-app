@@ -1,0 +1,219 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.2rem;
+  padding: 4rem 1.5rem 3.5rem;
+  background-color: var(--theme-layout-background);
+}
+
+.heroTitle {
+  max-width: 720px;
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--theme-dark-blue);
+
+  @media (max-width: 600px) {
+    font-size: 1.9rem;
+  }
+}
+
+.heroSubtitle {
+  max-width: 560px;
+  font-size: 1.05rem;
+  color: var(--theme-text-secondary);
+}
+
+.heroActions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.section {
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.sectionTitle {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--theme-dark-blue);
+  margin-bottom: 0.4rem;
+
+  @media (max-width: 440px) {
+    font-size: 1.4rem;
+  }
+}
+
+.sectionSubtitle {
+  text-align: center;
+  color: var(--theme-text-secondary);
+  max-width: 500px;
+  margin: 0 auto 2rem;
+}
+
+.valueGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.valueCard {
+  background-color: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.valueIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background-color: color-mix(in srgb, var(--theme-primary) 12%, transparent);
+  color: var(--theme-primary);
+}
+
+.valueTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--theme-dark-blue);
+}
+
+.valueDescription {
+  font-size: 0.9rem;
+  color: var(--theme-text-secondary);
+  line-height: 1.5;
+}
+
+.categoryGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.categoryChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--theme-border);
+  background-color: var(--theme-card-background);
+  color: var(--theme-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: border-color 0.15s ease-in-out, color 0.15s ease-in-out;
+
+  svg {
+    color: var(--theme-primary);
+  }
+
+  &:hover {
+    border-color: var(--theme-primary);
+    color: var(--theme-primary);
+  }
+}
+
+.pricingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.pricingCard {
+  background-color: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+
+  &.highlighted {
+    border-color: var(--theme-primary);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.pricingCardTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--theme-dark-blue);
+  margin-bottom: 0.75rem;
+}
+
+.pricingFeatureList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--theme-text-secondary);
+  }
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 3px;
+    color: var(--theme-primary);
+  }
+}
+
+.pricingLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 1.5rem;
+  color: var(--theme-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.finalCta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  text-align: center;
+  padding: 3.5rem 1.5rem 4.5rem;
+}
+
+.finalCtaTitle {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--theme-dark-blue);
+
+  @media (max-width: 440px) {
+    font-size: 1.5rem;
+  }
+}

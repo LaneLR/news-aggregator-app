@@ -2,6 +2,11 @@ import Link from "next/link";
 import { Shield } from "lucide-react";
 import styles from "../AccountCard.module.scss";
 
+export const metadata = {
+  title: "Privacy Settings",
+  robots: { index: false, follow: false },
+};
+
 export default function PrivacyPage() {
   return (
     <div className={styles.card}>

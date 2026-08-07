@@ -4,6 +4,11 @@ import { Wallet } from "lucide-react";
 import ManageSubscriptionButton from "@/components/ManageSubscriptionButton";
 import styles from "../AccountCard.module.scss";
 
+export const metadata = {
+  title: "Payment",
+  robots: { index: false, follow: false },
+};
+
 export default async function PaymentInfoPage() {
   const session = await auth();
 

@@ -9,6 +9,11 @@ import { redirect } from "next/navigation";
 import CreateNewArchiveCard from "@/components/CreateNewArchiveCard";
 import styles from "./page.module.scss";
 
+export const metadata = {
+  title: "My Archives",
+  robots: { index: false, follow: false },
+};
+
 export default async function ArchivesPage() {
   const session = await auth();
   if (!session) {

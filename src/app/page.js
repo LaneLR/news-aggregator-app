@@ -1,7 +1,9 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import HomePage from "@/components/HomePage";
 
 export default async function LandingPage() {
   const session = await auth();
-  redirect(session ? "/news" : "/login");
+  if (session) redirect("/news");
+  return <HomePage />;
 }
