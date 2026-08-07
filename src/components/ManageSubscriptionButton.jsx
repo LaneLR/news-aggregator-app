@@ -25,7 +25,7 @@ export default function ManageSubscriptionButton() {
       <Button
         wide={"fit-content"}
         bgColor={"var(--theme-primary)"}
-        clr={"var(--theme-text)"}
+        clr={"var(--theme-primary-contrast)"}
         onClick={handleManage}
       >
         Manage Subscription

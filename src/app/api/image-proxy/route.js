@@ -103,7 +103,12 @@ export async function GET(req) {
       status: 200,
       headers: {
         "Content-Type": contentType,
-        "Cache-Control": "public, max-age=86400",
+        // A published article's image is effectively immutable — cache it
+        // for a week, and let a stale copy keep serving for a day after
+        // that while it revalidates in the background. Next.js's own
+        // image optimizer also uses this header to set its own cache
+        // lifetime for the resized/converted output it derives from this.
+        "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400",
       },
     });
   } catch (err) {

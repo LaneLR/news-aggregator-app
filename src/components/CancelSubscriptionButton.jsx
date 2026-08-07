@@ -32,7 +32,11 @@ export default function CancelSubscriptionButton() {
 
   return (
     <div>
-      <Button onClick={handleCancel} bgColor={"#b40000"} clr={"var(--white)"}>
+      <Button
+        onClick={handleCancel}
+        bgColor={"var(--theme-warning)"}
+        clr={"var(--theme-button-text)"}
+      >
         Cancel Subscription
       </Button>
       {error && <p style={{ color: "var(--theme-warning)", marginTop: "10px" }}>{error}</p>}

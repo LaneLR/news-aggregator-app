@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { CheckCircle2, Lock, Eye, EyeOff } from "lucide-react";
 import Button from "./Button";
+import AuthLayout from "./AuthLayout";
 import styles from "./ResetPasswordForm.module.scss";
 
 export default function ResetPasswordComponent() {
@@ -11,6 +13,8 @@ export default function ResetPasswordComponent() {
   const token = searchParams.get("token");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
@@ -60,60 +64,99 @@ export default function ResetPasswordComponent() {
 
   if (success) {
     return (
-      <div className={styles.wrapper}>
-        <div className={styles.header}>Your password has been reset</div>
-        <div style={{ textAlign: "center" }}>
-          <p>You can now log in with your new password.</p>
-          <br />
+      <AuthLayout>
+        <div className={styles.formBody}>
+          <div className={styles.successIcon}>
+            <CheckCircle2 size={22} strokeWidth={2} />
+          </div>
+          <h2 className={styles.formTitle}>Password Reset</h2>
+          <p className={styles.helperText}>
+            You can now log in with your new password.
+          </p>
           <Link href="/login">
-            <Button bgColor={"var(--theme-primary)"} clr={"var(--theme-text)"}>
-              Go to Log in
+            <Button
+              bgColor={"var(--theme-primary)"}
+              clr={"var(--theme-primary-contrast)"}
+              wide={"100%"}
+            >
+              Go to Sign In
             </Button>
           </Link>
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.header}>Reset Your Password</div>
-      <form className={styles.formWrapper} onSubmit={handleSubmit}>
-        <div className={styles.inputWrapper}>
-          <input
-            className={styles.resetPasswordFormInput}
-            type="password"
-            id="password"
-            placeholder="New Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <input
-            className={styles.resetPasswordFormInput}
-            type="password"
-            id="confirmPassword"
-            placeholder="Confirm New Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-        </div>
-        <Button
-          bgColor={"var(--theme-primary)"}
-          clr={"var(--theme-text)"}
-          type="submit"
-          disabled={loading}
-        >
-          Reset password
-        </Button>
-        {error && (
-          <>
-            <br />
-            <p style={{ color: "var(--theme-warning)" }}>{error}</p>
-          </>
-        )}
-      </form>
-    </div>
+    <AuthLayout>
+      <div className={styles.formBody}>
+        <h2 className={styles.formTitle}>Reset Your Password</h2>
+        <p className={styles.helperText}>
+          Choose a new password for your account.
+        </p>
+
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>New Password</span>
+            <div className={styles.inputGroup}>
+              <Lock size={17} strokeWidth={2} className={styles.inputIcon} />
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                placeholder="Enter a new password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className={styles.togglePasswordButton}
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+              </button>
+            </div>
+          </label>
+
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Confirm New Password</span>
+            <div className={styles.inputGroup}>
+              <Lock size={17} strokeWidth={2} className={styles.inputIcon} />
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id="confirmPassword"
+                placeholder="Re-enter your new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className={styles.togglePasswordButton}
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                aria-label={
+                  showConfirmPassword ? "Hide password" : "Show password"
+                }
+              >
+                {showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+              </button>
+            </div>
+          </label>
+
+          {error && <p className={styles.errorText}>{error}</p>}
+
+          <Button
+            bgColor={"var(--theme-primary)"}
+            clr={"var(--theme-primary-contrast)"}
+            type="submit"
+            disabled={loading}
+            wide={"100%"}
+          >
+            {loading ? "Resetting..." : "Reset Password"}
+          </Button>
+        </form>
+      </div>
+    </AuthLayout>
   );
 }

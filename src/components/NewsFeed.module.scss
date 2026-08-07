@@ -1,15 +1,8 @@
-.searchBarHeader {
-  font-size: 3rem;
-  font-weight: 600;
-  color: var(--deep-blue);
-  padding: 20px 0 0 0;
-  text-align: center;
-  width: 100%;
+.refreshBanner {
   display: flex;
   justify-content: center;
   align-items: center;
-
-  @media (max-width: 440px) {
-    font-size: 1.8rem;
-  }
+  gap: 8px;
+  margin: 1rem 0;
+  color: var(--theme-text-secondary);
 }

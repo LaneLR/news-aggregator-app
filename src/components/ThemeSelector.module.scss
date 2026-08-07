@@ -4,20 +4,41 @@
 }
 
 .swatch {
+  position: relative;
   width: 100px;
   height: 60px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   border: 3px solid transparent;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
 
   &.active {
     border-color: var(--theme-primary);
   }
+}
+
+.checkBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--theme-primary);
+  color: var(--theme-primary-contrast);
+  box-shadow: var(--shadow-sm);
 }
 
 .selectThemeText {

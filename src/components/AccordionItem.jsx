@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { ChevronDown } from "lucide-react";
 import styles from "./AccordionItem.module.scss";
 
 export default function AccordionItem({ question, answer }) {
@@ -14,10 +15,20 @@ export default function AccordionItem({ question, answer }) {
   }, [expanded]);
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.question} onClick={() => setExpanded(!expanded)}>
-        {question} {expanded ? "▲" : "▼"}
-      </div>
+    <div className={`${styles.wrapper} ${expanded ? styles.expandedWrapper : ""}`}>
+      <button
+        type="button"
+        className={styles.question}
+        onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+      >
+        {question}
+        <ChevronDown
+          size={18}
+          strokeWidth={2}
+          className={`${styles.chevron} ${expanded ? styles.chevronExpanded : ""}`}
+        />
+      </button>
       <div
         className={styles.answerWrapper}
         style={{ maxHeight: expanded ? `${contentHeight}px` : "0px" }}

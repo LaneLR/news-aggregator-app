@@ -1,20 +1,78 @@
 .sideBarNavWrapper {
-  width: 220px;
+  width: 240px;
   flex-shrink: 0;
   height: fit-content;
-  background-color: var(--theme-primary);
+  background-color: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
   border-radius: var(--radius-md);
-  padding: 10px;
+  padding: 16px 12px;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  box-shadow: var(--shadow-sm);
 
   @media (max-width: 768px) {
     width: 100%;
     flex-direction: row;
+    align-items: center;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     gap: 6px;
+  }
+}
+
+.sectionLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--theme-text-secondary);
+  padding: 4px 14px 10px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--theme-border);
+  margin: 10px 8px;
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 1px;
+    height: 24px;
+    margin: 0 4px;
+  }
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--theme-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background-color: var(--theme-layout-background);
+    color: var(--theme-warning);
+  }
+
+  @media (max-width: 768px) {
+    width: auto;
+    flex-shrink: 0;
   }
 }

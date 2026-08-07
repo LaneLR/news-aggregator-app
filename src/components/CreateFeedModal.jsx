@@ -107,11 +107,11 @@ export default function CreateFeedModal({
           {isEditMode ? "Edit Feed" : "Create a New Feed"}
         </h2>
         <input
+          className={styles.titleInput}
           type="text"
           placeholder="Feed Name (e.g., 'Tech News')"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          style={{ width: "100%", padding: "10px", marginBottom: "1rem" }}
         />
 
         <h4 className={styles.categoryNames}>Select Sources</h4>
@@ -155,32 +155,33 @@ export default function CreateFeedModal({
             </label>
           ))}
         </div>
-        <div className={styles.buttonWrapper}>
+        <div
+          className={`${styles.buttonWrapper} ${
+            !isEditMode ? styles.singleAction : ""
+          }`}
+        >
           {isEditMode ? (
             <>
-              {" "}
-              <Button
-                onClick={handleSave}
-                bgColor={"var(--theme-primary)"}
-                clr={"var(--theme-text)"}
-                style={{ marginLeft: "auto" }}
-              >
-                Save Feed
-              </Button>
               <Button
                 onClick={handleDelete}
                 bgColor={"var(--theme-warning)"}
-                clr={"var(--theme-text-tertiary)"}
+                clr={"var(--theme-button-text)"}
               >
                 Delete Feed
+              </Button>
+              <Button
+                onClick={handleSave}
+                bgColor={"var(--theme-primary)"}
+                clr={"var(--theme-primary-contrast)"}
+              >
+                Save Feed
               </Button>
             </>
           ) : (
             <Button
               onClick={handleSave}
               bgColor={"var(--theme-primary)"}
-              clr={"var(--theme-text)"}
-              style={{ marginLeft: "auto" }}
+              clr={"var(--theme-primary-contrast)"}
             >
               Create Feed
             </Button>

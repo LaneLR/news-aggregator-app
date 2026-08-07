@@ -1,11 +1,12 @@
 .wrapper {
   width: 100%;
-  background-color: var(--theme-primary);
+  background-color: var(--theme-card-background);
+  border-bottom: 1px solid var(--theme-border);
   display: flex;
   justify-content: center;
   align-items: center;
   height: auto;
-  padding: 8px 15px;
+  padding: 10px 15px;
   gap: 8px;
   overflow-x: auto;
 
@@ -20,31 +21,85 @@
   gap: 6px;
   padding: 7px 14px;
   border-radius: 999px;
-  font-size: 0.92rem;
-  font-weight: 500;
+  border: 1px solid var(--theme-border);
+  font-size: 0.88rem;
+  font-weight: 600;
   white-space: nowrap;
-  color: var(--theme-button-text);
+  color: var(--theme-text);
   background-color: transparent;
-  transition: background-color 0.15s ease-in-out;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, color 0.15s ease-in-out;
+  flex-shrink: 0;
 
   svg {
     flex-shrink: 0;
   }
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.14);
+    background-color: var(--theme-layout-background);
   }
 
   &.active {
-    background-color: rgba(255, 255, 255, 0.22);
-    font-weight: 700;
+    background-color: var(--theme-primary);
+    border-color: var(--theme-primary);
+    color: var(--theme-primary-contrast);
   }
 }
 
 .divider {
   width: 1px;
   align-self: stretch;
-  background-color: rgba(255, 255, 255, 0.2);
-  margin: 4px 4px;
+  background-color: var(--theme-border);
+  margin: 2px 4px;
   flex-shrink: 0;
+}
+
+.moreWrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.moreMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: var(--theme-background);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 6px;
+  min-width: 180px;
+  list-style: none;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.moreMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--theme-text);
+  white-space: nowrap;
+
+  svg {
+    flex-shrink: 0;
+    color: var(--theme-text-secondary);
+  }
+
+  &:hover {
+    background-color: var(--theme-layout-background);
+  }
+
+  &.active {
+    color: var(--theme-primary);
+
+    svg {
+      color: var(--theme-primary);
+    }
+  }
 }

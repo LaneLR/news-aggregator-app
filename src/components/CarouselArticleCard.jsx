@@ -9,6 +9,8 @@ import ShareButton from "./ShareButton";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
+import { getCategoryColor } from "@/lib/categoryColors";
+import { timeAgo } from "@/lib/timeAgo";
 import styles from "./CarouselArticleCard.module.scss";
 
 export default function CarouselCard({ article, archiveId }) {
@@ -52,6 +54,7 @@ export default function CarouselCard({ article, archiveId }) {
   const cleanSourceName =
     article.sourceName || article.source?.name || "Unknown";
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
+  const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
 
   return (
     <div className={styles.cardWrapper}>
@@ -69,51 +72,47 @@ export default function CarouselCard({ article, archiveId }) {
           sizes="320px"
           style={{ objectFit: "cover" }}
         />
+        {badgeCategory && (
+          <span
+            className={styles.categoryBadge}
+            style={{ backgroundColor: getCategoryColor(badgeCategory) }}
+          >
+            {badgeCategory}
+          </span>
+        )}
+        <div className={styles.titleOverlay}>
+          <h3 className={`${styles.title} headline`}>{article.title}</h3>
+        </div>
       </Link>
-      <div className={styles.contentArea}>
-        <p className={styles.source}>
-          {cleanSourceName}
+      <div className={styles.metaRow}>
+        <span className={styles.source}>{cleanSourceName}</span>
+        <span className={styles.metaRight}>
           {isPaywalled && (
-            <Lock
-              className={styles.lockIcon}
-              size={12}
-              strokeWidth={2.5}
-              title="This source could be behind a paywall."
-            />
+            <Lock size={12} strokeWidth={2.5} title="This source could be behind a paywall." />
           )}
-        </p>
-        <h3 className={`${styles.title} headline`}>
-          <Link
-            className={styles.titleLink}
-            href={article.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackArticleClick(article)}
-          >
-            {article.title}
-          </Link>
-        </h3>
-        <div className={styles.actionsRow}>
-          <a
-            className={styles.readMoreButton}
-            href={article.url}
-            target="_blank"
-            onClick={() => trackArticleClick(article)}
-          >
-            Read article
-          </a>
+          {article.publishedAt && <span>{timeAgo(article.publishedAt)}</span>}
+        </span>
+      </div>
+      <div className={styles.actionsRow}>
+        <a
+          className={styles.readMoreButton}
+          href={article.url}
+          target="_blank"
+          onClick={() => trackArticleClick(article)}
+        >
+          Read article
+        </a>
 
-          <div className={styles.actionsGroup}>
-            <ArchiveToggleButton article={article} archiveId={archiveId} />
-            <ShareButton article={article} />
-            <button
-              className={`${styles.likeButton} ${isLiked ? styles.liked : ""}`}
-              onClick={handleLike}
-            >
-              <Heart size={17} strokeWidth={2} fill={isLiked ? "currentColor" : "none"} />
-              {likeCount}
-            </button>
-          </div>
+        <div className={styles.actionsGroup}>
+          <ArchiveToggleButton article={article} archiveId={archiveId} />
+          <ShareButton article={article} />
+          <button
+            className={`${styles.likeButton} ${isLiked ? styles.liked : ""}`}
+            onClick={handleLike}
+          >
+            <Heart size={17} strokeWidth={2} fill={isLiked ? "currentColor" : "none"} />
+            {likeCount}
+          </button>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { loadStripe } from "@stripe/stripe-js";
+import { Sparkles, Check, X, Gift } from "lucide-react";
 import Button from "./Button";
 import Loading from "@/app/loading";
 import { MONTHLY_PRICE_ID, ANNUAL_PRICE_ID } from "@/lib/stripePrices";
@@ -124,7 +125,8 @@ export default function PricingPage() {
           onClick={handleManage}
           disabled={isLoading}
           bgColor={"var(--theme-primary)"}
-          clr={"var(--theme-button-text)"}
+          clr={"var(--theme-primary-contrast)"}
+          wide={"100%"}
         >
           Manage Subscription
         </Button>
@@ -135,7 +137,8 @@ export default function PricingPage() {
         onClick={handleSubscribe}
         disabled={isLoading}
         bgColor={"var(--theme-primary)"}
-        clr={"var(--theme-button-text)"}
+        clr={"var(--theme-primary-contrast)"}
+        wide={"100%"}
       >
         Subscribe
       </Button>
@@ -144,12 +147,15 @@ export default function PricingPage() {
 
   return (
     <div className={styles.pricingWrapper}>
-      <div className={styles.header}>
-        <h1 className={styles.headline}>Unlock Your Personalized News Experience</h1>
-        <p className={styles.subheadline}>
-          Subscribe for full Market, Finance & Journal coverage, custom feeds
-          built from your own sources, a "For You" feed that learns what you
-          like, and referral credit toward future bills.
+      <div className={styles.pageHeader}>
+        <h1 className={`${styles.pageTitle} headline`}>
+          <Sparkles size={26} strokeWidth={2} />
+          Simple, Transparent Pricing
+        </h1>
+        <p className={styles.pageSubtitle}>
+          Subscribe for full Market, Finance &amp; Journal coverage, custom
+          feeds built from your own sources, a &quot;For You&quot; feed that
+          learns what you like, and referral credit toward future bills.
         </p>
       </div>
 
@@ -171,20 +177,25 @@ export default function PricingPage() {
       </div>
 
       {userTier === "Free" && (
-        <div className={styles.referralWrapper}>
-          <h4>Have a referral code?</h4>
+        <div className={styles.referralCard}>
+          <h4 className={styles.referralTitle}>
+            <Gift size={16} strokeWidth={2} />
+            Have a referral code?
+          </h4>
           <div className={styles.referralInputContainer}>
             <input
+              className={styles.referralInput}
               type="text"
               placeholder="Enter code here"
               value={referralCode}
               onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
               disabled={!!promotionCodeId}
-              style={{ flexGrow: 1, padding: "10px", borderRadius: "6px" }}
             />
             <Button
               onClick={handleApplyReferral}
               disabled={isLoading || !!promotionCodeId}
+              bgColor={"var(--theme-primary)"}
+              clr={"var(--theme-primary-contrast)"}
             >
               {promotionCodeId ? "Applied!" : "Apply"}
             </Button>
@@ -209,25 +220,30 @@ export default function PricingPage() {
             {FREE_FEATURES.map((feature) => (
               <li key={feature.text}>
                 <span
-                  style={{
-                    color: feature.included
-                      ? "var(--theme-primary)"
-                      : "var(--theme-warning)",
-                    fontSize: "1.5rem",
-                  }}
+                  className={`${styles.featureIcon} ${feature.included ? styles.included : styles.excluded}`}
                 >
-                  {feature.included ? "✔" : "✖"}
+                  {feature.included ? (
+                    <Check size={13} strokeWidth={3} />
+                  ) : (
+                    <X size={13} strokeWidth={3} />
+                  )}
                 </span>
                 <p>{feature.text}</p>
               </li>
             ))}
           </ul>
-          <Button disabled>
+          <Button
+            disabled
+            bgColor={"var(--theme-layout-background)"}
+            clr={"var(--theme-text-secondary)"}
+            wide={"100%"}
+          >
             {userTier === "Free" ? "Your Current Plan" : "Free Plan"}
           </Button>
         </div>
 
         <div className={`${styles.pricingCard} ${styles.highlighted}`}>
+          <span className={styles.popularBadge}>Most Popular</span>
           <h2 className={styles.planName}>Subscribed</h2>
           <p className={styles.price}>
             {billingInterval === "annual" ? (
@@ -243,8 +259,8 @@ export default function PricingPage() {
           <ul className={styles.featureList}>
             {SUBSCRIBED_FEATURES.map((feature) => (
               <li key={feature.text}>
-                <span style={{ color: "var(--theme-primary)", fontSize: "1.5rem" }}>
-                  ✔
+                <span className={`${styles.featureIcon} ${styles.included}`}>
+                  <Check size={13} strokeWidth={3} />
                 </span>
                 <p>{feature.text}</p>
               </li>

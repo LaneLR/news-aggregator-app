@@ -1,5 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
+import { Check } from "lucide-react";
 import { themes } from "@/styles/themes";
 import styles from "./ThemeSelector.module.scss";
 
@@ -34,6 +35,11 @@ export default function ThemeSelector() {
           onClick={() => handleThemeChange("default")}
         >
           Light
+          {currentTheme === "default" && (
+            <span className={styles.checkBadge}>
+              <Check size={12} strokeWidth={3} />
+            </span>
+          )}
         </button>
         <button
           type="button"
@@ -45,6 +51,11 @@ export default function ThemeSelector() {
           onClick={() => handleThemeChange("dark")}
         >
           Dark
+          {currentTheme === "dark" && (
+            <span className={styles.checkBadge}>
+              <Check size={12} strokeWidth={3} />
+            </span>
+          )}
         </button>
       </div>
     </div>

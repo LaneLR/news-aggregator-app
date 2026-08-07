@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useState } from "react";
+import { Plus } from "lucide-react";
 import styles from "./CreateNewArchiveCard.module.scss";
 
 export default function CreateNewArchiveCard() {
@@ -46,12 +47,16 @@ export default function CreateNewArchiveCard() {
 
   return (
     <>
-      <div className={styles.card}>
-        <div className={styles.cardContainer} onClick={() => setIsModalOpen(true)}>
-          <div className={styles.plusIcon}>+</div>
-          <p className={styles.createText}>Create New Archive</p>
-        </div>
-      </div>
+      <button
+        type="button"
+        className={styles.cardContainer}
+        onClick={() => setIsModalOpen(true)}
+      >
+        <span className={styles.plusIcon}>
+          <Plus size={26} strokeWidth={2} />
+        </span>
+        <p className={styles.createText}>Create New Archive</p>
+      </button>
 
       {isModalOpen && (
         <div className={styles.modalBackdrop} onClick={handleCloseModal}>
@@ -66,6 +71,7 @@ export default function CreateNewArchiveCard() {
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleCreate();
               }}
+              autoFocus
             />
             {error && <p className={styles.errorText}>{error}</p>}
             <div className={styles.buttonContainer}>

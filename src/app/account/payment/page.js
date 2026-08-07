@@ -1,7 +1,9 @@
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { Wallet } from "lucide-react";
 import ManageSubscriptionButton from "@/components/ManageSubscriptionButton";
+import styles from "../AccountCard.module.scss";
 
 export default async function PaymentInfoPage() {
   const session = await getServerSession(authOptions);
@@ -10,22 +12,31 @@ export default async function PaymentInfoPage() {
     redirect("/login");
   }
 
+  const isSubscribed = session.user.tier !== "Free";
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "1rem",
-        width: "100%",
-        textAlign: "center",
-      }}
-    >
-      <p>Payment methods and billing history are managed securely through Stripe.</p>
-      {session.user.tier === "Free" ? (
-        <p>Subscribe to a paid plan to add a payment method.</p>
-      ) : (
-        <ManageSubscriptionButton />
+    <div className={styles.card}>
+      <h2 className={styles.cardHeader}>
+        <span className={styles.cardHeaderIcon}>
+          <Wallet size={17} />
+        </span>
+        Payment Details
+      </h2>
+      <div className={styles.cardContent}>
+        <p className={styles.helperText}>
+          Payment methods and billing history are managed securely through
+          Stripe.
+        </p>
+        {!isSubscribed && (
+          <p className={styles.helperText}>
+            Subscribe to a paid plan to add a payment method.
+          </p>
+        )}
+      </div>
+      {isSubscribed && (
+        <div className={styles.cardFooter}>
+          <ManageSubscriptionButton />
+        </div>
       )}
     </div>
   );

@@ -1,9 +1,5 @@
-import ContactUsComponent from "@/components/ContactUs";
+import LegalInfoPage from "@/components/LegalInfoPage";
 
 export default function ContactUsPage() {
-  return (
-    <>
-      <ContactUsComponent contactEmail={process.env.CONTACT_EMAIL} />
-    </>
-  );
+  return <LegalInfoPage activeTab="contact" contactEmail={process.env.CONTACT_EMAIL} />;
 }

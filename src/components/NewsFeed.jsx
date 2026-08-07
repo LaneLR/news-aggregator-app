@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { RefreshCw } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardFour from "./NewsCardFour";
 import Button from "./Button";
@@ -109,34 +110,18 @@ export default function News({ archiveId, feedId }) {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        <div className={styles.searchBarHeader}>The most recent headlines</div>
-        {newAvailable && (
-          <div
-            style={{
-              margin: "20px 0 0 0",
-              display: "flex",
-              alignItems: "center",
-            }}
+      {newAvailable && (
+        <div className={styles.refreshBanner}>
+          <RefreshCw size={18} strokeWidth={2} />
+          <Button
+            bgColor={"var(--theme-primary)"}
+            clr={"var(--theme-primary-contrast)"}
+            onClick={refreshArticles}
           >
-            <div style={{ fontSize: "1.6rem" }}>🔄</div>
-            <Button
-              bgColor={"var(--primary-blue)"}
-              clr={"var(--white)"}
-              onClick={refreshArticles}
-            >
-              New articles available
-            </Button>
-          </div>
-        )}
-      </div>
+            New articles available
+          </Button>
+        </div>
+      )}
 
       {loading ? (
         <Loading />

@@ -12,7 +12,7 @@ import styles from "./Loading.module.scss";
  */
 export default function LoadingDots({
   size = 10,
-  color = "var(--primary-blue)",
+  color = "var(--theme-primary)",
   duration = 0.9,
   gap = 8,
   stagger = 0.12,

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Sparkles } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 import Loading from "@/app/loading";
@@ -48,17 +49,21 @@ export default function ForYouFeed() {
 
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
-        <div className={styles.header}>For You</div>
-        <p className={styles.subHeader}>
-          Picked based on the sources, categories, and articles you&apos;ve liked, saved, and clicked on.
+      <div className={styles.pageHeader}>
+        <h1 className={`${styles.pageTitle} headline`}>
+          <Sparkles size={26} strokeWidth={2} />
+          For You
+        </h1>
+        <p className={styles.pageSubtitle}>
+          Picked based on the sources, categories, and articles you&apos;ve
+          liked, saved, and clicked on.
         </p>
       </div>
 
       {isLoading ? (
         <Loading />
       ) : error ? (
-        <p>Error: {error}</p>
+        <p className={styles.statusText}>Error: {error}</p>
       ) : articles.length > 0 ? (
         <NewsGridWrapper>
           {articles.map((article) => (
@@ -71,9 +76,14 @@ export default function ForYouFeed() {
           ))}
         </NewsGridWrapper>
       ) : (
-        <p style={{ textAlign: "center" }}>
-          Like, save, or click a few articles and check back here — we&apos;ll start tailoring this feed to you.
-        </p>
+        <div className={styles.emptyState}>
+          <Sparkles size={32} strokeWidth={1.5} />
+          <p>Nothing tailored just yet.</p>
+          <p className={styles.emptyStateHint}>
+            Like, save, or click a few articles and check back here —
+            we&apos;ll start tailoring this feed to you.
+          </p>
+        </div>
       )}
     </>
   );

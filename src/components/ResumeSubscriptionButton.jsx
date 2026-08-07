@@ -30,30 +30,25 @@ export default function ResumeSubscriptionButton({ subscriptionEndDate }) {
   };
 
   return (
-    <div
-      style={{
-        textAlign: "center",
-        color: "var(--theme-dark-blue)",
-        padding: "10px 50px",
-      }}
-    >
-      <div style={{ marginBottom: "1rem" }}>
-        <p style={{ padding: "0 0 5px 0" }}>
-          <i>
-            You have scheduled your subscription to cancel. You can resume it
-            at any time before the period ends.
-          </i>
-        </p>
-        {subscriptionEndDate && (
-          <strong>
-            Access ends on: {new Date(subscriptionEndDate).toLocaleDateString()}
-          </strong>
-        )}
-      </div>
-      <Button onClick={handleResume} bgColor={"var(--theme-primary)"} clr={"var(--theme-button-text)"}>
+    <div>
+      <p style={{ color: "var(--theme-text-secondary)", marginBottom: "0.75rem" }}>
+        Your subscription is set to cancel
+        {subscriptionEndDate &&
+          ` on ${new Date(subscriptionEndDate).toLocaleDateString()}`}
+        . You can resume it any time before then.
+      </p>
+      <Button
+        onClick={handleResume}
+        bgColor={"var(--theme-primary)"}
+        clr={"var(--theme-primary-contrast)"}
+      >
         Resume Subscription
       </Button>
-      {error && <p style={{ color: "var(--theme-warning)", marginTop: "10px" }}>{error}</p>}
+      {error && (
+        <p style={{ color: "var(--theme-warning)", marginTop: "10px" }}>
+          {error}
+        </p>
+      )}
     </div>
   );
 }

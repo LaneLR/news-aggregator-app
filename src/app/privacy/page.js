@@ -1,9 +1,5 @@
-import PrivacyPageComponent from "@/components/Privacy";
+import LegalInfoPage from "@/components/LegalInfoPage";
 
 export default function PrivacyPage() {
-  return (
-    <>
-      <PrivacyPageComponent contactEmail={process.env.CONTACT_EMAIL} />
-    </>
-  );
+  return <LegalInfoPage activeTab="privacy" contactEmail={process.env.CONTACT_EMAIL} />;
 }

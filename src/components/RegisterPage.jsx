@@ -3,10 +3,14 @@ import Button from "@/components/Button";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import AuthLayout from "./AuthLayout";
 import styles from "./RegisterPage.module.scss";
 
 export default function RegisterPage() {
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
   async function handleCreateUser(e) {
@@ -43,97 +47,104 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className={styles.wrapper}>
-      <form className={styles.formWrapper} onSubmit={handleCreateUser}>
-        <div className={styles.header}>Create an account!</div>
-        <div className={styles.inputWrapper}>
-          <input
-            className={styles.registerFormInput}
-            name="email"
-            type="email"
-            placeholder="Email"
-            required
-          />
-          <input
-            className={styles.registerFormInput}
-            name="password"
-            type="password"
-            placeholder="Password"
-            required
-          />
-          <input
-            className={styles.registerFormInput}
-            name="confirmPassword"
-            type="password"
-            placeholder="Confirm Password"
-            required
-          />
-        </div>
-
-        <div className={styles.checkboxWrapper}>
-          <input
-            className={styles.styledInput}
-            type="checkbox"
-            id="tos"
-            name="tos"
-            required
-          />
-          <label htmlFor="tos">
-            I agree to the{" "}
-            <Link
-              href="/terms-of-service"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link href="/privacy" target="_blank" rel="noopener noreferrer">
-              Privacy Policy
-            </Link>
-            .
+    <AuthLayout activeTab="register">
+      <div className={styles.formBody}>
+        <h2 className={styles.formTitle}>Create Account</h2>
+        <form className={styles.form} onSubmit={handleCreateUser}>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Email Address</span>
+            <div className={styles.inputGroup}>
+              <Mail size={17} strokeWidth={2} className={styles.inputIcon} />
+              <input
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+              />
+            </div>
           </label>
-        </div>
-        <Button
-          bgColor={"var(--theme-primary)"}
-          clr={"var(--theme-button-text)"}
-          type="submit"
-        >
-          Create Account
-        </Button>
 
-        {error && (
-          <>
-            <br />
-            <p style={{ color: "var(--theme-warning)" }}>{error}</p>
-          </>
-        )}
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Password</span>
+            <div className={styles.inputGroup}>
+              <Lock size={17} strokeWidth={2} className={styles.inputIcon} />
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Create a password"
+                required
+              />
+              <button
+                type="button"
+                className={styles.togglePasswordButton}
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+              </button>
+            </div>
+          </label>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            fontWeight: "600",
-            fontSize: "0.83rem",
-          }}
-        >
-          <br />
-          <div
-            style={{
-              display: "flex",
-              gap: "5px",
-              color: "var(--theme-text)",
-              textAlign: "center",
-            }}
-          >
-            <p>Already have an account?</p>
-            <Link href="/login">
-              <u>Log in!</u>
-            </Link>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Confirm Password</span>
+            <div className={styles.inputGroup}>
+              <Lock size={17} strokeWidth={2} className={styles.inputIcon} />
+              <input
+                name="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Re-enter your password"
+                required
+              />
+              <button
+                type="button"
+                className={styles.togglePasswordButton}
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                aria-label={
+                  showConfirmPassword ? "Hide password" : "Show password"
+                }
+              >
+                {showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+              </button>
+            </div>
+          </label>
+
+          <div className={styles.checkboxWrapper}>
+            <input
+              className={styles.styledInput}
+              type="checkbox"
+              id="tos"
+              name="tos"
+              required
+            />
+            <label htmlFor="tos">
+              I agree to the{" "}
+              <Link
+                href="/terms-of-service"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" target="_blank" rel="noopener noreferrer">
+                Privacy Policy
+              </Link>
+              .
+            </label>
           </div>
-        </div>
-      </form>
-    </div>
+
+          {error && <p className={styles.errorText}>{error}</p>}
+
+          <Button
+            bgColor={"var(--theme-primary)"}
+            clr={"var(--theme-button-text)"}
+            type="submit"
+            wide={"100%"}
+          >
+            Create Account
+          </Button>
+        </form>
+      </div>
+    </AuthLayout>
   );
 }

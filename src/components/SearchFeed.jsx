@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { Search } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 import styles from "./SearchFeed.module.scss";
@@ -74,25 +75,44 @@ export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
 
   return (
     <>
-      <div style={{ textAlign: "center", width: "100%" }}>
-        <h2 className={styles.searchBarHeader}>What&apos;s making the news</h2>
-        <p>{query ? `Results for: '${query}'` : "Results"}</p>
+      <div className={styles.pageHeader}>
+        <h1 className={`${styles.pageTitle} headline`}>
+          <Search size={26} strokeWidth={2} />
+          Search Results
+        </h1>
+        <p className={styles.pageSubtitle}>
+          {query ? `Showing results for "${query}"` : "Results"}
+        </p>
       </div>
 
-      <NewsGridWrapper>
-        {results.map((article, i) => (
-          <NewsCardThree
-            key={i}
-            article={article}
-            archiveId={archiveId}
-            viewOnly={viewOnly}
-          />
-        ))}
-      </NewsGridWrapper>
+      {results.length > 0 && (
+        <NewsGridWrapper>
+          {results.map((article, i) => (
+            <NewsCardThree
+              key={i}
+              article={article}
+              archiveId={archiveId}
+              viewOnly={viewOnly}
+            />
+          ))}
+        </NewsGridWrapper>
+      )}
 
-      <div ref={observerRef} style={{ height: "20px", margin: "40px 0" }} />
-      {loading && <p style={{ textAlign: "center" }}>Loading more...</p>}
-      {!hasMore && <p style={{ textAlign: "center" }}>No more results</p>}
+      {!loading && results.length === 0 && !hasMore && (
+        <div className={styles.emptyState}>
+          <Search size={32} strokeWidth={1.5} />
+          <p>No results found for &quot;{query}&quot;.</p>
+          <p className={styles.emptyStateHint}>
+            Try a different search term or check the spelling.
+          </p>
+        </div>
+      )}
+
+      <div ref={observerRef} className={styles.sentinel} />
+      {loading && <p className={styles.statusText}>Loading more...</p>}
+      {!hasMore && results.length > 0 && (
+        <p className={styles.statusText}>No more results</p>
+      )}
     </>
   );
 }

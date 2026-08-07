@@ -1,9 +1,5 @@
-import TermsOfServiceComponent from "@/components/TermsOfService";
+import LegalInfoPage from "@/components/LegalInfoPage";
 
 export default function TermsOfServicePage() {
-  return (
-    <>
-      <TermsOfServiceComponent contactEmail={process.env.CONTACT_EMAIL} />
-    </>
-  );
+  return <LegalInfoPage activeTab="terms" contactEmail={process.env.CONTACT_EMAIL} />;
 }
