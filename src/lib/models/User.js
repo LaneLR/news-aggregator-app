@@ -117,6 +117,34 @@ export default function defineUser(sequelize) {
         type: DataTypes.DATE,
         allowNull: true,
       },
+      // Scopes the email digest to one of the user's own custom Feeds
+      // instead of general trending/personalized picks. Nullable FK, not a
+      // hard reference constraint here — set/read via the Feed association
+      // in db.js, and cleared if the referenced Feed is ever deleted.
+      digestFeedId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      mutedKeywords: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
+      },
+      onboardingCompleted: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      preferredCategories: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
+      },
+      preferredSources: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
+      },
     },
     {
       sequelize,

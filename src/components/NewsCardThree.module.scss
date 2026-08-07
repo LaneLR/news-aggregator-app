@@ -13,6 +13,19 @@
     transform: translateY(-3px);
     box-shadow: var(--shadow-md);
   }
+
+  // Dims already-clicked articles so unread content stands out at a glance —
+  // the read/unread convention most RSS readers (Feedly included) use.
+  &.read {
+    .imageLink img {
+      opacity: 0.55;
+      filter: grayscale(35%);
+    }
+
+    .articleTitle {
+      color: var(--theme-text-secondary);
+    }
+  }
 }
 
 .imageLink {

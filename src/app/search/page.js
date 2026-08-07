@@ -1,10 +1,9 @@
 import SearchFeed from "@/components/SearchFeed";
-import { authOptions } from "@/lib/auth-options";
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
 
 export default async function SearchResultsPage({ searchParams }) {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session) {
       redirect("/login");

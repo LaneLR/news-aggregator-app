@@ -1,10 +1,9 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 import { sendEmail } from "@/utils/emailer"; // 1. Import your emailer
 
 export async function PATCH(req) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session?.user) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {

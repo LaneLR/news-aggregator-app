@@ -8,10 +8,7 @@ import Loading from "@/app/loading";
 import styles from "./CategoryPage.module.scss";
 
 async function fetchCategoryArticles(category, sort) {
-  const baseUrl =
-    process.env.RENDER_EXTERNAL_URL ||
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
   const res = await fetch(
     `${baseUrl}/api/articles/${category}?sort=${sort}`,

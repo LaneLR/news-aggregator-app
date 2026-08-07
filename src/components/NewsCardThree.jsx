@@ -72,7 +72,7 @@ export default function NewsCardThree({
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
 
   return (
-    <div className={styles.cardContainer}>
+    <div className={`${styles.cardContainer} ${article.isRead ? styles.read : ""}`}>
       <Link
         className={styles.imageLink}
         href={article.url}
@@ -95,13 +95,7 @@ export default function NewsCardThree({
       <div className={styles.contentArea}>
         <div>
           <h3 className={`${styles.articleTitle} headline`}>
-            <Link
-              href={article.url}
-              target={"_blank"}
-              onClick={() => trackArticleClick(article)}
-            >
-              {cleanTitle}
-            </Link>
+            <Link href={`/article/${article.id}`}>{cleanTitle}</Link>
           </h3>
           <p className={styles.articleSnippetText}>{cleanSourceName}</p>
         </div>

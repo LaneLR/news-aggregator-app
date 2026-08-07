@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { Op } from "sequelize";
 import initializeDbAndModels from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { auth } from "@/lib/auth";
+import { buildKeywordExclusion } from "@/lib/keywordFilter";
 
 const RESULT_LIMIT = 40;
 const MIN_RESULTS_BEFORE_BACKFILL = 24;
@@ -15,9 +15,10 @@ const TOP_SIGNALS = 8;
 // then scores unseen articles by how much their source/category overlaps
 // that profile, plus small recency/popularity tie-breakers. Falls back to
 // trending for brand-new users with no signal yet.
-async function fetchTrending(Article, limit, excludeUrls) {
+async function fetchTrending(Article, limit, excludeUrls, keywordExclusion) {
   const where = {};
   if (excludeUrls.length) where.url = { [Op.notIn]: excludeUrls };
+  if (keywordExclusion) where[Op.and] = [keywordExclusion];
   return Article.findAll({
     where,
     order: [
@@ -29,7 +30,7 @@ async function fetchTrending(Article, limit, excludeUrls) {
 }
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -43,10 +44,10 @@ export async function GET() {
   const userId = session.user.id;
 
   try {
-    const { Article, ArticleLike, SavedArticle, Archive, UserInteraction } =
+    const { Article, ArticleLike, ReadArticle, SavedArticle, Archive, UserInteraction, User } =
       await initializeDbAndModels();
 
-    const [likes, userArchives, interactions] = await Promise.all([
+    const [likes, userArchives, interactions, currentUser] = await Promise.all([
       ArticleLike.findAll({ where: { userId }, attributes: ["articleUrl"] }),
       Archive.findAll({ where: { userId }, attributes: ["id"] }),
       UserInteraction.findAll({
@@ -55,7 +56,11 @@ export async function GET() {
         limit: MAX_RECENT_CLICKS,
         attributes: ["articleUrl", "sourceName", "category"],
       }),
+      User.findByPk(userId, {
+        attributes: ["mutedKeywords", "preferredCategories", "preferredSources"],
+      }),
     ]);
+    const keywordExclusion = buildKeywordExclusion(currentUser?.mutedKeywords);
 
     const likedUrls = likes.map((l) => l.articleUrl);
     const archiveIds = userArchives.map((a) => a.id);
@@ -89,6 +94,12 @@ export async function GET() {
     likedArticles.forEach((a) => addSignal(a.sourceName, a.category, 3));
     savedArticles.forEach((a) => addSignal(a.sourceName, null, 5));
     interactions.forEach((i) => addSignal(i.sourceName, i.category, 1));
+    // Onboarding picks are a deliberate but lower-confidence signal than
+    // actual engagement — weighted between a click and a like so a brand
+    // new account isn't stuck on generic trending until it accumulates
+    // real activity.
+    (currentUser?.preferredSources || []).forEach((s) => addSignal(s, null, 2));
+    (currentUser?.preferredCategories || []).forEach((c) => addSignal(null, [c], 2));
 
     const excludedUrls = Array.from(
       new Set([
@@ -104,7 +115,7 @@ export async function GET() {
 
     let ranked;
     if (!hasSignal) {
-      ranked = await fetchTrending(Article, RESULT_LIMIT, excludedUrls);
+      ranked = await fetchTrending(Article, RESULT_LIMIT, excludedUrls, keywordExclusion);
     } else {
       const topSources = Object.entries(sourceWeights)
         .sort((a, b) => b[1] - a[1])
@@ -120,7 +131,9 @@ export async function GET() {
       if (topCategories.length)
         orConditions.push({ category: { [Op.overlap]: topCategories } });
 
-      const candidateWhere = { [Op.or]: orConditions };
+      const candidateAnd = [{ [Op.or]: orConditions }];
+      if (keywordExclusion) candidateAnd.push(keywordExclusion);
+      const candidateWhere = { [Op.and]: candidateAnd };
       if (excludedUrls.length) candidateWhere.url = { [Op.notIn]: excludedUrls };
 
       const candidates = await Article.findAll({
@@ -153,16 +166,27 @@ export async function GET() {
         const backfill = await fetchTrending(
           Article,
           MIN_RESULTS_BEFORE_BACKFILL - ranked.length,
-          backfillExclude
+          backfillExclude,
+          keywordExclusion
         );
         ranked = [...ranked, ...backfill];
       }
     }
 
+    const rankedUrls = ranked.map((a) => a.url);
+    const userReads = rankedUrls.length
+      ? await ReadArticle.findAll({
+          where: { userId, articleUrl: { [Op.in]: rankedUrls } },
+          attributes: ["articleUrl"],
+        })
+      : [];
+    const readUrls = new Set(userReads.map((read) => read.articleUrl));
+
     const likedUrlSet = new Set(likedUrls);
     const articles = ranked.map((a) => ({
       ...a.toJSON(),
       isLikedByUser: likedUrlSet.has(a.url),
+      isRead: readUrls.has(a.url),
     }));
 
     return NextResponse.json({ articles });

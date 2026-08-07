@@ -1,20 +1,28 @@
 import jwt from "jsonwebtoken";
-import User from "@/lib/models/User";
 import { sendEmail } from "@/utils/emailer";
 import initializeDbAndModels from "@/lib/db";
+import { authRateLimitMiddleware } from "@/lib/rate-limiter";
 
 export async function POST(req) {
+  try {
+    await authRateLimitMiddleware(req);
+  } catch (err) {
+    return Response.json({ error: err.message }, { status: err.status || 429 });
+  }
+
   const db = await initializeDbAndModels();
   const { User } = db;
   try {
     const { email } = await req.json();
     const user = await User.findOne({ where: { email } });
 
-    if (!user) {
-      return Response.json({ error: "User not found" }, { status: 404 });
-    }
-    if (user.emailIsVerified) {
-      return Response.json({ error: "Already verified" }, { status: 400 });
+    // Same generic response whether the account exists, is already
+    // verified, or doesn't exist at all — avoids leaking account
+    // existence/status to an unauthenticated caller (matches request-reset).
+    if (!user || user.emailIsVerified) {
+      return Response.json({
+        message: "If that account needs verification, a new email has been sent.",
+      });
     }
 
     const token = jwt.sign(
@@ -30,7 +38,9 @@ export async function POST(req) {
       html: `<p>Click the link to verify your account:</p><a href="${verifyUrl}">${verifyUrl}</a>`,
     });
 
-    return Response.json({ message: "Verification email sent" });
+    return Response.json({
+      message: "If that account needs verification, a new email has been sent.",
+    });
   } catch (err) {
     console.error(err);
     return Response.json({ error: "Server error" }, { status: 500 });

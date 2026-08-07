@@ -13,6 +13,17 @@
     transform: translateY(-3px);
     box-shadow: var(--shadow-md);
   }
+
+  &.read {
+    .imageLink img {
+      opacity: 0.55;
+      filter: grayscale(35%);
+    }
+
+    .articleTitle {
+      color: var(--theme-text-secondary);
+    }
+  }
 }
 
 .imageLink {

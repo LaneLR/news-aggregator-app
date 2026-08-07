@@ -1,12 +1,11 @@
 import initializeDbAndModels from "@/lib/db";
 import { QueryTypes } from "sequelize";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { auth } from "@/lib/auth";
 
 export async function GET(req) {
-  const { sequelize } = await initializeDbAndModels();
+  const { sequelize, User, ArticleLike, ReadArticle } = await initializeDbAndModels();
   const { searchParams } = new URL(req.url);
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
 
   const query = searchParams.get("query")?.trim() || "";
@@ -38,10 +37,36 @@ export async function GET(req) {
       whereParts.push(`"sourceType" = 'news'`);
     }
 
+    let likedUrls = new Set();
+    let readUrls = new Set();
+    if (session?.user?.id) {
+      const currentUser = await User.findByPk(session.user.id, {
+        attributes: ["mutedKeywords"],
+      });
+      (currentUser?.mutedKeywords || []).forEach((keyword, i) => {
+        const key = `muted${i}`;
+        replacements[key] = `%${keyword}%`;
+        whereParts.push(`"title" NOT ILIKE :${key}`);
+      });
+
+      const [userLikes, userReads] = await Promise.all([
+        ArticleLike.findAll({
+          where: { userId: session.user.id },
+          attributes: ["articleUrl"],
+        }),
+        ReadArticle.findAll({
+          where: { userId: session.user.id },
+          attributes: ["articleUrl"],
+        }),
+      ]);
+      likedUrls = new Set(userLikes.map((like) => like.articleUrl));
+      readUrls = new Set(userReads.map((read) => read.articleUrl));
+    }
+
     const whereClauseSQL =
       whereParts.length > 0 ? `WHERE ${whereParts.join(" AND ")}` : "";
 
-    const results = await sequelize.query(
+    const rows = await sequelize.query(
       `SELECT *
        FROM "Articles"
        ${whereClauseSQL}
@@ -49,6 +74,12 @@ export async function GET(req) {
        LIMIT :limit OFFSET :offset;`,
       { replacements, type: QueryTypes.SELECT }
     );
+
+    const results = rows.map((row) => ({
+      ...row,
+      isLikedByUser: likedUrls.has(row.url),
+      isRead: readUrls.has(row.url),
+    }));
 
     return Response.json({ results });
   } catch (err) {

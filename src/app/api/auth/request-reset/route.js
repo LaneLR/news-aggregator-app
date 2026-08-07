@@ -1,9 +1,15 @@
 import jwt from "jsonwebtoken";
-import User from "@/lib/models/User";
 import { sendEmail } from "@/utils/emailer";
 import initializeDbAndModels from "@/lib/db";
+import { authRateLimitMiddleware } from "@/lib/rate-limiter";
 
 export async function POST(req) {
+  try {
+    await authRateLimitMiddleware(req);
+  } catch (err) {
+    return Response.json({ error: err.message }, { status: err.status || 429 });
+  }
+
   const db = await initializeDbAndModels();
   const { User } = db;
   try {

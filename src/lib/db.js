@@ -1,3 +1,4 @@
+import { PHASE_PRODUCTION_BUILD } from "next/constants.js";
 import getSequelizeInstance from "./sequelize.js";
 import defineArticle from "./models/Article.js";
 import defineFeed from "./models/Feed.js";
@@ -7,6 +8,7 @@ import defineArchive from "./models/Archive.js";
 import defineSavedArticle from "./models/SavedArticle.js";
 import defineProcessedStripeEvent from "./models/ProcessedStripeEvent.js";
 import defineUserInteraction from "./models/UserInteraction.js";
+import defineReadArticle from "./models/ReadArticle.js";
 
 if (!global.db) {
   global.db = {};
@@ -29,6 +31,7 @@ async function initializeDbAndModels() {
       const SavedArticle = defineSavedArticle(sequelize);
       const ProcessedStripeEvent = defineProcessedStripeEvent(sequelize);
       const UserInteraction = defineUserInteraction(sequelize);
+      const ReadArticle = defineReadArticle(sequelize);
 
       global.db.sequelize = sequelize;
       global.db.User = User;
@@ -39,6 +42,7 @@ async function initializeDbAndModels() {
       global.db.ArticleLike = ArticleLike;
       global.db.ProcessedStripeEvent = ProcessedStripeEvent;
       global.db.UserInteraction = UserInteraction;
+      global.db.ReadArticle = ReadArticle;
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -64,12 +68,26 @@ async function initializeDbAndModels() {
       });
       UserInteraction.belongsTo(User, { foreignKey: "userId" });
 
+      User.hasMany(ReadArticle, { foreignKey: "userId", onDelete: "CASCADE" });
+      ReadArticle.belongsTo(User, { foreignKey: "userId" });
+
       // There's no formal migration tooling in this project yet, so `alter`
       // is what actually applies model changes to the database. This is a
       // known risk once there's real production data (ALTER can lock large
       // tables or, if Sequelize misreads a diff, drop/recreate a column) —
       // set DISABLE_DB_SYNC=true to turn it off once migrations replace it.
-      if (process.env.DISABLE_DB_SYNC !== "true") {
+      //
+      // Also skipped during `next build` specifically: Next collects page
+      // data across multiple parallel worker processes (each with its own
+      // `global`, so the cold-start guard above doesn't dedupe across them),
+      // and each one independently running `alter: true` at the same time
+      // was racing the others — none see the others' in-flight constraint,
+      // so every worker adds its own "new" unique index on every build.
+      // This is what actually produced 670+ duplicate indexes on `Users`
+      // (and the original 210 on `Articles.url`) over months of builds —
+      // schema sync only needs to happen once, at real server startup.
+      const isProductionBuild = process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD;
+      if (process.env.DISABLE_DB_SYNC !== "true" && !isProductionBuild) {
         await sequelize.sync({ alter: true });
       }
 

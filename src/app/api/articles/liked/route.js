@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 import { Op } from "sequelize";
 
 export async function GET(req) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -14,7 +13,7 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")) : null;
 
-    const { ArticleLike, Article } = await initializeDbAndModels();
+    const { ArticleLike, ReadArticle, Article } = await initializeDbAndModels();
 
     const userLikes = await ArticleLike.findAll({
       where: { userId: session.user.id },
@@ -29,9 +28,16 @@ export async function GET(req) {
     const likedUrls = userLikes.map(like => like.articleUrl);
     const likedOrderMap = new Map(userLikes.map((like, index) => [like.articleUrl, index]));
 
-    const combinedArticles = await Article.findAll({
-      where: { url: { [Op.in]: likedUrls } },
-    });
+    const [combinedArticles, userReads] = await Promise.all([
+      Article.findAll({
+        where: { url: { [Op.in]: likedUrls } },
+      }),
+      ReadArticle.findAll({
+        where: { userId: session.user.id, articleUrl: { [Op.in]: likedUrls } },
+        attributes: ["articleUrl"],
+      }),
+    ]);
+    const readUrls = new Set(userReads.map((read) => read.articleUrl));
 
     const sortedArticles = combinedArticles.sort((a, b) => {
         return likedOrderMap.get(a.url) - likedOrderMap.get(b.url);
@@ -39,7 +45,8 @@ export async function GET(req) {
 
     const articlesWithLikeStatus = sortedArticles.map(article => ({
         ...article.toJSON(),
-        isLikedByUser: true, 
+        isLikedByUser: true,
+        isRead: readUrls.has(article.url),
     }));
 
     return NextResponse.json({ articles: articlesWithLikeStatus });

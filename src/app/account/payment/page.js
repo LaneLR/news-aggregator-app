@@ -1,12 +1,11 @@
-import { authOptions } from "@/lib/auth-options";
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Wallet } from "lucide-react";
 import ManageSubscriptionButton from "@/components/ManageSubscriptionButton";
 import styles from "../AccountCard.module.scss";
 
 export default async function PaymentInfoPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session) {
     redirect("/login");

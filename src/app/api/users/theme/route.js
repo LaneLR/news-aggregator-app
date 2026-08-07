@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 
 // A list of themes you'll offer. This prevents users from saving invalid data.
-const ALLOWED_THEMES = ['default', 'dark', 'forest'];
+// Must match the themes actually defined in src/styles/themes.scss — a name
+// accepted here with no matching CSS block would leave every --theme-* custom
+// property unset for that user (the whole site silently loses its styling).
+const ALLOWED_THEMES = ['default', 'dark'];
 
 export async function PATCH(req) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

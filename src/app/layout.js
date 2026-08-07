@@ -6,8 +6,8 @@ import AppWrapper from "@/components/AppWrapper";
 import MainContentWrapper from "@/components/MainContentWrapper";
 import Footer from "@/components/Footer";
 import ThemeProvider from "@/components/ThemeProvider";
-import { authOptions } from "@/lib/auth-options";
-import { getServerSession } from "next-auth";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import { auth } from "@/lib/auth";
 
 const roboto = Roboto({
   weight: ["400", "700"],
@@ -35,7 +35,13 @@ export const metadata = {
     "MorningFeeds is a fast, customizable RSS feed reader and news aggregator where you can find and save stories from your favorite news sites all in one place.",
   icons: {
     icon: "/favicon.ico",
+    apple: "/images/icon-192.png",
   },
+  manifest: "/manifest.json",
+};
+
+export const viewport = {
+  themeColor: "#2e5ce6",
 };
 
 export default async function RootLayout({ children }) {
@@ -43,7 +49,7 @@ export default async function RootLayout({ children }) {
   // client component's useSession() (Header included) is correct on the
   // very first render — no client-only fetch-and-settle race that can
   // land on a stale "unauthenticated" state until a manual refresh.
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   return (
     <html lang="en" data-theme={session?.user?.selectedTheme || "default"}>
@@ -60,6 +66,7 @@ export default async function RootLayout({ children }) {
             </AppWrapper>
           </ThemeProvider>
         </Providers>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

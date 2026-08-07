@@ -1,6 +1,5 @@
 // app/archives/page.jsx
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 import { Bookmark } from "lucide-react";
 import DeleteArchiveButton from "@/components/DeleteArchiveButton";
@@ -11,7 +10,7 @@ import CreateNewArchiveCard from "@/components/CreateNewArchiveCard";
 import styles from "./page.module.scss";
 
 export default async function ArchivesPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session) {
     return redirect("/login");
   }

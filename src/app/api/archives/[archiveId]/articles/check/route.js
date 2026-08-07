@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import initializeDbAndModels from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { auth } from "@/lib/auth";
 
 export async function GET(req, context) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session)
     return NextResponse.json({ saved: false }, { status: 401 });
 

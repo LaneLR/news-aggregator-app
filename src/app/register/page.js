@@ -1,12 +1,11 @@
 import RegisterPage from "@/components/RegisterPage";
-import { authOptions } from "@/lib/auth-options";
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import Loading from "../loading";
 
 export default async function Register() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (session) {
     redirect("/news");

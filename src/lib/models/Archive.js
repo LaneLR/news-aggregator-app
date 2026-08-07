@@ -18,6 +18,16 @@ export default function defineArchive(sequelize) {
         type: DataTypes.UUID,
         allowNull: false,
       },
+      isPublic: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      publicSlug: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true,
+      },
     },
     {
       sequelize,

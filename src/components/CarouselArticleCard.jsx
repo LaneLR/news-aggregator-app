@@ -57,14 +57,8 @@ export default function CarouselCard({ article, archiveId }) {
   const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
 
   return (
-    <div className={styles.cardWrapper}>
-      <Link
-        className={styles.imageLink}
-        href={article.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={() => trackArticleClick(article)}
-      >
+    <div className={`${styles.cardWrapper} ${article.isRead ? styles.read : ""}`}>
+      <Link className={styles.imageLink} href={`/article/${article.id}`}>
         <Image
           src={proxiedImageUrl}
           alt={article.title}

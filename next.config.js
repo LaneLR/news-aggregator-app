@@ -1,21 +1,32 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    // No `remotePatterns` — every third-party image is already routed
+    // through /api/image-proxy, which has its own SSRF/private-IP
+    // protections. Leaving a wildcard remote pattern here would let any
+    // future `<Image src={externalUrl}>` silently bypass that proxy and
+    // hit Next's own (unprotected) image fetcher instead.
     localPatterns: [
       {
         pathname: '/images/**',
-        search: '', 
+        search: '',
       },
       {
         pathname: '/api/image-proxy/**',
       }
     ],
-    remotePatterns: [
+  },
+  async headers() {
+    return [
       {
-        protocol: 'https',
-        hostname: '**',
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
       },
-    ],
+    ];
   },
   webpack: (config, { isServer }) => {
     if (isServer) {

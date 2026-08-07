@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 import { Op } from "sequelize";
+import { buildKeywordExclusion } from "@/lib/keywordFilter";
 
 export async function GET(req, context) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -66,6 +66,13 @@ export async function GET(req, context) {
       });
     }
 
+    const { User } = await initializeDbAndModels();
+    const currentUser = await User.findByPk(session.user.id, {
+      attributes: ["mutedKeywords"],
+    });
+    const keywordExclusion = buildKeywordExclusion(currentUser?.mutedKeywords);
+    if (keywordExclusion) filterConditions.push(keywordExclusion);
+
     const whereClause = {};
     if (filterConditions.length > 0) {
       whereClause[Op.and] = filterConditions;
@@ -91,16 +98,24 @@ export async function GET(req, context) {
     });
 
     if (session?.user?.id) {
-      const { ArticleLike } = await initializeDbAndModels();
-      const userLikes = await ArticleLike.findAll({
-        where: { userId: session.user.id },
-        attributes: ["articleUrl"],
-      });
+      const { ArticleLike, ReadArticle } = await initializeDbAndModels();
+      const [userLikes, userReads] = await Promise.all([
+        ArticleLike.findAll({
+          where: { userId: session.user.id },
+          attributes: ["articleUrl"],
+        }),
+        ReadArticle.findAll({
+          where: { userId: session.user.id },
+          attributes: ["articleUrl"],
+        }),
+      ]);
       const likedUrls = new Set(userLikes.map((like) => like.articleUrl));
+      const readUrls = new Set(userReads.map((read) => read.articleUrl));
 
       const articlesWithLikes = combinedArticles.map((article) => ({
         ...article.toJSON(),
         isLikedByUser: likedUrls.has(article.url),
+        isRead: readUrls.has(article.url),
       }));
 
       return NextResponse.json({ articles: articlesWithLikes });
