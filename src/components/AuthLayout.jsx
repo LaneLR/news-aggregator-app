@@ -63,20 +63,22 @@ export default function AuthLayout({ activeTab, children }) {
 
       <div className={styles.formPanel}>
         <div className={styles.card}>
-          <div className={styles.tabRow}>
-            <Link
-              href="/login"
-              className={`${styles.tab} ${activeTab === "signin" ? styles.activeTab : ""}`}
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/register"
-              className={`${styles.tab} ${activeTab === "register" ? styles.activeTab : ""}`}
-            >
-              Create Account
-            </Link>
-          </div>
+          {(activeTab === "signin" || activeTab === "register") && (
+            <div className={styles.tabRow}>
+              <Link
+                href="/login"
+                className={`${styles.tab} ${activeTab === "signin" ? styles.activeTab : ""}`}
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/register"
+                className={`${styles.tab} ${activeTab === "register" ? styles.activeTab : ""}`}
+              >
+                Create Account
+              </Link>
+            </div>
+          )}
           {children}
         </div>
       </div>
