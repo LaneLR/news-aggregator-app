@@ -1,4 +1,3 @@
-import { PHASE_PRODUCTION_BUILD } from "next/constants.js";
 import getSequelizeInstance from "./sequelize.js";
 import defineArticle from "./models/Article.js";
 import defineFeed from "./models/Feed.js";
@@ -72,28 +71,25 @@ async function initializeDbAndModels() {
       ReadArticle.belongsTo(User, { foreignKey: "userId" });
 
       // There's no formal migration tooling in this project yet, so `alter`
-      // is what actually applies model changes to the database. This is a
-      // known risk once there's real production data (ALTER can lock large
-      // tables or, if Sequelize misreads a diff, drop/recreate a column) —
-      // set DISABLE_DB_SYNC=true to turn it off once migrations replace it.
+      // is what actually applies model changes to the database — but it is
+      // NOT run automatically here. Sequelize's index-sync step runs on
+      // every single `.sync()` call regardless of the alter/force options,
+      // and for this Postgres/Sequelize version combo it never recognizes
+      // an existing unique index as matching the model's, so it re-adds a
+      // "new" duplicate every time. Running this on every cold start (every
+      // `next dev` restart, every `next build` worker, every Vercel
+      // serverless invocation) is what produced 670+ duplicate indexes on
+      // `Users` and 210+ on `Articles.url` over time — the parallel build
+      // workers and the RSS fetcher's own per-run `sequelize.sync()` call
+      // both independently contributed.
       //
-      // Also skipped during `next build` specifically: Next collects page
-      // data across multiple parallel worker processes (each with its own
-      // `global`, so the cold-start guard above doesn't dedupe across them),
-      // and each one independently running `alter: true` at the same time
-      // was racing the others — none see the others' in-flight constraint,
-      // so every worker adds its own "new" unique index on every build.
-      // This is what actually produced 670+ duplicate indexes on `Users`
-      // (and the original 210 on `Articles.url`) over months of builds —
-      // schema sync only needs to happen once, at real server startup.
-      const isProductionBuild = process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD;
-      if (process.env.DISABLE_DB_SYNC !== "true" && !isProductionBuild) {
+      // Schema sync is now a deliberate, manual action: run `npm run
+      // db:sync` (scripts/sync-db.mjs) after changing a model, then don't
+      // run it again until the next model change. That script also sweeps
+      // up whatever duplicate index it just created, so it's safe to rerun.
+      if (process.env.RUN_DB_SYNC === "true") {
         await sequelize.sync({ alter: true });
       }
-
-      // To fully reset data: drop tables in this order in PgAdmin (or via
-      // psql) — SavedArticles, then Archives, then Users — and let the sync
-      // above recreate them on the next request.
     } catch (error) {
       console.error("----------------------------------------------------");
       console.error(
