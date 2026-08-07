@@ -1,9 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Check, ArrowRight } from "lucide-react";
 import { CATEGORY_LINKS } from "./HeaderNavBar";
 import styles from "./OnboardingFlow.module.scss";
+
+// CATEGORY_LINKS' `label` is display text ("Journals" reads better in nav
+// than "Journal"), but article rows are tagged with the singular capitalized
+// slug ("Journal"). Selections need to carry that canonical tag, not the
+// label, or picking "Journals" here would silently never match anything.
+function categoryTag(href) {
+  const slug = href.split("/").pop();
+  return slug.charAt(0).toUpperCase() + slug.slice(1);
+}
 
 async function saveOnboarding(preferredCategories, preferredSources) {
   await fetch("/api/users/onboarding", {
@@ -15,6 +25,8 @@ async function saveOnboarding(preferredCategories, preferredSources) {
 
 export default function OnboardingFlow() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
   const [step, setStep] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedSources, setSelectedSources] = useState([]);
@@ -22,9 +34,17 @@ export default function OnboardingFlow() {
   const [loadingSources, setLoadingSources] = useState(false);
   const [finishing, setFinishing] = useState(false);
 
-  const toggleCategory = (label) => {
+  // First-time onboarding always happens before a user could plausibly be
+  // subscribed, but gate on the actual session tier rather than assuming —
+  // Journals/Market/Finance are subscriber-only, so a non-subscriber picking
+  // them here would set preferences for content they can't see yet.
+  const pickableCategories = CATEGORY_LINKS.filter(
+    (link) => isSubscribed || !link.subscriberOnly
+  );
+
+  const toggleCategory = (tag) => {
     setSelectedCategories((prev) =>
-      prev.includes(label) ? prev.filter((c) => c !== label) : [...prev, label]
+      prev.includes(tag) ? prev.filter((c) => c !== tag) : [...prev, tag]
     );
   };
 
@@ -75,14 +95,15 @@ export default function OnboardingFlow() {
             </p>
 
             <div className={styles.chipGrid}>
-              {CATEGORY_LINKS.map(({ label, Icon }) => {
-                const active = selectedCategories.includes(label);
+              {pickableCategories.map(({ label, href, Icon }) => {
+                const tag = categoryTag(href);
+                const active = selectedCategories.includes(tag);
                 return (
                   <button
-                    key={label}
+                    key={tag}
                     type="button"
                     className={`${styles.chip} ${active ? styles.active : ""}`}
-                    onClick={() => toggleCategory(label)}
+                    onClick={() => toggleCategory(tag)}
                   >
                     <Icon size={16} strokeWidth={2} />
                     {label}

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@faker-js/faker": "^9.9.0",
+    "@sentry/nextjs": "^10.69.0",
     "@stripe/stripe-js": "^7.8.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.6.1",

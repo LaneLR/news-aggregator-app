@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -54,19 +55,50 @@ export default function HeaderNavBar() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [menuPosition, setMenuPosition] = useState(null);
   const moreRef = useRef(null);
+  const menuRef = useRef(null);
 
   const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
 
+  // The nav bar scrolls horizontally (overflow-x: auto), which per the CSS
+  // spec forces overflow-y to compute as auto too — so a dropdown positioned
+  // absolute inside it gets clipped by the bar's own scroll box instead of
+  // floating over the page. Portaling it to <body> and positioning it from
+  // the button's actual screen coordinates sidesteps that entirely.
+  const toggleMoreMenu = () => {
+    if (!isMoreOpen && moreRef.current) {
+      const rect = moreRef.current.getBoundingClientRect();
+      setMenuPosition({ top: rect.bottom + 8, right: window.innerWidth - rect.right });
+    }
+    setIsMoreOpen((prev) => !prev);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (moreRef.current && !moreRef.current.contains(event.target)) {
+      const clickedButton = moreRef.current?.contains(event.target);
+      const clickedMenu = menuRef.current?.contains(event.target);
+      if (!clickedButton && !clickedMenu) {
         setIsMoreOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!isMoreOpen) return;
+    // The button's position is only known at the moment the menu opens — if
+    // the bar scrolls or the window resizes after that, just close it rather
+    // than tracking and re-measuring on every scroll event.
+    const close = () => setIsMoreOpen(false);
+    window.addEventListener("resize", close);
+    window.addEventListener("scroll", close, true);
+    return () => {
+      window.removeEventListener("resize", close);
+      window.removeEventListener("scroll", close, true);
+    };
+  }, [isMoreOpen]);
 
   const visibleCategories = CATEGORY_LINKS.filter(
     (link) => isSubscribed || !link.subscriberOnly
@@ -97,27 +129,34 @@ export default function HeaderNavBar() {
           <button
             type="button"
             className={`${styles.link} ${moreCategories.some((l) => l.href === pathname) ? styles.active : ""}`}
-            onClick={() => setIsMoreOpen((prev) => !prev)}
+            onClick={toggleMoreMenu}
           >
             More
             <ChevronDown size={15} strokeWidth={2.25} />
           </button>
-          {isMoreOpen && (
-            <ul className={styles.moreMenu}>
-              {moreCategories.map(({ label, href, Icon }) => (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    className={`${styles.moreMenuItem} ${pathname === href ? styles.active : ""}`}
-                    onClick={() => setIsMoreOpen(false)}
-                  >
-                    <Icon size={16} strokeWidth={2} />
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
+          {isMoreOpen &&
+            menuPosition &&
+            createPortal(
+              <ul
+                ref={menuRef}
+                className={styles.moreMenu}
+                style={{ top: menuPosition.top, right: menuPosition.right }}
+              >
+                {moreCategories.map(({ label, href, Icon }) => (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      className={`${styles.moreMenuItem} ${pathname === href ? styles.active : ""}`}
+                      onClick={() => setIsMoreOpen(false)}
+                    >
+                      <Icon size={16} strokeWidth={2} />
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>,
+              document.body
+            )}
         </div>
       )}
     </div>

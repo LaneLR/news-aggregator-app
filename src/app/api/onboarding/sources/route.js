@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 import { Op } from "sequelize";
+import { GATED_TAGS } from "@/lib/subscriberOnlyCategories";
 
 const MAX_SOURCES = 12;
 
@@ -14,11 +15,14 @@ export async function GET(req) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const isSubscribed = session.user.tier && session.user.tier !== "Free";
+
   const { searchParams } = new URL(req.url);
   const categories = (searchParams.get("categories") || "")
     .split(",")
     .map((c) => c.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((c) => isSubscribed || !GATED_TAGS.includes(c));
 
   if (categories.length === 0) {
     return NextResponse.json({ sources: [] });
