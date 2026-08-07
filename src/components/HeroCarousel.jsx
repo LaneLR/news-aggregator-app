@@ -3,9 +3,15 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Sparkles, TrendingUp } from "lucide-react";
 import CarouselArticleCard from "@/components/CarouselArticleCard";
+import CarouselRow from "@/components/CarouselRow";
 import styles from "./HeroCarousel.module.scss";
 
 const CAROUSEL_LIMIT = 12;
+
+const SUBTITLES = {
+  forYou: "Picked based on the sources, categories, and articles you've liked, saved, and clicked on.",
+  trending: "The most-read stories across MorningFeeds right now.",
+};
 
 // Sits where the single-article hero used to be. Subscribers get a "For
 // You" vs "Trending" toggle; free users only ever see Trending (the "For
@@ -50,10 +56,16 @@ export default function HeroCarousel() {
   return (
     <section className={styles.section}>
       <div className={styles.headerRow}>
-        <h2 className={styles.sectionTitle}>
-          {view === "forYou" ? <Sparkles size={22} /> : <TrendingUp size={22} />}
-          {view === "forYou" ? "For You" : "Trending"}
-        </h2>
+        <div className={styles.headerLeft}>
+          <span className={styles.accentBar} />
+          <div>
+            <h2 className={styles.sectionTitle}>
+              {view === "forYou" ? <Sparkles size={20} /> : <TrendingUp size={20} />}
+              {view === "forYou" ? "For You" : "Trending"}
+            </h2>
+            <p className={styles.sectionSubtitle}>{SUBTITLES[view]}</p>
+          </div>
+        </div>
         <div className={styles.toggleGroup}>
           {isSubscribed && (
             <div className={styles.toggleRow}>
@@ -93,11 +105,11 @@ export default function HeroCarousel() {
           )}
         </div>
       </div>
-      <div className={styles.carouselWrapper}>
+      <CarouselRow>
         {articles.map((article) => (
           <CarouselArticleCard key={article.url} article={article} />
         ))}
-      </div>
+      </CarouselRow>
     </section>
   );
 }

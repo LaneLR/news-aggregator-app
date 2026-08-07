@@ -9,7 +9,7 @@
 
 .icon {
   position: absolute;
-  left: 14px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--theme-text-secondary);
@@ -19,7 +19,7 @@
 .input {
   font-size: 0.95rem;
   width: 100%;
-  padding: 10px 14px 10px 40px;
+  padding: 10px 40px 10px 14px;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   color: var(--theme-dark-blue);

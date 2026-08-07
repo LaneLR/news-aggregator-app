@@ -7,7 +7,7 @@ import { SUBSCRIBER_ONLY_CATEGORIES } from "@/lib/subscriberOnlyCategories";
 
 const CATEGORIES_TO_DISPLAY = [
   "Business",
-  "Technology",
+  "Tech",
   "Entertainment",
   "Sports",
   "Science",

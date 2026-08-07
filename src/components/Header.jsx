@@ -5,7 +5,7 @@ import Button from "./Button";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Menu, Newspaper, Bookmark, User, Crown, Settings, LogOut } from "lucide-react";
+import { Menu, Newspaper, Bookmark, User, Crown, Settings, LogOut, Sun, Moon } from "lucide-react";
 import SearchBar from "./SearchBar";
 import HeaderNavBar from "./HeaderNavBar";
 import HeaderSubscribeBanner from "./SubscribeHeaderBanner";
@@ -20,10 +20,13 @@ const MENU_ITEMS = [
 ];
 
 export default function Header() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
+  const currentTheme = session?.user?.selectedTheme || "default";
 
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -52,6 +55,20 @@ export default function Header() {
     router.push(path);
   };
 
+  const handleToggleTheme = async () => {
+    const nextTheme = currentTheme === "dark" ? "default" : "dark";
+    try {
+      await fetch("/api/users/theme", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ themeName: nextTheme }),
+      });
+      await update({ selectedTheme: nextTheme });
+    } catch (err) {
+      console.error("Failed to update theme", err);
+    }
+  };
+
   if (status === "loading") return null;
 
   return (
@@ -70,9 +87,12 @@ export default function Header() {
                     height={48}
                   />
                 </div>
-                <div className={styles.logoText}>
-                  <span>morning</span>
-                  <span>feeds</span>
+                <div className={styles.logoTextWrapper}>
+                  <div className={styles.logoText}>
+                    <span>morning</span>
+                    <span>feeds</span>
+                  </div>
+                  <span className={styles.tagline}>All the news. One place.</span>
                 </div>
               </Link>
             </div>
@@ -80,33 +100,56 @@ export default function Header() {
               <SearchBar />
             </div>
             <div className={styles.rightContainer}>
-              <div className={styles.dropdownContainer} ref={dropdownRef}>
-                <div className={styles.menuTrigger} onClick={toggleDropdown}>
-                  <Menu size={20} strokeWidth={2} />
-                </div>
-                {isDropdownOpen && (
-                  <ul className={styles.dropdownMenu}>
-                    {MENU_ITEMS.map(({ label, path, Icon }) => (
-                      <li
-                        key={path}
-                        className={styles.dropdownMenuItem}
-                        onClick={() => handleNavigation(path)}
-                      >
+              <div className={styles.iconButtonGroup}>
+                {isSubscribed && (
+                  <button
+                    type="button"
+                    className={styles.iconButton}
+                    onClick={handleToggleTheme}
+                    title="Toggle light/dark theme"
+                  >
+                    {currentTheme === "dark" ? (
+                      <Sun size={19} strokeWidth={2} />
+                    ) : (
+                      <Moon size={19} strokeWidth={2} />
+                    )}
+                  </button>
+                )}
+                <Link className={styles.iconButton} href="/archives" title="Archives">
+                  <Bookmark size={19} strokeWidth={2} />
+                </Link>
+                <div className={styles.dropdownContainer} ref={dropdownRef}>
+                  <button
+                    type="button"
+                    className={styles.iconButton}
+                    onClick={toggleDropdown}
+                  >
+                    <Menu size={20} strokeWidth={2} />
+                  </button>
+                  {isDropdownOpen && (
+                    <ul className={styles.dropdownMenu}>
+                      {MENU_ITEMS.map(({ label, path, Icon }) => (
+                        <li
+                          key={path}
+                          className={styles.dropdownMenuItem}
+                          onClick={() => handleNavigation(path)}
+                        >
+                          <div className={styles.dropdownItemRow}>
+                            <Icon size={18} strokeWidth={2} />
+                            <span>{label}</span>
+                          </div>
+                        </li>
+                      ))}
+                      <li className={styles.dropdownDivider} />
+                      <li className={styles.dropdownMenuItem} onClick={handleLogout}>
                         <div className={styles.dropdownItemRow}>
-                          <Icon size={18} strokeWidth={2} />
-                          <span>{label}</span>
+                          <LogOut size={18} strokeWidth={2} />
+                          <span>Log out</span>
                         </div>
                       </li>
-                    ))}
-                    <li className={styles.dropdownDivider} />
-                    <li className={styles.dropdownMenuItem} onClick={handleLogout}>
-                      <div className={styles.dropdownItemRow}>
-                        <LogOut size={18} strokeWidth={2} />
-                        <span>Log out</span>
-                      </div>
-                    </li>
-                  </ul>
-                )}
+                    </ul>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -126,9 +169,12 @@ export default function Header() {
                   height={48}
                 />
               </div>
-              <div className={styles.logoText}>
-                <span>morning</span>
-                <span>feeds</span>
+              <div className={styles.logoTextWrapper}>
+                <div className={styles.logoText}>
+                  <span>morning</span>
+                  <span>feeds</span>
+                </div>
+                <span className={styles.tagline}>All the news. One place.</span>
               </div>
             </Link>
           </div>
