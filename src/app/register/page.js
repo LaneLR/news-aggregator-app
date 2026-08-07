@@ -4,6 +4,11 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import Loading from "../loading";
 
+export const metadata = {
+  title: "Sign Up",
+  description: "Create a free MorningFeeds account to start building your personalized news feed.",
+};
+
 export default async function Register() {
   const session = await auth();
 

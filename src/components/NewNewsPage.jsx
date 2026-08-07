@@ -60,6 +60,7 @@ export default function NewsPage() {
 
   return (
     <div className={styles.newsPageWrapper}>
+      <h1 className={styles.srOnly}>Your News Feed</h1>
       <HeroCarousel />
 
       {topStories.length > 0 && (

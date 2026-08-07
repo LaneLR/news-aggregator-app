@@ -6,6 +6,11 @@ import CancelSubscriptionButton from "@/components/CancelSubscriptionButton";
 import ResumeSubscriptionButton from "@/components/ResumeSubscriptionButton";
 import styles from "../AccountCard.module.scss";
 
+export const metadata = {
+  title: "Subscription",
+  robots: { index: false, follow: false },
+};
+
 export default async function SubscriptionPage() {
   const session = await auth();
 
