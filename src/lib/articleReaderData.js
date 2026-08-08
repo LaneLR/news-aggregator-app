@@ -1,0 +1,66 @@
+import sanitizeHtml from "sanitize-html";
+import initializeDbAndModels from "@/lib/db";
+import { SUBSCRIBER_ONLY_CATEGORIES } from "@/lib/subscriberOnlyCategories";
+import { getRelatedCoverage } from "@/lib/storyClustering";
+import { estimateReadingTime } from "@/lib/readingTime";
+
+const SANITIZE_OPTIONS = {
+  allowedTags: [
+    "p", "br", "strong", "b", "em", "i", "u", "a", "blockquote",
+    "ul", "ol", "li", "h2", "h3", "h4", "img", "figure", "figcaption",
+  ],
+  allowedAttributes: {
+    a: ["href", "target", "rel"],
+    img: ["src", "alt"],
+  },
+  allowedSchemes: ["http", "https"],
+  transformTags: {
+    a: sanitizeHtml.simpleTransform("a", { target: "_blank", rel: "noopener noreferrer" }),
+  },
+};
+
+// Shared by the full article page (src/app/article/[id]/page.js) and the
+// 3-pane reading-pane API (src/app/api/articles/[id]/reader/route.js) so
+// the sanitize/gating/related-coverage/reading-time logic lives in one
+// place instead of drifting between a server-rendered and client-fetched
+// copy of the same article view.
+export async function getArticleReaderData(id, session) {
+  const { Article, ArticleLike, ReadArticle } = await initializeDbAndModels();
+  const article = await Article.findByPk(id);
+  if (!article) return null;
+
+  const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
+  const isGated = (article.category || []).some((c) =>
+    SUBSCRIBER_ONLY_CATEGORIES.has(String(c).toLowerCase())
+  );
+  if (isGated && !isSubscribed) {
+    return { gated: true };
+  }
+
+  let isLikedByUser = false;
+  if (session?.user?.id) {
+    const [like] = await Promise.all([
+      ArticleLike.findOne({
+        where: { userId: session.user.id, articleUrl: article.url },
+      }),
+      ReadArticle.findOrCreate({
+        where: { userId: session.user.id, articleUrl: article.url },
+      }),
+    ]);
+    isLikedByUser = !!like;
+  }
+
+  const sanitizedContent = article.content
+    ? sanitizeHtml(article.content, SANITIZE_OPTIONS)
+    : null;
+  const readingTime = sanitizedContent ? estimateReadingTime(sanitizedContent) : null;
+  const relatedCoverage = await getRelatedCoverage(Article, article);
+
+  return {
+    gated: false,
+    article: { ...article.toJSON(), isLikedByUser },
+    sanitizedContent,
+    relatedCoverage: relatedCoverage.map((a) => a.toJSON()),
+    readingTime,
+  };
+}

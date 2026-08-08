@@ -1,3 +1,36 @@
+.swipeWrapper {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.swipeHint {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 0 1.25rem;
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  color: #fff;
+
+  &.visible {
+    display: flex;
+  }
+}
+
+.swipeHintSave {
+  justify-content: flex-start;
+  background-color: var(--theme-primary);
+}
+
+.swipeHintRead {
+  justify-content: flex-end;
+  background-color: var(--theme-text-secondary);
+}
+
 .cardContainer {
   background-color: var(--theme-card-background);
   border-radius: var(--radius-lg);
@@ -7,6 +40,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid var(--theme-border);
+  border-top-width: 1px;
   overflow: hidden;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, outline-color 0.1s ease-in-out;
   &:hover {
@@ -31,6 +65,65 @@
 
     .articleTitle {
       color: var(--theme-text-secondary);
+    }
+  }
+
+  // Compact horizontal row — small thumbnail, single-line title, no snippet.
+  &.densityList {
+    max-width: none;
+    flex-direction: row;
+    align-items: stretch;
+
+    &:hover {
+      transform: none;
+    }
+
+    .imageLink {
+      width: 96px;
+      height: auto;
+      flex-shrink: 0;
+    }
+
+    .contentArea {
+      padding: 0.6rem 1rem;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .articleTitle {
+      -webkit-line-clamp: 1;
+      font-size: 0.98rem;
+      margin: 0;
+    }
+
+    .articleSnippetText {
+      display: none;
+    }
+
+    .actionsRow {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+      flex-shrink: 0;
+    }
+
+    .readMoreButton {
+      display: none;
+    }
+  }
+
+  // Bigger visual emphasis for a skim-the-headlines magazine feel.
+  &.densityMagazine {
+    max-width: none;
+
+    .imageLink {
+      height: 280px;
+    }
+
+    .articleTitle {
+      font-size: 1.4rem;
     }
   }
 }

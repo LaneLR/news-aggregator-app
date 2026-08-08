@@ -9,6 +9,8 @@ import { Menu, Newspaper, Bookmark, User, Crown, Settings, LogOut, Sun, Moon } f
 import SearchBar from "./SearchBar";
 import HeaderNavBar from "./HeaderNavBar";
 import HeaderSubscribeBanner from "./SubscribeHeaderBanner";
+import { useLayoutPrefs, applyCustomOrder } from "@/lib/useLayoutPrefs";
+import { useDragReorder } from "@/lib/useDragReorder";
 import styles from "./Header.module.scss";
 
 // News and Archives moved to their own icon buttons in the header (next to
@@ -19,6 +21,9 @@ const MENU_ITEMS = [
   { label: "Premium", path: "/pricing", Icon: Crown },
   { label: "Settings", path: "/settings", Icon: Settings },
 ];
+
+// Drag-and-drop reorderable — see renderIconItem/useDragReorder below.
+const DEFAULT_ICON_ORDER = ["news", "archives", "theme", "menu"];
 
 export default function Header() {
   const { data: session, status, update } = useSession();
@@ -69,6 +74,96 @@ export default function Header() {
     }
   };
 
+  const { headerIconOrder, setHeaderIconOrder } = useLayoutPrefs();
+  const orderedIconIds = applyCustomOrder(
+    DEFAULT_ICON_ORDER,
+    headerIconOrder,
+    (id) => id
+  );
+  const { draggedIndex, dragOverIndex, getHandlers } = useDragReorder(
+    orderedIconIds,
+    setHeaderIconOrder
+  );
+
+  const dragClassFor = (i) =>
+    `${styles.draggableIcon} ${draggedIndex === i ? styles.dragging : ""} ${
+      dragOverIndex === i ? styles.dragOver : ""
+    }`;
+
+  function renderIconItem(id, i) {
+    const dragProps = getHandlers(i);
+    const dragClass = dragClassFor(i);
+    switch (id) {
+      case "news":
+        return (
+          <Link key="news" className={`${styles.iconButton} ${dragClass}`} href="/news" title="News" {...dragProps}>
+            <Newspaper size={19} strokeWidth={2} />
+          </Link>
+        );
+      case "archives":
+        return (
+          <Link key="archives" className={`${styles.iconButton} ${dragClass}`} href="/archives" title="Archives" {...dragProps}>
+            <Bookmark size={19} strokeWidth={2} />
+          </Link>
+        );
+      case "theme":
+        return (
+          <button
+            key="theme"
+            type="button"
+            className={`${styles.iconButton} ${dragClass}`}
+            onClick={handleToggleTheme}
+            title="Toggle light/dark theme"
+            {...dragProps}
+          >
+            {currentTheme === "dark" ? (
+              <Sun size={19} strokeWidth={2} />
+            ) : (
+              <Moon size={19} strokeWidth={2} />
+            )}
+          </button>
+        );
+      case "menu":
+        return (
+          <div
+            key="menu"
+            className={`${styles.dropdownContainer} ${dragClass}`}
+            ref={dropdownRef}
+            {...dragProps}
+          >
+            <button type="button" className={styles.iconButton} onClick={toggleDropdown}>
+              <Menu size={20} strokeWidth={2} />
+            </button>
+            {isDropdownOpen && (
+              <ul className={styles.dropdownMenu}>
+                {MENU_ITEMS.map(({ label, path, Icon }) => (
+                  <li
+                    key={path}
+                    className={styles.dropdownMenuItem}
+                    onClick={() => handleNavigation(path)}
+                  >
+                    <div className={styles.dropdownItemRow}>
+                      <Icon size={18} strokeWidth={2} />
+                      <span>{label}</span>
+                    </div>
+                  </li>
+                ))}
+                <li className={styles.dropdownDivider} />
+                <li className={styles.dropdownMenuItem} onClick={handleLogout}>
+                  <div className={styles.dropdownItemRow}>
+                    <LogOut size={18} strokeWidth={2} />
+                    <span>Log out</span>
+                  </div>
+                </li>
+              </ul>
+            )}
+          </div>
+        );
+      default:
+        return null;
+    }
+  }
+
   if (status === "loading") return null;
 
   return (
@@ -101,56 +196,7 @@ export default function Header() {
             </div>
             <div className={styles.rightContainer}>
               <div className={styles.iconButtonGroup}>
-                <Link className={styles.iconButton} href="/news" title="News">
-                  <Newspaper size={19} strokeWidth={2} />
-                </Link>
-                <Link className={styles.iconButton} href="/archives" title="Archives">
-                  <Bookmark size={19} strokeWidth={2} />
-                </Link>
-                <button
-                  type="button"
-                  className={styles.iconButton}
-                  onClick={handleToggleTheme}
-                  title="Toggle light/dark theme"
-                >
-                  {currentTheme === "dark" ? (
-                    <Sun size={19} strokeWidth={2} />
-                  ) : (
-                    <Moon size={19} strokeWidth={2} />
-                  )}
-                </button>
-                <div className={styles.dropdownContainer} ref={dropdownRef}>
-                  <button
-                    type="button"
-                    className={styles.iconButton}
-                    onClick={toggleDropdown}
-                  >
-                    <Menu size={20} strokeWidth={2} />
-                  </button>
-                  {isDropdownOpen && (
-                    <ul className={styles.dropdownMenu}>
-                      {MENU_ITEMS.map(({ label, path, Icon }) => (
-                        <li
-                          key={path}
-                          className={styles.dropdownMenuItem}
-                          onClick={() => handleNavigation(path)}
-                        >
-                          <div className={styles.dropdownItemRow}>
-                            <Icon size={18} strokeWidth={2} />
-                            <span>{label}</span>
-                          </div>
-                        </li>
-                      ))}
-                      <li className={styles.dropdownDivider} />
-                      <li className={styles.dropdownMenuItem} onClick={handleLogout}>
-                        <div className={styles.dropdownItemRow}>
-                          <LogOut size={18} strokeWidth={2} />
-                          <span>Log out</span>
-                        </div>
-                      </li>
-                    </ul>
-                  )}
-                </div>
+                {orderedIconIds.map((id, i) => renderIconItem(id, i))}
               </div>
             </div>
           </div>

@@ -151,6 +151,25 @@ export default function defineUser(sequelize) {
         allowNull: false,
         defaultValue: DEFAULT_KEYBOARD_SHORTCUTS,
       },
+      // Drag-and-drop custom ordering — stored as an array of stable keys
+      // (category hrefs / icon ids). An empty array means "use the default
+      // order"; entries not present in the current default list are simply
+      // ignored (e.g. a category that no longer exists).
+      categoryOrder: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
+      },
+      headerIconOrder: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
+      },
+      viewDensity: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "card",
+      },
     },
     {
       sequelize,

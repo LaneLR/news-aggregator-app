@@ -2,13 +2,15 @@
 import ArchiveToggleButton from "./ArchiveToggleButton.jsx";
 import Link from "next/link.js";
 import Image from "next/image.js";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation.js";
-import { Heart, Lock } from "lucide-react";
+import { Heart, Lock, Bookmark, Check } from "lucide-react";
 import ShareButton from "./ShareButton.jsx";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
+import { getCategoryColor } from "@/lib/categoryColors";
+import { useSwipeGesture } from "@/lib/useSwipeGesture";
 import styles from "./NewsCardFour.module.scss";
 
 export default function NewsCardFour({
@@ -18,9 +20,30 @@ export default function NewsCardFour({
 }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const cardRef = useRef(null);
 
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
   const [likeCount, setLikeCount] = useState(article.likeCount || 0);
+  const [locallyRead, setLocallyRead] = useState(false);
+
+  const handleSwipeSave = () => {
+    cardRef.current?.querySelector('[data-action="save"]')?.click();
+  };
+
+  const handleSwipeMarkRead = () => {
+    if (!session?.user?.id || article.isRead || locallyRead) return;
+    setLocallyRead(true);
+    fetch("/api/articles/mark-all-read", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ urls: [article.url] }),
+    }).catch((err) => console.error("Failed to mark article as read:", err));
+  };
+
+  const { offsetX, isSwiping, swipeHandlers } = useSwipeGesture({
+    onSwipeLeft: handleSwipeMarkRead,
+    onSwipeRight: handleSwipeSave,
+  });
 
   const FALLBACK_IMAGE_URL = "/images/morningfeedsplaceholder.png";
 
@@ -71,9 +94,37 @@ export default function NewsCardFour({
     article.sourceName || article.source?.name || "Unknown source";
 
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
+  const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
 
   return (
-    <div className={`${styles.cardContainer} ${article.isRead ? styles.read : ""}`}>
+    <div className={styles.swipeWrapper} {...swipeHandlers}>
+      <div
+        className={`${styles.swipeHint} ${offsetX !== 0 ? styles.visible : ""} ${
+          offsetX > 0 ? styles.swipeHintSave : styles.swipeHintRead
+        }`}
+        style={{ opacity: Math.min(Math.abs(offsetX) / 80, 1) }}
+      >
+        {offsetX > 0 ? (
+          <>
+            <Bookmark size={20} strokeWidth={2} />
+            Save
+          </>
+        ) : (
+          <>
+            <Check size={20} strokeWidth={2} />
+            Mark read
+          </>
+        )}
+      </div>
+      <div
+        ref={cardRef}
+        className={`${styles.cardContainer} ${article.isRead || locallyRead ? styles.read : ""}`}
+        style={{
+          ...(badgeCategory ? { borderTopColor: getCategoryColor(badgeCategory), borderTopWidth: "4px" } : {}),
+          transform: `translateX(${offsetX}px)`,
+          transition: isSwiping ? "none" : "transform 0.2s ease-in-out",
+        }}
+      >
       <Link
         className={styles.imageLink}
         href={article.url}
@@ -131,6 +182,7 @@ export default function NewsCardFour({
             </button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -45,6 +45,23 @@
   }
 }
 
+.draggable {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.dragging {
+  opacity: 0.4;
+}
+
+.dragOver {
+  border-color: var(--theme-primary);
+  border-style: dashed;
+}
+
 .divider {
   width: 1px;
   align-self: stretch;

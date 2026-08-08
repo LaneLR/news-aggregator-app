@@ -26,14 +26,34 @@
   }
 }
 
+.filterBar {
+  // Header/HeaderNavBar scroll away normally (not fixed), so once this bar
+  // reaches the very top of the viewport it's the first thing pinned there.
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  background-color: var(--theme-layout-background);
+
+  .sortToggle {
+    margin: 0;
+  }
+}
+
 .sortToggle {
   display: flex;
   justify-content: center;
   gap: 0.3rem;
   margin: 1rem 0 0.5rem;
-  background-color: var(--theme-layout-background);
+  background-color: var(--theme-card-background);
   padding: 4px;
   border-radius: 999px;
+  box-shadow: var(--shadow-sm);
 }
 
 .sortOption {

@@ -4,6 +4,8 @@ import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLayoutPrefs, applyCustomOrder } from "@/lib/useLayoutPrefs";
+import { useDragReorder } from "@/lib/useDragReorder";
 import {
   LayoutGrid,
   Sparkles,
@@ -100,16 +102,33 @@ export default function HeaderNavBar() {
     };
   }, [isMoreOpen]);
 
+  const { categoryOrder, setCategoryOrder } = useLayoutPrefs();
+  const canReorder = !!session?.user?.id;
+
   const visibleCategories = CATEGORY_LINKS.filter(
     (link) => isSubscribed || !link.subscriberOnly
   );
-  const primaryCategories = visibleCategories.filter((link) => link.primary);
+  const primaryCategoriesDefault = visibleCategories.filter((link) => link.primary);
   const moreCategories = visibleCategories.filter((link) => !link.primary);
 
-  const NavLink = ({ label, href, Icon }) => (
+  const primaryCategories = canReorder
+    ? applyCustomOrder(primaryCategoriesDefault, categoryOrder, (l) => l.href)
+    : primaryCategoriesDefault;
+
+  const { draggedIndex, dragOverIndex, getHandlers } = useDragReorder(
+    primaryCategories,
+    (reordered) => setCategoryOrder(reordered.map((l) => l.href))
+  );
+
+  const NavLink = ({ label, href, Icon, dragProps, dragState }) => (
     <Link
       href={href}
-      className={`${styles.link} ${pathname === href ? styles.active : ""}`}
+      className={`${styles.link} ${pathname === href ? styles.active : ""} ${
+        dragProps ? styles.draggable : ""
+      } ${dragState === "dragging" ? styles.dragging : ""} ${
+        dragState === "dragOver" ? styles.dragOver : ""
+      }`}
+      {...dragProps}
     >
       <Icon size={15} strokeWidth={2.25} />
       {label}
@@ -121,8 +140,13 @@ export default function HeaderNavBar() {
       <NavLink {...ALL_ARTICLES_LINK} />
       <span className={styles.divider} />
       {isSubscribed && PERSONAL_LINKS.map((link) => <NavLink key={link.href} {...link} />)}
-      {primaryCategories.map((link) => (
-        <NavLink key={link.href} {...link} />
+      {primaryCategories.map((link, i) => (
+        <NavLink
+          key={link.href}
+          {...link}
+          dragProps={canReorder ? getHandlers(i) : undefined}
+          dragState={draggedIndex === i ? "dragging" : dragOverIndex === i ? "dragOver" : undefined}
+        />
       ))}
       {moreCategories.length > 0 && (
         <div className={styles.moreWrapper} ref={moreRef}>

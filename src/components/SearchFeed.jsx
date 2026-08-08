@@ -1,10 +1,18 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useSession } from "next-auth/react";
 import { Search } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
+import ThreePaneLayout from "./ThreePaneLayout";
+import MarkAllReadButton from "./MarkAllReadButton";
+import ViewDensityToggle from "./ViewDensityToggle";
 import { useArticleShortcuts } from "@/lib/useArticleShortcuts";
+import { useMarkAllRead } from "@/lib/useMarkAllRead";
+import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
 import styles from "./SearchFeed.module.scss";
+
+const GATED_DENSITIES = new Set(["list", "magazine"]);
 
 export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
   const [query, setQuery] = useState(initialQuery);
@@ -74,7 +82,16 @@ export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
     };
   }, [hasMore, loading]);
 
-  const { selectedIndex, cardRefs } = useArticleShortcuts(results);
+  const { data: session } = useSession();
+  const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
+  const { viewDensity, setViewDensity } = useLayoutPrefs();
+  const effectiveDensity = GATED_DENSITIES.has(viewDensity) && !isSubscribed ? "card" : viewDensity;
+  const [selectedArticleId, setSelectedArticleId] = useState(null);
+  const { selectedIndex, cardRefs } = useArticleShortcuts(
+    results,
+    effectiveDensity === "reader" ? (article) => setSelectedArticleId(article.id) : undefined
+  );
+  const { hasUnread, markingAllRead, handleMarkAllRead } = useMarkAllRead(results, setResults);
 
   return (
     <>
@@ -89,18 +106,40 @@ export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
       </div>
 
       {results.length > 0 && (
-        <NewsGridWrapper>
-          {results.map((article, i) => (
-            <NewsCardThree
-              key={i}
-              article={article}
-              archiveId={archiveId}
-              viewOnly={viewOnly}
-              isKeyboardFocused={i === selectedIndex}
-              innerRef={(el) => (cardRefs.current[i] = el)}
-            />
-          ))}
-        </NewsGridWrapper>
+        <div className={styles.actionRow}>
+          <ViewDensityToggle density={viewDensity} onChange={setViewDensity} isSubscribed={isSubscribed} />
+          {hasUnread && (
+            <MarkAllReadButton onClick={handleMarkAllRead} disabled={markingAllRead} />
+          )}
+        </div>
+      )}
+
+      {results.length > 0 && (
+        effectiveDensity === "reader" ? (
+          <ThreePaneLayout
+            articles={results}
+            archiveId={archiveId}
+            viewOnly={viewOnly}
+            selectedIndex={selectedIndex}
+            cardRefs={cardRefs}
+            selectedArticleId={selectedArticleId}
+            onSelectArticle={(article) => setSelectedArticleId(article?.id ?? null)}
+          />
+        ) : (
+          <NewsGridWrapper density={effectiveDensity}>
+            {results.map((article, i) => (
+              <NewsCardThree
+                key={i}
+                article={article}
+                density={effectiveDensity}
+                archiveId={archiveId}
+                viewOnly={viewOnly}
+                isKeyboardFocused={i === selectedIndex}
+                innerRef={(el) => (cardRefs.current[i] = el)}
+              />
+            ))}
+          </NewsGridWrapper>
+        )
       )}
 
       {!loading && results.length === 0 && !hasMore && (

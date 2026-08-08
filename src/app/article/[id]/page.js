@@ -3,11 +3,9 @@ import { notFound, redirect } from "next/navigation";
 import sanitizeHtml from "sanitize-html";
 import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
-import { SUBSCRIBER_ONLY_CATEGORIES } from "@/lib/subscriberOnlyCategories";
-import { getRelatedCoverage } from "@/lib/storyClustering";
+import { getArticleReaderData } from "@/lib/articleReaderData";
 import ArticleReader from "@/components/ArticleReader";
 import JsonLd from "@/components/JsonLd";
-import { estimateReadingTime } from "@/lib/readingTime";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -60,59 +58,15 @@ export async function generateMetadata({ params }) {
   };
 }
 
-const SANITIZE_OPTIONS = {
-  allowedTags: [
-    "p", "br", "strong", "b", "em", "i", "u", "a", "blockquote",
-    "ul", "ol", "li", "h2", "h3", "h4", "img", "figure", "figcaption",
-  ],
-  allowedAttributes: {
-    a: ["href", "target", "rel"],
-    img: ["src", "alt"],
-  },
-  allowedSchemes: ["http", "https"],
-  transformTags: {
-    a: sanitizeHtml.simpleTransform("a", { target: "_blank", rel: "noopener noreferrer" }),
-  },
-};
-
 export default async function ArticlePage({ params }) {
   const { id } = await params;
   const session = await auth();
 
-  const article = await getArticle(id);
-  if (!article) notFound();
+  const data = await getArticleReaderData(id, session);
+  if (!data) notFound();
+  if (data.gated) redirect("/pricing");
 
-  const { Article, ArticleLike, ReadArticle } = await initializeDbAndModels();
-
-  const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
-  const isGated = (article.category || []).some((c) =>
-    SUBSCRIBER_ONLY_CATEGORIES.has(String(c).toLowerCase())
-  );
-  if (isGated && !isSubscribed) {
-    redirect("/pricing");
-  }
-
-  let isLikedByUser = false;
-  if (session?.user?.id) {
-    const [like] = await Promise.all([
-      ArticleLike.findOne({
-        where: { userId: session.user.id, articleUrl: article.url },
-      }),
-      // Opening the reader is itself a "read" signal, same as clicking out
-      // to the source — no need to wait for the click-tracking round trip.
-      ReadArticle.findOrCreate({
-        where: { userId: session.user.id, articleUrl: article.url },
-      }),
-    ]);
-    isLikedByUser = !!like;
-  }
-
-  const sanitizedContent = article.content
-    ? sanitizeHtml(article.content, SANITIZE_OPTIONS)
-    : null;
-  const readingTime = sanitizedContent ? estimateReadingTime(sanitizedContent) : null;
-
-  const relatedCoverage = await getRelatedCoverage(Article, article);
+  const { article, sanitizedContent, relatedCoverage, readingTime } = data;
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -134,9 +88,9 @@ export default async function ArticlePage({ params }) {
     <>
       <JsonLd data={articleSchema} />
       <ArticleReader
-        article={{ ...article.toJSON(), isLikedByUser }}
+        article={article}
         sanitizedContent={sanitizedContent}
-        relatedCoverage={relatedCoverage.map((a) => a.toJSON())}
+        relatedCoverage={relatedCoverage}
         readingTime={readingTime}
       />
     </>
