@@ -18,8 +18,9 @@ export default async function FinanceNewsPage() {
   }
 
   let initialArticles;
+  let initialTotalPages;
   try {
-    ({ articles: initialArticles } = await getCategoryArticles({
+    ({ articles: initialArticles, totalPages: initialTotalPages } = await getCategoryArticles({
       category: "finance",
       userId: session.user.id,
     }));
@@ -29,7 +30,11 @@ export default async function FinanceNewsPage() {
 
   return (
     <>
-      <CategoryPageComponent category={"Finance"} initialArticles={initialArticles} />
+      <CategoryPageComponent
+        category={"Finance"}
+        initialArticles={initialArticles}
+        initialTotalPages={initialTotalPages}
+      />
     </>
   );
 }

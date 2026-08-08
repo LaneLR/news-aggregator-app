@@ -1,0 +1,13 @@
+// ~320px approximates a real CarouselArticleCard's total rendered height
+// (200px image at 16/10 + meta row + actions row) — close enough that
+// swapping this for real cards doesn't shift the page.
+.skeleton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 320px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--theme-border);
+  background-color: var(--theme-card-background);
+}

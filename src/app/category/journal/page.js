@@ -18,8 +18,9 @@ export default async function JournalNewsPage() {
   }
 
   let initialArticles;
+  let initialTotalPages;
   try {
-    ({ articles: initialArticles } = await getCategoryArticles({
+    ({ articles: initialArticles, totalPages: initialTotalPages } = await getCategoryArticles({
       category: "journal",
       userId: session.user.id,
     }));
@@ -29,7 +30,11 @@ export default async function JournalNewsPage() {
 
   return (
     <>
-      <CategoryPageComponent category={"Journal"} initialArticles={initialArticles} />
+      <CategoryPageComponent
+        category={"Journal"}
+        initialArticles={initialArticles}
+        initialTotalPages={initialTotalPages}
+      />
     </>
   );
 }

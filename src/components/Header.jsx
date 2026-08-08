@@ -11,9 +11,10 @@ import HeaderNavBar from "./HeaderNavBar";
 import HeaderSubscribeBanner from "./SubscribeHeaderBanner";
 import styles from "./Header.module.scss";
 
+// News and Archives moved to their own icon buttons in the header (next to
+// the burger menu) — kept out of this dropdown so the two aren't listed
+// twice.
 const MENU_ITEMS = [
-  { label: "News", path: "/news", Icon: Newspaper },
-  { label: "Archives", path: "/archives", Icon: Bookmark },
   { label: "Profile", path: "/account", Icon: User },
   { label: "Premium", path: "/pricing", Icon: Crown },
   { label: "Settings", path: "/settings", Icon: Settings },
@@ -101,6 +102,12 @@ export default function Header() {
             </div>
             <div className={styles.rightContainer}>
               <div className={styles.iconButtonGroup}>
+                <Link className={styles.iconButton} href="/news" title="News">
+                  <Newspaper size={19} strokeWidth={2} />
+                </Link>
+                <Link className={styles.iconButton} href="/archives" title="Archives">
+                  <Bookmark size={19} strokeWidth={2} />
+                </Link>
                 {isSubscribed && (
                   <button
                     type="button"
@@ -115,9 +122,6 @@ export default function Header() {
                     )}
                   </button>
                 )}
-                <Link className={styles.iconButton} href="/archives" title="Archives">
-                  <Bookmark size={19} strokeWidth={2} />
-                </Link>
                 <div className={styles.dropdownContainer} ref={dropdownRef}>
                   <button
                     type="button"

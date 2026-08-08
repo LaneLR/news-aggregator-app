@@ -10,8 +10,9 @@ export const metadata = {
 export default async function SportsNewsPage() {
   const session = await auth();
   let initialArticles;
+  let initialTotalPages;
   try {
-    ({ articles: initialArticles } = await getCategoryArticles({
+    ({ articles: initialArticles, totalPages: initialTotalPages } = await getCategoryArticles({
       category: "sports",
       userId: session?.user?.id,
     }));
@@ -21,7 +22,11 @@ export default async function SportsNewsPage() {
 
   return (
     <>
-      <CategoryPageComponent category={"Sports"} initialArticles={initialArticles} />
+      <CategoryPageComponent
+        category={"Sports"}
+        initialArticles={initialArticles}
+        initialTotalPages={initialTotalPages}
+      />
     </>
   );
 }

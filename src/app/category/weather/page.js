@@ -10,8 +10,9 @@ export const metadata = {
 export default async function WeatherNewsPage() {
   const session = await auth();
   let initialArticles;
+  let initialTotalPages;
   try {
-    ({ articles: initialArticles } = await getCategoryArticles({
+    ({ articles: initialArticles, totalPages: initialTotalPages } = await getCategoryArticles({
       category: "weather",
       userId: session?.user?.id,
     }));
@@ -21,7 +22,11 @@ export default async function WeatherNewsPage() {
 
   return (
     <>
-      <CategoryPageComponent category={"Weather"} initialArticles={initialArticles} />
+      <CategoryPageComponent
+        category={"Weather"}
+        initialArticles={initialArticles}
+        initialTotalPages={initialTotalPages}
+      />
     </>
   );
 }

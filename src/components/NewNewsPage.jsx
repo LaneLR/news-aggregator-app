@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Briefcase, Cpu, Clapperboard, Trophy, FlaskConical, Newspaper, ChevronRight, Flame } from "lucide-react";
-import Loading from "@/app/loading";
 import CarouselArticleCard from "@/components/CarouselArticleCard";
 import CarouselRow from "@/components/CarouselRow";
+import CarouselSkeleton from "@/components/CarouselSkeleton";
 import HeroCarousel from "@/components/HeroCarousel";
 import styles from "./NewNewsPage.module.scss";
 
@@ -25,45 +25,42 @@ const CATEGORY_SUBTITLES = {
 };
 
 export default function NewsPage() {
+  // null = still loading; [] / {} = loaded (possibly empty). Sections render
+  // a same-sized skeleton while null instead of the page blocking on one
+  // big spinner, so the shell (headers, icons) shows immediately and only
+  // the card content pops in once each fetch resolves.
   const [categorizedArticles, setCategorizedArticles] = useState(null);
-  const [topStories, setTopStories] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [topStories, setTopStories] = useState(null);
 
   useEffect(() => {
-    const fetchNews = async () => {
-      setIsLoading(true);
-      try {
-        const res = await fetch("/api/news-by-category");
-        const data = await res.json();
-        setCategorizedArticles(data);
-      } catch (err) {
+    fetch("/api/news-by-category")
+      .then((res) => res.json())
+      .then((data) => setCategorizedArticles(data))
+      .catch((err) => {
         console.error("Failed to fetch news:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchNews();
+        setCategorizedArticles({});
+      });
 
     fetch("/api/news/top-stories")
       .then((res) => res.json())
       .then((data) => setTopStories(data.topStories || []))
-      .catch((err) => console.error("Failed to fetch top stories:", err));
+      .catch((err) => {
+        console.error("Failed to fetch top stories:", err);
+        setTopStories([]);
+      });
   }, []);
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (!categorizedArticles) {
-    return <p>Could not load news.</p>;
-  }
+  const categoriesLoading = categorizedArticles === null;
+  const categorySections = categoriesLoading
+    ? Object.keys(CATEGORY_ICONS)
+    : Object.keys(categorizedArticles);
 
   return (
     <div className={styles.newsPageWrapper}>
       <h1 className={styles.srOnly}>Your News Feed</h1>
       <HeroCarousel />
 
-      {topStories.length > 0 && (
+      {(topStories === null || topStories.length > 0) && (
         <section className={styles.section}>
           <div className={styles.headerRow}>
             <div className={styles.headerLeft}>
@@ -79,26 +76,31 @@ export default function NewsPage() {
               </div>
             </div>
           </div>
-          <CarouselRow>
-            {topStories.map(({ lead, relatedCount, sources }) => (
-              <div key={lead.id} className={styles.topStoryCard}>
-                <CarouselArticleCard article={lead} />
-                {relatedCount > 0 && (
-                  <span
-                    className={styles.relatedBadge}
-                    title={sources.join(", ")}
-                  >
-                    +{relatedCount} more source{relatedCount === 1 ? "" : "s"}
-                  </span>
-                )}
-              </div>
-            ))}
-          </CarouselRow>
+          {topStories === null ? (
+            <CarouselSkeleton />
+          ) : (
+            <CarouselRow>
+              {topStories.map(({ lead, relatedCount, sources }) => (
+                <div key={lead.id} className={styles.topStoryCard}>
+                  <CarouselArticleCard article={lead} />
+                  {relatedCount > 0 && (
+                    <span
+                      className={styles.relatedBadge}
+                      title={sources.join(", ")}
+                    >
+                      +{relatedCount} more source{relatedCount === 1 ? "" : "s"}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </CarouselRow>
+          )}
         </section>
       )}
 
-      {Object.entries(categorizedArticles).map(([category, articles]) => {
+      {categorySections.map((category) => {
         const CategoryIcon = CATEGORY_ICONS[category] || Newspaper;
+        const articles = categorizedArticles?.[category];
         return (
           <section className={styles.section} key={category}>
             <div className={styles.headerRow}>
@@ -119,11 +121,15 @@ export default function NewsPage() {
                 <ChevronRight size={16} />
               </Link>
             </div>
-            <CarouselRow>
-              {articles.map((article) => (
-                <CarouselArticleCard key={article.url} article={article} />
-              ))}
-            </CarouselRow>
+            {categoriesLoading ? (
+              <CarouselSkeleton />
+            ) : (
+              <CarouselRow>
+                {articles.map((article) => (
+                  <CarouselArticleCard key={article.url} article={article} />
+                ))}
+              </CarouselRow>
+            )}
           </section>
         );
       })}

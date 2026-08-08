@@ -7,6 +7,7 @@ import { SUBSCRIBER_ONLY_CATEGORIES } from "@/lib/subscriberOnlyCategories";
 import { getRelatedCoverage } from "@/lib/storyClustering";
 import ArticleReader from "@/components/ArticleReader";
 import JsonLd from "@/components/JsonLd";
+import { estimateReadingTime } from "@/lib/readingTime";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -109,6 +110,7 @@ export default async function ArticlePage({ params }) {
   const sanitizedContent = article.content
     ? sanitizeHtml(article.content, SANITIZE_OPTIONS)
     : null;
+  const readingTime = sanitizedContent ? estimateReadingTime(sanitizedContent) : null;
 
   const relatedCoverage = await getRelatedCoverage(Article, article);
 
@@ -135,6 +137,7 @@ export default async function ArticlePage({ params }) {
         article={{ ...article.toJSON(), isLikedByUser }}
         sanitizedContent={sanitizedContent}
         relatedCoverage={relatedCoverage.map((a) => a.toJSON())}
+        readingTime={readingTime}
       />
     </>
   );

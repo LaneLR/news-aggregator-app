@@ -13,7 +13,7 @@ import { getCategoryColor } from "@/lib/categoryColors";
 import { timeAgo } from "@/lib/timeAgo";
 import styles from "./ArticleReader.module.scss";
 
-export default function ArticleReader({ article, sanitizedContent, relatedCoverage }) {
+export default function ArticleReader({ article, sanitizedContent, relatedCoverage, readingTime }) {
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -72,6 +72,7 @@ export default function ArticleReader({ article, sanitizedContent, relatedCovera
             <Lock size={13} strokeWidth={2.5} title="This source could be behind a paywall." />
           )}
           {article.publishedAt && <span>{timeAgo(article.publishedAt)}</span>}
+          {readingTime && <span>{readingTime} min read</span>}
         </div>
 
         <a

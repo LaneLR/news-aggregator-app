@@ -1,10 +1,11 @@
 import DigestSettings from "@/components/DigestSettings";
 import KeywordFilters from "@/components/KeywordFilters";
+import KeyboardShortcutsSettings from "@/components/KeyboardShortcutsSettings";
 import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Settings as SettingsIcon, Mail, Lock, Info, KeyRound, Shield, VolumeX } from "lucide-react";
+import { Settings as SettingsIcon, Mail, Lock, Info, KeyRound, Shield, VolumeX, Keyboard } from "lucide-react";
 import styles from "./page.module.scss";
 
 export const metadata = {
@@ -24,7 +25,7 @@ export default async function SettingsPage() {
   // fetched directly here instead.
   const { User } = await initializeDbAndModels();
   const currentUser = await User.findByPk(session.user.id, {
-    attributes: ["mutedKeywords"],
+    attributes: ["mutedKeywords", "keyboardShortcuts"],
   });
 
   return (
@@ -62,6 +63,18 @@ export default async function SettingsPage() {
             </h2>
             <div className={styles.cardContent}>
               <KeywordFilters initialKeywords={currentUser?.mutedKeywords} />
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <h2 className={styles.cardHeader}>
+              <span className={styles.cardHeaderIcon}>
+                <Keyboard size={17} />
+              </span>
+              Keyboard Shortcuts
+            </h2>
+            <div className={styles.cardContent}>
+              <KeyboardShortcutsSettings initialShortcuts={currentUser?.keyboardShortcuts} />
             </div>
           </div>
 

@@ -4,6 +4,7 @@ import { Sparkles } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 import Loading from "@/app/loading";
+import { useArticleShortcuts } from "@/lib/useArticleShortcuts";
 import styles from "./ForYouFeed.module.scss";
 
 async function fetchRecommendations() {
@@ -47,6 +48,8 @@ export default function ForYouFeed() {
     fetchDefaultArchive();
   }, []);
 
+  const { selectedIndex, cardRefs } = useArticleShortcuts(articles);
+
   return (
     <>
       <div className={styles.pageHeader}>
@@ -66,12 +69,14 @@ export default function ForYouFeed() {
         <p className={styles.statusText}>Error: {error}</p>
       ) : articles.length > 0 ? (
         <NewsGridWrapper>
-          {articles.map((article) => (
+          {articles.map((article, i) => (
             <NewsCardThree
               key={article.url}
               article={article}
               archiveId={defaultArchiveId}
               viewOnly={true}
+              isKeyboardFocused={i === selectedIndex}
+              innerRef={(el) => (cardRefs.current[i] = el)}
             />
           ))}
         </NewsGridWrapper>

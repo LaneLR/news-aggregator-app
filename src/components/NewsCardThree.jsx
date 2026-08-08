@@ -14,6 +14,8 @@ export default function NewsCardThree({
   article,
   archiveId,
   viewOnly = false,
+  isKeyboardFocused = false,
+  innerRef,
 }) {
   const { data: session } = useSession();
   const router = useRouter();
@@ -72,7 +74,12 @@ export default function NewsCardThree({
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
 
   return (
-    <div className={`${styles.cardContainer} ${article.isRead ? styles.read : ""}`}>
+    <div
+      ref={innerRef}
+      className={`${styles.cardContainer} ${article.isRead ? styles.read : ""} ${
+        isKeyboardFocused ? styles.keyboardFocused : ""
+      }`}
+    >
       <Link
         className={styles.imageLink}
         href={article.url}
@@ -121,6 +128,7 @@ export default function NewsCardThree({
               viewOnly={viewOnly}
             />
             <button
+              data-action="like"
               className={`${styles.likeButton} ${isLiked ? styles.liked : ""}`}
               onClick={handleLike}
             >

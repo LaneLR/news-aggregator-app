@@ -18,8 +18,9 @@ export default async function MarketNewsPage() {
   }
 
   let initialArticles;
+  let initialTotalPages;
   try {
-    ({ articles: initialArticles } = await getCategoryArticles({
+    ({ articles: initialArticles, totalPages: initialTotalPages } = await getCategoryArticles({
       category: "market",
       userId: session.user.id,
     }));
@@ -29,7 +30,11 @@ export default async function MarketNewsPage() {
 
   return (
     <>
-      <CategoryPageComponent category={"Market"} initialArticles={initialArticles} />
+      <CategoryPageComponent
+        category={"Market"}
+        initialArticles={initialArticles}
+        initialTotalPages={initialTotalPages}
+      />
     </>
   );
 }

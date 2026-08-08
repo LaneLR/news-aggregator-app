@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { Sparkles, TrendingUp } from "lucide-react";
 import CarouselArticleCard from "@/components/CarouselArticleCard";
 import CarouselRow from "@/components/CarouselRow";
+import CarouselSkeleton from "@/components/CarouselSkeleton";
 import styles from "./HeroCarousel.module.scss";
 
 const CAROUSEL_LIMIT = 12;
@@ -105,11 +106,15 @@ export default function HeroCarousel() {
           )}
         </div>
       </div>
-      <CarouselRow>
-        {articles.map((article) => (
-          <CarouselArticleCard key={article.url} article={article} />
-        ))}
-      </CarouselRow>
+      {isLoading ? (
+        <CarouselSkeleton />
+      ) : (
+        <CarouselRow>
+          {articles.map((article) => (
+            <CarouselArticleCard key={article.url} article={article} />
+          ))}
+        </CarouselRow>
+      )}
     </section>
   );
 }

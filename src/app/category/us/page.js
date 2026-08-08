@@ -10,8 +10,9 @@ export const metadata = {
 export default async function USNewsPage() {
   const session = await auth();
   let initialArticles;
+  let initialTotalPages;
   try {
-    ({ articles: initialArticles } = await getCategoryArticles({
+    ({ articles: initialArticles, totalPages: initialTotalPages } = await getCategoryArticles({
       category: "us",
       userId: session?.user?.id,
     }));
@@ -21,7 +22,11 @@ export default async function USNewsPage() {
 
   return (
     <>
-      <CategoryPageComponent category={"US"} initialArticles={initialArticles} />
+      <CategoryPageComponent
+        category={"US"}
+        initialArticles={initialArticles}
+        initialTotalPages={initialTotalPages}
+      />
     </>
   );
 }
