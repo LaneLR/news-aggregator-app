@@ -1,0 +1,106 @@
+.threePane {
+  display: grid;
+  grid-template-columns: 220px 380px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0.5rem 1.5rem 3rem;
+
+  @media (max-width: 1280px) {
+    grid-template-columns: 340px 1fr;
+
+    .navPane {
+      display: none;
+    }
+  }
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.navPane,
+.listPane {
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.listPane {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 2rem;
+}
+
+.listItem {
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+
+  &.selected > * {
+    outline: 2px solid var(--theme-primary);
+    outline-offset: 2px;
+  }
+}
+
+.readingPane {
+  min-height: 400px;
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: var(--theme-text-secondary);
+  text-align: center;
+  background-color: var(--theme-card-background);
+  border: 1px dashed var(--theme-border);
+  border-radius: var(--radius-md);
+}
+
+.backButton {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  margin: 0 auto 1rem;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--theme-border);
+  background-color: var(--theme-card-background);
+  color: var(--theme-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--theme-primary);
+    border-color: var(--theme-primary);
+  }
+}
+
+@media (max-width: 860px) {
+  .navPane,
+  .listPane {
+    position: static;
+    max-height: none;
+  }
+
+  .listPaneHidden {
+    display: none;
+  }
+
+  .readingPane {
+    display: none;
+  }
+
+  .readingPaneVisible {
+    display: block;
+  }
+
+  .readingPaneVisible .backButton {
+    display: flex;
+  }
+}

@@ -3,8 +3,13 @@ import { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
+import ThreePaneLayout from "./ThreePaneLayout";
+import MarkAllReadButton from "./MarkAllReadButton";
+import ViewDensityToggle from "./ViewDensityToggle";
 import Loading from "@/app/loading";
 import { useArticleShortcuts } from "@/lib/useArticleShortcuts";
+import { useMarkAllRead } from "@/lib/useMarkAllRead";
+import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
 import styles from "./ForYouFeed.module.scss";
 
 async function fetchRecommendations() {
@@ -48,7 +53,15 @@ export default function ForYouFeed() {
     fetchDefaultArchive();
   }, []);
 
-  const { selectedIndex, cardRefs } = useArticleShortcuts(articles);
+  const [selectedArticleId, setSelectedArticleId] = useState(null);
+  // For You is already a subscriber-only page (gated at the route level),
+  // so every visitor here is on a plan that unlocks the density toggle.
+  const { viewDensity, setViewDensity } = useLayoutPrefs();
+  const { selectedIndex, cardRefs } = useArticleShortcuts(
+    articles,
+    viewDensity === "reader" ? (article) => setSelectedArticleId(article.id) : undefined
+  );
+  const { hasUnread, markingAllRead, handleMarkAllRead } = useMarkAllRead(articles, setArticles);
 
   return (
     <>
@@ -63,23 +76,45 @@ export default function ForYouFeed() {
         </p>
       </div>
 
+      {(hasUnread || articles.length > 0) && (
+        <div className={styles.actionRow}>
+          <ViewDensityToggle density={viewDensity} onChange={setViewDensity} isSubscribed={true} />
+          {hasUnread && (
+            <MarkAllReadButton onClick={handleMarkAllRead} disabled={markingAllRead} />
+          )}
+        </div>
+      )}
+
       {isLoading ? (
         <Loading />
       ) : error ? (
         <p className={styles.statusText}>Error: {error}</p>
       ) : articles.length > 0 ? (
-        <NewsGridWrapper>
-          {articles.map((article, i) => (
-            <NewsCardThree
-              key={article.url}
-              article={article}
-              archiveId={defaultArchiveId}
-              viewOnly={true}
-              isKeyboardFocused={i === selectedIndex}
-              innerRef={(el) => (cardRefs.current[i] = el)}
-            />
-          ))}
-        </NewsGridWrapper>
+        viewDensity === "reader" ? (
+          <ThreePaneLayout
+            articles={articles}
+            archiveId={defaultArchiveId}
+            viewOnly={true}
+            selectedIndex={selectedIndex}
+            cardRefs={cardRefs}
+            selectedArticleId={selectedArticleId}
+            onSelectArticle={(article) => setSelectedArticleId(article?.id ?? null)}
+          />
+        ) : (
+          <NewsGridWrapper density={viewDensity}>
+            {articles.map((article, i) => (
+              <NewsCardThree
+                key={article.url}
+                article={article}
+                density={viewDensity}
+                archiveId={defaultArchiveId}
+                viewOnly={true}
+                isKeyboardFocused={i === selectedIndex}
+                innerRef={(el) => (cardRefs.current[i] = el)}
+              />
+            ))}
+          </NewsGridWrapper>
+        )
       ) : (
         <div className={styles.emptyState}>
           <Sparkles size={32} strokeWidth={1.5} />

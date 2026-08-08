@@ -3,12 +3,14 @@ import ArchiveToggleButton from "./ArchiveToggleButton.jsx";
 import ShareButton from "./ShareButton.jsx";
 import Link from "next/link.js";
 import Image from "next/image.js";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation.js";
-import { Heart, Lock } from "lucide-react";
+import { Heart, Lock, Bookmark, Check } from "lucide-react";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
+import { getCategoryColor } from "@/lib/categoryColors";
+import { useSwipeGesture } from "@/lib/useSwipeGesture";
 import styles from "./NewsCardThree.module.scss";
 
 export default function NewsCardThree({
@@ -17,12 +19,39 @@ export default function NewsCardThree({
   viewOnly = false,
   isKeyboardFocused = false,
   innerRef,
+  density = "card",
 }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const cardRef = useRef(null);
 
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
   const [likeCount, setLikeCount] = useState(article.likeCount || 0);
+  const [locallyRead, setLocallyRead] = useState(false);
+
+  const setCardRef = (el) => {
+    cardRef.current = el;
+    if (typeof innerRef === "function") innerRef(el);
+  };
+
+  const handleSwipeSave = () => {
+    cardRef.current?.querySelector('[data-action="save"]')?.click();
+  };
+
+  const handleSwipeMarkRead = () => {
+    if (!session?.user?.id || article.isRead || locallyRead) return;
+    setLocallyRead(true);
+    fetch("/api/articles/mark-all-read", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ urls: [article.url] }),
+    }).catch((err) => console.error("Failed to mark article as read:", err));
+  };
+
+  const { offsetX, isSwiping, swipeHandlers } = useSwipeGesture({
+    onSwipeLeft: handleSwipeMarkRead,
+    onSwipeRight: handleSwipeSave,
+  });
 
   const FALLBACK_IMAGE_URL = "/images/blurimage.png";
 
@@ -73,14 +102,41 @@ export default function NewsCardThree({
     article.sourceName || article.source?.name || "Unknown source";
 
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
+  const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
 
   return (
-    <div
-      ref={innerRef}
-      className={`${styles.cardContainer} ${article.isRead ? styles.read : ""} ${
-        isKeyboardFocused ? styles.keyboardFocused : ""
-      }`}
-    >
+    <div className={styles.swipeWrapper} {...swipeHandlers}>
+      <div
+        className={`${styles.swipeHint} ${offsetX !== 0 ? styles.visible : ""} ${
+          offsetX > 0 ? styles.swipeHintSave : styles.swipeHintRead
+        }`}
+        style={{ opacity: Math.min(Math.abs(offsetX) / 80, 1) }}
+      >
+        {offsetX > 0 ? (
+          <>
+            <Bookmark size={20} strokeWidth={2} />
+            Save
+          </>
+        ) : (
+          <>
+            <Check size={20} strokeWidth={2} />
+            Mark read
+          </>
+        )}
+      </div>
+      <div
+        ref={setCardRef}
+        className={`${styles.cardContainer} ${article.isRead || locallyRead ? styles.read : ""} ${
+          isKeyboardFocused ? styles.keyboardFocused : ""
+        } ${density === "list" ? styles.densityList : ""} ${
+          density === "magazine" ? styles.densityMagazine : ""
+        }`}
+        style={{
+          ...(badgeCategory ? { borderTopColor: getCategoryColor(badgeCategory), borderTopWidth: "4px" } : {}),
+          transform: `translateX(${offsetX}px)`,
+          transition: isSwiping ? "none" : "transform 0.2s ease-in-out",
+        }}
+      >
       <Link
         className={styles.imageLink}
         href={article.url}
@@ -139,6 +195,7 @@ export default function NewsCardThree({
             </button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

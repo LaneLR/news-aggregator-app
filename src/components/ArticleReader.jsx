@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
@@ -7,18 +7,34 @@ import { useRouter } from "next/navigation";
 import { Heart, Lock, ExternalLink, Newspaper } from "lucide-react";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 import ShareButton from "./ShareButton";
+import ReaderCustomizationPanel from "./ReaderCustomizationPanel";
+import TextToSpeechButton from "./TextToSpeechButton";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { timeAgo } from "@/lib/timeAgo";
+import { useReaderPrefs, readerPrefsToCssVars } from "@/lib/readerPrefs";
 import styles from "./ArticleReader.module.scss";
+
+function extractPlainText(html) {
+  if (typeof window === "undefined" || !html) return "";
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent || "";
+}
 
 export default function ArticleReader({ article, sanitizedContent, relatedCoverage, readingTime }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
 
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
   const [likeCount, setLikeCount] = useState(article.likeCount || 0);
+  const { prefs, updatePrefs, resetPrefs } = useReaderPrefs();
+
+  const speechText = useMemo(() => {
+    const bodyText = extractPlainText(sanitizedContent);
+    return [article.title, bodyText].filter(Boolean).join(". ");
+  }, [article.title, sanitizedContent]);
 
   const cleanSourceName = article.sourceName || "Unknown source";
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
@@ -53,7 +69,7 @@ export default function ArticleReader({ article, sanitizedContent, relatedCovera
   };
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} style={readerPrefsToCssVars(prefs)}>
       <article className={styles.article}>
         {badgeCategory && (
           <span
@@ -110,6 +126,9 @@ export default function ArticleReader({ article, sanitizedContent, relatedCovera
           </button>
           <ArchiveToggleButton article={article} />
           <ShareButton article={article} />
+          <TextToSpeechButton text={speechText} isSubscribed={isSubscribed} />
+          <span className={styles.actionsSpacer} />
+          <ReaderCustomizationPanel prefs={prefs} onChange={updatePrefs} onReset={resetPrefs} />
         </div>
 
         {sanitizedContent ? (

@@ -1,10 +1,11 @@
 .wrapper {
-  max-width: 720px;
+  max-width: var(--reader-content-width, 720px);
   margin: 2rem auto;
   padding: 0 1.25rem 3rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  transition: max-width 0.15s ease-in-out;
 }
 
 .article {
@@ -94,6 +95,10 @@
   border-bottom: 1px solid var(--theme-border);
 }
 
+.actionsSpacer {
+  flex: 1;
+}
+
 .likeButton {
   display: flex;
   align-items: center;
@@ -120,8 +125,9 @@
 
 .content {
   color: var(--theme-text);
-  font-size: 1.05rem;
-  line-height: 1.75;
+  font-size: var(--reader-font-size, 1.05rem);
+  line-height: var(--reader-line-height, 1.75);
+  font-family: var(--reader-font-family, inherit);
 
   p {
     margin: 0 0 1.25rem;

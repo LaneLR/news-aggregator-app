@@ -1,12 +1,20 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import { Newspaper, RefreshCw } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
+import ThreePaneLayout from "./ThreePaneLayout";
 import Button from "./Button";
+import MarkAllReadButton from "./MarkAllReadButton";
+import ViewDensityToggle from "./ViewDensityToggle";
 import Loading from "@/app/loading";
 import { useArticleShortcuts } from "@/lib/useArticleShortcuts";
+import { useMarkAllRead } from "@/lib/useMarkAllRead";
+import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
 import styles from "./CategoryPage.module.scss";
+
+const GATED_DENSITIES = new Set(["list", "magazine"]);
 
 async function fetchCategoryArticles(category, sort, page = 1) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -27,6 +35,11 @@ export default function CategoryPage({
   initialArticles,
   initialTotalPages,
 }) {
+  const { data: session } = useSession();
+  const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
+  const { viewDensity, setViewDensity } = useLayoutPrefs();
+  const effectiveDensity = GATED_DENSITIES.has(viewDensity) && !isSubscribed ? "card" : viewDensity;
+  const [selectedArticleId, setSelectedArticleId] = useState(null);
   const hasInitialArticles = Array.isArray(initialArticles);
   const [articles, setArticles] = useState(initialArticles ?? []);
   const [defaultArchiveId, setDefaultArchiveId] = useState(null);
@@ -124,6 +137,8 @@ export default function CategoryPage({
     await loadArticles();
   };
 
+  const { hasUnread, markingAllRead, handleMarkAllRead } = useMarkAllRead(articles, setArticles);
+
   useEffect(() => {
     const fetchDefaultArchive = async () => {
       try {
@@ -141,7 +156,10 @@ export default function CategoryPage({
     fetchDefaultArchive();
   }, []);
 
-  const { selectedIndex, cardRefs } = useArticleShortcuts(articles);
+  const { selectedIndex, cardRefs } = useArticleShortcuts(
+    articles,
+    effectiveDensity === "reader" ? (article) => setSelectedArticleId(article.id) : undefined
+  );
 
   if (isLoading) {
     return <Loading />;
@@ -158,6 +176,21 @@ export default function CategoryPage({
           <Newspaper size={30} />
           {categoryNameForDisplay} Headlines
         </h1>
+        {newAvailable && (
+          <div className={styles.refreshBanner}>
+            <RefreshCw size={18} />
+            <Button
+              bgColor={"var(--theme-primary)"}
+              clr={"var(--theme-primary-contrast)"}
+              onClick={refreshArticles}
+            >
+              New articles available
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <div className={styles.filterBar}>
         <div className={styles.sortToggle}>
           <button
             type="button"
@@ -181,34 +214,39 @@ export default function CategoryPage({
             Most Liked
           </button>
         </div>
-        {newAvailable && (
-          <div className={styles.refreshBanner}>
-            <RefreshCw size={18} />
-            <Button
-              bgColor={"var(--theme-primary)"}
-              clr={"var(--theme-primary-contrast)"}
-              onClick={refreshArticles}
-            >
-              New articles available
-            </Button>
-          </div>
+        <ViewDensityToggle density={viewDensity} onChange={setViewDensity} isSubscribed={isSubscribed} />
+        {hasUnread && (
+          <MarkAllReadButton onClick={handleMarkAllRead} disabled={markingAllRead} />
         )}
       </div>
 
       {articles.length > 0 ? (
         <>
-          <NewsGridWrapper>
-            {articles.map((article, i) => (
-              <NewsCardThree
-                key={article.url}
-                article={article}
-                archiveId={defaultArchiveId}
-                viewOnly={true}
-                isKeyboardFocused={i === selectedIndex}
-                innerRef={(el) => (cardRefs.current[i] = el)}
-              />
-            ))}
-          </NewsGridWrapper>
+          {effectiveDensity === "reader" ? (
+            <ThreePaneLayout
+              articles={articles}
+              archiveId={defaultArchiveId}
+              viewOnly={true}
+              selectedIndex={selectedIndex}
+              cardRefs={cardRefs}
+              selectedArticleId={selectedArticleId}
+              onSelectArticle={(article) => setSelectedArticleId(article?.id ?? null)}
+            />
+          ) : (
+            <NewsGridWrapper density={effectiveDensity}>
+              {articles.map((article, i) => (
+                <NewsCardThree
+                  key={article.url}
+                  density={effectiveDensity}
+                  article={article}
+                  archiveId={defaultArchiveId}
+                  viewOnly={true}
+                  isKeyboardFocused={i === selectedIndex}
+                  innerRef={(el) => (cardRefs.current[i] = el)}
+                />
+              ))}
+            </NewsGridWrapper>
+          )}
 
           <div className={styles.loadMoreRow}>
             {page < totalPages ? (

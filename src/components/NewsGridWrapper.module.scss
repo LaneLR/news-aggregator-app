@@ -15,3 +15,22 @@
     grid-template-columns: repeat(1, 1fr);
   }
 }
+
+// Compact single-column row layout — swaps NewsGridWrapper's grid for a
+// stacked list; NewsCardThree's own .densityList modifier handles the
+// horizontal thumbnail-left layout inside each row.
+.listWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  grid-template-columns: none;
+}
+
+// Fewer, larger cards for a magazine-style skim.
+.magazineWrapper {
+  grid-template-columns: repeat(2, 1fr);
+
+  @media (max-width: 885px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}

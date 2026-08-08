@@ -1,0 +1,31 @@
+.markAllReadButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--theme-border);
+  background-color: var(--theme-card-background);
+  color: var(--theme-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+
+  &:hover:not(:disabled) {
+    color: var(--theme-primary);
+    border-color: var(--theme-primary);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  @media (max-width: 600px) {
+    span {
+      display: none;
+    }
+  }
+}

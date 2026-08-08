@@ -94,6 +94,23 @@
   gap: 8px;
 }
 
+.draggableIcon {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.dragging {
+  opacity: 0.35;
+}
+
+.dragOver {
+  outline: 2px dashed var(--theme-button-text);
+  outline-offset: 2px;
+}
+
 .dropdownContainer {
   position: relative;
   display: flex;

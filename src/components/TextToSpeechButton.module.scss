@@ -1,0 +1,44 @@
+.group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 38px;
+  border-radius: 999px;
+  border: none;
+  background: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: var(--theme-layout-background);
+    color: var(--theme-primary);
+  }
+}
+
+.stopButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: none;
+  background: none;
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--theme-layout-background);
+    color: var(--theme-warning);
+  }
+}

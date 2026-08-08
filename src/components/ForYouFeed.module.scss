@@ -29,6 +29,15 @@
   max-width: 500px;
 }
 
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
 .emptyState {
   display: flex;
   flex-direction: column;

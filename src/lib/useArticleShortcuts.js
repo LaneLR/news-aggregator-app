@@ -10,7 +10,7 @@ import { useKeyboardShortcuts, isTypingTarget } from "@/components/KeyboardShort
 // view, and so the save/like actions can click the card's own buttons
 // (see NewsCardThree's data-action attributes) instead of re-implementing
 // their stateful save/like logic from outside the component.
-export function useArticleShortcuts(articles) {
+export function useArticleShortcuts(articles, onOpen) {
   const { shortcuts } = useKeyboardShortcuts();
   const router = useRouter();
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -45,7 +45,13 @@ export function useArticleShortcuts(articles) {
         setSelectedIndex((prev) => Math.max(prev - 1, 0));
       } else if (event.key === shortcuts.open || event.key === "Enter") {
         const article = articles[selectedIndex];
-        if (article) router.push(`/article/${article.id}`);
+        if (!article) return;
+        // In the 3-pane reader view, "open" selects the article into the
+        // reading pane in place instead of leaving the list (see
+        // ThreePaneLayout.jsx). Falls back to a full navigation everywhere
+        // else, matching the pre-3-pane behavior.
+        if (onOpen) onOpen(article);
+        else router.push(`/article/${article.id}`);
       } else if (event.key === shortcuts.save) {
         cardRefs.current[selectedIndex]
           ?.querySelector('[data-action="save"]')
@@ -59,7 +65,7 @@ export function useArticleShortcuts(articles) {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [articles, selectedIndex, shortcuts, router]);
+  }, [articles, selectedIndex, shortcuts, router, onOpen]);
 
   useEffect(() => {
     if (selectedIndex >= 0) {
