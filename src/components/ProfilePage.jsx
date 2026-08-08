@@ -6,7 +6,7 @@ import Button from "./Button";
 import { useEffect, useState } from "react";
 import CopyButton from "./CopyButton";
 import Link from "next/link";
-import { CreditCard, Gift, Heart, Palette, ShieldAlert, LayoutGrid, Rows3 } from "lucide-react";
+import { CreditCard, Gift, Heart, Palette, Shield, ShieldAlert, LayoutGrid, Rows3 } from "lucide-react";
 import RecentlyLikedItem from "./RecentlyLikedArticle";
 import ThemeSelector from "./ThemeSelector";
 import styles from "./ProfilePage.module.scss";
@@ -338,11 +338,22 @@ export default function ProfilePage() {
             Appearance
           </h2>
           <div className={styles.cardContent}>
-            {user.tier === "Free" ? (
-              <p>Upgrade to Pro to unlock custom themes.</p>
-            ) : (
-              <ThemeSelector />
-            )}
+            <ThemeSelector />
+          </div>
+        </div>
+
+        <div id="privacy" className={styles.card}>
+          <h2 className={styles.cardHeader}>
+            <span className={styles.cardHeaderIcon}>
+              <Shield size={17} />
+            </span>
+            Privacy
+          </h2>
+          <div className={styles.cardContent}>
+            <p>
+              See our <Link href="/privacy">Privacy Policy</Link> for details
+              on what data we collect and how it&apos;s used.
+            </p>
           </div>
         </div>
 

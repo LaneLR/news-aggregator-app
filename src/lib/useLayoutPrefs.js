@@ -2,14 +2,12 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 
-// Shared by HeaderNavBar (category order) and Header (icon group order) —
-// one fetch-on-mount for both instead of two separate round trips, since
-// they're both small per-user personalization arrays living on the same
-// /api/users/layout-prefs endpoint.
+// Account-synced reading preference (List/Card/Magazine/Reader density) —
+// intentionally the only field left here. Category-nav and header-icon
+// order live in useLocalOrder.js instead: per-device, not per-account (see
+// that file's comment for why).
 export function useLayoutPrefs() {
   const { data: session } = useSession();
-  const [categoryOrder, setCategoryOrderState] = useState([]);
-  const [headerIconOrder, setHeaderIconOrderState] = useState([]);
   const [viewDensity, setViewDensityState] = useState("card");
   const [loaded, setLoaded] = useState(false);
 
@@ -18,47 +16,23 @@ export function useLayoutPrefs() {
     fetch("/api/users/layout-prefs")
       .then((res) => res.json())
       .then((data) => {
-        setCategoryOrderState(data.categoryOrder || []);
-        setHeaderIconOrderState(data.headerIconOrder || []);
         setViewDensityState(data.viewDensity || "card");
         setLoaded(true);
       })
       .catch((err) => console.error("Failed to load layout prefs:", err));
   }, [session?.user?.id]);
 
-  const persist = (partial) => {
+  const setViewDensity = (density) => {
+    setViewDensityState(density);
     if (!session?.user?.id) return;
     fetch("/api/users/layout-prefs", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(partial),
+      body: JSON.stringify({ viewDensity: density }),
     }).catch((err) => console.error("Failed to save layout prefs:", err));
   };
 
-  const setCategoryOrder = (order) => {
-    setCategoryOrderState(order);
-    persist({ categoryOrder: order });
-  };
-
-  const setHeaderIconOrder = (order) => {
-    setHeaderIconOrderState(order);
-    persist({ headerIconOrder: order });
-  };
-
-  const setViewDensity = (density) => {
-    setViewDensityState(density);
-    persist({ viewDensity: density });
-  };
-
-  return {
-    loaded,
-    categoryOrder,
-    headerIconOrder,
-    viewDensity,
-    setCategoryOrder,
-    setHeaderIconOrder,
-    setViewDensity,
-  };
+  return { loaded, viewDensity, setViewDensity };
 }
 
 // Applies a persisted custom order (array of stable keys) on top of a

@@ -4,7 +4,8 @@ import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLayoutPrefs, applyCustomOrder } from "@/lib/useLayoutPrefs";
+import { applyCustomOrder } from "@/lib/useLayoutPrefs";
+import { useLocalOrder } from "@/lib/useLocalOrder";
 import { useDragReorder } from "@/lib/useDragReorder";
 import {
   LayoutGrid,
@@ -102,7 +103,7 @@ export default function HeaderNavBar() {
     };
   }, [isMoreOpen]);
 
-  const { categoryOrder, setCategoryOrder } = useLayoutPrefs();
+  const [categoryOrder, setCategoryOrder] = useLocalOrder("morningfeeds:categoryOrder");
   const canReorder = !!session?.user?.id;
 
   const visibleCategories = CATEGORY_LINKS.filter(
