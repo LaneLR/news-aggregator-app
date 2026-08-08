@@ -1,5 +1,6 @@
 "use client";
 import ArchiveToggleButton from "./ArchiveToggleButton.jsx";
+import ShareButton from "./ShareButton.jsx";
 import Link from "next/link.js";
 import Image from "next/image.js";
 import { useState } from "react";
@@ -122,6 +123,7 @@ export default function NewsCardThree({
                 <Lock size={15} strokeWidth={2} />
               </span>
             )}
+            <ShareButton article={article} />
             <ArchiveToggleButton
               article={article}
               archiveId={archiveId}
