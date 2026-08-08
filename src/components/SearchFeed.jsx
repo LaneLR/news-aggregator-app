@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { Search } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
+import { useArticleShortcuts } from "@/lib/useArticleShortcuts";
 import styles from "./SearchFeed.module.scss";
 
 export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
@@ -73,6 +74,8 @@ export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
     };
   }, [hasMore, loading]);
 
+  const { selectedIndex, cardRefs } = useArticleShortcuts(results);
+
   return (
     <>
       <div className={styles.pageHeader}>
@@ -93,6 +96,8 @@ export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
               article={article}
               archiveId={archiveId}
               viewOnly={viewOnly}
+              isKeyboardFocused={i === selectedIndex}
+              innerRef={(el) => (cardRefs.current[i] = el)}
             />
           ))}
         </NewsGridWrapper>

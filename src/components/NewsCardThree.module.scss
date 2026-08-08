@@ -8,10 +8,17 @@
   flex-direction: column;
   border: 1px solid var(--theme-border);
   overflow: hidden;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, outline-color 0.1s ease-in-out;
   &:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-md);
+  }
+
+  // Visible focus ring for keyboard navigation (see useArticleShortcuts) —
+  // outline instead of border so it doesn't shift layout.
+  &.keyboardFocused {
+    outline: 2px solid var(--theme-primary);
+    outline-offset: 2px;
   }
 
   // Dims already-clicked articles so unread content stands out at a glance —

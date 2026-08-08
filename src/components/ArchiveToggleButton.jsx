@@ -115,6 +115,7 @@ export default function ArchiveToggleButton({
     <div style={{ position: "relative" }}>
       {isSaved && propArchiveId && !viewOnly ? (
         <div
+          data-action="save"
           className={`${styles.saveButton} ${styles.saved}`}
           onClick={handleRemove}
           disabled={loading}
@@ -133,6 +134,7 @@ export default function ArchiveToggleButton({
       ) : (
         <>
           <div
+            data-action="save"
             className={`${styles.saveButton} ${isSaved ? styles.saved : ""}`}
             onClick={() => setDropdownVisible(!dropdownVisible)}
             disabled={loading}

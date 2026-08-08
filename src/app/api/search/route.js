@@ -20,10 +20,17 @@ export async function GET(req) {
     const whereParts = [];
     const replacements = { limit, offset };
 
+    // Matches title/source always; also matches the full article body when a
+    // source's feed provided one (see Article.content — not every source
+    // does). Plain ILIKE, not a Postgres full-text index — fine at current
+    // scale, worth revisiting with a trigram/GIN index if search ever gets
+    // noticeably slow as the (unpruned, see capacity discussion) table grows.
     terms.forEach((word, i) => {
       const key = `term${i}`;
       replacements[key] = `%${word}%`;
-      whereParts.push(`("title" ILIKE :${key} OR "sourceName" ILIKE :${key})`);
+      whereParts.push(
+        `("title" ILIKE :${key} OR "sourceName" ILIKE :${key} OR "content" ILIKE :${key})`
+      );
     });
 
     if (category) {

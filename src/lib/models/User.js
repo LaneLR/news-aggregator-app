@@ -1,6 +1,7 @@
 import { DataTypes, Model, Op } from "sequelize";
 import { nanoid } from "nanoid";
 import bcrypt from "bcryptjs";
+import { DEFAULT_KEYBOARD_SHORTCUTS } from "../keyboardShortcuts.js";
 
 class User extends Model {
   async validatePassword(password) {
@@ -144,6 +145,11 @@ export default function defineUser(sequelize) {
         type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: false,
         defaultValue: [],
+      },
+      keyboardShortcuts: {
+        type: DataTypes.JSONB,
+        allowNull: false,
+        defaultValue: DEFAULT_KEYBOARD_SHORTCUTS,
       },
     },
     {

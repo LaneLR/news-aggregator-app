@@ -5,23 +5,28 @@ import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 import Button from "./Button";
 import Loading from "@/app/loading";
+import { useArticleShortcuts } from "@/lib/useArticleShortcuts";
 import styles from "./CategoryPage.module.scss";
 
-async function fetchCategoryArticles(category, sort) {
+async function fetchCategoryArticles(category, sort, page = 1) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
   const res = await fetch(
-    `${baseUrl}/api/articles/${category}?sort=${sort}`,
+    `${baseUrl}/api/articles/${category}?sort=${sort}&page=${page}`,
     { next: { revalidate: 3600 } }
   );
 
   if (!res.ok) throw new Error("Failed to fetch news for category");
 
-  const data = await res.json();
-  return data.articles;
+  return res.json();
 }
 
-export default function CategoryPage({ category, archiveId, initialArticles }) {
+export default function CategoryPage({
+  category,
+  archiveId,
+  initialArticles,
+  initialTotalPages,
+}) {
   const hasInitialArticles = Array.isArray(initialArticles);
   const [articles, setArticles] = useState(initialArticles ?? []);
   const [defaultArchiveId, setDefaultArchiveId] = useState(null);
@@ -32,8 +37,13 @@ export default function CategoryPage({ category, archiveId, initialArticles }) {
   );
   const [newAvailable, setNewAvailable] = useState(false);
   const [isLoading, setIsLoading] = useState(!hasInitialArticles);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [sort, setSort] = useState("latest");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(
+    hasInitialArticles ? initialTotalPages || 1 : 1
+  );
   // Skips exactly one upcoming mount-effect fetch when SSR already provided
   // the initial "latest" page — any later sort change still fetches normally.
   const skipNextFetch = useRef(hasInitialArticles);
@@ -45,16 +55,36 @@ export default function CategoryPage({ category, archiveId, initialArticles }) {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await fetchCategoryArticles(category.toLowerCase(), sort);
-      setArticles(data);
-      if (data.length > 0) {
-        const newest = new Date(data[0].publishedAt || data[0].updatedAt);
+      const data = await fetchCategoryArticles(category.toLowerCase(), sort, 1);
+      setArticles(data.articles);
+      setPage(1);
+      setTotalPages(data.totalPages || 1);
+      if (data.articles.length > 0) {
+        const newest = new Date(
+          data.articles[0].publishedAt || data.articles[0].updatedAt
+        );
         setLatestTimestamp(newest);
       }
     } catch (err) {
       setError(err.message);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadMoreArticles = async () => {
+    if (isLoadingMore || page >= totalPages) return;
+    setIsLoadingMore(true);
+    try {
+      const nextPage = page + 1;
+      const data = await fetchCategoryArticles(category.toLowerCase(), sort, nextPage);
+      setArticles((prev) => [...prev, ...data.articles]);
+      setPage(nextPage);
+      setTotalPages(data.totalPages || totalPages);
+    } catch (err) {
+      console.error("Failed to load more articles:", err);
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
@@ -70,8 +100,8 @@ export default function CategoryPage({ category, archiveId, initialArticles }) {
     const handleFocus = async () => {
       if (!category) return;
       try {
-        const latest = await fetchCategoryArticles(category.toLowerCase(), sort);
-        const latestArticle = latest[0];
+        const latest = await fetchCategoryArticles(category.toLowerCase(), sort, 1);
+        const latestArticle = latest.articles[0];
         if (latestArticle) {
           const latestDate = new Date(
             latestArticle.publishedAt || latestArticle.updatedAt
@@ -110,6 +140,8 @@ export default function CategoryPage({ category, archiveId, initialArticles }) {
     };
     fetchDefaultArchive();
   }, []);
+
+  const { selectedIndex, cardRefs } = useArticleShortcuts(articles);
 
   if (isLoading) {
     return <Loading />;
@@ -164,16 +196,35 @@ export default function CategoryPage({ category, archiveId, initialArticles }) {
       </div>
 
       {articles.length > 0 ? (
-        <NewsGridWrapper>
-          {articles.map((article) => (
-            <NewsCardThree
-              key={article.url}
-              article={article}
-              archiveId={defaultArchiveId}
-              viewOnly={true}
-            />
-          ))}
-        </NewsGridWrapper>
+        <>
+          <NewsGridWrapper>
+            {articles.map((article, i) => (
+              <NewsCardThree
+                key={article.url}
+                article={article}
+                archiveId={defaultArchiveId}
+                viewOnly={true}
+                isKeyboardFocused={i === selectedIndex}
+                innerRef={(el) => (cardRefs.current[i] = el)}
+              />
+            ))}
+          </NewsGridWrapper>
+
+          <div className={styles.loadMoreRow}>
+            {page < totalPages ? (
+              <Button
+                bgColor={"var(--theme-layout-background)"}
+                clr={"var(--theme-dark-blue)"}
+                onClick={loadMoreArticles}
+                disabled={isLoadingMore}
+              >
+                {isLoadingMore ? "Loading…" : "Load More"}
+              </Button>
+            ) : (
+              <p className={styles.caughtUpText}>You&apos;re all caught up.</p>
+            )}
+          </div>
+        </>
       ) : (
         <p>No articles found for {categoryNameForDisplay}.</p>
       )}

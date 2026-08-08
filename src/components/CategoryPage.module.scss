@@ -60,3 +60,14 @@
   align-items: center;
   gap: 8px;
 }
+
+.loadMoreRow {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.caughtUpText {
+  color: var(--theme-text-secondary);
+  font-size: 0.9rem;
+}

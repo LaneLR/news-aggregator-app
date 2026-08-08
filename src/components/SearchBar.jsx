@@ -31,6 +31,7 @@ export default function SearchBar() {
     <div className={styles.wrapper}>
       <Search className={styles.icon} size={18} strokeWidth={2} />
       <input
+        data-search-input
         className={styles.input}
         type="text"
         placeholder={isNarrow ? "Search..." : "Search by title, topic, or author..."}

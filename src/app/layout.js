@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import ThemeProvider from "@/components/ThemeProvider";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import JsonLd from "@/components/JsonLd";
+import KeyboardShortcutsProvider from "@/components/KeyboardShortcutsProvider";
 import { auth } from "@/lib/auth";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -102,11 +103,13 @@ export default async function RootLayout({ children }) {
         <JsonLd data={websiteSchema} />
         <Providers session={session}>
           <ThemeProvider>
-            <AppWrapper>
-              <Header />
-              <MainContentWrapper>{children}</MainContentWrapper>
-              <Footer />
-            </AppWrapper>
+            <KeyboardShortcutsProvider>
+              <AppWrapper>
+                <Header />
+                <MainContentWrapper>{children}</MainContentWrapper>
+                <Footer />
+              </AppWrapper>
+            </KeyboardShortcutsProvider>
           </ThemeProvider>
         </Providers>
         <ServiceWorkerRegister />
