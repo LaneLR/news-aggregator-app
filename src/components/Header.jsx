@@ -9,7 +9,8 @@ import { Menu, Newspaper, Bookmark, User, Crown, Settings, LogOut, Sun, Moon } f
 import SearchBar from "./SearchBar";
 import HeaderNavBar from "./HeaderNavBar";
 import HeaderSubscribeBanner from "./SubscribeHeaderBanner";
-import { useLayoutPrefs, applyCustomOrder } from "@/lib/useLayoutPrefs";
+import { applyCustomOrder } from "@/lib/useLayoutPrefs";
+import { useLocalOrder } from "@/lib/useLocalOrder";
 import { useDragReorder } from "@/lib/useDragReorder";
 import styles from "./Header.module.scss";
 
@@ -74,7 +75,7 @@ export default function Header() {
     }
   };
 
-  const { headerIconOrder, setHeaderIconOrder } = useLayoutPrefs();
+  const [headerIconOrder, setHeaderIconOrder] = useLocalOrder("morningfeeds:headerIconOrder");
   const orderedIconIds = applyCustomOrder(
     DEFAULT_ICON_ORDER,
     headerIconOrder,

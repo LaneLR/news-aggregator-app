@@ -1,6 +1,6 @@
 "use client";
 import { signOut } from "next-auth/react";
-import { User, CreditCard, Shield, Wallet, Bookmark, LogOut } from "lucide-react";
+import { User, CreditCard, Bookmark, LogOut } from "lucide-react";
 import NavTab from "./NavTab";
 import styles from "./SideNavBar.module.scss";
 
@@ -12,13 +12,7 @@ export default function SideBarNav() {
         Profile
       </NavTab>
       <NavTab href={"/account/subscription"} Icon={CreditCard}>
-        Subscription
-      </NavTab>
-      <NavTab href={"/account/privacy"} Icon={Shield}>
-        Privacy
-      </NavTab>
-      <NavTab href={"/account/payment"} Icon={Wallet}>
-        Payment Details
+        Subscription &amp; Billing
       </NavTab>
       <NavTab href={"/archives"} Icon={Bookmark}>
         Archives

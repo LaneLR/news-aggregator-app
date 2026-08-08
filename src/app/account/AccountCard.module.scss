@@ -1,4 +1,16 @@
+// Wraps single-card account pages (currently just Subscription & Billing)
+// so the card is centered in the available space instead of stuck in the
+// top-left corner of a mostly-empty content column.
+.pageWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 2rem 1rem;
+}
+
 .card {
+  width: 100%;
   max-width: 640px;
   background-color: var(--theme-card-background);
   border-radius: var(--radius-md);
@@ -64,4 +76,5 @@
   border-top: 1px solid var(--theme-border);
   display: flex;
   justify-content: flex-end;
+  gap: 0.75rem;
 }

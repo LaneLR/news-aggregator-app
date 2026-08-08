@@ -117,7 +117,7 @@ export default async function SettingsPage() {
               <KeyRound size={15} strokeWidth={2} />
               Reset Password
             </Link>
-            <Link href="/account/privacy" className={styles.quickLink}>
+            <Link href="/account#privacy" className={styles.quickLink}>
               <Shield size={15} strokeWidth={2} />
               Privacy &amp; Data
             </Link>
