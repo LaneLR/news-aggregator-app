@@ -26,7 +26,6 @@ export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
   const currentTheme = session?.user?.selectedTheme || "default";
 
   const toggleDropdown = () => {
@@ -108,20 +107,18 @@ export default function Header() {
                 <Link className={styles.iconButton} href="/archives" title="Archives">
                   <Bookmark size={19} strokeWidth={2} />
                 </Link>
-                {isSubscribed && (
-                  <button
-                    type="button"
-                    className={styles.iconButton}
-                    onClick={handleToggleTheme}
-                    title="Toggle light/dark theme"
-                  >
-                    {currentTheme === "dark" ? (
-                      <Sun size={19} strokeWidth={2} />
-                    ) : (
-                      <Moon size={19} strokeWidth={2} />
-                    )}
-                  </button>
-                )}
+                <button
+                  type="button"
+                  className={styles.iconButton}
+                  onClick={handleToggleTheme}
+                  title="Toggle light/dark theme"
+                >
+                  {currentTheme === "dark" ? (
+                    <Sun size={19} strokeWidth={2} />
+                  ) : (
+                    <Moon size={19} strokeWidth={2} />
+                  )}
+                </button>
                 <div className={styles.dropdownContainer} ref={dropdownRef}>
                   <button
                     type="button"

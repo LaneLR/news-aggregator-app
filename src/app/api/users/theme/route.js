@@ -14,11 +14,6 @@ export async function PATCH(req) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Security Check: Only allow non-free users to change their theme
-  if (session.user.tier === 'Free') {
-    return NextResponse.json({ error: "Theme customization is a Pro feature." }, { status: 403 });
-  }
-
   try {
     const { themeName } = await req.json();
 
