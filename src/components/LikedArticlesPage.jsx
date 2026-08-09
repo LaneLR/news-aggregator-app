@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { Heart } from "lucide-react";
 import NewsCardFour from "@/components/NewsCardFour";
 import NewsGridWrapper from "@/components/NewsGridWrapper";
-import Loading from "@/app/loading";
+import CardSkeleton from "@/components/CardSkeleton";
 import styles from "./LikedArticlesPage.module.scss";
 
 export default function LikedArticlesPage() {
@@ -35,11 +35,7 @@ export default function LikedArticlesPage() {
     }
   }, [status]);
 
-  if (isLoading || status === "loading") {
-    return <Loading />;
-  }
-
-  if (!session) {
+  if (!session && status !== "loading") {
     return (
       <p className={styles.statusText}>
         Please sign in to see your liked articles.
@@ -56,10 +52,16 @@ export default function LikedArticlesPage() {
         </h1>
       </div>
 
-      {likedArticles.length > 0 ? (
+      {isLoading || status === "loading" ? (
         <NewsGridWrapper>
-          {likedArticles.map((article) => (
-            <NewsCardFour key={article.url} article={article} viewOnly={true} />
+          {Array.from({ length: 6 }).map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
+        </NewsGridWrapper>
+      ) : likedArticles.length > 0 ? (
+        <NewsGridWrapper>
+          {likedArticles.map((article, i) => (
+            <NewsCardFour key={article.url} article={article} viewOnly={true} index={i} />
           ))}
         </NewsGridWrapper>
       ) : (

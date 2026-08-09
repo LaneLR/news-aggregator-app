@@ -1,7 +1,9 @@
 "use client";
 import Button from "./Button";
+import { useToast } from "./ToastProvider";
 
 export default function ManageSubscriptionButton() {
+  const toast = useToast();
   const handleManage = async () => {
     try {
       const response = await fetch("/api/stripe/manage-subscription", {
@@ -16,7 +18,7 @@ export default function ManageSubscriptionButton() {
       window.location.href = url;
     } catch (err) {
       console.error(err);
-      alert("Error: Could not manage subscription.");
+      toast.error("Could not open the subscription management page. Please try again.");
     }
   };
 

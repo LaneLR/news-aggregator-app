@@ -1,0 +1,103 @@
+@keyframes shimmer {
+  0% {
+    background-position: -300px 0;
+  }
+  100% {
+    background-position: 300px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--theme-layout-background) 0%,
+    var(--theme-border) 50%,
+    var(--theme-layout-background) 100%
+  );
+  background-size: 600px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+.wrapper {
+  max-width: var(--reader-content-width, 720px);
+  margin: 2rem auto;
+  padding: 0 1.25rem 3rem;
+}
+
+.article {
+  background-color: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 2rem;
+}
+
+.badge {
+  width: 84px;
+  height: 22px;
+  border-radius: 999px;
+  margin-bottom: 0.85rem;
+}
+
+.titleLine {
+  width: 100%;
+  height: 28px;
+  margin-bottom: 10px;
+}
+
+.titleLineShort {
+  width: 55%;
+  height: 28px;
+  margin-bottom: 1.1rem;
+}
+
+.metaRow {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.25rem;
+}
+
+.metaPill {
+  width: 90px;
+  height: 13px;
+  border-radius: var(--radius-sm);
+}
+
+.metaPillSmall {
+  width: 55px;
+  height: 13px;
+  border-radius: var(--radius-sm);
+}
+
+.hero {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.5rem;
+}
+
+.actionsRow {
+  display: flex;
+  gap: 10px;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.actionPill {
+  width: 60px;
+  height: 34px;
+  border-radius: 999px;
+}
+
+.paragraphs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.textLine {
+  width: 100%;
+  height: 15px;
+}

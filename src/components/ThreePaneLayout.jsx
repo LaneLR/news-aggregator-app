@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
+import { AlertCircle } from "lucide-react";
 import NewsCardThree from "./NewsCardThree";
 import ArticleReader from "./ArticleReader";
 import ReaderNavSidebar from "./ReaderNavSidebar";
-import Loading from "@/app/loading";
+import ReaderSkeleton from "./ReaderSkeleton";
 import styles from "./ThreePaneLayout.module.scss";
 
 // The "reader" view density option — nav sidebar (ReaderNavSidebar) + a
@@ -31,6 +32,7 @@ export default function ThreePaneLayout({
   const [readerData, setReaderData] = useState(null);
   const [readerLoading, setReaderLoading] = useState(false);
   const [readerError, setReaderError] = useState(null);
+  const [retryToken, setRetryToken] = useState(0);
 
   useEffect(() => {
     if (!selectedArticleId) {
@@ -62,7 +64,7 @@ export default function ThreePaneLayout({
     return () => {
       cancelled = true;
     };
-  }, [selectedArticleId]);
+  }, [selectedArticleId, retryToken]);
 
   // NewsCardThree's title/thumbnail links call onSelect directly (see
   // below) instead of navigating away. This wrapper-level handler is the
@@ -95,6 +97,7 @@ export default function ThreePaneLayout({
               isKeyboardFocused={i === selectedIndex}
               innerRef={(el) => (cardRefs.current[i] = el)}
               onSelect={() => onSelectArticle(article)}
+              index={i}
             />
           </div>
         ))}
@@ -106,10 +109,18 @@ export default function ThreePaneLayout({
         }`}
       >
         {readerLoading ? (
-          <Loading />
+          <ReaderSkeleton />
         ) : readerError ? (
           <div className={styles.emptyState}>
+            <AlertCircle size={28} strokeWidth={1.5} />
             <p>{readerError}</p>
+            <button
+              type="button"
+              className={styles.retryButton}
+              onClick={() => setRetryToken((n) => n + 1)}
+            >
+              Try again
+            </button>
           </div>
         ) : readerData ? (
           <ArticleReader

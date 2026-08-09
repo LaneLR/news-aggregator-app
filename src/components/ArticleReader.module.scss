@@ -8,6 +8,23 @@
   transition: max-width 0.15s ease-in-out;
 }
 
+.progressTrack {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 1500;
+  background: transparent;
+  pointer-events: none;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: var(--theme-primary);
+  transition: width 0.1s linear;
+}
+
 .article {
   background-color: var(--theme-card-background);
   border: 1px solid var(--theme-border);

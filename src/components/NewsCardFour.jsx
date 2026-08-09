@@ -11,15 +11,18 @@ import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { useSwipeGesture } from "@/lib/useSwipeGesture";
+import { useToast } from "./ToastProvider";
 import styles from "./NewsCardFour.module.scss";
 
 export default function NewsCardFour({
   article,
   archiveId,
   viewOnly = false,
+  index,
 }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const toast = useToast();
   const cardRef = useRef(null);
 
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
@@ -60,7 +63,7 @@ export default function NewsCardFour({
 
   const handleLike = async () => {
     if (!session) {
-      alert("You must be signed in to like articles.");
+      toast.info("Sign in to like articles.");
       router.push("/login");
       return;
     }
@@ -84,7 +87,7 @@ export default function NewsCardFour({
     } catch (err) {
       setIsLiked(originalLikedState);
       setLikeCount(originalLikeCount);
-      alert("There was an error. Please try again.");
+      toast.error("Couldn't update like status. Please try again.");
     }
   };
   const cleanTitle =
@@ -97,7 +100,11 @@ export default function NewsCardFour({
   const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
 
   return (
-    <div className={styles.swipeWrapper} {...swipeHandlers}>
+    <div
+      className={styles.swipeWrapper}
+      style={index != null ? { animationDelay: `${Math.min(index, 10) * 35}ms` } : undefined}
+      {...swipeHandlers}
+    >
       <div
         className={`${styles.swipeHint} ${offsetX !== 0 ? styles.visible : ""} ${
           offsetX > 0 ? styles.swipeHintSave : styles.swipeHintRead

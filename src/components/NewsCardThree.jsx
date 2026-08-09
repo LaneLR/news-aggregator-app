@@ -6,11 +6,12 @@ import Image from "next/image.js";
 import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation.js";
-import { Heart, Lock, Bookmark, Check } from "lucide-react";
+import { Heart, Lock, Bookmark, Check, Compass } from "lucide-react";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { useSwipeGesture } from "@/lib/useSwipeGesture";
+import { useToast } from "./ToastProvider";
 import styles from "./NewsCardThree.module.scss";
 
 export default function NewsCardThree({
@@ -21,9 +22,11 @@ export default function NewsCardThree({
   innerRef,
   density = "card",
   onSelect,
+  index,
 }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const toast = useToast();
   const cardRef = useRef(null);
 
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
@@ -69,7 +72,7 @@ export default function NewsCardThree({
 
   const handleLike = async () => {
     if (!session) {
-      alert("You must be signed in to like articles.");
+      toast.info("Sign in to like articles.");
       router.push("/login");
       return;
     }
@@ -93,7 +96,7 @@ export default function NewsCardThree({
     } catch (err) {
       setIsLiked(originalLikedState);
       setLikeCount(originalLikeCount);
-      alert("There was an error. Please try again.");
+      toast.error("Couldn't update like status. Please try again.");
     }
   };
   const cleanTitle =
@@ -106,7 +109,11 @@ export default function NewsCardThree({
   const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
 
   return (
-    <div className={styles.swipeWrapper} {...swipeHandlers}>
+    <div
+      className={styles.swipeWrapper}
+      style={index != null ? { animationDelay: `${Math.min(index, 10) * 35}ms` } : undefined}
+      {...swipeHandlers}
+    >
       <div
         className={`${styles.swipeHint} ${offsetX !== 0 ? styles.visible : ""} ${
           offsetX > 0 ? styles.swipeHintSave : styles.swipeHintRead
@@ -166,6 +173,12 @@ export default function NewsCardThree({
       </Link>
       <div className={styles.contentArea}>
         <div className={styles.titleBlock}>
+          {article.recommendationReason && (
+            <p className={styles.recommendationReason}>
+              <Compass size={11} strokeWidth={2.5} />
+              {article.recommendationReason}
+            </p>
+          )}
           <h3 className={`${styles.articleTitle} headline`}>
             <Link
               href={`/article/${article.id}`}

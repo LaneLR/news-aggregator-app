@@ -36,3 +36,109 @@
     box-shadow: 0 0 0 3px rgba(46, 92, 230, 0.18);
   }
 }
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background-color: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 6px;
+  z-index: 1000;
+  max-height: 380px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.dropdownLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--theme-text-secondary);
+}
+
+.suggestionRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  color: var(--theme-text);
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.12s ease-in-out;
+
+  &.highlighted,
+  &:hover {
+    background-color: var(--theme-layout-background);
+  }
+}
+
+.rowIcon {
+  flex-shrink: 0;
+  color: var(--theme-text-secondary);
+}
+
+.categoryDot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.rowText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.rowSource {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--theme-text-secondary);
+}
+
+.removeRecent {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  color: var(--theme-text-secondary);
+  transition: background-color 0.12s ease-in-out, color 0.12s ease-in-out;
+
+  &:hover {
+    background-color: var(--theme-border);
+    color: var(--theme-text);
+  }
+}
+
+.seeAllRow {
+  justify-content: space-between;
+  color: var(--theme-primary);
+  font-weight: 600;
+  border-top: 1px solid var(--theme-border);
+  margin-top: 4px;
+  padding-top: 12px;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}

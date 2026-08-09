@@ -1,14 +1,16 @@
 "use client";
 import { useState } from "react";
 import { Copy, Check, X } from "lucide-react";
+import { useToast } from "./ToastProvider";
 import styles from "./CopyButton.module.scss";
 
 export default function CopyButton({ textToCopy }) {
+  const toast = useToast();
   const [copyStatus, setCopyStatus] = useState("Copy");
 
   const handleCopy = async () => {
     if (!navigator.clipboard) {
-      alert("Clipboard API not available.");
+      toast.error("Clipboard access isn't available in this browser.");
       return;
     }
 

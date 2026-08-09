@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
@@ -14,6 +14,7 @@ import { trackArticleClick } from "@/lib/trackClick";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { timeAgo } from "@/lib/timeAgo";
 import { useReaderPrefs, readerPrefsToCssVars } from "@/lib/readerPrefs";
+import { useToast } from "./ToastProvider";
 import styles from "./ArticleReader.module.scss";
 
 function extractPlainText(html) {
@@ -25,11 +26,36 @@ function extractPlainText(html) {
 export default function ArticleReader({ article, sanitizedContent, relatedCoverage, readingTime, onClose }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const toast = useToast();
   const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
 
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
   const [likeCount, setLikeCount] = useState(article.likeCount || 0);
   const { prefs, updatePrefs, resetPrefs } = useReaderPrefs();
+  const articleRef = useRef(null);
+  const [readProgress, setReadProgress] = useState(0);
+
+  // Both the standalone article page and the 3-pane reader's reading pane
+  // scroll the window itself (the pane has no overflow/max-height of its
+  // own — see ThreePaneLayout.module.scss), so a single window scroll
+  // listener covers both contexts without needing to know which one this is.
+  useEffect(() => {
+    const handleScroll = () => {
+      const el = articleRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const total = rect.height - window.innerHeight;
+      if (total <= 0) {
+        setReadProgress(100);
+        return;
+      }
+      const scrolled = Math.min(Math.max(-rect.top, 0), total);
+      setReadProgress((scrolled / total) * 100);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true, capture: true });
+    return () => window.removeEventListener("scroll", handleScroll, { capture: true });
+  }, [sanitizedContent]);
 
   const speechText = useMemo(() => {
     const bodyText = extractPlainText(sanitizedContent);
@@ -47,7 +73,7 @@ export default function ArticleReader({ article, sanitizedContent, relatedCovera
 
   const handleLike = async () => {
     if (!session) {
-      alert("You must be signed in to like articles.");
+      toast.info("Sign in to like articles.");
       router.push("/login");
       return;
     }
@@ -70,7 +96,10 @@ export default function ArticleReader({ article, sanitizedContent, relatedCovera
 
   return (
     <div className={styles.wrapper} style={readerPrefsToCssVars(prefs)}>
-      <article className={styles.article}>
+      <div className={styles.progressTrack}>
+        <div className={styles.progressFill} style={{ width: `${readProgress}%` }} />
+      </div>
+      <article className={styles.article} ref={articleRef}>
         {(badgeCategory || onClose) && (
           <div className={styles.headerRow}>
             {badgeCategory && (
