@@ -145,7 +145,7 @@ export default function NewsCardFour({
         />
       </Link>
       <div className={styles.contentArea}>
-        <div>
+        <div className={styles.titleBlock}>
           <h3 className={`${styles.articleTitle} headline`}>
             <Link href={`/article/${article.id}`}>{cleanTitle}</Link>
           </h3>
