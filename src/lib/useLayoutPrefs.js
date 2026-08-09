@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 // that file's comment for why).
 export function useLayoutPrefs() {
   const { data: session } = useSession();
-  const [viewDensity, setViewDensityState] = useState("card");
+  const [viewDensity, setViewDensityState] = useState("reader");
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export function useLayoutPrefs() {
     fetch("/api/users/layout-prefs")
       .then((res) => res.json())
       .then((data) => {
-        setViewDensityState(data.viewDensity || "card");
+        setViewDensityState(data.viewDensity || "reader");
         setLoaded(true);
       })
       .catch((err) => console.error("Failed to load layout prefs:", err));

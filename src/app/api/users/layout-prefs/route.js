@@ -10,7 +10,7 @@ const ALLOWED_VIEW_DENSITIES = ["card", "list", "magazine", "reader"];
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) {
-    return NextResponse.json({ viewDensity: "card" }, { status: 200 });
+    return NextResponse.json({ viewDensity: "reader" }, { status: 200 });
   }
 
   try {

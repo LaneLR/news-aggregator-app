@@ -1,5 +1,10 @@
 .swipeWrapper {
   position: relative;
+  // See NewsCardThree.module.scss's identical comment — this is the actual
+  // grid item inside NewsGridWrapper, and needs an explicit min-width so a
+  // card with longer text than its row-neighbors can't force its column
+  // wider than the grid's own math, eating into the gap next to it.
+  min-width: 0;
   border-radius: var(--radius-lg);
   overflow: hidden;
   touch-action: pan-y;
@@ -36,7 +41,6 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   width: 100%;
-  max-width: 400px;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--theme-border);
@@ -69,17 +73,17 @@
 }
 
 .contentArea {
-  padding: 1.1rem;
+  padding: 1.35rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 }
 
 .articleTitle {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--theme-dark-blue);
-  line-height: 1.35;
+  line-height: 1.4;
   margin: 0 0 0.5rem 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;

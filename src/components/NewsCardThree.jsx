@@ -20,6 +20,7 @@ export default function NewsCardThree({
   isKeyboardFocused = false,
   innerRef,
   density = "card",
+  onSelect,
 }) {
   const { data: session } = useSession();
   const router = useRouter();
@@ -140,8 +141,15 @@ export default function NewsCardThree({
       <Link
         className={styles.imageLink}
         href={article.url}
-        target={"_blank"}
-        onClick={() => trackArticleClick(article)}
+        target={onSelect ? undefined : "_blank"}
+        onClick={
+          onSelect
+            ? (e) => {
+                e.preventDefault();
+                onSelect();
+              }
+            : () => trackArticleClick(article)
+        }
       >
         <Image
           src={imageSrc}
@@ -159,7 +167,19 @@ export default function NewsCardThree({
       <div className={styles.contentArea}>
         <div>
           <h3 className={`${styles.articleTitle} headline`}>
-            <Link href={`/article/${article.id}`}>{cleanTitle}</Link>
+            <Link
+              href={`/article/${article.id}`}
+              onClick={
+                onSelect
+                  ? (e) => {
+                      e.preventDefault();
+                      onSelect();
+                    }
+                  : undefined
+              }
+            >
+              {cleanTitle}
+            </Link>
           </h3>
           <p className={styles.articleSnippetText}>{cleanSourceName}</p>
         </div>

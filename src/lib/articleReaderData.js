@@ -19,6 +19,17 @@ const SANITIZE_OPTIONS = {
   },
 };
 
+// Many RSS feeds re-embed the lead/hero image as the very first element of
+// the body content — redundant with (and visually disconnected from, thanks
+// to the actions-row divider sitting between them) the dedicated hero image
+// ArticleReader already renders above the content. Stripping a leading
+// image/figure lets the title/hero/content read as one continuous block.
+function stripLeadingImage(html) {
+  return html
+    .replace(/^\s*<figure[^>]*>[\s\S]*?<\/figure>\s*/i, "")
+    .replace(/^\s*<img[^>]*>\s*/i, "");
+}
+
 // Shared by the full article page (src/app/article/[id]/page.js) and the
 // 3-pane reading-pane API (src/app/api/articles/[id]/reader/route.js) so
 // the sanitize/gating/related-coverage/reading-time logic lives in one
@@ -50,9 +61,12 @@ export async function getArticleReaderData(id, session) {
     isLikedByUser = !!like;
   }
 
-  const sanitizedContent = article.content
+  let sanitizedContent = article.content
     ? sanitizeHtml(article.content, SANITIZE_OPTIONS)
     : null;
+  if (sanitizedContent && article.urlToImage) {
+    sanitizedContent = stripLeadingImage(sanitizedContent);
+  }
   const readingTime = sanitizedContent ? estimateReadingTime(sanitizedContent) : null;
   const relatedCoverage = await getRelatedCoverage(Article, article);
 
