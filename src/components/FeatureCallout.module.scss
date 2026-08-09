@@ -5,14 +5,16 @@
   margin: 0 1.5rem 1.5rem;
   padding: 1rem 1.1rem;
   border-radius: var(--radius-md);
-  border: 1px solid var(--theme-border);
-  background-color: color-mix(in srgb, var(--theme-primary) 6%, var(--theme-card-background));
+  // Dedicated tip-banner tokens (soft amber tint), not a derived tint of
+  // --theme-primary — a distinct, intentional treatment for callouts.
+  border: 1px solid var(--theme-tip-border);
+  background-color: var(--theme-tip-background);
 }
 
 .icon {
   flex-shrink: 0;
   margin-top: 2px;
-  color: var(--theme-primary);
+  color: var(--theme-tip-text);
 }
 
 .body {
@@ -23,7 +25,7 @@
 .title {
   font-size: 0.92rem;
   font-weight: 700;
-  color: var(--theme-text);
+  color: var(--theme-tip-text);
   margin: 0 0 0.4rem;
 }
 
@@ -35,7 +37,7 @@
   gap: 0.3rem;
   font-size: 0.85rem;
   line-height: 1.45;
-  color: var(--theme-text-secondary);
+  color: var(--theme-tip-text);
 
   kbd {
     display: inline-flex;

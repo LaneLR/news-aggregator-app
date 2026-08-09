@@ -33,10 +33,14 @@ export default function ThreePaneLayout({
   const [readerLoading, setReaderLoading] = useState(false);
   const [readerError, setReaderError] = useState(null);
   const [retryToken, setRetryToken] = useState(0);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   useEffect(() => {
     if (!selectedArticleId) {
       setReaderData(null);
+      // Full screen is a per-reading-session view choice, not something
+      // that should still be armed the next time an article is opened.
+      setIsFullScreen(false);
       return;
     }
     let cancelled = false;
@@ -66,6 +70,15 @@ export default function ThreePaneLayout({
     };
   }, [selectedArticleId, retryToken]);
 
+  useEffect(() => {
+    if (!isFullScreen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setIsFullScreen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isFullScreen]);
+
   // NewsCardThree's title/thumbnail links call onSelect directly (see
   // below) instead of navigating away. This wrapper-level handler is the
   // fallback for clicking blank card space that isn't a link/button — the
@@ -75,6 +88,36 @@ export default function ThreePaneLayout({
     if (event.target.closest("a, button")) return;
     onSelectArticle(article);
   };
+
+  // A single JSX value rendered in exactly one of two places below — the
+  // normal pane, or the full-screen overlay — never both at once. Two
+  // simultaneously-mounted ArticleReader instances would each track their
+  // own local like/progress state independently and drift out of sync.
+  const readerContent = readerLoading ? (
+    <ReaderSkeleton />
+  ) : readerError ? (
+    <div className={styles.emptyState}>
+      <AlertCircle size={28} strokeWidth={1.5} />
+      <p>{readerError}</p>
+      <button
+        type="button"
+        className={styles.retryButton}
+        onClick={() => setRetryToken((n) => n + 1)}
+      >
+        Try again
+      </button>
+    </div>
+  ) : readerData ? (
+    <ArticleReader
+      article={readerData.article}
+      sanitizedContent={readerData.sanitizedContent}
+      relatedCoverage={readerData.relatedCoverage}
+      readingTime={readerData.readingTime}
+      onClose={() => onSelectArticle(null)}
+      isFullScreen={isFullScreen}
+      onToggleFullScreen={() => setIsFullScreen((prev) => !prev)}
+    />
+  ) : null;
 
   return (
     <div className={styles.threePane}>
@@ -108,30 +151,22 @@ export default function ThreePaneLayout({
           selectedArticleId ? styles.readingPaneExpanded : styles.readingPaneCollapsed
         }`}
       >
-        {readerLoading ? (
-          <ReaderSkeleton />
-        ) : readerError ? (
-          <div className={styles.emptyState}>
-            <AlertCircle size={28} strokeWidth={1.5} />
-            <p>{readerError}</p>
-            <button
-              type="button"
-              className={styles.retryButton}
-              onClick={() => setRetryToken((n) => n + 1)}
-            >
-              Try again
-            </button>
-          </div>
-        ) : readerData ? (
-          <ArticleReader
-            article={readerData.article}
-            sanitizedContent={readerData.sanitizedContent}
-            relatedCoverage={readerData.relatedCoverage}
-            readingTime={readerData.readingTime}
-            onClose={() => onSelectArticle(null)}
-          />
-        ) : null}
+        {!isFullScreen && readerContent}
       </div>
+
+      {isFullScreen && selectedArticleId && (
+        <div className={styles.fullScreenOverlay} onClick={() => setIsFullScreen(false)}>
+          <div
+            className={styles.fullScreenPanel}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Full screen article reader"
+          >
+            {readerContent}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

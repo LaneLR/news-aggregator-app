@@ -4,7 +4,11 @@
 // themes.js itself stays around only because ThemeSelector needs the raw
 // JS values to render its swatch previews of *both* themes at once.
 //
-// Keep this in sync with src/styles/themes.js by hand.
+// Palette: "Modern Editorial Paper" (light) / "Midnight Charcoal" (dark) —
+// warm off-white/paper and true zinc-charcoal instead of the blue-tinted
+// neutrals this used to use, with a warm amber accent as the primary color
+// in both modes instead of a generic SaaS blue. Keep in sync with
+// src/styles/themes.js by hand.
 //
 // Light is the baseline on bare :root (not gated behind a [data-theme]
 // selector) so it's always defined even before any attribute is set. Dark
@@ -17,83 +21,110 @@
 :root {
   color-scheme: light;
 
-  --theme-primary: var(--primary-blue);
-  --theme-primary-contrast: #ffffff;
-  --theme-dark-blue: var(--dark-blue);
-  --theme-deep-blue: var(--deep-blue);
-  --theme-secondary-blue: var(--secondary-blue);
+  --theme-primary: #d97706;
+  // Amber at this saturation only clears ~3.2:1 contrast against white text
+  // (fails WCAG AA and AAA both) — near-black text against it clears ~6:1
+  // instead, which is the best a vivid amber background can offer without
+  // desaturating it. See the dark-mode primary contrast for the same reason
+  // it uses near-black text too.
+  // Text tokens use a warm near-black (Tailwind "stone", brown-leaning)
+  // rather than a neutral zinc/true-black — flat zinc-black text reads cold
+  // and slightly clashes against the warm paper background. Surface tokens
+  // just below (header/footer/buttons) stay on the cooler #18181b — that
+  // one's a deliberate near-black surface color from the original spec, not
+  // a text color, so it's unaffected by this.
+  --theme-primary-contrast: #1c1917;
+  --theme-dark-blue: #1c1917;
+  --theme-deep-blue: #1c1917;
   --theme-title-contrast: #d97706;
-  --theme-header-background: var(--dark-blue);
-  --theme-footer-background: var(--dark-blue);
-  --theme-secondary-dark: var(--dark-blue);
-  --theme-background: #ffffff;
-  --theme-layout-background: var(--light-gray);
-  --theme-card-background: var(--white);
-  --theme-button-background: var(--dark-blue);
-  --theme-text: #0f172a;
+  --theme-header-background: #18181b;
+  --theme-footer-background: #18181b;
+  --theme-secondary-dark: #18181b;
+  --theme-background: #f9f8f6;
+  --theme-layout-background: #f9f8f6;
+  --theme-card-background: #ffffff;
+  --theme-button-background: #18181b;
+  --theme-text: #1c1917;
   --theme-button-text: #fff;
-  --theme-text-secondary: #55607a;
-  --theme-text-tertiary: #0f172a;
-  --theme-border: #e2e8f0;
+  --theme-text-secondary: #57534e;
+  --theme-text-tertiary: #78716c;
+  --theme-border: #e5e3df;
   --theme-warning: #dc2626;
-  --theme-tier-badge: #2e5ce6;
-  --theme-card: #94a3b8;
-  --theme-archive-background: #f8fafc;
-  --theme-slate: var(--slate);
+  --theme-tier-badge: #d97706;
+  --theme-card: #a1a1aa;
+  --theme-archive-background: #fafaf9;
+  --theme-slate: #71717a;
   --theme-success: #16a34a;
   --theme-dropdown-menu: #fff;
-  --theme-search-background: #f1f5f9;
-  --theme-primary-dark: #0b1220;
-  --theme-accent-orange: #d97706;
-  --theme-accent-hover: #b45309;
-  --theme-text-light: #e7eaf0;
+  --theme-search-background: #f4f4f5;
+  --theme-primary-dark: #18181b;
+  // Icon/badge accent — a step darker than --theme-primary so accents
+  // (notification icons, header highlights) read as a deliberate second
+  // tone rather than just reusing the button color everywhere.
+  --theme-accent-orange: #b45309;
+  --theme-accent-hover: #92400e;
+  --theme-text-light: #fafafa;
   --theme-text-white: #ffffff;
-  --theme-section-gray: #f4f6fb;
-  --theme-border-gray: #e2e8f0;
+  --theme-section-gray: #f4f4f5;
+  --theme-border-gray: #e4e4e7;
+
+  // Tip/callout banners (e.g. FeatureCallout) — a distinct soft-amber
+  // treatment, not just a tinted derivation of --theme-primary.
+  --theme-tip-background: #fef3c7;
+  --theme-tip-border: #fcd34d;
+  --theme-tip-text: #78350f;
 }
 
 @mixin dark-theme-vars {
   color-scheme: dark;
 
-  --theme-primary: #5b82f0;
-  --theme-primary-contrast: var(--white);
-  --theme-dark-blue: #e7eaf0;
-  --theme-deep-blue: #e7eaf0;
-  --theme-secondary-blue: var(--secondary-blue);
+  --theme-primary: #f59e0b;
+  --theme-primary-contrast: #09090b;
+  // Warm near-white (stone), not flat white/zinc — same reasoning as the
+  // light-mode text tokens above.
+  --theme-dark-blue: #fafaf9;
+  --theme-deep-blue: #fafaf9;
   --theme-title-contrast: #f59e0b;
-  --theme-header-background: #0b0e14;
-  --theme-footer-background: #0b0e14;
-  --theme-secondary-dark: #0b0e14;
-  --theme-background: #151923;
-  --theme-layout-background: #0b0e14;
-  --theme-card-background: #151923;
-  --theme-button-background: #151923;
-  --theme-text: #e7eaf0;
-  --theme-button-text: var(--white);
-  --theme-text-secondary: #9aa4b8;
-  --theme-text-tertiary: #e7eaf0;
-  --theme-border: #2a3040;
+  --theme-header-background: #18181b;
+  --theme-footer-background: #18181b;
+  --theme-secondary-dark: #18181b;
+  --theme-background: #09090b;
+  --theme-layout-background: #09090b;
+  --theme-card-background: #18181b;
+  --theme-button-background: #18181b;
+  --theme-text: #fafaf9;
+  --theme-button-text: #fff;
+  --theme-text-secondary: #a8a29e;
+  --theme-text-tertiary: #a8a29e;
+  --theme-border: #27272a;
   --theme-warning: #ef4444;
-  --theme-tier-badge: #5b82f0;
-  --theme-card: #2a3040;
-  --theme-archive-background: #151923;
-  --theme-slate: #94a3b8;
+  --theme-tier-badge: #f59e0b;
+  --theme-card: #3f3f46;
+  --theme-archive-background: #18181b;
+  --theme-slate: #a1a1aa;
   --theme-success: #22c55e;
   --theme-dropdown-menu: #fff;
-  --theme-search-background: #1d2230;
-  --theme-primary-dark: #0b0e14;
-  --theme-accent-orange: #f59e0b;
-  --theme-accent-hover: #fbbf24;
-  --theme-text-light: #d7dce8;
+  --theme-search-background: #27272a;
+  --theme-primary-dark: #18181b;
+  --theme-accent-orange: #fbbf24;
+  --theme-accent-hover: #d97706;
+  --theme-text-light: #fafafa;
   --theme-text-white: #ffffff;
-  --theme-section-gray: #1d2230;
-  --theme-border-gray: #2a3040;
+  --theme-section-gray: #27272a;
+  --theme-border-gray: #3f3f46;
+
+  --theme-tip-background: #1e1b18;
+  --theme-tip-border: #451a03;
+  --theme-tip-text: #fde68a;
 }
 
 [data-theme="dark"] {
   @include dark-theme-vars;
 }
 
+// No explicit choice stored (selectedTheme is null) → follow the OS.
+// Guarded by :not([data-theme="default"]) so an explicit light choice
+// always wins over a dark-preferring OS.
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="default"]) {
     @include dark-theme-vars;

@@ -1,13 +1,91 @@
-// ~320px approximates a real CarouselArticleCard's total rendered height
-// (200px image at 16/10 + meta row + actions row) — close enough that
-// swapping this for real cards doesn't shift the page.
-.skeleton {
+@keyframes shimmer {
+  0% {
+    background-position: -300px 0;
+  }
+  100% {
+    background-position: 300px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--theme-layout-background) 0%,
+    var(--theme-border) 50%,
+    var(--theme-layout-background) 100%
+  );
+  background-size: 600px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+// Matches CarouselRow's real .row (same gap/padding) so this drops in
+// without any layout shift once real cards replace it.
+.row {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 320px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--theme-border);
+  gap: 1.1rem;
+  padding: 5px 4px 20px 4px;
+  overflow: hidden;
+
+  @media (max-width: 440px) {
+    gap: 1rem;
+  }
+}
+
+// Matches CarouselArticleCard's .cardWrapper dimensions exactly.
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  flex-shrink: 0;
   background-color: var(--theme-card-background);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--theme-border);
+  overflow: hidden;
+
+  @media (max-width: 440px) {
+    width: 280px;
+  }
+}
+
+.image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+}
+
+.body {
+  padding: 0.9rem 1.1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.line {
+  height: 12px;
+  border-radius: var(--radius-sm);
+}
+
+.lineTitle {
+  width: 100%;
+  height: 16px;
+  margin-bottom: 8px;
+}
+
+.lineTitleShort {
+  width: 65%;
+  height: 16px;
+  margin-bottom: 1rem;
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lineSource {
+  width: 35%;
+}
+
+.lineMeta {
+  width: 20%;
 }

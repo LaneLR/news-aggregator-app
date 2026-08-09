@@ -55,12 +55,18 @@
   color: #fff;
 }
 
-.closeButton {
+.headerActions {
   // Sits opposite the category badge in .headerRow — margin-left: auto
   // pushes it to the far edge whether or not a badge is present, rather
   // than relying on justify-content: space-between (see NewsCardThree's
   // .actionsRow for why that's the more robust pattern here).
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconActionButton {
   flex-shrink: 0;
   display: flex;
   align-items: center;

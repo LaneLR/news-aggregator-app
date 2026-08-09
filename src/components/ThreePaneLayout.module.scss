@@ -78,6 +78,62 @@
     opacity 0.15s ease;
 }
 
+@keyframes fullScreenOverlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fullScreenPanelIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.fullScreenOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;
+  // Same backdrop treatment as the app's other overlays (ConfirmDialogProvider,
+  // CreateFeedModal) — dim enough that the reader is clearly the focus, but
+  // the page underneath stays visible rather than disappearing entirely.
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  animation: fullScreenOverlayIn 0.2s ease;
+
+  @media (max-width: 700px) {
+    padding: 0;
+  }
+}
+
+.fullScreenPanel {
+  width: 100%;
+  max-width: 860px;
+  max-height: 100%;
+  overflow-y: auto;
+  background-color: var(--theme-background);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  animation: fullScreenPanelIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @media (max-width: 700px) {
+    max-width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+}
+
 .listItem {
   cursor: pointer;
   border-radius: var(--radius-lg);
