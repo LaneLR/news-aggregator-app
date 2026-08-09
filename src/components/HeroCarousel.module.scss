@@ -59,6 +59,19 @@
   color: var(--theme-text-secondary);
 }
 
+.emptySectionText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 320px;
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--theme-border);
+  color: var(--theme-text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 0 2rem;
+}
+
 .toggleGroup {
   display: flex;
   flex-wrap: wrap;

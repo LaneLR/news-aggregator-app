@@ -52,12 +52,16 @@ export async function GET(req) {
       }))
     );
 
-    // Combine everything into a structured object
+    // Combine everything into a structured object — every category in
+    // CATEGORIES_TO_DISPLAY gets a key even when empty (`[]`), not just the
+    // ones with current articles. NewNewsPage renders one section per key
+    // it receives; dropping empty categories here would make their whole
+    // section (title included, not just the article row) disappear the
+    // moment real data replaces the loading skeleton, instead of just
+    // showing "nothing new" inside a section that's still there.
     const categorizedArticles = {};
     categoryResults.forEach((result) => {
-      if (result.articles.length > 0) {
-        categorizedArticles[result.category] = result.articles;
-      }
+      categorizedArticles[result.category] = result.articles;
     });
 
     // 4. Add user-specific "liked"/"read" status to all articles

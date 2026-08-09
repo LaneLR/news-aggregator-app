@@ -97,6 +97,18 @@
   }
 }
 
+.emptySectionText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 320px;
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--theme-border);
+  color: var(--theme-text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 .topStoryCard {
   position: relative;
 }

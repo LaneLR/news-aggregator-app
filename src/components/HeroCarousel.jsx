@@ -52,8 +52,6 @@ export default function HeroCarousel() {
     };
   }, [view, sort]);
 
-  if (!isLoading && articles.length === 0) return null;
-
   return (
     <section className={styles.section}>
       <div className={styles.headerRow}>
@@ -108,12 +106,18 @@ export default function HeroCarousel() {
       </div>
       {isLoading ? (
         <CarouselSkeleton />
-      ) : (
+      ) : articles.length > 0 ? (
         <CarouselRow>
           {articles.map((article) => (
             <CarouselArticleCard key={article.url} article={article} />
           ))}
         </CarouselRow>
+      ) : (
+        <p className={styles.emptySectionText}>
+          {view === "forYou"
+            ? "Like, save, or click a few articles and check back here — we'll start tailoring this to you."
+            : "Nothing trending right now — check back soon."}
+        </p>
       )}
     </section>
   );
