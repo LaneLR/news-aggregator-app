@@ -7,8 +7,8 @@ import styles from "./ViewDensityToggle.module.scss";
 // reasoning as ungating dark mode earlier this session. List/Magazine are
 // cosmetic density skins in the Feedly-Pro mold, so those stay gated.
 const OPTIONS = [
-  { value: "card", label: "Card", Icon: LayoutGrid, subscriberOnly: false },
   { value: "reader", label: "Reader (3-pane)", Icon: Columns3, subscriberOnly: false },
+  { value: "card", label: "Card", Icon: LayoutGrid, subscriberOnly: false },
   { value: "list", label: "List", Icon: List, subscriberOnly: true },
   { value: "magazine", label: "Magazine", Icon: Newspaper, subscriberOnly: true },
 ];

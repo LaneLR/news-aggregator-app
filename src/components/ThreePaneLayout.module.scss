@@ -1,42 +1,112 @@
 .threePane {
-  display: grid;
-  grid-template-columns: 240px 520px 1fr;
-  gap: 2rem;
-  align-items: start;
+  display: flex;
+  // Centers the nav+list panes as a block when the reading pane is
+  // collapsed to zero width (see .readingPaneCollapsed) — once it expands
+  // and takes flex-grow: 1, there's no free space left to center, so this
+  // has no visible effect at that point. Deliberately no `gap` here — gap
+  // reserves its full space even for a zero-width flex item, which would
+  // leave a stray sliver next to the collapsed reading pane and throw off
+  // the "as if it weren't there" centering. Spacing between panes is done
+  // with margins instead, on .navPane/.readingPane, so it can be zeroed
+  // out precisely when the reading pane collapses.
+  justify-content: center;
   max-width: 1800px;
   margin: 0 auto;
   padding: 0.5rem 2rem 3rem;
 
-  @media (max-width: 1500px) {
-    grid-template-columns: 220px 440px 1fr;
-  }
-
   @media (max-width: 1280px) {
-    grid-template-columns: 440px 1fr;
-
     .navPane {
       display: none;
     }
   }
 
   @media (max-width: 860px) {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 }
 
-.navPane,
-.listPane {
+.navPane {
+  flex: 0 0 240px;
+  margin-right: 2rem;
   position: sticky;
   top: 0;
   max-height: 100vh;
   overflow-y: auto;
+
+  @media (max-width: 1500px) {
+    flex-basis: 220px;
+  }
 }
 
 .listPane {
+  flex: 0 0 640px;
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding-bottom: 2rem;
+
+  @media (max-width: 1500px) {
+    flex-basis: 540px;
+  }
+
+  @media (max-width: 1280px) {
+    flex-basis: 560px;
+  }
+}
+
+.readingPane {
+  flex: 1 1 0%;
+  margin-left: 2rem;
+  min-width: 0;
+  min-height: 400px;
+  opacity: 1;
+  transition: flex-grow 0.35s ease, flex-basis 0.35s ease, margin-left 0.35s ease,
+    opacity 0.3s ease 0.05s;
+}
+
+.readingPaneCollapsed {
+  flex: 0 0 0%;
+  margin-left: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: flex-grow 0.3s ease, flex-basis 0.3s ease, margin-left 0.3s ease,
+    opacity 0.15s ease;
+}
+
+.readingPaneInner {
+  position: relative;
+  // Reserves room so the floating close button never overlaps the
+  // article's own category badge/title.
+  padding-top: 3.25rem;
+}
+
+.closeButton {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--theme-border);
+  background-color: var(--theme-card-background);
+  color: var(--theme-text-secondary);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+
+  &:hover {
+    color: var(--theme-primary);
+    border-color: var(--theme-primary);
+  }
 }
 
 .listItem {
@@ -47,10 +117,6 @@
     outline: 2px solid var(--theme-primary);
     outline-offset: 2px;
   }
-}
-
-.readingPane {
-  min-height: 400px;
 }
 
 .emptyState {
@@ -65,46 +131,25 @@
   border-radius: var(--radius-md);
 }
 
-.backButton {
-  display: none;
-  align-items: center;
-  gap: 6px;
-  margin: 0 auto 1rem;
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: 1px solid var(--theme-border);
-  background-color: var(--theme-card-background);
-  color: var(--theme-text-secondary);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-
-  &:hover {
-    color: var(--theme-primary);
-    border-color: var(--theme-primary);
-  }
-}
-
 @media (max-width: 860px) {
   .navPane,
   .listPane {
     position: static;
     max-height: none;
+    margin-right: 0;
   }
 
   .listPaneHidden {
     display: none;
   }
 
-  .readingPane {
+  .readingPaneCollapsed {
     display: none;
   }
 
-  .readingPaneVisible {
-    display: block;
-  }
-
-  .readingPaneVisible .backButton {
-    display: flex;
+  .readingPaneExpanded {
+    flex-basis: auto;
+    width: 100%;
+    margin-left: 0;
   }
 }

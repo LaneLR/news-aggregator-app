@@ -13,6 +13,13 @@ import styles from "./ThreePaneLayout.module.scss";
 // an article fetches its content via /api/articles/reader/[id] instead of
 // navigating away, so j/k + Enter (see useArticleShortcuts' onOpen param)
 // can move through a whole category without ever leaving the list.
+//
+// The reading pane column has zero width until an article is selected —
+// see .readingPane/.readingPaneCollapsed in the stylesheet — so with
+// nothing selected the layout reads as a plain 2-pane (nav + list) view,
+// centered in the available space, rather than a 3rd empty pane just
+// sitting there. Selecting an article grows that column back in (and the
+// nav/list panes slide left to make room) via an animated flex-basis.
 export default function ThreePaneLayout({
   articles,
   archiveId,
@@ -94,33 +101,38 @@ export default function ThreePaneLayout({
         ))}
       </div>
 
-      <div className={`${styles.readingPane} ${selectedArticleId ? styles.readingPaneVisible : ""}`}>
-        {!selectedArticleId ? (
-          <div className={styles.emptyState}>
-            <p>Select an article to start reading.</p>
-          </div>
-        ) : (
-          <>
-            <button type="button" className={styles.backButton} onClick={() => onSelectArticle(null)}>
-              <X size={16} strokeWidth={2} />
-              Close
+      <div
+        className={`${styles.readingPane} ${
+          selectedArticleId ? styles.readingPaneExpanded : styles.readingPaneCollapsed
+        }`}
+      >
+        <div className={styles.readingPaneInner}>
+          {selectedArticleId && (
+            <button
+              type="button"
+              className={styles.closeButton}
+              onClick={() => onSelectArticle(null)}
+              title="Close"
+              aria-label="Close"
+            >
+              <X size={18} strokeWidth={2} />
             </button>
-            {readerLoading ? (
-              <Loading />
-            ) : readerError ? (
-              <div className={styles.emptyState}>
-                <p>{readerError}</p>
-              </div>
-            ) : readerData ? (
-              <ArticleReader
-                article={readerData.article}
-                sanitizedContent={readerData.sanitizedContent}
-                relatedCoverage={readerData.relatedCoverage}
-                readingTime={readerData.readingTime}
-              />
-            ) : null}
-          </>
-        )}
+          )}
+          {readerLoading ? (
+            <Loading />
+          ) : readerError ? (
+            <div className={styles.emptyState}>
+              <p>{readerError}</p>
+            </div>
+          ) : readerData ? (
+            <ArticleReader
+              article={readerData.article}
+              sanitizedContent={readerData.sanitizedContent}
+              relatedCoverage={readerData.relatedCoverage}
+              readingTime={readerData.readingTime}
+            />
+          ) : null}
+        </div>
       </div>
     </div>
   );
