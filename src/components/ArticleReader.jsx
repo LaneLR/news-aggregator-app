@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Heart, Lock, ExternalLink, Newspaper } from "lucide-react";
+import { Heart, Lock, ExternalLink, Newspaper, X } from "lucide-react";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 import ShareButton from "./ShareButton";
 import ReaderCustomizationPanel from "./ReaderCustomizationPanel";
@@ -22,7 +22,7 @@ function extractPlainText(html) {
   return doc.body.textContent || "";
 }
 
-export default function ArticleReader({ article, sanitizedContent, relatedCoverage, readingTime }) {
+export default function ArticleReader({ article, sanitizedContent, relatedCoverage, readingTime, onClose }) {
   const { data: session } = useSession();
   const router = useRouter();
   const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
@@ -71,13 +71,28 @@ export default function ArticleReader({ article, sanitizedContent, relatedCovera
   return (
     <div className={styles.wrapper} style={readerPrefsToCssVars(prefs)}>
       <article className={styles.article}>
-        {badgeCategory && (
-          <span
-            className={styles.categoryBadge}
-            style={{ backgroundColor: getCategoryColor(badgeCategory) }}
-          >
-            {badgeCategory}
-          </span>
+        {(badgeCategory || onClose) && (
+          <div className={styles.headerRow}>
+            {badgeCategory && (
+              <span
+                className={styles.categoryBadge}
+                style={{ backgroundColor: getCategoryColor(badgeCategory) }}
+              >
+                {badgeCategory}
+              </span>
+            )}
+            {onClose && (
+              <button
+                type="button"
+                className={styles.closeButton}
+                onClick={onClose}
+                title="Close"
+                aria-label="Close"
+              >
+                <X size={18} strokeWidth={2} />
+              </button>
+            )}
+          </div>
         )}
 
         <h1 className={`${styles.title} headline`}>{article.title}</h1>

@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
 import NewsCardThree from "./NewsCardThree";
 import ArticleReader from "./ArticleReader";
 import ReaderNavSidebar from "./ReaderNavSidebar";
@@ -106,33 +105,21 @@ export default function ThreePaneLayout({
           selectedArticleId ? styles.readingPaneExpanded : styles.readingPaneCollapsed
         }`}
       >
-        <div className={styles.readingPaneInner}>
-          {selectedArticleId && (
-            <button
-              type="button"
-              className={styles.closeButton}
-              onClick={() => onSelectArticle(null)}
-              title="Close"
-              aria-label="Close"
-            >
-              <X size={18} strokeWidth={2} />
-            </button>
-          )}
-          {readerLoading ? (
-            <Loading />
-          ) : readerError ? (
-            <div className={styles.emptyState}>
-              <p>{readerError}</p>
-            </div>
-          ) : readerData ? (
-            <ArticleReader
-              article={readerData.article}
-              sanitizedContent={readerData.sanitizedContent}
-              relatedCoverage={readerData.relatedCoverage}
-              readingTime={readerData.readingTime}
-            />
-          ) : null}
-        </div>
+        {readerLoading ? (
+          <Loading />
+        ) : readerError ? (
+          <div className={styles.emptyState}>
+            <p>{readerError}</p>
+          </div>
+        ) : readerData ? (
+          <ArticleReader
+            article={readerData.article}
+            sanitizedContent={readerData.sanitizedContent}
+            relatedCoverage={readerData.relatedCoverage}
+            readingTime={readerData.readingTime}
+            onClose={() => onSelectArticle(null)}
+          />
+        ) : null}
       </div>
     </div>
   );

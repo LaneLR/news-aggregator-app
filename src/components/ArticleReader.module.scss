@@ -22,8 +22,13 @@
   }
 }
 
+.headerRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
 .categoryBadge {
-  align-self: flex-start;
   padding: 4px 12px;
   border-radius: 999px;
   font-size: 0.7rem;
@@ -31,7 +36,33 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #fff;
-  margin-bottom: 0.75rem;
+}
+
+.closeButton {
+  // Sits opposite the category badge in .headerRow — margin-left: auto
+  // pushes it to the far edge whether or not a badge is present, rather
+  // than relying on justify-content: space-between (see NewsCardThree's
+  // .actionsRow for why that's the more robust pattern here).
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--theme-border);
+  background-color: transparent;
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  transition: color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out;
+
+  &:hover {
+    color: var(--theme-primary);
+    border-color: var(--theme-primary);
+    background-color: var(--theme-layout-background);
+  }
 }
 
 .title {
