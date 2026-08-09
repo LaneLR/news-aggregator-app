@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import { Bookmark } from "lucide-react";
 import initializeDbAndModels from "@/lib/db";
@@ -105,9 +106,9 @@ export default async function SharedArchivePage({ params }) {
 
       <p className={styles.footerNote}>
         Shared from{" "}
-        <a href="/" className={styles.footerLink}>
+        <Link href="/" className={styles.footerLink}>
           MorningFeeds
-        </a>{" "}
+        </Link>{" "}
         — a fast, customizable RSS news aggregator.
       </p>
     </div>
