@@ -79,6 +79,26 @@ a {
   text-decoration: none;
 }
 
+.skipLink {
+  position: absolute;
+  top: -48px;
+  left: 8px;
+  z-index: 4000;
+  background-color: var(--dark-blue);
+  color: var(--light-white);
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.15s ease;
+
+  &:focus {
+    top: 8px;
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+  }
+}
+
 // Headline/editorial typeface — used selectively for article titles and
 // section headings via the .headline utility class, layered on top of
 // Roboto for UI chrome. See layout.js for the font loader.

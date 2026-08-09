@@ -1,4 +1,11 @@
 .saveButton {
+  // Two of the three variants this class is used on are now real <button>
+  // elements (see ArchiveToggleButton.jsx) — reset the browser's default
+  // button chrome so they still look identical to the plain status <div>.
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
   color: var(--theme-text-secondary);
   border-radius: 999px;
   display: flex;
@@ -15,6 +22,11 @@
 
   &.saved {
     color: var(--theme-primary);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 }
 

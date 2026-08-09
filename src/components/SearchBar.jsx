@@ -164,6 +164,7 @@ export default function SearchBar() {
         onFocus={() => setIsOpen(true)}
         onKeyDown={handleKeyDown}
         role="combobox"
+        aria-label="Search articles"
         aria-expanded={isOpen}
         aria-autocomplete="list"
         autoComplete="off"

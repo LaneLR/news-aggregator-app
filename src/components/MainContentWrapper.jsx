@@ -2,5 +2,9 @@
 import styles from "./MainContentWrapper.module.scss";
 
 export default function MainContentWrapper({ children }) {
-  return <div className={styles.wrapper}>{children}</div>;
+  return (
+    <main id="main-content" className={styles.wrapper}>
+      {children}
+    </main>
+  );
 }

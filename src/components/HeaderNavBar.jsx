@@ -137,7 +137,7 @@ export default function HeaderNavBar() {
   );
 
   return (
-    <div className={styles.wrapper}>
+    <nav className={styles.wrapper} aria-label="Categories">
       <NavLink {...ALL_ARTICLES_LINK} />
       <span className={styles.divider} />
       {isSubscribed && PERSONAL_LINKS.map((link) => <NavLink key={link.href} {...link} />)}
@@ -184,6 +184,6 @@ export default function HeaderNavBar() {
             )}
         </div>
       )}
-    </div>
+    </nav>
   );
 }

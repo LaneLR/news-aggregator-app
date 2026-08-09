@@ -63,7 +63,15 @@ export default function ShareButton({ article }) {
 
   return (
     <div className={styles.shareWrapper} ref={wrapperRef}>
-      <button className={styles.button} onClick={handleShare} title="Share article">
+      <button
+        type="button"
+        className={styles.button}
+        onClick={handleShare}
+        title="Share article"
+        aria-label="Share article"
+        aria-haspopup="menu"
+        aria-expanded={showFallback}
+      >
         <Share2 size={18} strokeWidth={2} />
       </button>
 

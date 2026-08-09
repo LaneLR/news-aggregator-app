@@ -118,40 +118,47 @@ export default function ArchiveToggleButton({
   return (
     <div style={{ position: "relative" }}>
       {isSaved && propArchiveId && !viewOnly ? (
-        <div
+        <button
+          type="button"
           data-action="save"
           className={`${styles.saveButton} ${styles.saved}`}
           onClick={handleRemove}
           disabled={loading}
           title="Remove from archive"
+          aria-label="Remove from archive"
         >
           <Bookmark size={19} strokeWidth={2} fill="currentColor" />
-        </div>
+        </button>
       ) : viewOnly && isSaved ? (
         <div
           className={`${styles.saveButton} ${styles.saved}`}
           style={{ cursor: "default" }}
           title="Saved"
+          aria-label="Saved"
         >
           <Bookmark size={19} strokeWidth={2} fill="currentColor" />
         </div>
       ) : (
         <>
-          <div
+          <button
+            type="button"
             data-action="save"
             className={`${styles.saveButton} ${isSaved ? styles.saved : ""}`}
             onClick={() => setDropdownVisible(!dropdownVisible)}
             disabled={loading}
             title={isSaved ? "Saved" : "Save to archive"}
+            aria-label={isSaved ? "Saved" : "Save to archive"}
+            aria-haspopup="menu"
+            aria-expanded={dropdownVisible}
           >
             <Bookmark size={19} strokeWidth={2} fill={isSaved ? "currentColor" : "none"} />
-          </div>
+          </button>
 
           {dropdownVisible && (
             <ul className={styles.dropdown}>
               {archives.map((archive) => (
                 <li key={archive.id} className={styles.dropdownItem}>
-                  <button onClick={() => handleArchiveSelect(archive.id)}>
+                  <button type="button" onClick={() => handleArchiveSelect(archive.id)}>
                     {archive.name}
                   </button>
                 </li>
