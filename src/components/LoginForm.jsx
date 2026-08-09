@@ -11,6 +11,29 @@ import GoogleSignInButton from "./GoogleSignInButton";
 import AuthLayout from "./AuthLayout";
 import styles from "./LoginForm.module.scss";
 
+// Keyed on the custom `code` each CredentialsSignin subclass sets in
+// src/lib/auth.js — res.error itself is always just the generic
+// "CredentialsSignin" string for every credentials failure, so it can't
+// distinguish these on its own (see auth.js's comment for why).
+const ERROR_MESSAGES = {
+  "no-account": "No account found with that email.",
+  "account-inactive": "This account is inactive or deleted.",
+  "google-only": "This account uses Google sign-in — try the button below instead.",
+  "invalid-password": "Incorrect password.",
+  "email-not-verified": "Please verify your email address before logging in.",
+};
+const DEFAULT_ERROR_MESSAGE = "Something went wrong signing in. Please try again.";
+
+// Google sign-in (unlike the credentials form) does a full redirect back to
+// /login?error=<type> on failure rather than resolving a promise here, so
+// it's handled separately by reading the URL instead of a signIn() result.
+const OAUTH_ERROR_MESSAGES = {
+  OAuthAccountNotLinked:
+    "That email is already registered with a password — sign in with your password instead, or use the same method you originally signed up with.",
+  AccessDenied: "Google sign-in was cancelled.",
+  AccountInactive: "This account is inactive or deleted.",
+};
+
 export default function LoginPage() {
   const [user, setUser] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
@@ -20,6 +43,13 @@ export default function LoginPage() {
   const { data: session, status } = useSession();
   const searchParams = useSearchParams();
   const justVerified = searchParams.get("verified") === "1";
+
+  useEffect(() => {
+    const oauthError = searchParams.get("error");
+    if (oauthError) {
+      setError(OAUTH_ERROR_MESSAGES[oauthError] || DEFAULT_ERROR_MESSAGE);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Safety net for landing on /login while already signed in (e.g. via
@@ -48,7 +78,7 @@ export default function LoginPage() {
 
     if (res.error) {
       setLoading(false);
-      setError(`${res.error}`);
+      setError(ERROR_MESSAGES[res.code] || DEFAULT_ERROR_MESSAGE);
       return;
     }
 

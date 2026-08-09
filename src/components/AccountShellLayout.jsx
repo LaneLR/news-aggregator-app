@@ -13,7 +13,10 @@ export default function AccountShellLayout({ children }) {
     <Suspense fallback={<Loading />}>
       <div className={styles.layoutRow}>
         <SideBarNav />
-        <main className={styles.main}>{children}</main>
+        {/* Not a <main> — MainContentWrapper already provides the page's
+            one #main-content landmark; a second nested <main> here would
+            be an invalid duplicate landmark. */}
+        <div className={styles.main}>{children}</div>
       </div>
     </Suspense>
   );

@@ -6,8 +6,7 @@ import Button from "./Button";
 import { useEffect, useState } from "react";
 import CopyButton from "./CopyButton";
 import Link from "next/link";
-import { CreditCard, Gift, Heart, Palette, Shield, ShieldAlert, LayoutGrid, Rows3 } from "lucide-react";
-import RecentlyLikedItem from "./RecentlyLikedArticle";
+import { CreditCard, Gift, Palette, Shield, ShieldAlert, LayoutGrid, Rows3 } from "lucide-react";
 import ThemeSelector from "./ThemeSelector";
 import styles from "./ProfilePage.module.scss";
 
@@ -17,7 +16,6 @@ const LAYOUT_STORAGE_KEY = "accountCardLayout";
 
 export default function ProfilePage() {
   const { data: session, status, update } = useSession();
-  const [recentlyLiked, setRecentlyLiked] = useState([]);
   const [layout, setLayout] = useState("grid");
 
   useEffect(() => {
@@ -35,21 +33,6 @@ export default function ProfilePage() {
     : FALLBACK_IMAGE_URL;
 
   const [imageSrc, setImageSrc] = useState(FALLBACK_IMAGE_URL);
-
-  useEffect(() => {
-    const fetchRecentlyLiked = async () => {
-      try {
-        const res = await fetch("/api/articles/liked?limit=3");
-        const data = await res.json();
-        if (res.ok) {
-          setRecentlyLiked(data.articles);
-        }
-      } catch (err) {
-        console.error("Failed to fetch recently liked articles:", err);
-      }
-    };
-    fetchRecentlyLiked();
-  }, []);
 
   useEffect(() => {
     if (session?.user?.image) {
@@ -300,33 +283,6 @@ export default function ProfilePage() {
                 </div>
               </>
             )}
-          </div>
-        </div>
-
-        <div className={styles.card}>
-          <h2 className={styles.cardHeader}>
-            <span className={styles.cardHeaderIcon}>
-              <Heart size={17} />
-            </span>
-            Recently Liked
-          </h2>
-          <div className={styles.cardContent}>
-            {recentlyLiked.length > 0 ? (
-              <ul className={styles.recentlyLikedList}>
-                {recentlyLiked.map((article) => (
-                  <RecentlyLikedItem key={article.url} article={article} />
-                ))}
-              </ul>
-            ) : (
-              <p>Your recently liked articles will appear here.</p>
-            )}
-          </div>
-          <div className={styles.cardFooter}>
-            <Link href="/liked" passHref>
-              <Button bgColor={"var(--theme-primary)"} clr={"var(--theme-button-text)"}>
-                View Liked Articles
-              </Button>
-            </Link>
           </div>
         </div>
 

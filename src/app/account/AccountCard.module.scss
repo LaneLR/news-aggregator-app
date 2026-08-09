@@ -1,9 +1,11 @@
 // Wraps single-card account pages (currently just Subscription & Billing)
-// so the card is centered in the available space instead of stuck in the
-// top-left corner of a mostly-empty content column.
+// so the card is horizontally centered in the available space instead of
+// stuck against the left edge — but starts from the top rather than
+// vertically centering, so it doesn't float in the middle of a tall,
+// mostly-empty content column.
 .pageWrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   min-height: 100%;
   padding: 2rem 1rem;
