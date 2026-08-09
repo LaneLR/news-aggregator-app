@@ -166,12 +166,13 @@ export default function SearchBar() {
         role="combobox"
         aria-label="Search articles"
         aria-expanded={isOpen}
+        aria-controls="search-suggestions-listbox"
         aria-autocomplete="list"
         autoComplete="off"
       />
 
       {isOpen && (listItems.length > 0 || hasTrailingRow) && (
-        <div className={styles.dropdown} role="listbox">
+        <div id="search-suggestions-listbox" className={styles.dropdown} role="listbox">
           {showingRecent ? (
             <>
               <p className={styles.dropdownLabel}>

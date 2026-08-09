@@ -54,6 +54,24 @@ export const CATEGORY_LINKS = [
   { label: "Weather", href: "/category/weather", Icon: CloudSun },
 ];
 
+// Defined outside the component (rather than as a closure inside
+// HeaderNavBar) so it isn't redefined — and every <NavLink> forcibly
+// remounted — on every single render.
+const NavLink = ({ label, href, Icon, dragProps, dragState, pathname }) => (
+  <Link
+    href={href}
+    className={`${styles.link} ${pathname === href ? styles.active : ""} ${
+      dragProps ? styles.draggable : ""
+    } ${dragState === "dragging" ? styles.dragging : ""} ${
+      dragState === "dragOver" ? styles.dragOver : ""
+    }`}
+    {...dragProps}
+  >
+    <Icon size={15} strokeWidth={2.25} />
+    {label}
+  </Link>
+);
+
 export default function HeaderNavBar() {
   const { data: session } = useSession();
   const pathname = usePathname();
@@ -121,30 +139,17 @@ export default function HeaderNavBar() {
     (reordered) => setCategoryOrder(reordered.map((l) => l.href))
   );
 
-  const NavLink = ({ label, href, Icon, dragProps, dragState }) => (
-    <Link
-      href={href}
-      className={`${styles.link} ${pathname === href ? styles.active : ""} ${
-        dragProps ? styles.draggable : ""
-      } ${dragState === "dragging" ? styles.dragging : ""} ${
-        dragState === "dragOver" ? styles.dragOver : ""
-      }`}
-      {...dragProps}
-    >
-      <Icon size={15} strokeWidth={2.25} />
-      {label}
-    </Link>
-  );
-
   return (
     <nav className={styles.wrapper} aria-label="Categories">
-      <NavLink {...ALL_ARTICLES_LINK} />
+      <NavLink {...ALL_ARTICLES_LINK} pathname={pathname} />
       <span className={styles.divider} />
-      {isSubscribed && PERSONAL_LINKS.map((link) => <NavLink key={link.href} {...link} />)}
+      {isSubscribed &&
+        PERSONAL_LINKS.map((link) => <NavLink key={link.href} {...link} pathname={pathname} />)}
       {primaryCategories.map((link, i) => (
         <NavLink
           key={link.href}
           {...link}
+          pathname={pathname}
           dragProps={canReorder ? getHandlers(i) : undefined}
           dragState={draggedIndex === i ? "dragging" : dragOverIndex === i ? "dragOver" : undefined}
         />
