@@ -78,37 +78,6 @@
     opacity 0.15s ease;
 }
 
-.readingPaneInner {
-  position: relative;
-  // Reserves room so the floating close button never overlaps the
-  // article's own category badge/title.
-  padding-top: 3.25rem;
-}
-
-.closeButton {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  border: 1px solid var(--theme-border);
-  background-color: var(--theme-card-background);
-  color: var(--theme-text-secondary);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: color 0.15s ease-in-out, border-color 0.15s ease-in-out;
-
-  &:hover {
-    color: var(--theme-primary);
-    border-color: var(--theme-primary);
-  }
-}
-
 .listItem {
   cursor: pointer;
   border-radius: var(--radius-lg);
