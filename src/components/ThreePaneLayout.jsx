@@ -58,9 +58,11 @@ export default function ThreePaneLayout({
     };
   }, [selectedArticleId]);
 
-  // A click anywhere on the card that isn't a link/button (thumbnail,
-  // title, and the share/save/like/read-article controls all keep their
-  // own behavior) selects the article into the reading pane.
+  // NewsCardThree's title/thumbnail links call onSelect directly (see
+  // below) instead of navigating away. This wrapper-level handler is the
+  // fallback for clicking blank card space that isn't a link/button — the
+  // share/save/like controls and the explicit "Read article" link keep
+  // their own behavior either way.
   const handleListItemClick = (event, article) => {
     if (event.target.closest("a, button")) return;
     onSelectArticle(article);
@@ -86,6 +88,7 @@ export default function ThreePaneLayout({
               viewOnly={viewOnly}
               isKeyboardFocused={i === selectedIndex}
               innerRef={(el) => (cardRefs.current[i] = el)}
+              onSelect={() => onSelectArticle(article)}
             />
           </div>
         ))}

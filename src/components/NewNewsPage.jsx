@@ -123,12 +123,16 @@ export default function NewsPage() {
             </div>
             {categoriesLoading ? (
               <CarouselSkeleton />
-            ) : (
+            ) : articles.length > 0 ? (
               <CarouselRow>
                 {articles.map((article) => (
                   <CarouselArticleCard key={article.url} article={article} />
                 ))}
               </CarouselRow>
+            ) : (
+              <p className={styles.emptySectionText}>
+                No {category.toLowerCase()} articles right now — check back soon.
+              </p>
             )}
           </section>
         );

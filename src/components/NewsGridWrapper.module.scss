@@ -1,19 +1,20 @@
 .wrapper {
   display: grid;
-  column-gap: 30px;
-  padding: 20px;
-  max-width: 1300px;
+  // auto-fill/minmax instead of a fixed repeat(3, 1fr) + width breakpoints —
+  // columns size themselves from an explicit 340px floor rather than a bare
+  // 1fr (whose implicit minimum is "auto", i.e. its content's size). That
+  // bare-1fr behavior was the actual bug: a card with a slightly longer
+  // title/source line than its row-neighbors could force that one column
+  // wider, eating straight into the gap next to it — which is why the
+  // missing gap only showed up on some rows, not every row. This also
+  // drops the two manual column-count breakpoints; auto-fill adapts
+  // continuously instead of jumping at fixed widths.
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 32px;
+  padding: 24px;
+  max-width: 1400px;
   margin: 0 auto;
   background-color: inherit;
-  grid-template-columns: repeat(3, 1fr);
-
-  @media (max-width: 1290px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: 885px) {
-    grid-template-columns: repeat(1, 1fr);
-  }
 }
 
 // Compact single-column row layout — swaps NewsGridWrapper's grid for a
@@ -26,11 +27,13 @@
   grid-template-columns: none;
 }
 
-// Fewer, larger cards for a magazine-style skim.
+// Fewer, larger cards for a magazine-style skim. minmax(0, 1fr), not a bare
+// 1fr, for the same reason as .wrapper above — keeps both columns pinned
+// to an even split regardless of which card's content is longer.
 .magazineWrapper {
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 
   @media (max-width: 885px) {
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 }

@@ -1,14 +1,18 @@
 .threePane {
   display: grid;
-  grid-template-columns: 220px 380px 1fr;
-  gap: 1.5rem;
+  grid-template-columns: 240px 520px 1fr;
+  gap: 2rem;
   align-items: start;
-  max-width: 1500px;
+  max-width: 1800px;
   margin: 0 auto;
-  padding: 0.5rem 1.5rem 3rem;
+  padding: 0.5rem 2rem 3rem;
+
+  @media (max-width: 1500px) {
+    grid-template-columns: 220px 440px 1fr;
+  }
 
   @media (max-width: 1280px) {
-    grid-template-columns: 340px 1fr;
+    grid-template-columns: 440px 1fr;
 
     .navPane {
       display: none;
@@ -31,7 +35,7 @@
 .listPane {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
   padding-bottom: 2rem;
 }
 

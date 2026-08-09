@@ -1,5 +1,11 @@
 .swipeWrapper {
   position: relative;
+  // This is the actual grid item inside NewsGridWrapper — without an
+  // explicit min-width, a grid/flex item's default min-width is "auto"
+  // (its content's own size), which can let a card with slightly longer
+  // text than its row-neighbors force its whole column wider than the
+  // grid's fair-share math, eating into the gap next to it.
+  min-width: 0;
   border-radius: var(--radius-lg);
   overflow: hidden;
   touch-action: pan-y;
@@ -36,7 +42,6 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   width: 100%;
-  max-width: 400px;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--theme-border);
@@ -68,24 +73,27 @@
     }
   }
 
-  // Compact horizontal row — small thumbnail, single-line title, no snippet.
+  // Horizontal row for the 3-pane reader's list pane — wide thumbnail and a
+  // large, two-line title so it's obvious what you're about to click, with
+  // room to spare since this pane isn't fighting a 3-column card grid for
+  // width the way .densityMagazine/.densityCard are.
   &.densityList {
-    max-width: none;
     flex-direction: row;
     align-items: stretch;
+    min-height: 132px;
 
     &:hover {
       transform: none;
     }
 
     .imageLink {
-      width: 96px;
+      width: 160px;
       height: auto;
       flex-shrink: 0;
     }
 
     .contentArea {
-      padding: 0.6rem 1rem;
+      padding: 0.9rem 1.25rem;
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
@@ -93,13 +101,14 @@
     }
 
     .articleTitle {
-      -webkit-line-clamp: 1;
-      font-size: 0.98rem;
-      margin: 0;
+      -webkit-line-clamp: 3;
+      font-size: 1.2rem;
+      line-height: 1.3;
+      margin: 0 0 0.4rem 0;
     }
 
     .articleSnippetText {
-      display: none;
+      margin: 0;
     }
 
     .actionsRow {
@@ -116,8 +125,6 @@
 
   // Bigger visual emphasis for a skim-the-headlines magazine feel.
   &.densityMagazine {
-    max-width: none;
-
     .imageLink {
       height: 280px;
     }
@@ -132,22 +139,22 @@
   display: block;
   position: relative;
   width: 100%;
-  height: 200px;
+  height: 220px;
   background-color: var(--theme-layout-background);
 }
 
 .contentArea {
-  padding: 1.1rem;
+  padding: 1.35rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 }
 
 .articleTitle {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--theme-dark-blue);
-  line-height: 1.35;
+  line-height: 1.4;
   margin: 0 0 0.5rem 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;

@@ -157,7 +157,7 @@ export default function defineUser(sequelize) {
       viewDensity: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: "card",
+        defaultValue: "reader",
       },
     },
     {
