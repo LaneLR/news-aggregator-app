@@ -6,7 +6,7 @@ import NewsCardThree from "./NewsCardThree";
 import ThreePaneLayout from "./ThreePaneLayout";
 import MarkAllReadButton from "./MarkAllReadButton";
 import ViewDensityToggle from "./ViewDensityToggle";
-import Loading from "@/app/loading";
+import CardSkeleton from "./CardSkeleton";
 import { useArticleShortcuts } from "@/lib/useArticleShortcuts";
 import { useMarkAllRead } from "@/lib/useMarkAllRead";
 import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
@@ -86,7 +86,11 @@ export default function ForYouFeed() {
       )}
 
       {isLoading ? (
-        <Loading />
+        <NewsGridWrapper density={viewDensity === "reader" ? "list" : viewDensity}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <CardSkeleton key={i} density={viewDensity === "reader" ? "list" : viewDensity} />
+          ))}
+        </NewsGridWrapper>
       ) : error ? (
         <p className={styles.statusText}>Error: {error}</p>
       ) : articles.length > 0 ? (
@@ -111,6 +115,7 @@ export default function ForYouFeed() {
                 viewOnly={true}
                 isKeyboardFocused={i === selectedIndex}
                 innerRef={(el) => (cardRefs.current[i] = el)}
+                index={i}
               />
             ))}
           </NewsGridWrapper>

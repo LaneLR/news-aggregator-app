@@ -115,7 +115,8 @@ export async function GET() {
 
     let ranked;
     if (!hasSignal) {
-      ranked = await fetchTrending(Article, RESULT_LIMIT, excludedUrls, keywordExclusion);
+      const trending = await fetchTrending(Article, RESULT_LIMIT, excludedUrls, keywordExclusion);
+      ranked = trending.map((article) => ({ article, reason: null }));
     } else {
       const topSources = Object.entries(sourceWeights)
         .sort((a, b) => b[1] - a[1])
@@ -144,36 +145,56 @@ export async function GET() {
 
       const now = Date.now();
       const scored = candidates.map((article) => {
-        let score = sourceWeights[article.sourceName] || 0;
+        // Tracks whichever single signal (a followed source, or a category
+        // you engage with) contributed the most weight, so the UI can show
+        // an honest "Because you..." reason instead of a black-box ranking.
+        let score = 0;
+        let reason = null;
+        let reasonWeight = 0;
+
+        const sourceScore = sourceWeights[article.sourceName] || 0;
+        score += sourceScore;
+        if (sourceScore > reasonWeight) {
+          reasonWeight = sourceScore;
+          reason = `Because you follow ${article.sourceName}`;
+        }
+
         if (Array.isArray(article.category)) {
           article.category.forEach((c) => {
-            score += categoryWeights[c] || 0;
+            const catScore = categoryWeights[c] || 0;
+            score += catScore;
+            if (catScore > reasonWeight) {
+              reasonWeight = catScore;
+              reason = `Because you read ${c}`;
+            }
           });
         }
+
         const publishedAt = article.publishedAt || article.createdAt;
         const daysOld = (now - new Date(publishedAt).getTime()) / 86400000;
         const recencyBoost = Math.max(0, 3 - daysOld * 0.15);
         const popularityBoost = Math.log10(
           (article.clickCount || 0) + (article.likeCount || 0) + 1
         );
-        return { article, score: score + recencyBoost + popularityBoost };
+        return { article, score: score + recencyBoost + popularityBoost, reason };
       });
       scored.sort((a, b) => b.score - a.score);
-      ranked = scored.slice(0, RESULT_LIMIT).map((s) => s.article);
+      ranked = scored.slice(0, RESULT_LIMIT);
 
       if (ranked.length < MIN_RESULTS_BEFORE_BACKFILL) {
-        const backfillExclude = [...excludedUrls, ...ranked.map((a) => a.url)];
+        const backfillExclude = [...excludedUrls, ...ranked.map((s) => s.article.url)];
         const backfill = await fetchTrending(
           Article,
           MIN_RESULTS_BEFORE_BACKFILL - ranked.length,
           backfillExclude,
           keywordExclusion
         );
-        ranked = [...ranked, ...backfill];
+        // Backfill is generic trending, not personalized — no reason attached.
+        ranked = [...ranked, ...backfill.map((article) => ({ article, reason: null }))];
       }
     }
 
-    const rankedUrls = ranked.map((a) => a.url);
+    const rankedUrls = ranked.map((r) => r.article.url);
     const userReads = rankedUrls.length
       ? await ReadArticle.findAll({
           where: { userId, articleUrl: { [Op.in]: rankedUrls } },
@@ -183,10 +204,11 @@ export async function GET() {
     const readUrls = new Set(userReads.map((read) => read.articleUrl));
 
     const likedUrlSet = new Set(likedUrls);
-    const articles = ranked.map((a) => ({
+    const articles = ranked.map(({ article: a, reason }) => ({
       ...a.toJSON(),
       isLikedByUser: likedUrlSet.has(a.url),
       isRead: readUrls.has(a.url),
+      recommendationReason: reason,
     }));
 
     return NextResponse.json({ articles });

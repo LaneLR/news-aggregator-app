@@ -1,10 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useToast } from "./ToastProvider";
 import styles from "./DigestSettings.module.scss";
 
 export default function DigestSettings() {
   const { data: session } = useSession();
+  const toast = useToast();
   const [prefs, setPrefs] = useState(null);
   const [feeds, setFeeds] = useState([]);
   const [saving, setSaving] = useState(false);
@@ -38,7 +40,7 @@ export default function DigestSettings() {
       setPrefs((prev) => ({ ...prev, ...data }));
     } catch (err) {
       console.error("Failed to update digest preferences:", err);
-      alert("Something went wrong updating your email digest settings.");
+      toast.error("Something went wrong updating your email digest settings.");
     } finally {
       setSaving(false);
     }

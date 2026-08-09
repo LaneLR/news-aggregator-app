@@ -2,9 +2,11 @@
 import { useState } from "react";
 import { Globe, Lock } from "lucide-react";
 import CopyButton from "./CopyButton";
+import { useToast } from "./ToastProvider";
 import styles from "./ArchiveVisibilityToggle.module.scss";
 
 export default function ArchiveVisibilityToggle({ archiveId, initialIsPublic, initialSlug }) {
+  const toast = useToast();
   const [isPublic, setIsPublic] = useState(!!initialIsPublic);
   const [slug, setSlug] = useState(initialSlug || null);
   const [saving, setSaving] = useState(false);
@@ -22,9 +24,10 @@ export default function ArchiveVisibilityToggle({ archiveId, initialIsPublic, in
       const data = await res.json();
       setIsPublic(data.isPublic);
       setSlug(data.publicSlug);
+      toast.success(data.isPublic ? "Archive is now public." : "Archive is now private.");
     } catch (err) {
       console.error("Failed to update archive visibility:", err);
-      alert("Something went wrong updating this archive's visibility.");
+      toast.error("Something went wrong updating this archive's visibility.");
     } finally {
       setSaving(false);
     }

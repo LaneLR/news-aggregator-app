@@ -66,7 +66,7 @@ export default function NewsPage() {
             <div className={styles.headerLeft}>
               <span className={styles.accentBar} />
               <div>
-                <h2 className={styles.sectionTitle}>
+                <h2 className={`${styles.sectionTitle} headline`}>
                   <Flame size={20} />
                   Top Stories
                 </h2>
@@ -107,7 +107,7 @@ export default function NewsPage() {
               <div className={styles.headerLeft}>
                 <span className={styles.accentBar} />
                 <div>
-                  <h2 className={styles.sectionTitle}>
+                  <h2 className={`${styles.sectionTitle} headline`}>
                     <CategoryIcon size={20} />
                     {category}
                   </h2>

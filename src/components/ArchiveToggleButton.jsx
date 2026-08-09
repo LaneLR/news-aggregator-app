@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Bookmark } from "lucide-react";
+import { useToast } from "./ToastProvider";
 import styles from "./ArchiveToggleButton.module.scss";
 
 export default function ArchiveToggleButton({
@@ -8,6 +9,7 @@ export default function ArchiveToggleButton({
   archiveId: propArchiveId,
   viewOnly = false,
 }) {
+  const toast = useToast();
   const [archives, setArchives] = useState([]);
   const [selectedArchiveId, setSelectedArchiveId] = useState(
     propArchiveId || null
@@ -78,10 +80,11 @@ export default function ArchiveToggleButton({
         setSelectedArchiveId(archiveId);
         setDropdownVisible(false);
       } else {
-        alert(data.message || "Failed to save article.");
+        toast.error(data.message || "Failed to save article.");
       }
     } catch (err) {
       console.error("Error saving article:", err);
+      toast.error("Failed to save article. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -102,10 +105,11 @@ export default function ArchiveToggleButton({
       if (res.ok) {
         setIsSaved(false);
       } else {
-        alert(data.message || "Failed to remove article.");
+        toast.error(data.message || "Failed to remove article.");
       }
     } catch (err) {
       console.error("Error removing article:", err);
+      toast.error("Failed to remove article. Check your connection and try again.");
     } finally {
       setLoading(false);
     }

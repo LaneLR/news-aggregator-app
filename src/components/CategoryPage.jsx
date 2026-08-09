@@ -8,7 +8,7 @@ import ThreePaneLayout from "./ThreePaneLayout";
 import Button from "./Button";
 import MarkAllReadButton from "./MarkAllReadButton";
 import ViewDensityToggle from "./ViewDensityToggle";
-import Loading from "@/app/loading";
+import CardSkeleton from "./CardSkeleton";
 import { useArticleShortcuts } from "@/lib/useArticleShortcuts";
 import { useMarkAllRead } from "@/lib/useMarkAllRead";
 import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
@@ -161,13 +161,7 @@ export default function CategoryPage({
     effectiveDensity === "reader" ? (article) => setSelectedArticleId(article.id) : undefined
   );
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
+  const skeletonDensity = effectiveDensity === "reader" ? "list" : effectiveDensity;
 
   return (
     <>
@@ -220,7 +214,15 @@ export default function CategoryPage({
         )}
       </div>
 
-      {articles.length > 0 ? (
+      {isLoading ? (
+        <NewsGridWrapper density={skeletonDensity}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <CardSkeleton key={i} density={skeletonDensity} />
+          ))}
+        </NewsGridWrapper>
+      ) : error ? (
+        <p className={styles.caughtUpText}>Error: {error}</p>
+      ) : articles.length > 0 ? (
         <>
           {effectiveDensity === "reader" ? (
             <ThreePaneLayout
@@ -243,6 +245,7 @@ export default function CategoryPage({
                   viewOnly={true}
                   isKeyboardFocused={i === selectedIndex}
                   innerRef={(el) => (cardRefs.current[i] = el)}
+                  index={i}
                 />
               ))}
             </NewsGridWrapper>
@@ -264,7 +267,11 @@ export default function CategoryPage({
           </div>
         </>
       ) : (
-        <p>No articles found for {categoryNameForDisplay}.</p>
+        <div className={styles.emptyState}>
+          <Newspaper size={32} strokeWidth={1.5} />
+          <p>No articles found for {categoryNameForDisplay}.</p>
+          <p className={styles.emptyStateHint}>Check back soon — new stories come in throughout the day.</p>
+        </div>
       )}
     </>
   );

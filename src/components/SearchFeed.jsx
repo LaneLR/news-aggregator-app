@@ -7,6 +7,7 @@ import NewsCardThree from "./NewsCardThree";
 import ThreePaneLayout from "./ThreePaneLayout";
 import MarkAllReadButton from "./MarkAllReadButton";
 import ViewDensityToggle from "./ViewDensityToggle";
+import CardSkeleton from "./CardSkeleton";
 import { useArticleShortcuts } from "@/lib/useArticleShortcuts";
 import { useMarkAllRead } from "@/lib/useMarkAllRead";
 import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
@@ -114,6 +115,14 @@ export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
         </div>
       )}
 
+      {loading && results.length === 0 && (
+        <NewsGridWrapper density={effectiveDensity === "reader" ? "list" : effectiveDensity}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <CardSkeleton key={i} density={effectiveDensity === "reader" ? "list" : effectiveDensity} />
+          ))}
+        </NewsGridWrapper>
+      )}
+
       {results.length > 0 && (
         effectiveDensity === "reader" ? (
           <ThreePaneLayout
@@ -136,6 +145,7 @@ export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
                 viewOnly={viewOnly}
                 isKeyboardFocused={i === selectedIndex}
                 innerRef={(el) => (cardRefs.current[i] = el)}
+                index={i}
               />
             ))}
           </NewsGridWrapper>

@@ -11,11 +11,13 @@ import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { timeAgo } from "@/lib/timeAgo";
+import { useToast } from "./ToastProvider";
 import styles from "./CarouselArticleCard.module.scss";
 
 export default function CarouselCard({ article, archiveId }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const toast = useToast();
 
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
   const [likeCount, setLikeCount] = useState(article.likeCount || 0);
@@ -27,7 +29,7 @@ export default function CarouselCard({ article, archiveId }) {
 
   const handleLike = async () => {
     if (!session) {
-      alert("You must be signed in to like articles.");
+      toast.info("Sign in to like articles.");
       router.push("/login");
       return;
     }
@@ -48,6 +50,7 @@ export default function CarouselCard({ article, archiveId }) {
     } catch (err) {
       setIsLiked(originalLikedState);
       setLikeCount(originalLikeCount);
+      toast.error("Couldn't update like status. Please try again.");
     }
   };
 

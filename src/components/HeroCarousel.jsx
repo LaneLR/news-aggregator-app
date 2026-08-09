@@ -58,7 +58,7 @@ export default function HeroCarousel() {
         <div className={styles.headerLeft}>
           <span className={styles.accentBar} />
           <div>
-            <h2 className={styles.sectionTitle}>
+            <h2 className={`${styles.sectionTitle} headline`}>
               {view === "forYou" ? <Sparkles size={20} /> : <TrendingUp size={20} />}
               {view === "forYou" ? "For You" : "Trending"}
             </h2>

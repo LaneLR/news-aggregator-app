@@ -1,3 +1,14 @@
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .swipeWrapper {
   position: relative;
   // This is the actual grid item inside NewsGridWrapper — without an
@@ -9,6 +20,12 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   touch-action: pan-y;
+
+  // animationDelay (staggered per card index) is set inline by the
+  // component — see its `index` prop.
+  @media (prefers-reduced-motion: no-preference) {
+    animation: cardEnter 0.35s ease both;
+  }
 }
 
 .swipeHint {
@@ -163,6 +180,20 @@
 // .actionsRow out of its consistent right-aligned spot in .densityList.
 .titleBlock {
   min-width: 0;
+}
+
+.recommendationReason {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--theme-primary);
+  margin: 0 0 0.4rem 0;
+
+  svg {
+    flex-shrink: 0;
+  }
 }
 
 .articleTitle {

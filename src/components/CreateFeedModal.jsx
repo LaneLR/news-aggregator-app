@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import Button from "./Button";
+import { useToast } from "./ToastProvider";
+import { useConfirm } from "./ConfirmDialogProvider";
 import styles from "./CreateFeedModal.module.scss";
 
 export default function CreateFeedModal({
@@ -9,6 +11,8 @@ export default function CreateFeedModal({
   onSuccess,
   feedToEdit,
 }) {
+  const toast = useToast();
+  const confirm = useConfirm();
   const [title, setTitle] = useState("");
   const [availableSources, setAvailableSources] = useState([]);
   const [availableCategories, setAvailableCategories] = useState([]);
@@ -69,32 +73,36 @@ export default function CreateFeedModal({
     });
 
     if (res.ok) {
+      toast.success(isEditMode ? "Feed updated." : "Feed created.");
       onSuccess();
       resetForm();
       onClose();
     } else {
-      alert(`Failed to ${isEditMode ? "update" : "create"} feed.`);
+      toast.error(`Failed to ${isEditMode ? "update" : "create"} feed.`);
     }
   };
 
   const handleDelete = async () => {
     if (!isEditMode) return;
 
-    if (
-      window.confirm(
-        "Are you sure you want to delete this feed? This action cannot be undone."
-      )
-    ) {
-      const res = await fetch(`/api/feeds/${feedToEdit.id}`, {
-        method: "DELETE",
-      });
+    const ok = await confirm({
+      title: "Delete this feed?",
+      message: "This action cannot be undone.",
+      confirmLabel: "Delete feed",
+      danger: true,
+    });
+    if (!ok) return;
 
-      if (res.ok) {
-        onSuccess();
-        onClose();
-      } else {
-        alert("Failed to delete feed.");
-      }
+    const res = await fetch(`/api/feeds/${feedToEdit.id}`, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      toast.success("Feed deleted.");
+      onSuccess();
+      onClose();
+    } else {
+      toast.error("Failed to delete feed.");
     }
   };
 

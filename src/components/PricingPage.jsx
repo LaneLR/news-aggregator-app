@@ -6,6 +6,7 @@ import { Sparkles, Check, X, Gift } from "lucide-react";
 import Button from "./Button";
 import Loading from "@/app/loading";
 import { MONTHLY_PRICE_ID, ANNUAL_PRICE_ID } from "@/lib/stripePrices";
+import { useToast } from "./ToastProvider";
 import styles from "./PricingPage.module.scss";
 
 const stripePromise = loadStripe(
@@ -31,6 +32,7 @@ const SUBSCRIBED_FEATURES = [
 
 export default function PricingPage() {
   const { data: session, status, update } = useSession();
+  const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [billingInterval, setBillingInterval] = useState("monthly");
   const [referralCode, setReferralCode] = useState("");
@@ -95,7 +97,7 @@ export default function PricingPage() {
       await stripe.redirectToCheckout({ sessionId });
     } catch (err) {
       console.error(err);
-      alert("Error: " + err.message);
+      toast.error(err.message || "Something went wrong starting checkout.");
       setIsLoading(false);
     }
   };
@@ -111,7 +113,7 @@ export default function PricingPage() {
       window.location.href = url;
     } catch (err) {
       console.error(err);
-      alert("Error: Could not manage subscription.");
+      toast.error("Could not open the subscription management page. Please try again.");
     } finally {
       setIsLoading(false);
       update();

@@ -91,3 +91,24 @@
   color: var(--theme-text-secondary);
   font-size: 0.9rem;
 }
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3rem 1rem;
+  color: var(--theme-text-secondary);
+  text-align: center;
+
+  svg {
+    color: var(--theme-border);
+    margin-bottom: 0.5rem;
+  }
+}
+
+.emptyStateHint {
+  font-size: 0.85rem;
+  color: var(--theme-text-secondary);
+  max-width: 420px;
+}
