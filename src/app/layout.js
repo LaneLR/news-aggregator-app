@@ -96,12 +96,19 @@ export default async function RootLayout({ children }) {
   // land on a stale "unauthenticated" state until a manual refresh.
   const session = await auth();
 
+  // No data-theme attribute at all when the user hasn't explicitly chosen —
+  // themes.scss then follows prefers-color-scheme via a media query (pure
+  // CSS, evaluated at first paint, no flash) instead of defaulting everyone
+  // to light.
   return (
-    <html lang="en" data-theme={session?.user?.selectedTheme || "default"}>
+    <html lang="en" data-theme={session?.user?.selectedTheme || undefined}>
       <body
         style={{ backgroundColor: "var(--dark-blue)", color: "var(--light-white)" }}
         className={`${roboto.variable} ${lora.variable}`}
       >
+        <a href="#main-content" className="skipLink">
+          Skip to main content
+        </a>
         <JsonLd data={organizationSchema} />
         <JsonLd data={websiteSchema} />
         <Providers session={session}>

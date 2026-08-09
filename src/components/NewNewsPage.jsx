@@ -6,6 +6,7 @@ import CarouselArticleCard from "@/components/CarouselArticleCard";
 import CarouselRow from "@/components/CarouselRow";
 import CarouselSkeleton from "@/components/CarouselSkeleton";
 import HeroCarousel from "@/components/HeroCarousel";
+import FeatureCallout from "@/components/FeatureCallout";
 import styles from "./NewNewsPage.module.scss";
 
 const CATEGORY_ICONS = {
@@ -58,6 +59,7 @@ export default function NewsPage() {
   return (
     <div className={styles.newsPageWrapper}>
       <h1 className={styles.srOnly}>Your News Feed</h1>
+      <FeatureCallout />
       <HeroCarousel />
 
       {(topStories === null || topStories.length > 0) && (

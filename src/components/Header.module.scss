@@ -69,6 +69,27 @@
   }
 }
 
+@keyframes headerShimmer {
+  0% {
+    background-position: -300px 0;
+  }
+  100% {
+    background-position: 300px 0;
+  }
+}
+
+.headerShimmer {
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 600px 100%;
+  animation: headerShimmer 1.6s ease-in-out infinite;
+}
+
 .iconButton {
   width: 40px;
   height: 40px;
@@ -137,6 +158,14 @@
 }
 
 .dropdownMenuItem {
+  // Now a real <button> (see Header.jsx) — reset browser button chrome so
+  // it still looks like the plain menu row it always was.
+  display: block;
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
   color: var(--theme-text);

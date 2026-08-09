@@ -1,12 +1,14 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { Check } from "lucide-react";
+import { Check, Monitor } from "lucide-react";
 import { themes } from "@/styles/themes";
 import styles from "./ThemeSelector.module.scss";
 
 export default function ThemeSelector() {
   const { data: session, update } = useSession();
-  const currentTheme = session?.user?.selectedTheme || "default";
+  // No `|| "default"` fallback — null is a real, distinct state ("follow
+  // the system theme") and must not be displayed as if Light were chosen.
+  const currentTheme = session?.user?.selectedTheme ?? null;
 
   const handleThemeChange = async (themeName) => {
     try {
@@ -25,6 +27,19 @@ export default function ThemeSelector() {
     <div>
       <p className={styles.selectThemeText}>Select your preferred theme:</p>
       <div className={styles.swatchGrid}>
+        <button
+          type="button"
+          className={`${styles.swatch} ${styles.autoSwatch} ${currentTheme === null ? styles.active : ""}`}
+          onClick={() => handleThemeChange(null)}
+        >
+          <Monitor size={18} strokeWidth={2} />
+          Auto
+          {currentTheme === null && (
+            <span className={styles.checkBadge}>
+              <Check size={12} strokeWidth={3} />
+            </span>
+          )}
+        </button>
         <button
           type="button"
           className={`${styles.swatch} ${currentTheme === "default" ? styles.active : ""}`}

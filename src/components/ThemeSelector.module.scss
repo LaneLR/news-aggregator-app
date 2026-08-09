@@ -26,6 +26,14 @@
   }
 }
 
+.autoSwatch {
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  background-color: var(--theme-layout-background);
+  color: var(--theme-text);
+}
+
 .checkBadge {
   position: absolute;
   top: -8px;

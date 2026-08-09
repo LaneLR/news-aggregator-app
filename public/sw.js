@@ -2,8 +2,15 @@
 // repeat loads of static assets. Deliberately not caching API responses or
 // article content: news goes stale fast, so an offline-first cache for it
 // would serve outdated data instead of "no connection," which is worse.
-const CACHE_NAME = "morningfeeds-shell-v1";
-const SHELL_ASSETS = ["/", "/manifest.json", "/images/icon-192.png", "/images/icon-512.png"];
+//
+// "/" must NOT be in this list even though it looks like a static shell
+// asset — it's a server-rendered HTML document whose header UI depends on
+// the visitor's session (logged-in vs logged-out). Caching it cache-first
+// used to mean a fresh tab could get served yesterday's HTML with a stale
+// or missing session baked in, showing "Log in" even while signed in. Only
+// truly static, session-independent files belong here.
+const CACHE_NAME = "morningfeeds-shell-v2";
+const SHELL_ASSETS = ["/manifest.json", "/images/icon-192.png", "/images/icon-512.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

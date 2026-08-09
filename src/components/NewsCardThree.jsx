@@ -219,9 +219,12 @@ export default function NewsCardThree({
               viewOnly={viewOnly}
             />
             <button
+              type="button"
               data-action="like"
               className={`${styles.likeButton} ${isLiked ? styles.liked : ""}`}
               onClick={handleLike}
+              aria-label={isLiked ? "Unlike this article" : "Like this article"}
+              aria-pressed={isLiked}
             >
               <Heart size={17} strokeWidth={2} fill={isLiked ? "currentColor" : "none"} />
               {likeCount}

@@ -27,6 +27,8 @@ export default function ViewDensityToggle({ density, onChange, isSubscribed }) {
             className={`${styles.option} ${density === value ? styles.active : ""}`}
             onClick={() => (locked ? router.push("/pricing") : onChange(value))}
             title={locked ? `${label} view — Subscribed feature` : `${label} view`}
+            aria-label={locked ? `${label} view — Subscribed feature` : `${label} view`}
+            aria-pressed={density === value}
           >
             {locked ? <Lock size={12} strokeWidth={2} /> : <Icon size={15} strokeWidth={2} />}
           </button>

@@ -32,7 +32,21 @@ export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const currentTheme = session?.user?.selectedTheme || "default";
+  // When selectedTheme is null (no explicit choice — see themes.scss), the
+  // page is actually following the OS's prefers-color-scheme. Reading that
+  // here too, not just falling back to "default", is what makes the quick
+  // toggle's icon and direction match what the user is actually looking at.
+  const [systemPrefersDark, setSystemPrefersDark] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
+    setSystemPrefersDark(mql.matches);
+    const handleChange = (e) => setSystemPrefersDark(e.matches);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
+  }, []);
+
+  const explicitTheme = session?.user?.selectedTheme || null;
+  const currentTheme = explicitTheme || (systemPrefersDark ? "dark" : "default");
 
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -97,13 +111,27 @@ export default function Header() {
     switch (id) {
       case "news":
         return (
-          <Link key="news" className={`${styles.iconButton} ${dragClass}`} href="/news" title="News" {...dragProps}>
+          <Link
+            key="news"
+            className={`${styles.iconButton} ${dragClass}`}
+            href="/news"
+            title="News"
+            aria-label="News"
+            {...dragProps}
+          >
             <Newspaper size={19} strokeWidth={2} />
           </Link>
         );
       case "archives":
         return (
-          <Link key="archives" className={`${styles.iconButton} ${dragClass}`} href="/archives" title="Archives" {...dragProps}>
+          <Link
+            key="archives"
+            className={`${styles.iconButton} ${dragClass}`}
+            href="/archives"
+            title="Archives"
+            aria-label="Archives"
+            {...dragProps}
+          >
             <Bookmark size={19} strokeWidth={2} />
           </Link>
         );
@@ -115,6 +143,7 @@ export default function Header() {
             className={`${styles.iconButton} ${dragClass}`}
             onClick={handleToggleTheme}
             title="Toggle light/dark theme"
+            aria-label="Toggle light/dark theme"
             {...dragProps}
           >
             {currentTheme === "dark" ? (
@@ -132,29 +161,46 @@ export default function Header() {
             ref={dropdownRef}
             {...dragProps}
           >
-            <button type="button" className={styles.iconButton} onClick={toggleDropdown}>
+            <button
+              type="button"
+              className={styles.iconButton}
+              onClick={toggleDropdown}
+              aria-label="Open menu"
+              aria-haspopup="menu"
+              aria-expanded={isDropdownOpen}
+            >
               <Menu size={20} strokeWidth={2} />
             </button>
             {isDropdownOpen && (
-              <ul className={styles.dropdownMenu}>
+              <ul className={styles.dropdownMenu} role="menu">
                 {MENU_ITEMS.map(({ label, path, Icon }) => (
-                  <li
-                    key={path}
-                    className={styles.dropdownMenuItem}
-                    onClick={() => handleNavigation(path)}
-                  >
-                    <div className={styles.dropdownItemRow}>
-                      <Icon size={18} strokeWidth={2} />
-                      <span>{label}</span>
-                    </div>
+                  <li key={path} role="none">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className={styles.dropdownMenuItem}
+                      onClick={() => handleNavigation(path)}
+                    >
+                      <div className={styles.dropdownItemRow}>
+                        <Icon size={18} strokeWidth={2} />
+                        <span>{label}</span>
+                      </div>
+                    </button>
                   </li>
                 ))}
-                <li className={styles.dropdownDivider} />
-                <li className={styles.dropdownMenuItem} onClick={handleLogout}>
-                  <div className={styles.dropdownItemRow}>
-                    <LogOut size={18} strokeWidth={2} />
-                    <span>Log out</span>
-                  </div>
+                <li className={styles.dropdownDivider} role="separator" />
+                <li role="none">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={styles.dropdownMenuItem}
+                    onClick={handleLogout}
+                  >
+                    <div className={styles.dropdownItemRow}>
+                      <LogOut size={18} strokeWidth={2} />
+                      <span>Log out</span>
+                    </div>
+                  </button>
                 </li>
               </ul>
             )}
@@ -165,7 +211,45 @@ export default function Header() {
     }
   }
 
-  if (status === "loading") return null;
+  // Neither the logged-in header (search bar + icon group) nor the
+  // logged-out one ("Log in" button) is correct yet while the session is
+  // still resolving — committing to either one risks a visible flash to the
+  // wrong state a moment later. This renders a state-neutral shell instead.
+  if (status === "loading") {
+    return (
+      <div className={styles.wrapper}>
+        <div className={styles.leftContainer}>
+          <div className={styles.logoLink}>
+            <div className={styles.logoContainer}>
+              <Image
+                priority
+                src={"/images/morningfeeds-logo1.png"}
+                alt={"MorningFeeds logo"}
+                width={52}
+                height={48}
+              />
+            </div>
+            <div className={styles.logoTextWrapper}>
+              <div className={styles.logoText}>
+                <span>morning</span>
+                <span>feeds</span>
+              </div>
+              <span className={styles.tagline}>All the news. One place.</span>
+            </div>
+          </div>
+        </div>
+        <div className={styles.centerContainer}>
+          <div className={styles.headerShimmer} style={{ width: "min(520px, 100%)", height: 38 }} />
+        </div>
+        <div className={styles.rightContainer}>
+          <div className={styles.iconButtonGroup}>
+            <div className={styles.headerShimmer} style={{ width: 40, height: 40, borderRadius: 999 }} />
+            <div className={styles.headerShimmer} style={{ width: 40, height: 40, borderRadius: 999 }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

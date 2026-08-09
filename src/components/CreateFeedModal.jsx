@@ -106,18 +106,34 @@ export default function CreateFeedModal({
     }
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
     <div className={styles.modalBackdrop} onClick={onClose}>
-      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        <h2 className={styles.formTitle}>
+      <div
+        className={styles.modalContent}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="feed-modal-title"
+      >
+        <h2 id="feed-modal-title" className={styles.formTitle}>
           {isEditMode ? "Edit Feed" : "Create a New Feed"}
         </h2>
         <input
           className={styles.titleInput}
           type="text"
           placeholder="Feed Name (e.g., 'Tech News')"
+          aria-label="Feed name"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />

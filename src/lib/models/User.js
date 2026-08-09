@@ -94,10 +94,14 @@ export default function defineUser(sequelize) {
         defaultValue: false,
         allowNull: false,
       },
+      // Null means "no explicit choice yet" — the client falls back to the
+      // OS's prefers-color-scheme in that case (see themes.scss) instead of
+      // being hardcoded to light. Only set to a literal "default"/"dark"
+      // once the user actually picks one via ThemeSelector.
       selectedTheme: {
         type: DataTypes.STRING,
-        defaultValue: "default",
-        allowNull: false,
+        defaultValue: null,
+        allowNull: true,
       },
       tokenVersion: {
         type: DataTypes.INTEGER,

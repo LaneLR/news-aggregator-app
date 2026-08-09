@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import styles from "./CreateNewArchiveCard.module.scss";
 
@@ -45,6 +45,15 @@ export default function CreateNewArchiveCard() {
     setError("");
   };
 
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") handleCloseModal();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isModalOpen]);
+
   return (
     <>
       <button
@@ -60,12 +69,21 @@ export default function CreateNewArchiveCard() {
 
       {isModalOpen && (
         <div className={styles.modalBackdrop} onClick={handleCloseModal}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <h2 className={styles.modalHeader}>Create New Archive</h2>
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-archive-title"
+          >
+            <h2 id="create-archive-title" className={styles.modalHeader}>
+              Create New Archive
+            </h2>
             <input
               className={styles.input}
               type="text"
               placeholder="Enter archive name"
+              aria-label="Archive name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => {

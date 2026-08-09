@@ -8,10 +8,17 @@ import { useSession } from "next-auth/react";
 // update()) without needing a full page reload.
 export default function ThemeProvider({ children }) {
   const { data: session } = useSession();
-  const selectedTheme = session?.user?.selectedTheme || "default";
+  const selectedTheme = session?.user?.selectedTheme || null;
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", selectedTheme);
+    // No explicit choice → no attribute at all, so the prefers-color-scheme
+    // media query in themes.scss can take over (matches layout.js's SSR
+    // behavior for the same case).
+    if (selectedTheme) {
+      document.documentElement.setAttribute("data-theme", selectedTheme);
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
   }, [selectedTheme]);
 
   return children;

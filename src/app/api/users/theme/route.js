@@ -17,8 +17,9 @@ export async function PATCH(req) {
   try {
     const { themeName } = await req.json();
 
-    // Validate the incoming theme name
-    if (!ALLOWED_THEMES.includes(themeName)) {
+    // null is a valid, deliberate value here too — it means "follow the
+    // system theme" (see themes.scss), not "invalid."
+    if (themeName !== null && !ALLOWED_THEMES.includes(themeName)) {
       return NextResponse.json({ error: "Invalid theme name." }, { status: 400 });
     }
 
