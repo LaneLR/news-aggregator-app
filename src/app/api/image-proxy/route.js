@@ -26,6 +26,27 @@ function isBlockedIp(ip) {
   return true; // couldn't determine — fail closed
 }
 
+// Falls back on when an upstream serves images as a generic binary type
+// instead of a proper image/* one — CNN's cdn.cnn.com (S3-backed) does this,
+// returning "application/octet-stream" for genuine JPEGs, which the strict
+// content-type check below would otherwise reject as "not an image".
+const EXTENSION_MIME_TYPES = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  gif: "image/gif",
+  webp: "image/webp",
+  avif: "image/avif",
+  svg: "image/svg+xml",
+  bmp: "image/bmp",
+};
+
+function guessMimeFromUrl(urlString) {
+  const pathname = new URL(urlString).pathname;
+  const ext = pathname.split(".").pop()?.toLowerCase();
+  return EXTENSION_MIME_TYPES[ext] || null;
+}
+
 async function assertSafeUrl(urlString) {
   let parsed;
   try {
@@ -92,9 +113,13 @@ export async function GET(req) {
       return NextResponse.json({ error: "Image fetch failed" }, { status: response.status });
     }
 
-    const contentType = response.headers.get("content-type") || "";
+    let contentType = response.headers.get("content-type") || "";
     if (!contentType.startsWith("image/")) {
-      return NextResponse.json({ error: "URL did not return an image" }, { status: 415 });
+      const guessedType = guessMimeFromUrl(imageUrl);
+      if (!guessedType) {
+        return NextResponse.json({ error: "URL did not return an image" }, { status: 415 });
+      }
+      contentType = guessedType;
     }
 
     const buffer = Buffer.from(await response.arrayBuffer());

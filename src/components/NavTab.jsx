@@ -12,7 +12,7 @@ export default function NavTab({ href, children, Icon }) {
       className={`${styles.navBarWrapper} ${isActive ? styles.active : ""}`}
       href={`${href}`}
     >
-      {Icon && <Icon size={17} strokeWidth={2} />}
+      {Icon && <Icon size={19} strokeWidth={2} />}
       {children}
     </Link>
   );

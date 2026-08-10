@@ -159,6 +159,9 @@ export default function FeedManager() {
               hidden
               onChange={handleImportFile}
             />
+            {/* File-download API route, not a page — next/link's client-side
+                routing doesn't apply here, so a plain <a> is correct. */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a href="/api/feeds/opml" className={styles.exportLink}>
               <Download size={15} strokeWidth={2} />
               Export OPML

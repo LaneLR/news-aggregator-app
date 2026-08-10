@@ -4,4 +4,10 @@
   flex-direction: column;
   box-sizing: border-box;
   background-color: var(--theme-background);
+  // body's own `color` (globals.scss) is deliberately the "always-light
+  // chrome text" token for the dark header/footer bars, not a sane default
+  // for page content — anything inside <main> that forgets to set its own
+  // color would otherwise silently inherit near-white text on a light
+  // background instead of failing loudly.
+  color: var(--theme-text);
 }

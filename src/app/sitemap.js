@@ -41,12 +41,21 @@ const STATIC_ROUTES = [
 ];
 
 export default async function sitemap() {
-  const { Article, Archive } = await initializeDbAndModels();
-
   const staticEntries = [
     ...STATIC_ROUTES.map((route) => ({ url: `${BASE_URL}${route}` })),
     ...FREE_CATEGORIES.map((category) => ({ url: `${BASE_URL}/category/${category}` })),
   ];
+
+  // No DB configured — e.g. a CI build that deliberately runs without
+  // secrets (see .github/workflows/ci.yml). Serve just the static routes
+  // instead of failing the build; production always has DATABASE_URL set,
+  // so real deploys still get the full article/archive sitemap via the
+  // hourly revalidation above.
+  if (!process.env.DATABASE_URL) {
+    return staticEntries;
+  }
+
+  const { Article, Archive } = await initializeDbAndModels();
 
   const recentArticles = await Article.findAll({
     where: {

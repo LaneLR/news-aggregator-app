@@ -1,0 +1,156 @@
+@use "../styles/marketCard" as market;
+
+.section {
+  margin-bottom: 1.5rem;
+}
+
+.heading {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--theme-text);
+}
+
+.addRow {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 0.75rem;
+  max-width: 420px;
+}
+
+.input {
+  flex-grow: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--theme-background);
+  color: var(--theme-text);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+
+  &::placeholder {
+    text-transform: none;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 15%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background-color: var(--theme-primary);
+  color: var(--theme-primary-contrast);
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.06);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.draftError {
+  margin: -0.4rem 0 0.75rem;
+  font-size: 0.82rem;
+  color: var(--theme-warning);
+}
+
+.emptyText {
+  color: var(--theme-text-secondary);
+  font-size: 0.9rem;
+}
+
+.grid {
+  @include market.ticker-grid;
+  padding: 0;
+}
+
+.card {
+  @include market.ticker-card;
+  position: relative;
+}
+
+.cardSkeleton {
+  gap: 8px;
+  justify-content: center;
+}
+
+.shimmerLine {
+  height: 12px;
+  width: 80%;
+  border-radius: var(--radius-sm);
+}
+
+.shimmer {
+  @include market.shimmer;
+}
+
+.removeButton {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: var(--theme-border);
+    color: var(--theme-text);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.name {
+  @include market.ticker-name;
+  padding-right: 16px;
+}
+
+.price {
+  @include market.ticker-price;
+}
+
+.change {
+  @include market.ticker-change;
+}
+
+.noData {
+  font-size: 0.8rem;
+  color: var(--theme-text-secondary);
+  font-style: italic;
+}
+
+.lastUpdated {
+  margin: 0.6rem 0 0;
+  font-size: 0.78rem;
+  color: var(--theme-text-secondary);
+}

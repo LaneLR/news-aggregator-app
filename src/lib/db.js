@@ -8,6 +8,8 @@ import defineSavedArticle from "./models/SavedArticle.js";
 import defineProcessedStripeEvent from "./models/ProcessedStripeEvent.js";
 import defineUserInteraction from "./models/UserInteraction.js";
 import defineReadArticle from "./models/ReadArticle.js";
+import defineMarketQuote from "./models/MarketQuote.js";
+import defineMarketChartCache from "./models/MarketChartCache.js";
 
 if (!global.db) {
   global.db = {};
@@ -31,6 +33,8 @@ async function initializeDbAndModels() {
       const ProcessedStripeEvent = defineProcessedStripeEvent(sequelize);
       const UserInteraction = defineUserInteraction(sequelize);
       const ReadArticle = defineReadArticle(sequelize);
+      const MarketQuote = defineMarketQuote(sequelize);
+      const MarketChartCache = defineMarketChartCache(sequelize);
 
       global.db.sequelize = sequelize;
       global.db.User = User;
@@ -42,6 +46,8 @@ async function initializeDbAndModels() {
       global.db.ProcessedStripeEvent = ProcessedStripeEvent;
       global.db.UserInteraction = UserInteraction;
       global.db.ReadArticle = ReadArticle;
+      global.db.MarketQuote = MarketQuote;
+      global.db.MarketChartCache = MarketChartCache;
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });

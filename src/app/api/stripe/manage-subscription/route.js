@@ -2,9 +2,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+import getStripe from "@/lib/stripe";
 
 export async function POST(req) {
   const session = await auth();
@@ -13,6 +11,7 @@ export async function POST(req) {
   }
 
   try {
+    const stripe = getStripe();
     const { User } = await initializeDbAndModels();
     const user = await User.findByPk(session.user.id);
 

@@ -2,6 +2,7 @@ import { DataTypes, Model, Op } from "sequelize";
 import { nanoid } from "nanoid";
 import bcrypt from "bcryptjs";
 import { DEFAULT_KEYBOARD_SHORTCUTS } from "../keyboardShortcuts.js";
+import { DEFAULT_HOME_SECTIONS } from "../homeSections.js";
 
 class User extends Model {
   async validatePassword(password) {
@@ -162,6 +163,21 @@ export default function defineUser(sequelize) {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: "reader",
+      },
+      // Which sections show on the /news homepage — "forYou"/"topStories"
+      // (the two hero rows) plus category tags. See lib/homeSections.js.
+      homeSections: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: DEFAULT_HOME_SECTIONS,
+      },
+      // Extra tickers a subscriber tracks on the Market page, beyond the
+      // fixed index set. Uppercase symbols, capped/validated in the API
+      // route — see lib/marketData.js and api/users/watchlist/route.js.
+      watchlistSymbols: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
       },
     },
     {

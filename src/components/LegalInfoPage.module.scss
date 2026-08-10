@@ -21,7 +21,11 @@
   position: relative;
   overflow: hidden;
   padding: 2.75rem 2rem;
-  background: linear-gradient(120deg, var(--theme-deep-blue) 0%, var(--theme-primary) 100%);
+  // --theme-primary-dark (not --theme-deep-blue) deliberately — this needs
+  // to stay a dark charcoal in both themes so the always-white banner text
+  // stays readable, whereas --theme-deep-blue flips to near-white in dark
+  // mode (it's meant for heading text, not a gradient backdrop).
+  background: linear-gradient(120deg, var(--theme-primary-dark) 0%, var(--theme-primary) 100%);
   flex-shrink: 0;
 }
 

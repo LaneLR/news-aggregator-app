@@ -1,8 +1,31 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import initializeDbAndModels from "@/lib/db.js";
+
+// Auth.js v5 only passes a thrown error's *message* through to the client
+// when it's a CredentialsSignin instance — anything else (a plain `new
+// Error(...)`, which this authorize() used to throw) gets normalized to the
+// generic "Configuration" error code instead, which is why wrong-password
+// used to show the literal word "Configuration" to the user. Each of these
+// carries a distinct `code` (see LoginForm.jsx's ERROR_MESSAGES) so the
+// client can show the right message despite that limitation.
+class NoAccountError extends CredentialsSignin {
+  code = "no-account";
+}
+class AccountInactiveError extends CredentialsSignin {
+  code = "account-inactive";
+}
+class GoogleOnlyAccountError extends CredentialsSignin {
+  code = "google-only";
+}
+class InvalidPasswordError extends CredentialsSignin {
+  code = "invalid-password";
+}
+class EmailNotVerifiedError extends CredentialsSignin {
+  code = "email-not-verified";
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
@@ -32,21 +55,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const { User } = await initializeDbAndModels();
         const user = await User.findOne({ where: { email } });
 
-        if (!user) throw new Error("No user found with that email");
+        if (!user) throw new NoAccountError();
 
         if (user.status === "inactive") {
-          throw new Error("This account is inactive or deleted.");
+          throw new AccountInactiveError();
         }
 
         if (!user.password) {
-          throw new Error("Please sign in with Google to access your account.");
+          throw new GoogleOnlyAccountError();
         }
 
         const valid = await bcrypt.compare(password, user.password);
-        if (!valid) throw new Error("Incorrect password");
+        if (!valid) throw new InvalidPasswordError();
 
         if (!user.emailIsVerified) {
-          throw new Error("Please verify your email address to log in.");
+          throw new EmailNotVerifiedError();
         }
 
         return {

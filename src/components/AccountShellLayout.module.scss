@@ -1,7 +1,12 @@
 .layoutRow {
   display: flex;
+  // flex-grow instead of height: 100% — this is a flex item of
+  // MainContentWrapper's column flex container, and percentage heights
+  // don't reliably resolve through a nested flex-column chain the way
+  // flex-grow does. Without this it was sized to its own content height,
+  // leaving a gap of plain page background between it and the footer.
+  flex-grow: 1;
   gap: 15px;
-  height: 100%;
   padding: 15px;
   width: 100%;
   box-sizing: border-box;

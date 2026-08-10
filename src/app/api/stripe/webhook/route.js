@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
+import getStripe from "@/lib/stripe";
 import initializeDbAndModels from "@/lib/db";
 import { sendEmail } from "@/utils/emailer";
 import { billingIntervalForPrice } from "@/lib/stripePrices";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(req) {
+  const stripe = getStripe();
   const buf = await req.arrayBuffer();
   const signature = req.headers.get("stripe-signature");
 

@@ -1,7 +1,11 @@
 .section {
-  margin-bottom: 3rem;
+  // A single shorthand — this used to be a separate `margin-bottom: 3rem`
+  // followed by `margin: 0 1.5rem`, and the second declaration silently
+  // zeroed the first (later same-property wins in CSS), so sections had no
+  // gap between them at all and ran together visually.
   max-width: 95vw;
-  margin: 0 1.5rem;
+  margin: 0 1.5rem 3rem;
+
   @media (max-width: 440px) {
     margin-bottom: 2rem;
   }

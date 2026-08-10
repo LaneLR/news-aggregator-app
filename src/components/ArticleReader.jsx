@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Heart, Lock, ExternalLink, Newspaper, X } from "lucide-react";
+import { Heart, Lock, ExternalLink, Newspaper, X, Maximize2, Minimize2 } from "lucide-react";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 import ShareButton from "./ShareButton";
 import ReaderCustomizationPanel from "./ReaderCustomizationPanel";
@@ -23,7 +23,15 @@ function extractPlainText(html) {
   return doc.body.textContent || "";
 }
 
-export default function ArticleReader({ article, sanitizedContent, relatedCoverage, readingTime, onClose }) {
+export default function ArticleReader({
+  article,
+  sanitizedContent,
+  relatedCoverage,
+  readingTime,
+  onClose,
+  isFullScreen,
+  onToggleFullScreen,
+}) {
   const { data: session } = useSession();
   const router = useRouter();
   const toast = useToast();
@@ -100,7 +108,7 @@ export default function ArticleReader({ article, sanitizedContent, relatedCovera
         <div className={styles.progressFill} style={{ width: `${readProgress}%` }} />
       </div>
       <article className={styles.article} ref={articleRef}>
-        {(badgeCategory || onClose) && (
+        {(badgeCategory || onToggleFullScreen || onClose) && (
           <div className={styles.headerRow}>
             {badgeCategory && (
               <span
@@ -110,16 +118,35 @@ export default function ArticleReader({ article, sanitizedContent, relatedCovera
                 {badgeCategory}
               </span>
             )}
-            {onClose && (
-              <button
-                type="button"
-                className={styles.closeButton}
-                onClick={onClose}
-                title="Close"
-                aria-label="Close"
-              >
-                <X size={18} strokeWidth={2} />
-              </button>
+            {(onToggleFullScreen || onClose) && (
+              <div className={styles.headerActions}>
+                {onToggleFullScreen && (
+                  <button
+                    type="button"
+                    className={styles.iconActionButton}
+                    onClick={onToggleFullScreen}
+                    title={isFullScreen ? "Exit full screen" : "Full screen"}
+                    aria-label={isFullScreen ? "Exit full screen" : "Full screen"}
+                  >
+                    {isFullScreen ? (
+                      <Minimize2 size={17} strokeWidth={2} />
+                    ) : (
+                      <Maximize2 size={17} strokeWidth={2} />
+                    )}
+                  </button>
+                )}
+                {onClose && (
+                  <button
+                    type="button"
+                    className={styles.iconActionButton}
+                    onClick={onClose}
+                    title="Close"
+                    aria-label="Close"
+                  >
+                    <X size={18} strokeWidth={2} />
+                  </button>
+                )}
+              </div>
             )}
           </div>
         )}

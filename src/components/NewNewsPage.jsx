@@ -1,20 +1,49 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Briefcase, Cpu, Clapperboard, Trophy, FlaskConical, Newspaper, ChevronRight, Flame } from "lucide-react";
+import {
+  Briefcase,
+  Cpu,
+  Clapperboard,
+  Trophy,
+  FlaskConical,
+  Newspaper,
+  ChevronRight,
+  Flame,
+  HeartPulse,
+  Landmark,
+  Globe,
+  Flag,
+  CloudSun,
+  BookOpen,
+  LineChart,
+  DollarSign,
+} from "lucide-react";
 import CarouselArticleCard from "@/components/CarouselArticleCard";
 import CarouselRow from "@/components/CarouselRow";
 import CarouselSkeleton from "@/components/CarouselSkeleton";
 import HeroCarousel from "@/components/HeroCarousel";
 import FeatureCallout from "@/components/FeatureCallout";
+import { DEFAULT_HOME_SECTIONS } from "@/lib/homeSections";
 import styles from "./NewNewsPage.module.scss";
 
+// Covers every selectable category (see Settings → Home Page Sections),
+// not just the 5 that used to be hardcoded — matches HeaderNavBar's icon
+// choices for the same categories, kept in sync by hand.
 const CATEGORY_ICONS = {
   Business: Briefcase,
   Tech: Cpu,
   Entertainment: Clapperboard,
   Sports: Trophy,
   Science: FlaskConical,
+  Health: HeartPulse,
+  Politics: Landmark,
+  World: Globe,
+  US: Flag,
+  Weather: CloudSun,
+  Journal: BookOpen,
+  Market: LineChart,
+  Finance: DollarSign,
 };
 
 const CATEGORY_SUBTITLES = {
@@ -23,7 +52,22 @@ const CATEGORY_SUBTITLES = {
   Entertainment: "Movies, TV, music, and culture",
   Sports: "Scores, highlights, and analysis",
   Science: "Discoveries and breakthroughs",
+  Health: "Medicine, wellness, and public health",
+  Politics: "Policy, elections, and government",
+  World: "News from around the globe",
+  US: "National headlines",
+  Weather: "Forecasts and severe weather coverage",
+  Journal: "In-depth reporting and analysis",
+  Market: "Stocks, indices, and market movements",
+  Finance: "Personal finance and the economy",
 };
+
+// Matches the pre-fetch default so nothing flashes for the common case
+// (a user who's never opened Settings → Home Page Sections) — real values
+// arrive with the /api/news-by-category response and override these.
+const DEFAULT_SHOW_FOR_YOU = DEFAULT_HOME_SECTIONS.includes("forYou");
+const DEFAULT_SHOW_TOP_STORIES = DEFAULT_HOME_SECTIONS.includes("topStories");
+const DEFAULT_CATEGORY_SECTIONS = DEFAULT_HOME_SECTIONS.filter((key) => CATEGORY_ICONS[key]);
 
 export default function NewsPage() {
   // null = still loading; [] / {} = loaded (possibly empty). Sections render
@@ -32,11 +76,17 @@ export default function NewsPage() {
   // the card content pops in once each fetch resolves.
   const [categorizedArticles, setCategorizedArticles] = useState(null);
   const [topStories, setTopStories] = useState(null);
+  const [showForYou, setShowForYou] = useState(DEFAULT_SHOW_FOR_YOU);
+  const [showTopStories, setShowTopStories] = useState(DEFAULT_SHOW_TOP_STORIES);
 
   useEffect(() => {
     fetch("/api/news-by-category")
       .then((res) => res.json())
-      .then((data) => setCategorizedArticles(data))
+      .then((data) => {
+        setCategorizedArticles(data.categories || {});
+        setShowForYou(data.showForYou ?? true);
+        setShowTopStories(data.showTopStories ?? true);
+      })
       .catch((err) => {
         console.error("Failed to fetch news:", err);
         setCategorizedArticles({});
@@ -53,16 +103,16 @@ export default function NewsPage() {
 
   const categoriesLoading = categorizedArticles === null;
   const categorySections = categoriesLoading
-    ? Object.keys(CATEGORY_ICONS)
+    ? DEFAULT_CATEGORY_SECTIONS
     : Object.keys(categorizedArticles);
 
   return (
     <div className={styles.newsPageWrapper}>
       <h1 className={styles.srOnly}>Your News Feed</h1>
       <FeatureCallout />
-      <HeroCarousel />
+      {showForYou && <HeroCarousel />}
 
-      {(topStories === null || topStories.length > 0) && (
+      {showTopStories && (topStories === null || topStories.length > 0) && (
         <section className={styles.section}>
           <div className={styles.headerRow}>
             <div className={styles.headerLeft}>

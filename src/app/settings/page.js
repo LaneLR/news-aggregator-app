@@ -1,11 +1,22 @@
 import DigestSettings from "@/components/DigestSettings";
 import KeywordFilters from "@/components/KeywordFilters";
 import KeyboardShortcutsSettings from "@/components/KeyboardShortcutsSettings";
+import HomeSectionsSettings from "@/components/HomeSectionsSettings";
 import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Settings as SettingsIcon, Mail, Lock, Info, KeyRound, Shield, VolumeX, Keyboard } from "lucide-react";
+import {
+  Settings as SettingsIcon,
+  Mail,
+  Lock,
+  Info,
+  KeyRound,
+  Shield,
+  VolumeX,
+  Keyboard,
+  LayoutGrid,
+} from "lucide-react";
 import styles from "./page.module.scss";
 
 export const metadata = {
@@ -25,8 +36,9 @@ export default async function SettingsPage() {
   // fetched directly here instead.
   const { User } = await initializeDbAndModels();
   const currentUser = await User.findByPk(session.user.id, {
-    attributes: ["mutedKeywords", "keyboardShortcuts"],
+    attributes: ["mutedKeywords", "keyboardShortcuts", "homeSections"],
   });
+  const isSubscribed = session.user.tier && session.user.tier !== "Free";
 
   return (
     <div className={styles.pageWrapper}>
@@ -42,6 +54,21 @@ export default async function SettingsPage() {
 
       <div className={styles.layoutRow}>
         <div className={styles.mainColumn}>
+          <div className={styles.card}>
+            <h2 className={styles.cardHeader}>
+              <span className={styles.cardHeaderIcon}>
+                <LayoutGrid size={17} />
+              </span>
+              Home Page Sections
+            </h2>
+            <div className={styles.cardContent}>
+              <HomeSectionsSettings
+                initialSections={currentUser?.homeSections}
+                isSubscribed={isSubscribed}
+              />
+            </div>
+          </div>
+
           <div className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
