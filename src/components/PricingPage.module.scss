@@ -63,7 +63,7 @@
 
   &.active {
     background: var(--theme-card-background);
-    color: var(--theme-primary);
+    color: var(--theme-primary-text);
     box-shadow: var(--shadow-sm);
   }
 }
@@ -71,7 +71,7 @@
 .savingsBadge {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--theme-success);
+  color: var(--theme-success-text);
 }
 
 .referralCard {

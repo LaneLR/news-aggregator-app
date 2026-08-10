@@ -1,8 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Button from "./Button";
 import { useToast } from "./ToastProvider";
 import { useConfirm } from "./ConfirmDialogProvider";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 import styles from "./CreateFeedModal.module.scss";
 
 export default function CreateFeedModal({
@@ -13,6 +14,8 @@ export default function CreateFeedModal({
 }) {
   const toast = useToast();
   const confirm = useConfirm();
+  const modalRef = useRef(null);
+  useFocusTrap(modalRef, isOpen);
   const [title, setTitle] = useState("");
   const [availableSources, setAvailableSources] = useState([]);
   const [availableCategories, setAvailableCategories] = useState([]);
@@ -120,11 +123,13 @@ export default function CreateFeedModal({
   return (
     <div className={styles.modalBackdrop} onClick={onClose}>
       <div
+        ref={modalRef}
         className={styles.modalContent}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="feed-modal-title"
+        tabIndex={-1}
       >
         <h2 id="feed-modal-title" className={styles.formTitle}>
           {isEditMode ? "Edit Feed" : "Create a New Feed"}

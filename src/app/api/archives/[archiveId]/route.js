@@ -7,10 +7,14 @@ export async function DELETE(_, { params }) {
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  // params is a Promise in Next 16 App Router — it must be awaited before
+  // property access, otherwise archiveId is always undefined and every
+  // delete silently 404s (previously accessed synchronously, a real bug).
+  const { archiveId } = await params;
   const db = await initializeDbAndModels();
   const deleted = await db.Archive.destroy({
     where: {
-      id: Number(params.archiveId),
+      id: Number(archiveId),
       userId: session.user.id,
     },
   });

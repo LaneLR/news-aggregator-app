@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardFour from "./NewsCardFour";
@@ -31,6 +31,20 @@ export default function News({ archiveId, feedId }) {
   const [newAvailable, setNewAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Bug fix: handleFocus (below) is defined once inside an effect whose
+  // dependency array is only [feedId], so it closed over `latestTimestamp`
+  // from the render that effect ran in — which is always its initial value
+  // of `null`, since the effect never re-runs as latestTimestamp changes.
+  // That made `latestTimestamp && latestDate > latestTimestamp` permanently
+  // false, so the "new articles available" banner could never appear.
+  // Mirroring the value into a ref lets handleFocus read the current value
+  // without needing the effect (and its focus listener) to be re-created
+  // on every update.
+  const latestTimestampRef = useRef(null);
+  useEffect(() => {
+    latestTimestampRef.current = latestTimestamp;
+  }, [latestTimestamp]);
+
   useEffect(() => {
     const loadInitialArticles = async () => {
       setLoading(true);
@@ -56,7 +70,8 @@ export default function News({ archiveId, feedId }) {
           const latestDate = new Date(
             latestArticle.publishedAt || latestArticle.updatedAt
           );
-          if (latestTimestamp && latestDate > latestTimestamp) {
+          const currentLatestTimestamp = latestTimestampRef.current;
+          if (currentLatestTimestamp && latestDate > currentLatestTimestamp) {
             setNewAvailable(true);
           }
         }

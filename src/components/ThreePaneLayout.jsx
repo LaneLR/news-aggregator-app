@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import NewsCardThree from "./NewsCardThree";
 import ArticleReader from "./ArticleReader";
 import ReaderNavSidebar from "./ReaderNavSidebar";
 import ReaderSkeleton from "./ReaderSkeleton";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 import styles from "./ThreePaneLayout.module.scss";
 
 // The "reader" view density option — nav sidebar (ReaderNavSidebar) + a
@@ -34,6 +35,27 @@ export default function ThreePaneLayout({
   const [readerError, setReaderError] = useState(null);
   const [retryToken, setRetryToken] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const fullScreenPanelRef = useRef(null);
+  useFocusTrap(fullScreenPanelRef, isFullScreen);
+
+  // useFocusTrap's own restore-on-close targets whatever had focus right
+  // before fullscreen opened (the toggle button) — but readerContent is
+  // rendered in exactly one of two different parent containers depending
+  // on isFullScreen (see the comment on readerContent below), so entering
+  // fullscreen unmounts that button from .readingPane entirely rather than
+  // just visually covering it. By the time we're closing, that original
+  // button is a detached node — focusing it is a harmless no-op that sends
+  // focus nowhere. This targets the *new* toggle button that remounts in
+  // .readingPane once fullscreen closes.
+  const wasFullScreenRef = useRef(false);
+  useEffect(() => {
+    if (wasFullScreenRef.current && !isFullScreen) {
+      requestAnimationFrame(() => {
+        document.querySelector('[aria-label="Full screen"]')?.focus();
+      });
+    }
+    wasFullScreenRef.current = isFullScreen;
+  }, [isFullScreen]);
 
   useEffect(() => {
     if (!selectedArticleId) {
@@ -157,11 +179,13 @@ export default function ThreePaneLayout({
       {isFullScreen && selectedArticleId && (
         <div className={styles.fullScreenOverlay} onClick={() => setIsFullScreen(false)}>
           <div
+            ref={fullScreenPanelRef}
             className={styles.fullScreenPanel}
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             aria-label="Full screen article reader"
+            tabIndex={-1}
           >
             {readerContent}
           </div>

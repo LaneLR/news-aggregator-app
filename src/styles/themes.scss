@@ -34,6 +34,20 @@
   // one's a deliberate near-black surface color from the original spec, not
   // a text color, so it's unaffected by this.
   --theme-primary-contrast: #1c1917;
+  // For amber used as TEXT/icon color on a light background (active tab
+  // labels, badges, links) — the opposite case from --theme-primary-contrast
+  // above. --theme-primary itself only clears ~3.2:1 against white as text,
+  // which fails WCAG AA's 4.5:1 for normal text (confirmed via axe-core scan).
+  // #b45309 (--theme-accent-orange's value) clears white at ~5:1, but only
+  // ~4.4:1 against NavTab's own 12%-amber-tinted active background — just
+  // under AA. Using --theme-accent-hover's value instead (~6.3:1 against
+  // that same tinted background) gives every usage real margin rather than
+  // chasing per-component exceptions.
+  --theme-primary-text: #92400e;
+  // Same problem, same fix, for the green "up"/success indicators used as
+  // text (SectorPerformance, price-change badges) — --theme-success itself
+  // only clears ~3.3:1 against white.
+  --theme-success-text: #15803d;
   --theme-dark-blue: #1c1917;
   --theme-deep-blue: #1c1917;
   --theme-title-contrast: #d97706;
@@ -80,6 +94,11 @@
 
   --theme-primary: #f59e0b;
   --theme-primary-contrast: #09090b;
+  // Dark mode's --theme-primary already clears ~9.3:1 as text against the
+  // dark background — no separate darker variant needed, so this just
+  // mirrors --theme-primary itself.
+  --theme-primary-text: #f59e0b;
+  --theme-success-text: #22c55e;
   // Warm near-white (stone), not flat white/zinc — same reasoning as the
   // light-mode text tokens above.
   --theme-dark-blue: #fafaf9;

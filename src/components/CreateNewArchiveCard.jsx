@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Plus } from "lucide-react";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 import styles from "./CreateNewArchiveCard.module.scss";
 
 export default function CreateNewArchiveCard() {
@@ -10,6 +11,8 @@ export default function CreateNewArchiveCard() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const modalRef = useRef(null);
+  useFocusTrap(modalRef, isModalOpen);
 
   const handleCreate = async () => {
     if (!name.trim()) {
@@ -70,11 +73,13 @@ export default function CreateNewArchiveCard() {
       {isModalOpen && (
         <div className={styles.modalBackdrop} onClick={handleCloseModal}>
           <div
+            ref={modalRef}
             className={styles.modalContent}
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             aria-labelledby="create-archive-title"
+            tabIndex={-1}
           >
             <h2 id="create-archive-title" className={styles.modalHeader}>
               Create New Archive

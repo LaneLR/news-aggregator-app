@@ -1,10 +1,17 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { SHORTCUT_ACTIONS, SHORTCUT_LABELS } from "@/lib/keyboardShortcuts";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 import styles from "./KeyboardShortcutsHelp.module.scss";
 
 export default function KeyboardShortcutsHelp({ shortcuts, onClose }) {
+  const dialogRef = useRef(null);
+  // No isOpen prop here — the parent (KeyboardShortcutsProvider) only
+  // mounts this component while it should be shown, so the trap is simply
+  // active for as long as this is mounted.
+  useFocusTrap(dialogRef, true);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") onClose();
@@ -16,11 +23,13 @@ export default function KeyboardShortcutsHelp({ shortcuts, onClose }) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div
+        ref={dialogRef}
         className={styles.dialog}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="shortcuts-help-title"
+        tabIndex={-1}
       >
         <div className={styles.header}>
           <h2 id="shortcuts-help-title">Keyboard Shortcuts</h2>

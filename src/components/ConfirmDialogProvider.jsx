@@ -1,7 +1,8 @@
 "use client";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { AlertTriangle, HelpCircle } from "lucide-react";
 import Button from "./Button";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 import styles from "./ConfirmDialogProvider.module.scss";
 
 const ConfirmContext = createContext(() => Promise.resolve(false));
@@ -15,6 +16,8 @@ export function useConfirm() {
 
 export default function ConfirmDialogProvider({ children }) {
   const [request, setRequest] = useState(null);
+  const dialogRef = useRef(null);
+  useFocusTrap(dialogRef, !!request);
 
   const confirm = useCallback((options = {}) => {
     return new Promise((resolve) => {
@@ -52,11 +55,13 @@ export default function ConfirmDialogProvider({ children }) {
       {request && (
         <div className={styles.overlay} onClick={() => settle(false)}>
           <div
+            ref={dialogRef}
             className={styles.dialog}
             onClick={(e) => e.stopPropagation()}
             role="alertdialog"
             aria-modal="true"
             aria-labelledby="confirm-dialog-title"
+            tabIndex={-1}
           >
             <div className={`${styles.iconWrap} ${request.danger ? styles.danger : ""}`}>
               {request.danger ? (

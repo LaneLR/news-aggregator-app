@@ -76,7 +76,12 @@ export async function POST(req) {
   }
 
   try {
-    const origin = headers().get("origin") || "http://localhost:3000";
+    // headers() returns a Promise in this Next.js version (App Router
+    // Route Handlers) — calling .get() on it directly without awaiting
+    // throws "headers(...).get is not a function", which broke checkout
+    // session creation outright (every request hit the catch block below
+    // and returned a 500 instead of ever reaching Stripe).
+    const origin = (await headers()).get("origin") || "http://localhost:3000";
 
     const sessionParams = {
       payment_method_types: ["card"],

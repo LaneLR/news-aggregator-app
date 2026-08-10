@@ -15,8 +15,12 @@ export async function DELETE(req, { params }) {
     const db = await initializeDbAndModels();
     const { SavedArticle, Archive } = db;
 
-    const archiveId = Number(params.archiveId);
-    const articleId = Number(params.articleId);
+    // params is a Promise in Next 16 App Router — must be awaited, otherwise
+    // both IDs are always undefined and every delete 400s (real bug fixed
+    // here; see archives/[archiveId]/route.js for the same pattern).
+    const { archiveId: rawArchiveId, articleId: rawArticleId } = await params;
+    const archiveId = Number(rawArchiveId);
+    const articleId = Number(rawArticleId);
 
     if (!archiveId || !articleId || isNaN(archiveId) || isNaN(articleId)) {
       return NextResponse.json(

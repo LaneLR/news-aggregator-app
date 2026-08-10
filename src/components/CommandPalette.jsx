@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Search, Bookmark, Heart, Settings, User, LayoutGrid, CornerDownLeft } from "lucide-react";
 import { CATEGORY_LINKS, PERSONAL_LINKS } from "./HeaderNavBar";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 import styles from "./CommandPalette.module.scss";
 
 const EXTRA_LINKS = [
@@ -20,6 +21,11 @@ const EXTRA_LINKS = [
 // entry point by design (no visible trigger button) — the shortcuts
 // cheatsheet (KeyboardShortcutsProvider's "?" overlay) is the discovery
 // path, matching how this class of tool (Linear, Notion, Superhuman) works.
+//
+// Follows the ARIA combobox-with-listbox pattern: the input is the only
+// focusable element (arrow keys move a virtual selection, not real DOM
+// focus — options aren't independently tabbable), announced to screen
+// readers via aria-activedescendant rather than actual focus movement.
 export default function CommandPalette() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -27,6 +33,8 @@ export default function CommandPalette() {
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef(null);
+  const paletteRef = useRef(null);
+  useFocusTrap(paletteRef, isOpen);
 
   const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
 
@@ -41,6 +49,8 @@ export default function CommandPalette() {
     return allDestinations.filter((d) => d.label.toLowerCase().includes(q));
   }, [query, allDestinations]);
 
+  const closePalette = () => setIsOpen(false);
+
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -52,12 +62,12 @@ export default function CommandPalette() {
     return () => document.removeEventListener("keydown", handleGlobalKeyDown);
   }, []);
 
+  // Focus itself is handled by useFocusTrap (moves into the input on open,
+  // restores on close) — this just resets the search state for next time.
   useEffect(() => {
     if (!isOpen) return;
     setQuery("");
     setActiveIndex(0);
-    const timer = setTimeout(() => inputRef.current?.focus(), 0);
-    return () => clearTimeout(timer);
   }, [isOpen]);
 
   useEffect(() => {
@@ -71,7 +81,7 @@ export default function CommandPalette() {
 
   const handleKeyDown = (e) => {
     if (e.key === "Escape") {
-      setIsOpen(false);
+      closePalette();
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
       setActiveIndex((i) => Math.min(i + 1, Math.max(filtered.length - 1, 0)));
@@ -91,15 +101,23 @@ export default function CommandPalette() {
   if (!isOpen) return null;
 
   const trimmedQuery = query.trim();
+  const showSearchFallback = filtered.length === 0 && trimmedQuery;
+  const activeOptionId = showSearchFallback
+    ? "cmdp-option-fallback"
+    : filtered[activeIndex]
+    ? `cmdp-option-${activeIndex}`
+    : undefined;
 
   return (
-    <div className={styles.overlay} onClick={() => setIsOpen(false)}>
+    <div className={styles.overlay} onClick={closePalette}>
       <div
+        ref={paletteRef}
         className={styles.palette}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
+        tabIndex={-1}
       >
         <div className={styles.inputRow}>
           <Search size={17} strokeWidth={2.25} />
@@ -107,6 +125,12 @@ export default function CommandPalette() {
             ref={inputRef}
             className={styles.input}
             type="text"
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="cmdp-listbox"
+            aria-activedescendant={activeOptionId}
+            aria-autocomplete="list"
+            autoComplete="off"
             placeholder="Jump to a category, page, or search articles…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -115,26 +139,33 @@ export default function CommandPalette() {
           <kbd className={styles.escHint}>Esc</kbd>
         </div>
 
-        <div className={styles.results}>
-          {filtered.length === 0 ? (
-            trimmedQuery && (
-              <button
-                type="button"
-                className={`${styles.resultItem} ${styles.active}`}
-                onClick={() => goTo(`/search?query=${encodeURIComponent(trimmedQuery)}`)}
-              >
-                <Search size={16} strokeWidth={2} />
-                <span>Search articles for &ldquo;{trimmedQuery}&rdquo;</span>
-                <CornerDownLeft size={14} strokeWidth={2} className={styles.enterHint} />
-              </button>
-            )
+        <div className={styles.results} role="listbox" id="cmdp-listbox" aria-label="Results">
+          {showSearchFallback ? (
+            <div
+              id="cmdp-option-fallback"
+              role="option"
+              aria-selected="true"
+              className={`${styles.resultItem} ${styles.active}`}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => goTo(`/search?query=${encodeURIComponent(trimmedQuery)}`)}
+            >
+              <Search size={16} strokeWidth={2} />
+              <span>Search articles for &ldquo;{trimmedQuery}&rdquo;</span>
+              <CornerDownLeft size={14} strokeWidth={2} className={styles.enterHint} />
+            </div>
           ) : (
             filtered.map((dest, i) => (
-              <button
+              <div
                 key={dest.href}
-                type="button"
+                id={`cmdp-option-${i}`}
+                role="option"
+                aria-selected={i === activeIndex}
                 className={`${styles.resultItem} ${i === activeIndex ? styles.active : ""}`}
                 onMouseEnter={() => setActiveIndex(i)}
+                // Prevents the input from losing focus on click — the
+                // dialog only ever has one real focus target (see combobox
+                // note above), mousedown would otherwise blur it first.
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => goTo(dest.href)}
               >
                 <dest.Icon size={16} strokeWidth={2} />
@@ -142,7 +173,7 @@ export default function CommandPalette() {
                 {i === activeIndex && (
                   <CornerDownLeft size={14} strokeWidth={2} className={styles.enterHint} />
                 )}
-              </button>
+              </div>
             ))
           )}
         </div>
