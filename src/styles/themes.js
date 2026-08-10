@@ -7,6 +7,8 @@ export const themes = {
   default: {
     primary: "#d97706",
     primaryContrast: "#1c1917",
+    primaryText: "#92400e",
+    successText: "#15803d",
     darkBlue: "#1c1917",
     deepBlue: "#1c1917",
     titleContrast: "#d97706",
@@ -41,6 +43,8 @@ export const themes = {
   dark: {
     primary: "#f59e0b",
     primaryContrast: "#09090b",
+    primaryText: "#f59e0b",
+    successText: "#22c55e",
     darkBlue: "#fafaf9",
     deepBlue: "#fafaf9",
     titleContrast: "#f59e0b",

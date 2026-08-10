@@ -65,6 +65,7 @@ export default function DigestSettings() {
           <input
             className={styles.switchInput}
             type="checkbox"
+            aria-label="Enable email digest"
             checked={enabled}
             disabled={saving}
             onChange={(e) => savePreferences({ digestEnabled: e.target.checked })}

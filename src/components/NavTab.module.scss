@@ -23,7 +23,7 @@
 
   &.active {
     background-color: color-mix(in srgb, var(--theme-primary) 12%, transparent);
-    color: var(--theme-primary);
+    color: var(--theme-primary-text);
 
     svg {
       color: var(--theme-primary);

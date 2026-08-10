@@ -137,7 +137,7 @@ export default function RegisterPage() {
 
           <Button
             bgColor={"var(--theme-primary)"}
-            clr={"var(--theme-button-text)"}
+            clr={"var(--theme-primary-contrast)"}
             type="submit"
             wide={"100%"}
           >

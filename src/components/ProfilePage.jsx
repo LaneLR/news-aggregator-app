@@ -190,7 +190,7 @@ export default function ProfilePage() {
             {user.tier === "Free" ? (
               <Button
                 bgColor={"var(--theme-primary)"}
-                clr={"var(--theme-button-text)"}
+                clr={"var(--theme-primary-contrast)"}
                 onClick={() => (window.location.href = "/pricing")}
               >
                 Upgrade to Pro
@@ -198,7 +198,7 @@ export default function ProfilePage() {
             ) : (
               <Button
                 bgColor={"var(--theme-primary)"}
-                clr={"var(--theme-button-text)"}
+                clr={"var(--theme-primary-contrast)"}
                 onClick={handleManageSubscription}
               >
                 Manage Subscription
@@ -338,7 +338,7 @@ export default function ProfilePage() {
             {user.isPendingDeletion ? (
               <Button
                 bgColor={"var(--theme-primary)"}
-                clr={"var(--theme-button-text)"}
+                clr={"var(--theme-primary-contrast)"}
                 onClick={handleCancelDeletion}
               >
                 Cancel Deletion
