@@ -272,6 +272,9 @@ export default function PricingPage() {
             ))}
           </ul>
           {renderSubscribedButton()}
+          {userTier !== "Subscribed" && (
+            <p className={styles.riskReversal}>Cancel anytime — no questions asked.</p>
+          )}
         </div>
       </div>
     </div>
