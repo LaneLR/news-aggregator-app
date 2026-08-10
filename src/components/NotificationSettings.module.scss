@@ -1,0 +1,51 @@
+.helperText {
+  margin: 0 0 1rem;
+  color: var(--theme-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+
+  a {
+    color: var(--theme-primary);
+    font-weight: 600;
+  }
+}
+
+.enableButton,
+.disableButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.06);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.enableButton {
+  background-color: var(--theme-primary);
+  color: var(--theme-primary-contrast);
+}
+
+.disableButton {
+  background-color: var(--theme-layout-background);
+  color: var(--theme-text);
+  border: 1px solid var(--theme-border);
+}
+
+.error {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: var(--theme-warning);
+}

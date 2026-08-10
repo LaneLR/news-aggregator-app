@@ -35,6 +35,11 @@ body {
   overflow-x: hidden;
   margin: 0;
   padding: 0;
+  // Suppresses the browser's own native pull-to-refresh at the page-scroll
+  // boundary so it doesn't double-fire alongside the custom one
+  // (usePullToRefresh.js) on category/news pages — without this, pulling
+  // down could trigger a full page reload AND the in-app refresh at once.
+  overscroll-behavior-y: contain;
   color: var(--light-white);
   font-family: var(--font-roboto), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;

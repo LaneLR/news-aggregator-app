@@ -4,6 +4,7 @@ import {
   getTrendingArticles,
   getPersonalizedPicks,
   getFeedScopedArticles,
+  getFollowedArticles,
   buildDigestHtml,
 } from "@/lib/digest";
 import { filterByMutedKeywords } from "@/lib/keywordFilter";
@@ -76,9 +77,16 @@ async function handler(req) {
           );
         }
 
+        const followed = await getFollowedArticles(Article, {
+          isSubscribed,
+          mutedKeywords: user.mutedKeywords,
+          followedKeywords: user.followedKeywords,
+          days: user.digestFrequency === "daily" ? 1 : 7,
+        });
+
         // Nothing worth sending — still mark as processed so it isn't
         // retried every run until fresh content shows up.
-        if (picks.length === 0 && trending.length === 0 && feedArticles.length === 0) {
+        if (picks.length === 0 && trending.length === 0 && feedArticles.length === 0 && followed.length === 0) {
           await user.update({ lastDigestSentAt: new Date() });
           continue;
         }
@@ -88,6 +96,7 @@ async function handler(req) {
           picks,
           feedTitle: feed?.title,
           feedArticles,
+          followed,
           frequency: user.digestFrequency,
           baseUrl,
         });

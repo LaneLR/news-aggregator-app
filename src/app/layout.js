@@ -10,6 +10,7 @@ import ThemeProvider from "@/components/ThemeProvider";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import JsonLd from "@/components/JsonLd";
 import KeyboardShortcutsProvider from "@/components/KeyboardShortcutsProvider";
+import CommandPalette from "@/components/CommandPalette";
 import ToastProvider from "@/components/ToastProvider";
 import ConfirmDialogProvider from "@/components/ConfirmDialogProvider";
 import { auth } from "@/lib/auth";
@@ -122,6 +123,7 @@ export default async function RootLayout({ children }) {
                     <Footer />
                     <MobileTabBar />
                   </AppWrapper>
+                  <CommandPalette />
                 </KeyboardShortcutsProvider>
               </ConfirmDialogProvider>
             </ToastProvider>

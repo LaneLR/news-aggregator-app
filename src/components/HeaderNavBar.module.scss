@@ -45,6 +45,26 @@
   }
 }
 
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background-color: var(--theme-primary);
+  color: var(--theme-primary-contrast);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+
+  .active & {
+    background-color: var(--theme-primary-contrast);
+    color: var(--theme-primary);
+  }
+}
+
 .draggable {
   cursor: grab;
 

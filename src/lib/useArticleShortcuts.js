@@ -22,6 +22,12 @@ export function useArticleShortcuts(articles, onOpen) {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
+      // None of this app's single-key shortcuts are meant to combine with a
+      // modifier — without this guard, e.g. Ctrl/Cmd+K (open command
+      // palette) would also fire the bare "k" (previous article) binding
+      // since modifier keys don't change event.key for letter keys.
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+
       const typing = isTypingTarget(event.target);
 
       // "/" focuses search even while not inside the article list — and

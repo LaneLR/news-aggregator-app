@@ -6,7 +6,7 @@ import Image from "next/image.js";
 import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation.js";
-import { Heart, Lock, Bookmark, Check, Compass } from "lucide-react";
+import { Heart, Lock, Bookmark, Check, Compass, CheckSquare, Square } from "lucide-react";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
 import { getCategoryColor } from "@/lib/categoryColors";
@@ -23,6 +23,9 @@ export default function NewsCardThree({
   density = "card",
   onSelect,
   index,
+  selectionMode = false,
+  isSelected = false,
+  onToggleSelect,
 }) {
   const { data: session } = useSession();
   const router = useRouter();
@@ -148,9 +151,14 @@ export default function NewsCardThree({
       <Link
         className={styles.imageLink}
         href={article.url}
-        target={onSelect ? undefined : "_blank"}
+        target={onSelect || selectionMode ? undefined : "_blank"}
         onClick={
-          onSelect
+          selectionMode
+            ? (e) => {
+                e.preventDefault();
+                onToggleSelect?.();
+              }
+            : onSelect
             ? (e) => {
                 e.preventDefault();
                 onSelect();
@@ -170,6 +178,15 @@ export default function NewsCardThree({
             objectPosition: "top",
           }}
         />
+        {selectionMode && (
+          <span className={`${styles.selectCheckbox} ${isSelected ? styles.checked : ""}`}>
+            {isSelected ? (
+              <CheckSquare size={20} strokeWidth={2.25} />
+            ) : (
+              <Square size={20} strokeWidth={2.25} />
+            )}
+          </span>
+        )}
       </Link>
       <div className={styles.contentArea}>
         <div className={styles.titleBlock}>

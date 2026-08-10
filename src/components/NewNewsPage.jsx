@@ -24,6 +24,8 @@ import CarouselRow from "@/components/CarouselRow";
 import CarouselSkeleton from "@/components/CarouselSkeleton";
 import HeroCarousel from "@/components/HeroCarousel";
 import FeatureCallout from "@/components/FeatureCallout";
+import PullToRefreshIndicator from "@/components/PullToRefreshIndicator";
+import { usePullToRefresh } from "@/lib/usePullToRefresh";
 import { DEFAULT_HOME_SECTIONS } from "@/lib/homeSections";
 import styles from "./NewNewsPage.module.scss";
 
@@ -79,8 +81,8 @@ export default function NewsPage() {
   const [showForYou, setShowForYou] = useState(DEFAULT_SHOW_FOR_YOU);
   const [showTopStories, setShowTopStories] = useState(DEFAULT_SHOW_TOP_STORIES);
 
-  useEffect(() => {
-    fetch("/api/news-by-category")
+  const loadNews = () => {
+    const categoriesPromise = fetch("/api/news-by-category")
       .then((res) => res.json())
       .then((data) => {
         setCategorizedArticles(data.categories || {});
@@ -92,14 +94,22 @@ export default function NewsPage() {
         setCategorizedArticles({});
       });
 
-    fetch("/api/news/top-stories")
+    const topStoriesPromise = fetch("/api/news/top-stories")
       .then((res) => res.json())
       .then((data) => setTopStories(data.topStories || []))
       .catch((err) => {
         console.error("Failed to fetch top stories:", err);
         setTopStories([]);
       });
+
+    return Promise.all([categoriesPromise, topStoriesPromise]);
+  };
+
+  useEffect(() => {
+    loadNews();
   }, []);
+
+  const { pullDistance, isRefreshing, pullHandlers } = usePullToRefresh(loadNews);
 
   const categoriesLoading = categorizedArticles === null;
   const categorySections = categoriesLoading
@@ -107,7 +117,8 @@ export default function NewsPage() {
     : Object.keys(categorizedArticles);
 
   return (
-    <div className={styles.newsPageWrapper}>
+    <div className={styles.newsPageWrapper} {...pullHandlers}>
+      <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
       <h1 className={styles.srOnly}>Your News Feed</h1>
       <FeatureCallout />
       {showForYou && <HeroCarousel />}

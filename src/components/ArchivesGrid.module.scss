@@ -1,0 +1,17 @@
+.dragWrapper {
+  cursor: grab;
+  border-radius: var(--radius-lg);
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.dragging {
+  opacity: 0.4;
+}
+
+.dragOver {
+  outline: 2px dashed var(--theme-primary);
+  outline-offset: 4px;
+}

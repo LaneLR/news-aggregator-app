@@ -20,7 +20,13 @@
     }
   }
 
-  @media (max-width: 860px) {
+  // iPad-class tablets in portrait (744-834px CSS width) are wider than this
+  // cutoff, so they still get the 2-pane list+reader layout above (nav
+  // sidebar already hidden at 1280px) — only true phone-width screens fall
+  // back to a single stacked pane. Matches the 700px "mobile" cutoff already
+  // used elsewhere in this file (.fullScreenOverlay/.fullScreenPanel) and
+  // across the app (CarouselRow, LegalInfoPage).
+  @media (max-width: 700px) {
     flex-direction: column;
   }
 }
@@ -181,7 +187,7 @@
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 700px) {
   .navPane,
   .listPane {
     position: static;

@@ -30,6 +30,49 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// Push payloads are sent as plain JSON from lib/webPush.js — { title, body,
+// url }. `url` is where notificationclick below sends the user; defaults to
+// the Following page since that's what this app's only push trigger
+// (followed-keyword matches) is about.
+self.addEventListener("push", (event) => {
+  if (!event.data) return;
+
+  let payload;
+  try {
+    payload = event.data.json();
+  } catch {
+    return;
+  }
+
+  const { title, body, url } = payload;
+  event.waitUntil(
+    self.registration.showNotification(title || "MorningFeeds", {
+      body,
+      icon: "/images/icon-192.png",
+      badge: "/images/icon-192.png",
+      data: { url: url || "/following" },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const targetUrl = event.notification.data?.url || "/following";
+
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url.includes(targetUrl) && "focus" in client) {
+          return client.focus();
+        }
+      }
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(targetUrl);
+      }
+    })
+  );
+});
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
 

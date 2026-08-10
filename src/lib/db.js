@@ -10,6 +10,7 @@ import defineUserInteraction from "./models/UserInteraction.js";
 import defineReadArticle from "./models/ReadArticle.js";
 import defineMarketQuote from "./models/MarketQuote.js";
 import defineMarketChartCache from "./models/MarketChartCache.js";
+import definePushSubscription from "./models/PushSubscription.js";
 
 if (!global.db) {
   global.db = {};
@@ -35,6 +36,7 @@ async function initializeDbAndModels() {
       const ReadArticle = defineReadArticle(sequelize);
       const MarketQuote = defineMarketQuote(sequelize);
       const MarketChartCache = defineMarketChartCache(sequelize);
+      const PushSubscription = definePushSubscription(sequelize);
 
       global.db.sequelize = sequelize;
       global.db.User = User;
@@ -48,6 +50,7 @@ async function initializeDbAndModels() {
       global.db.ReadArticle = ReadArticle;
       global.db.MarketQuote = MarketQuote;
       global.db.MarketChartCache = MarketChartCache;
+      global.db.PushSubscription = PushSubscription;
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -75,6 +78,9 @@ async function initializeDbAndModels() {
 
       User.hasMany(ReadArticle, { foreignKey: "userId", onDelete: "CASCADE" });
       ReadArticle.belongsTo(User, { foreignKey: "userId" });
+
+      User.hasMany(PushSubscription, { foreignKey: "userId", onDelete: "CASCADE" });
+      PushSubscription.belongsTo(User, { foreignKey: "userId" });
 
       // There's no formal migration tooling in this project yet, so `alter`
       // is what actually applies model changes to the database — but it is
