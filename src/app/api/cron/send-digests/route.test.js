@@ -1,0 +1,103 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
+import { createDbMock, createInstanceMock } from "@/test/dbMock";
+
+const db = createDbMock();
+vi.mock("@/lib/db", () => ({ default: vi.fn(async () => db) }));
+
+const mockSendEmail = vi.fn();
+vi.mock("@/utils/emailer", () => ({ sendEmail: (...args) => mockSendEmail(...args) }));
+
+const mockGetTrendingArticles = vi.fn();
+const mockGetPersonalizedPicks = vi.fn();
+const mockGetFeedScopedArticles = vi.fn();
+const mockGetFollowedArticles = vi.fn();
+const mockBuildDigestHtml = vi.fn();
+vi.mock("@/lib/digest", () => ({
+  getTrendingArticles: (...args) => mockGetTrendingArticles(...args),
+  getPersonalizedPicks: (...args) => mockGetPersonalizedPicks(...args),
+  getFeedScopedArticles: (...args) => mockGetFeedScopedArticles(...args),
+  getFollowedArticles: (...args) => mockGetFollowedArticles(...args),
+  buildDigestHtml: (...args) => mockBuildDigestHtml(...args),
+}));
+
+const { GET, POST } = await import("./route");
+
+function makeRequest(authHeader) {
+  return new NextRequest("http://localhost/api/cron/send-digests", {
+    headers: authHeader ? { authorization: authHeader } : {},
+  });
+}
+
+describe("GET,POST /api/cron/send-digests", () => {
+  beforeEach(() => {
+    mockSendEmail.mockReset();
+    mockGetTrendingArticles.mockReset().mockResolvedValue([]);
+    mockGetPersonalizedPicks.mockReset().mockResolvedValue([]);
+    mockGetFeedScopedArticles.mockReset().mockResolvedValue([]);
+    mockGetFollowedArticles.mockReset().mockResolvedValue([]);
+    mockBuildDigestHtml.mockReset().mockReturnValue("<html></html>");
+    db.User.findAll.mockReset();
+  });
+
+  it("rejects requests missing the CRON_SECRET bearer header", async () => {
+    const res = await GET(makeRequest());
+
+    expect(res.status).toBe(401);
+  });
+
+  it("rejects requests with the wrong secret", async () => {
+    const res = await POST(makeRequest("Bearer wrong"));
+
+    expect(res.status).toBe(401);
+  });
+
+  it("skips users with nothing to send but still marks them processed", async () => {
+    const user = createInstanceMock({
+      id: "user-1",
+      email: "a@b.com",
+      tier: "Free",
+      digestFrequency: "weekly",
+      lastDigestSentAt: null,
+    });
+    db.User.findAll.mockResolvedValue([user]);
+
+    const res = await GET(makeRequest(`Bearer ${process.env.CRON_SECRET}`));
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.sent).toBe(0);
+    expect(user.update).toHaveBeenCalledWith({ lastDigestSentAt: expect.any(Date) });
+    expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+
+  it("sends a digest email when there's content and marks the user processed", async () => {
+    const user = createInstanceMock({
+      id: "user-1",
+      email: "a@b.com",
+      tier: "Subscribed",
+      digestFrequency: "daily",
+      digestFeedId: null,
+      lastDigestSentAt: null,
+    });
+    db.User.findAll.mockResolvedValue([user]);
+    mockGetPersonalizedPicks.mockResolvedValue([{ title: "Pick" }]);
+
+    const res = await GET(makeRequest(`Bearer ${process.env.CRON_SECRET}`));
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.sent).toBe(1);
+    expect(mockSendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ to: "a@b.com" })
+    );
+  });
+
+  it("returns 500 when the job throws unexpectedly", async () => {
+    db.User.findAll.mockRejectedValue(new Error("db down"));
+
+    const res = await GET(makeRequest(`Bearer ${process.env.CRON_SECRET}`));
+
+    expect(res.status).toBe(500);
+  });
+});
