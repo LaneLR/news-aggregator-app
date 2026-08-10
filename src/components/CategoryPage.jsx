@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Newspaper, RefreshCw } from "lucide-react";
+import { Newspaper, RefreshCw, ListChecks, X } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 import ThreePaneLayout from "./ThreePaneLayout";
@@ -9,11 +9,14 @@ import Button from "./Button";
 import MarkAllReadButton from "./MarkAllReadButton";
 import ViewDensityToggle from "./ViewDensityToggle";
 import CardSkeleton from "./CardSkeleton";
+import PullToRefreshIndicator from "./PullToRefreshIndicator";
+import { usePullToRefresh } from "@/lib/usePullToRefresh";
 import MarketTicker from "./MarketTicker";
 import MarketChart from "./MarketChart";
 import SectorPerformance from "./SectorPerformance";
 import MostCovered from "./MostCovered";
 import Watchlist from "./Watchlist";
+import BulkActionBar from "./BulkActionBar";
 import { useArticleShortcuts } from "@/lib/useArticleShortcuts";
 import { useMarkAllRead } from "@/lib/useMarkAllRead";
 import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
@@ -143,6 +146,97 @@ export default function CategoryPage({
   };
 
   const { hasUnread, markingAllRead, handleMarkAllRead } = useMarkAllRead(articles, setArticles);
+  const { pullDistance, isRefreshing, pullHandlers } = usePullToRefresh(refreshArticles);
+
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedUrls, setSelectedUrls] = useState(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+
+  const toggleSelectMode = () => {
+    setSelectMode((prev) => !prev);
+    setSelectedUrls(new Set());
+  };
+
+  const toggleSelectUrl = (url) => {
+    setSelectedUrls((prev) => {
+      const next = new Set(prev);
+      if (next.has(url)) next.delete(url);
+      else next.add(url);
+      return next;
+    });
+  };
+
+  const selectedArticles = articles.filter((a) => selectedUrls.has(a.url));
+
+  const handleBulkMarkRead = async () => {
+    if (bulkBusy || selectedArticles.length === 0) return;
+    setBulkBusy(true);
+    const urls = selectedArticles.map((a) => a.url);
+    setArticles((prev) => prev.map((a) => (urls.includes(a.url) ? { ...a, isRead: true } : a)));
+    try {
+      await fetch("/api/articles/mark-all-read", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ urls }),
+      });
+    } catch (err) {
+      console.error("Bulk mark-read failed:", err);
+    } finally {
+      setBulkBusy(false);
+      setSelectedUrls(new Set());
+    }
+  };
+
+  const handleBulkSave = async () => {
+    if (bulkBusy || selectedArticles.length === 0 || !defaultArchiveId) return;
+    setBulkBusy(true);
+    try {
+      await Promise.all(
+        selectedArticles.map((article) =>
+          fetch(`/api/archives/${defaultArchiveId}/articles`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              title: article.title,
+              url: article.url,
+              urlToImage: article.urlToImage,
+              sourceName: article.sourceName,
+            }),
+          })
+        )
+      );
+    } catch (err) {
+      console.error("Bulk save failed:", err);
+    } finally {
+      setBulkBusy(false);
+      setSelectedUrls(new Set());
+    }
+  };
+
+  const handleBulkLike = async () => {
+    if (bulkBusy || selectedArticles.length === 0) return;
+    setBulkBusy(true);
+    const urls = new Set(selectedArticles.filter((a) => !a.isLikedByUser).map((a) => a.url));
+    setArticles((prev) =>
+      prev.map((a) => (urls.has(a.url) ? { ...a, isLikedByUser: true, likeCount: (a.likeCount || 0) + 1 } : a))
+    );
+    try {
+      await Promise.all(
+        [...urls].map((articleUrl) =>
+          fetch("/api/articles/like", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ articleUrl }),
+          })
+        )
+      );
+    } catch (err) {
+      console.error("Bulk like failed:", err);
+    } finally {
+      setBulkBusy(false);
+      setSelectedUrls(new Set());
+    }
+  };
 
   useEffect(() => {
     const fetchDefaultArchive = async () => {
@@ -169,7 +263,8 @@ export default function CategoryPage({
   const skeletonDensity = effectiveDensity === "reader" ? "list" : effectiveDensity;
 
   return (
-    <>
+    <div {...pullHandlers}>
+      <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
       <div className={styles.pageHeader}>
         <h1 className={`${styles.searchBarHeader} headline`}>
           <Newspaper size={30} />
@@ -227,6 +322,16 @@ export default function CategoryPage({
         {hasUnread && (
           <MarkAllReadButton onClick={handleMarkAllRead} disabled={markingAllRead} />
         )}
+        {session?.user?.id && effectiveDensity !== "reader" && (
+          <button
+            type="button"
+            className={`${styles.selectModeButton} ${selectMode ? styles.active : ""}`}
+            onClick={toggleSelectMode}
+          >
+            {selectMode ? <X size={15} strokeWidth={2.25} /> : <ListChecks size={15} strokeWidth={2.25} />}
+            {selectMode ? "Cancel" : "Select"}
+          </button>
+        )}
       </div>
 
       {isLoading ? (
@@ -261,6 +366,9 @@ export default function CategoryPage({
                   isKeyboardFocused={i === selectedIndex}
                   innerRef={(el) => (cardRefs.current[i] = el)}
                   index={i}
+                  selectionMode={selectMode}
+                  isSelected={selectedUrls.has(article.url)}
+                  onToggleSelect={() => toggleSelectUrl(article.url)}
                 />
               ))}
             </NewsGridWrapper>
@@ -288,6 +396,17 @@ export default function CategoryPage({
           <p className={styles.emptyStateHint}>Check back soon — new stories come in throughout the day.</p>
         </div>
       )}
-    </>
+
+      {selectMode && (
+        <BulkActionBar
+          count={selectedUrls.size}
+          onMarkRead={handleBulkMarkRead}
+          onSave={handleBulkSave}
+          onLike={handleBulkLike}
+          onCancel={toggleSelectMode}
+          busy={bulkBusy}
+        />
+      )}
+    </div>
   );
 }

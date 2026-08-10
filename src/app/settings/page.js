@@ -1,5 +1,7 @@
 import DigestSettings from "@/components/DigestSettings";
 import KeywordFilters from "@/components/KeywordFilters";
+import FollowedKeywords from "@/components/FollowedKeywords";
+import NotificationSettings from "@/components/NotificationSettings";
 import KeyboardShortcutsSettings from "@/components/KeyboardShortcutsSettings";
 import HomeSectionsSettings from "@/components/HomeSectionsSettings";
 import { auth } from "@/lib/auth";
@@ -16,6 +18,8 @@ import {
   VolumeX,
   Keyboard,
   LayoutGrid,
+  Rss,
+  Bell,
 } from "lucide-react";
 import styles from "./page.module.scss";
 
@@ -36,7 +40,7 @@ export default async function SettingsPage() {
   // fetched directly here instead.
   const { User } = await initializeDbAndModels();
   const currentUser = await User.findByPk(session.user.id, {
-    attributes: ["mutedKeywords", "keyboardShortcuts", "homeSections"],
+    attributes: ["mutedKeywords", "followedKeywords", "keyboardShortcuts", "homeSections"],
   });
   const isSubscribed = session.user.tier && session.user.tier !== "Free";
 
@@ -90,6 +94,30 @@ export default async function SettingsPage() {
             </h2>
             <div className={styles.cardContent}>
               <KeywordFilters initialKeywords={currentUser?.mutedKeywords} />
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <h2 className={styles.cardHeader}>
+              <span className={styles.cardHeaderIcon}>
+                <Rss size={17} />
+              </span>
+              Following
+            </h2>
+            <div className={styles.cardContent}>
+              <FollowedKeywords initialKeywords={currentUser?.followedKeywords} />
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <h2 className={styles.cardHeader}>
+              <span className={styles.cardHeaderIcon}>
+                <Bell size={17} />
+              </span>
+              Push Notifications
+            </h2>
+            <div className={styles.cardContent}>
+              <NotificationSettings />
             </div>
           </div>
 

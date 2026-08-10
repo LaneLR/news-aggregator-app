@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
 import { excludeGatedCategoriesCondition } from "./subscriberOnlyCategories";
 import { buildKeywordExclusion } from "./keywordFilter";
+import { buildKeywordInclusion } from "./followedKeywords";
 
 function visibilityCondition(isSubscribed, mutedKeywords) {
   const conditions = isSubscribed ? [] : [excludeGatedCategoriesCondition()];
@@ -111,6 +112,29 @@ export async function getFeedScopedArticles(Article, feed, { mutedKeywords, limi
   });
 }
 
+// Independent of the trending/personalized/feed-scoped branch below — a
+// followed topic is worth surfacing in the digest no matter which of those
+// modes the user is otherwise in.
+export async function getFollowedArticles(Article, { isSubscribed, mutedKeywords, followedKeywords, days = 7, limit = 8 } = {}) {
+  const keywordInclusion = buildKeywordInclusion(followedKeywords);
+  if (!keywordInclusion) return [];
+
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  return Article.findAll({
+    where: {
+      [Op.and]: [
+        keywordInclusion,
+        { publishedAt: { [Op.gte]: since } },
+        ...visibilityCondition(isSubscribed, mutedKeywords),
+      ],
+    },
+    order: [["publishedAt", "DESC"]],
+    limit,
+  });
+}
+
 function articleRowHtml(article) {
   const image = article.urlToImage
     ? `<img src="${article.urlToImage}" alt="" width="72" height="72" style="border-radius:8px;object-fit:cover;display:block;" />`
@@ -134,15 +158,16 @@ function sectionHtml(title, articles) {
     </table>`;
 }
 
-export function buildDigestHtml({ trending, picks, frequency, baseUrl, feedTitle, feedArticles }) {
+export function buildDigestHtml({ trending, picks, frequency, baseUrl, feedTitle, feedArticles, followed }) {
   const cadence = frequency === "daily" ? "Today's" : "This week's";
   const body = feedTitle
     ? sectionHtml(`New in "${feedTitle}"`, feedArticles || [])
     : `${sectionHtml("Picked for you", picks)}${sectionHtml("Trending now", trending)}`;
+  const followedSection = sectionHtml("Topics you follow", followed || []);
   return `
     <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;">
       <h1 style="font-size:22px;color:#0a1430;">${cadence} MorningFeeds digest</h1>
-      ${body}
+      ${followedSection}${body}
       <p style="margin-top:28px;font-size:12px;color:#999;">
         You're getting this because you turned on email digests.
         <a href="${baseUrl}/settings">Manage your digest settings</a>.

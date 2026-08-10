@@ -2,11 +2,8 @@
 import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 import { Bookmark } from "lucide-react";
-import DeleteArchiveButton from "@/components/DeleteArchiveButton";
-import ArchiveCard from "@/components/ArchiveCard";
-import NewsGridWrapper from "@/components/NewsGridWrapper";
+import ArchivesGrid from "@/components/ArchivesGrid";
 import { redirect } from "next/navigation";
-import CreateNewArchiveCard from "@/components/CreateNewArchiveCard";
 import styles from "./page.module.scss";
 
 export const metadata = {
@@ -65,16 +62,7 @@ export default async function ArchivesPage() {
         </p>
       </div>
 
-      <NewsGridWrapper>
-        <CreateNewArchiveCard />
-        {plainArchives.map((archive) => (
-          <ArchiveCard archive={archive} key={archive.id}>
-            {archive.name !== "Saved for later" && (
-              <DeleteArchiveButton archiveId={archive.id} />
-            )}
-          </ArchiveCard>
-        ))}
-      </NewsGridWrapper>
+      <ArchivesGrid archives={plainArchives} />
     </>
   );
 }

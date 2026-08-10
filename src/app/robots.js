@@ -11,6 +11,8 @@ export default function robots() {
         "/settings",
         "/feeds",
         "/liked",
+        "/following",
+        "/share",
         "/for-you",
         "/onboarding",
         "/archives",

@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { applyCustomOrder } from "@/lib/useLayoutPrefs";
 import { useLocalOrder } from "@/lib/useLocalOrder";
 import { useDragReorder } from "@/lib/useDragReorder";
+import { useUnreadCounts } from "@/lib/useUnreadCounts";
 import {
   LayoutGrid,
   Sparkles,
@@ -25,14 +26,18 @@ import {
   DollarSign,
   CloudSun,
   ChevronDown,
+  Rss,
 } from "lucide-react";
 import styles from "./HeaderNavBar.module.scss";
 
 const ALL_ARTICLES_LINK = { label: "All Articles", href: "/news", Icon: LayoutGrid };
 
-const PERSONAL_LINKS = [
+// Exported so CommandPalette can list the same destinations without
+// duplicating this list.
+export const PERSONAL_LINKS = [
   { label: "For You", href: "/for-you", Icon: Sparkles, subscriberOnly: true },
-  { label: "My Feeds", href: "/feeds", Icon: Layers, subscriberOnly: true },
+  { label: "My Feeds", href: "/feeds", Icon: Layers, subscriberOnly: true, countKey: "feeds" },
+  { label: "Following", href: "/following", Icon: Rss, countKey: "following" },
 ];
 
 // `primary` links stay visible in the bar; the rest live behind "More" so
@@ -54,10 +59,16 @@ export const CATEGORY_LINKS = [
   { label: "Weather", href: "/category/weather", Icon: CloudSun },
 ];
 
+// Category slugs (href's last segment) don't always match the article
+// category tag's stored casing — "US" is stored uppercase, most others
+// aren't — so counts are looked up case-insensitively via this helper
+// rather than assuming a consistent capitalization scheme.
+const slugFromHref = (href) => href.split("/").pop();
+
 // Defined outside the component (rather than as a closure inside
 // HeaderNavBar) so it isn't redefined — and every <NavLink> forcibly
 // remounted — on every single render.
-const NavLink = ({ label, href, Icon, dragProps, dragState, pathname }) => (
+const NavLink = ({ label, href, Icon, dragProps, dragState, pathname, count }) => (
   <Link
     href={href}
     className={`${styles.link} ${pathname === href ? styles.active : ""} ${
@@ -69,6 +80,7 @@ const NavLink = ({ label, href, Icon, dragProps, dragState, pathname }) => (
   >
     <Icon size={15} strokeWidth={2.25} />
     {label}
+    {count > 0 && <span className={styles.badge}>{count > 99 ? "99+" : count}</span>}
   </Link>
 );
 
@@ -81,6 +93,8 @@ export default function HeaderNavBar() {
   const menuRef = useRef(null);
 
   const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
+  const isLoggedIn = !!session?.user?.id;
+  const unreadCounts = useUnreadCounts();
 
   // The nav bar scrolls horizontally (overflow-x: auto), which per the CSS
   // spec forces overflow-y to compute as auto too — so a dropdown positioned
@@ -139,17 +153,37 @@ export default function HeaderNavBar() {
     (reordered) => setCategoryOrder(reordered.map((l) => l.href))
   );
 
+  // A link's own subscriberOnly flag gates it individually — some
+  // PERSONAL_LINKS (like Following) are available to any logged-in user,
+  // not just subscribers, so the whole list can't be gated behind
+  // isSubscribed the way it used to be.
+  const visiblePersonalLinks = isLoggedIn
+    ? PERSONAL_LINKS.filter((link) => isSubscribed || !link.subscriberOnly)
+    : [];
+
+  const moreUnreadCount = moreCategories.reduce(
+    (sum, link) => sum + (unreadCounts.categories[slugFromHref(link.href)] || 0),
+    0
+  );
+
   return (
     <nav className={styles.wrapper} aria-label="Categories">
       <NavLink {...ALL_ARTICLES_LINK} pathname={pathname} />
       <span className={styles.divider} />
-      {isSubscribed &&
-        PERSONAL_LINKS.map((link) => <NavLink key={link.href} {...link} pathname={pathname} />)}
+      {visiblePersonalLinks.map((link) => (
+        <NavLink
+          key={link.href}
+          {...link}
+          pathname={pathname}
+          count={link.countKey ? unreadCounts[link.countKey] : undefined}
+        />
+      ))}
       {primaryCategories.map((link, i) => (
         <NavLink
           key={link.href}
           {...link}
           pathname={pathname}
+          count={unreadCounts.categories[slugFromHref(link.href)]}
           dragProps={canReorder ? getHandlers(i) : undefined}
           dragState={draggedIndex === i ? "dragging" : dragOverIndex === i ? "dragOver" : undefined}
         />
@@ -163,6 +197,9 @@ export default function HeaderNavBar() {
           >
             More
             <ChevronDown size={15} strokeWidth={2.25} />
+            {moreUnreadCount > 0 && (
+              <span className={styles.badge}>{moreUnreadCount > 99 ? "99+" : moreUnreadCount}</span>
+            )}
           </button>
           {isMoreOpen &&
             menuPosition &&
@@ -172,18 +209,22 @@ export default function HeaderNavBar() {
                 className={styles.moreMenu}
                 style={{ top: menuPosition.top, right: menuPosition.right }}
               >
-                {moreCategories.map(({ label, href, Icon }) => (
-                  <li key={href}>
-                    <Link
-                      href={href}
-                      className={`${styles.moreMenuItem} ${pathname === href ? styles.active : ""}`}
-                      onClick={() => setIsMoreOpen(false)}
-                    >
-                      <Icon size={16} strokeWidth={2} />
-                      {label}
-                    </Link>
-                  </li>
-                ))}
+                {moreCategories.map(({ label, href, Icon }) => {
+                  const count = unreadCounts.categories[slugFromHref(href)];
+                  return (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        className={`${styles.moreMenuItem} ${pathname === href ? styles.active : ""}`}
+                        onClick={() => setIsMoreOpen(false)}
+                      >
+                        <Icon size={16} strokeWidth={2} />
+                        {label}
+                        {count > 0 && <span className={styles.badge}>{count > 99 ? "99+" : count}</span>}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>,
               document.body
             )}

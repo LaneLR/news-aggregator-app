@@ -123,6 +123,13 @@ export default function defineUser(sequelize) {
         type: DataTypes.DATE,
         allowNull: true,
       },
+      // Tracks when this user's followed-keyword push notification last
+      // went out — enablement itself is signaled by having at least one
+      // PushSubscription row, not a separate boolean (see cron/send-push).
+      lastPushSentAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
       // Scopes the email digest to one of the user's own custom Feeds
       // instead of general trending/personalized picks. Nullable FK, not a
       // hard reference constraint here — set/read via the Feed association
@@ -132,6 +139,14 @@ export default function defineUser(sequelize) {
         allowNull: true,
       },
       mutedKeywords: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
+      },
+      // Inverse of mutedKeywords — surfaced on the /following page, counted
+      // in nav badges (lib/unreadCounts.js), and included in the email
+      // digest. See lib/followedKeywords.js.
+      followedKeywords: {
         type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: false,
         defaultValue: [],
