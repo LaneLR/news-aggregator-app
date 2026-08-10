@@ -7,6 +7,7 @@ import MainContentWrapper from "@/components/MainContentWrapper";
 import Footer from "@/components/Footer";
 import MobileTabBar from "@/components/MobileTabBar";
 import ThemeProvider from "@/components/ThemeProvider";
+import PostHogProvider from "@/components/PostHogProvider";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import JsonLd from "@/components/JsonLd";
 import KeyboardShortcutsProvider from "@/components/KeyboardShortcutsProvider";
@@ -113,21 +114,23 @@ export default async function RootLayout({ children }) {
         <JsonLd data={organizationSchema} />
         <JsonLd data={websiteSchema} />
         <Providers session={session}>
-          <ThemeProvider>
-            <ToastProvider>
-              <ConfirmDialogProvider>
-                <KeyboardShortcutsProvider>
-                  <AppWrapper>
-                    <Header />
-                    <MainContentWrapper>{children}</MainContentWrapper>
-                    <Footer />
-                    <MobileTabBar />
-                  </AppWrapper>
-                  <CommandPalette />
-                </KeyboardShortcutsProvider>
-              </ConfirmDialogProvider>
-            </ToastProvider>
-          </ThemeProvider>
+          <PostHogProvider>
+            <ThemeProvider>
+              <ToastProvider>
+                <ConfirmDialogProvider>
+                  <KeyboardShortcutsProvider>
+                    <AppWrapper>
+                      <Header />
+                      <MainContentWrapper>{children}</MainContentWrapper>
+                      <Footer />
+                      <MobileTabBar />
+                    </AppWrapper>
+                    <CommandPalette />
+                  </KeyboardShortcutsProvider>
+                </ConfirmDialogProvider>
+              </ToastProvider>
+            </ThemeProvider>
+          </PostHogProvider>
         </Providers>
         <ServiceWorkerRegister />
       </body>
