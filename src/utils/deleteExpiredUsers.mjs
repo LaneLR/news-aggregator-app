@@ -2,12 +2,11 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { Op } from "sequelize";
-import Stripe from "stripe";
+import getStripe from "@/lib/stripe";
 import initializeDbAndModels from "@/lib/db";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 export async function deleteExpiredUsers() {
+  const stripe = getStripe();
   const { User } = await initializeDbAndModels();
 
   const deletionThreshold = new Date(Date.now() - 24 * 60 * 60 * 1000);
