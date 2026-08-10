@@ -71,10 +71,12 @@ const FREE_CATEGORIES = [
 const FREE_FEATURES = [
   "Articles from hundreds of news sources and blogs",
   "Unlimited archives to save your favorite articles",
+  "Follow topics & keywords with instant notifications",
 ];
 
 const SUBSCRIBED_FEATURES = [
   "Everything in Free",
+  "Live Market dashboard with real-time charts & a watchlist",
   "Full Market, Finance & Journal coverage",
   "Create and customize your own news feeds",
   '"For You" recommendations based on your reading habits',
