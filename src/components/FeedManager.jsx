@@ -17,7 +17,12 @@ export default function FeedManager() {
   const fileInputRef = useRef(null);
 
   const { data: session } = useSession();
-  const isSubscribed = session?.user?.tier !== "Free";
+  // Must require a truthy tier, not just "!== Free" — a signed-out session
+  // has session.user.tier === undefined, which also satisfies "!== Free"
+  // and previously showed the feed-management toolbar (Create/Edit Feed,
+  // OPML import/export) to anonymous visitors. Matches the guard used by
+  // CategoryPage/ArticleReader's isSubscribed checks.
+  const isSubscribed = !!session?.user?.tier && session.user.tier !== "Free";
 
   const fetchFeeds = async () => {
     if (!isSubscribed) return;

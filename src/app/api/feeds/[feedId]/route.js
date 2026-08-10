@@ -17,7 +17,10 @@ export async function PATCH(req, context) {
     );
 
   try {
-    const { feedId } = context.params;
+    // params is a Promise in Next 16 App Router — must be awaited, otherwise
+    // feedId is always undefined and every update 404s (real bug fixed here;
+    // see archives/[archiveId]/route.js for the same pattern).
+    const { feedId } = await context.params;
     const { title, sourceNames, categories } = await req.json();
 
     if (!title || title.trim() === "") {
@@ -67,7 +70,9 @@ export async function DELETE(req, context) {
     );
 
   try {
-    const { feedId } = context.params;
+    // params is a Promise in Next 16 App Router — must be awaited (see
+    // PATCH above for the same fix).
+    const { feedId } = await context.params;
     const { Feed, User } = await initializeDbAndModels();
 
     const feed = await Feed.findOne({

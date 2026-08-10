@@ -7,7 +7,10 @@ export async function GET(_req, { params }) {
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const archiveId = Number(params.archiveId);
+  // params is a Promise in Next 16 App Router — must be awaited (real bug
+  // fix: it was read synchronously before, so archiveId was always NaN).
+  const { archiveId: rawArchiveId } = await params;
+  const archiveId = Number(rawArchiveId);
   if (isNaN(archiveId))
     return NextResponse.json({ error: "Invalid archive ID" }, { status: 400 });
 
@@ -33,7 +36,10 @@ export async function POST(req, { params }) {
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const archiveId = Number(params.archiveId);
+  // params is a Promise in Next 16 App Router — must be awaited (see GET
+  // above for the same fix).
+  const { archiveId: rawArchiveId } = await params;
+  const archiveId = Number(rawArchiveId);
   if (isNaN(archiveId))
     return NextResponse.json({ error: "Invalid archive ID" }, { status: 400 });
 

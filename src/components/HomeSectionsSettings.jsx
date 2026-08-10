@@ -83,7 +83,14 @@ export default function HomeSectionsSettings({ initialSections, isSubscribed }) 
         type="checkbox"
         checked={sections.has(key)}
         onChange={() => toggle(key, locked)}
-        disabled={saving || locked}
+        // Bug fix: disabling the checkbox for locked items also silently
+        // killed the "click a locked category to go to Pricing" redirect
+        // below in toggle() — a disabled control never fires onChange (and
+        // native label-click forwarding to a disabled control is a no-op
+        // too), so that branch was unreachable from a real click. Only
+        // `saving` should block interaction; `locked` still short-circuits
+        // toggle() itself before any section is actually changed.
+        disabled={saving}
       />
       <Icon size={16} strokeWidth={2} className={styles.optionIcon} />
       <span className={styles.optionText}>

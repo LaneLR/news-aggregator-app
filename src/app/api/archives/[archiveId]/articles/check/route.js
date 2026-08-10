@@ -7,7 +7,10 @@ export async function GET(req, context) {
   if (!session)
     return NextResponse.json({ saved: false }, { status: 401 });
 
-  const archiveId = Number(context.params.archiveId);
+  // params is a Promise in Next 16 App Router — must be awaited, otherwise
+  // archiveId is always NaN and every check 400s (real bug fixed here).
+  const { archiveId: rawArchiveId } = await context.params;
+  const archiveId = Number(rawArchiveId);
   if (isNaN(archiveId))
     return NextResponse.json({ saved: false }, { status: 400 });
 

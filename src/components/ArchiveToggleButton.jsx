@@ -14,7 +14,14 @@ export default function ArchiveToggleButton({
   const [selectedArchiveId, setSelectedArchiveId] = useState(
     propArchiveId || null
   );
-  const [isSaved, setIsSaved] = useState(false);
+  // A propArchiveId means the parent already knows this card belongs to
+  // that specific archive (e.g. an archive's own detail page renders its
+  // own SavedArticle rows) — that's not merely a hint to skip the "is this
+  // saved?" check below, it *is* the answer, so isSaved should start true
+  // rather than false-until-corrected. Without this, "Remove from archive"
+  // never appeared on an archive's own detail page, since nothing else
+  // ever set isSaved to true there.
+  const [isSaved, setIsSaved] = useState(Boolean(propArchiveId));
   const [loading, setLoading] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
@@ -32,7 +39,14 @@ export default function ArchiveToggleButton({
   }, []);
 
   useEffect(() => {
-    if (isSaved || !article.url || propArchiveId || viewOnly) return;
+    // propArchiveId means the parent already told us exactly which archive
+    // this card belongs to (a specific archive's own page) — no need to
+    // check. viewOnly alone does NOT mean "skip the check": it's the normal
+    // mode for ordinary feed cards (category/news/for-you/following/liked
+    // pages all render with viewOnly=true and no archiveId), where this
+    // check is the only way the bookmark icon ever reflects an article the
+    // user already saved in a previous session.
+    if (isSaved || !article.url || propArchiveId) return;
 
     const checkIfSaved = async () => {
       try {
@@ -129,7 +143,14 @@ export default function ArchiveToggleButton({
         >
           <Bookmark size={19} strokeWidth={2} fill="currentColor" />
         </button>
-      ) : viewOnly && isSaved ? (
+      ) : viewOnly && isSaved && propArchiveId ? (
+        // Paired with the branch above: a read-only view of one *specific*
+        // known archive's contents (propArchiveId set) shows a static
+        // indicator instead of a remove button. Ordinary feed cards
+        // (viewOnly=true, no propArchiveId — category/news/for-you/
+        // following/liked pages) fall through to the interactive button
+        // below instead, so an already-saved article can still be added to
+        // another archive from a feed, not frozen the moment it's saved.
         <div
           className={`${styles.saveButton} ${styles.saved}`}
           style={{ cursor: "default" }}

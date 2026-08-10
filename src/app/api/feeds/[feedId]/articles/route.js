@@ -16,7 +16,9 @@ export async function GET(req, context) {
     );
   }
 
-  const { feedId } = context.params;
+  // params is a Promise in Next 16 App Router — must be awaited, otherwise
+  // feedId is always undefined and this always 404s (real bug fixed here).
+  const { feedId } = await context.params;
   const { Feed, Article } = await initializeDbAndModels();
   const { searchParams } = new URL(req.url);
 

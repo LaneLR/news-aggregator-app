@@ -11,11 +11,16 @@ export default async function ArchiveDetailPage({ params }) {
   const session = await auth();
   if (!session) return notFound();
 
+  // `params` is a Promise in this Next.js version (see article/[id]/page.jsx
+  // and archives/shared/[slug]/page.jsx for the same pattern) — reading
+  // `params?.id` synchronously always returned undefined, so `Number(...)`
+  // was always NaN and this page 404'd for every real archive.
+  const { id } = await params;
   const db = await initializeDbAndModels();
 
   const archive = await db.Archive.findOne({
     where: {
-      id: Number(params?.id),
+      id: Number(id),
       userId: session.user.id,
     },
     include: [{ model: db.SavedArticle }],
