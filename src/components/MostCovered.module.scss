@@ -1,0 +1,98 @@
+@use "../styles/marketCard" as market;
+
+.section {
+  margin-bottom: 1.5rem;
+}
+
+.heading {
+  margin: 0 0 0.3rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--theme-text);
+}
+
+.helperText {
+  margin: 0 0 0.75rem;
+  color: var(--theme-text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.row {
+  display: block;
+  padding: 0.65rem 1rem;
+  background-color: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--theme-primary);
+  }
+}
+
+.rowSkeleton {
+  padding: 0.75rem 1rem;
+}
+
+.shimmerLine {
+  height: 14px;
+  width: 60%;
+  border-radius: var(--radius-sm);
+}
+
+.shimmer {
+  @include market.shimmer;
+}
+
+.rowHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.name {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--theme-text);
+}
+
+.ticker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--theme-text-secondary);
+  letter-spacing: 0.03em;
+}
+
+.count {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: var(--theme-text-secondary);
+}
+
+.barTrack {
+  height: 5px;
+  border-radius: 999px;
+  background-color: var(--theme-layout-background);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 999px;
+  background-color: var(--theme-primary);
+}

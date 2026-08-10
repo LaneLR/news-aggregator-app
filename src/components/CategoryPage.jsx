@@ -9,6 +9,11 @@ import Button from "./Button";
 import MarkAllReadButton from "./MarkAllReadButton";
 import ViewDensityToggle from "./ViewDensityToggle";
 import CardSkeleton from "./CardSkeleton";
+import MarketTicker from "./MarketTicker";
+import MarketChart from "./MarketChart";
+import SectorPerformance from "./SectorPerformance";
+import MostCovered from "./MostCovered";
+import Watchlist from "./Watchlist";
 import { useArticleShortcuts } from "@/lib/useArticleShortcuts";
 import { useMarkAllRead } from "@/lib/useMarkAllRead";
 import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
@@ -183,6 +188,16 @@ export default function CategoryPage({
           </div>
         )}
       </div>
+
+      {category === "Market" && (
+        <>
+          <MarketTicker />
+          <MarketChart />
+          <SectorPerformance />
+          <MostCovered />
+          <Watchlist />
+        </>
+      )}
 
       <div className={styles.filterBar}>
         <div className={styles.sortToggle}>

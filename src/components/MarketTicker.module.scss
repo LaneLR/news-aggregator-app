@@ -1,0 +1,50 @@
+@use "../styles/marketCard" as market;
+
+.shimmer {
+  @include market.shimmer;
+}
+
+.ticker {
+  @include market.ticker-grid;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  @include market.ticker-card;
+}
+
+.cardSkeleton {
+  gap: 8px;
+  justify-content: center;
+}
+
+.shimmerLine {
+  height: 12px;
+  width: 80%;
+  border-radius: var(--radius-sm);
+}
+
+.name {
+  @include market.ticker-name;
+}
+
+.price {
+  @include market.ticker-price;
+}
+
+.change {
+  @include market.ticker-change;
+}
+
+.lastUpdated {
+  grid-column: 1 / -1;
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: var(--theme-text-secondary);
+}
+
+.unavailable {
+  grid-column: 1 / -1;
+  color: var(--theme-text-secondary);
+  font-size: 0.9rem;
+}
