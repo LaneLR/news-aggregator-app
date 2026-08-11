@@ -32,6 +32,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
+  // See the identical rule in Header.module.scss — the M mark's own
+  // background is nearly the same near-black as this panel's background in
+  // dark mode (~1.18:1 contrast), so it needs a visible edge. Inert (and
+  // harmless) against the light-mode white background this panel also uses.
+  img {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+    border-radius: 2px;
+  }
 }
 
 .logoText {
