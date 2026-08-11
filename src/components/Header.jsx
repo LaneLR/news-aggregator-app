@@ -230,9 +230,9 @@ export default function Header() {
               />
             </div>
             <div className={styles.logoTextWrapper}>
-              <div className={styles.logoText}>
-                <span>mocha</span>
-                <span>reads</span>
+              <div className={`${styles.logoText} headline`}>
+                <span>Mocha</span>
+                <span>Reads</span>
               </div>
               <span className={styles.tagline}>All the news. One place.</span>
             </div>
@@ -268,9 +268,9 @@ export default function Header() {
                   />
                 </div>
                 <div className={styles.logoTextWrapper}>
-                  <div className={styles.logoText}>
-                    <span>mocha</span>
-                    <span>reads</span>
+                  <div className={`${styles.logoText} headline`}>
+                    <span>Mocha</span>
+                    <span>Reads</span>
                   </div>
                   <span className={styles.tagline}>All the news. One place.</span>
                 </div>
@@ -302,9 +302,9 @@ export default function Header() {
                 />
               </div>
               <div className={styles.logoTextWrapper}>
-                <div className={styles.logoText}>
-                  <span>mocha</span>
-                  <span>reads</span>
+                <div className={`${styles.logoText} headline`}>
+                  <span>Mocha</span>
+                  <span>Reads</span>
                 </div>
                 <span className={styles.tagline}>All the news. One place.</span>
               </div>
