@@ -64,6 +64,7 @@ A fast, customizable RSS feed reader and news aggregator built with Next.js. Fol
 - **This repo's own scheduled jobs** (`vercel.json`) run on Vercel Cron: `delete-users` (finalizes soft-deleted accounts), `send-digests` (daily/weekly email digest), `send-push-notifications` (followed-keyword alerts).
 - **Vercel's free Hobby plan prohibits commercial/revenue-generating use** — once Stripe billing goes live (it currently runs in sandbox/test mode), this needs to run on a Pro plan or above.
 - **Schema changes are applied manually.** There's no migration tool — after changing a model in `src/lib/models/`, run `npm run db:sync` once (see that script's own comments for why it's not automatic).
+- **Fonts (Roboto, Lora) are self-hosted**, not fetched via `next/font/google` — the `.woff2` files live in `src/app/fonts/` and are loaded with `next/font/local`. This is deliberate: `next/font/google` fetches font files from `fonts.gstatic.com` at *build* time, which failed a real CI build outright when that request didn't go through. To add a weight/style, pull the matching file from the `@fontsource/roboto` / `@fontsource/lora` npm packages (install with `--no-save`, copy the file out, uninstall) rather than switching back to `next/font/google`.
 
 ## 🚀 Getting started
 
