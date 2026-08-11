@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeSession } from "@/test/fixtures";
 
@@ -95,5 +95,74 @@ describe("ProfilePage", () => {
       expect.objectContaining({ method: "PATCH" })
     );
     await vi.waitFor(() => expect(update).toHaveBeenCalled());
+  });
+
+  it("cancels a scheduled deletion and refreshes the session", async () => {
+    mockSession = makeSession({ tier: "Free", isPendingDeletion: true });
+    mockStatus = "authenticated";
+    global.fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ success: true }) });
+    const user = userEvent.setup();
+    render(<ProfilePage />);
+
+    await user.click(screen.getByRole("button", { name: "Cancel Deletion" }));
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "/api/users/cancel-deletion",
+      expect.objectContaining({ method: "PATCH" })
+    );
+    await vi.waitFor(() => expect(update).toHaveBeenCalled());
+  });
+
+  it("opens the Stripe billing portal when Manage Subscription is clicked", async () => {
+    mockSession = makeSession({ tier: "Subscribed", stripeSubscriptionStatus: "active" });
+    mockStatus = "authenticated";
+    global.fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ url: "https://billing.stripe.com/session" }) });
+    const user = userEvent.setup();
+    render(<ProfilePage />);
+
+    await user.click(screen.getByRole("button", { name: "Manage Subscription" }));
+
+    expect(global.fetch).toHaveBeenCalledWith("/api/stripe/manage-subscription", { method: "POST" });
+  });
+
+  it("shows 'Cancels on' when subscriptionWillCancel is true, and 'Renews on' otherwise", () => {
+    mockSession = makeSession({
+      tier: "Subscribed",
+      stripeSubscriptionStatus: "active",
+      stripeSubscriptionEndsAt: "2026-06-01T00:00:00.000Z",
+      subscriptionWillCancel: true,
+    });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+    expect(screen.getByText("Cancels on")).toBeInTheDocument();
+    expect(screen.queryByText("Renews on")).not.toBeInTheDocument();
+  });
+
+  it("falls back to the placeholder avatar when the profile image fails to load", () => {
+    mockSession = makeSession({ tier: "Free", image: "https://example.com/avatar.jpg" });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+
+    const img = screen.getByAltText("User profile image");
+    expect(img.src).toContain(encodeURIComponent("/api/image-proxy"));
+
+    fireEvent.error(img);
+
+    expect(img.src).toContain(encodeURIComponent("/images/default-avatar.png"));
+  });
+
+  it("restores a previously-saved layout preference from localStorage", () => {
+    localStorage.setItem("accountCardLayout", "list");
+    mockSession = makeSession({ tier: "Free" });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+    expect(screen.getByTitle("List view").className).toMatch(/active/);
+  });
+
+  it("does not show the referral-count line for a subscriber with zero referrals", () => {
+    mockSession = makeSession({ tier: "Subscribed", referralCount: 0, referralCode: "REF000" });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+    expect(screen.queryByText(/Users referred:/)).not.toBeInTheDocument();
   });
 });

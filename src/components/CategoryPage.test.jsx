@@ -20,7 +20,20 @@ vi.mock("./NewsCardThree", () => ({
     </div>
   ),
 }));
-vi.mock("./ThreePaneLayout", () => ({ default: ({ articles }) => <div>ThreePane:{articles.length}</div> }));
+vi.mock("./ThreePaneLayout", () => ({
+  default: ({ articles, selectedArticleId, onSelectArticle }) => (
+    <div>
+      {`ThreePane:${articles.length}`}
+      <div data-testid="selected-marker">{selectedArticleId ?? "none"}</div>
+      <button type="button" onClick={() => onSelectArticle(articles[0])}>
+        Open first
+      </button>
+      <button type="button" onClick={() => onSelectArticle(null)}>
+        Close reader
+      </button>
+    </div>
+  ),
+}));
 vi.mock("./MarkAllReadButton", () => ({
   default: ({ onClick, disabled }) => (
     <button type="button" onClick={onClick} disabled={disabled}>
@@ -189,5 +202,120 @@ describe("CategoryPage", () => {
     mockFetchRoutes([[/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })]]);
     render(<CategoryPage category="business" initialArticles={[makeArticle(), makeArticle()]} initialTotalPages={1} />);
     expect(screen.getByText("ThreePane:2")).toBeInTheDocument();
+  });
+
+  it("selects and closes an article in reader density", async () => {
+    const user = userEvent.setup();
+    layoutPrefs.value = { loaded: true, viewDensity: "reader", setViewDensity: vi.fn() };
+    mockFetchRoutes([[/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })]]);
+    const article = makeArticle({ id: "reader-article" });
+    render(<CategoryPage category="business" initialArticles={[article]} initialTotalPages={1} />);
+
+    expect(screen.getByTestId("selected-marker")).toHaveTextContent("none");
+    await user.click(screen.getByRole("button", { name: "Open first" }));
+    expect(screen.getByTestId("selected-marker")).toHaveTextContent("reader-article");
+
+    await user.click(screen.getByRole("button", { name: "Close reader" }));
+    expect(screen.getByTestId("selected-marker")).toHaveTextContent("none");
+  });
+
+  it("runs the bulk mark-read action for selected articles", async () => {
+    const user = userEvent.setup();
+    mockSession.value = { user: { id: "user-1" } };
+    mockFetchRoutes([
+      [/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })],
+      [/\/api\/articles\/mark-all-read/, () => makeFetchResponse({ success: true })],
+    ]);
+
+    render(
+      <CategoryPage category="business" initialArticles={[makeArticle({ title: "Bulk Story" })]} initialTotalPages={1} />
+    );
+    await user.click(screen.getByRole("button", { name: "Select" }));
+    await user.click(screen.getByRole("button", { name: /Select:Bulk Story/ }));
+    await user.click(screen.getByRole("button", { name: "Mark read" }));
+
+    await waitFor(() => expect(screen.queryByText("1 selected")).not.toBeInTheDocument());
+  });
+
+  it("runs the bulk save action against the default archive", async () => {
+    const user = userEvent.setup();
+    mockSession.value = { user: { id: "user-1" } };
+    const saveCalls = [];
+    mockFetchRoutes([
+      [/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: "archive-1" })],
+      [
+        /\/api\/archives\/archive-1\/articles/,
+        () => {
+          saveCalls.push(1);
+          return makeFetchResponse({ success: true });
+        },
+      ],
+    ]);
+
+    render(
+      <CategoryPage category="business" initialArticles={[makeArticle({ title: "Save Story" })]} initialTotalPages={1} />
+    );
+    await waitFor(() => screen.getByRole("button", { name: "Select" }));
+    await user.click(screen.getByRole("button", { name: "Select" }));
+    await user.click(screen.getByRole("button", { name: /Select:Save Story/ }));
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() => expect(saveCalls.length).toBe(1));
+  });
+
+  it("runs the bulk like action for not-yet-liked selected articles", async () => {
+    const user = userEvent.setup();
+    mockSession.value = { user: { id: "user-1" } };
+    mockFetchRoutes([
+      [/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })],
+      [/\/api\/articles\/like/, () => makeFetchResponse({ success: true })],
+    ]);
+
+    render(
+      <CategoryPage
+        category="business"
+        initialArticles={[makeArticle({ title: "Like Story", isLikedByUser: false })]}
+        initialTotalPages={1}
+      />
+    );
+    await user.click(screen.getByRole("button", { name: "Select" }));
+    await user.click(screen.getByRole("button", { name: /Select:Like Story/ }));
+    await user.click(screen.getByRole("button", { name: "Like" }));
+
+    await waitFor(() => expect(screen.queryByText("1 selected")).not.toBeInTheDocument());
+  });
+
+  it("cancels bulk-selection mode", async () => {
+    const user = userEvent.setup();
+    mockSession.value = { user: { id: "user-1" } };
+    mockFetchRoutes([[/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })]]);
+
+    render(<CategoryPage category="business" initialArticles={[makeArticle({ title: "Cancel Story" })]} initialTotalPages={1} />);
+    await user.click(screen.getByRole("button", { name: "Select" }));
+    await user.click(screen.getByRole("button", { name: /Select:Cancel Story/ }));
+    expect(screen.getByText("1 selected")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Cancel selection" }));
+    expect(screen.queryByText("1 selected")).not.toBeInTheDocument();
+  });
+
+  it("shows a 'new articles available' banner on window focus and refreshes on click", async () => {
+    const user = userEvent.setup();
+    const older = makeArticle({ title: "Old Story", publishedAt: "2020-01-01T00:00:00.000Z" });
+    const newer = makeArticle({ title: "Fresh Story", publishedAt: "2030-01-01T00:00:00.000Z" });
+    mockFetchRoutes([
+      [/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })],
+      [/\/api\/articles\/business\?sort=latest&page=1/, () => makeFetchResponse({ articles: [newer], totalPages: 1 })],
+    ]);
+
+    render(<CategoryPage category="business" initialArticles={[older]} initialTotalPages={1} />);
+    expect(screen.queryByText("New articles available")).not.toBeInTheDocument();
+
+    window.dispatchEvent(new Event("focus"));
+    expect(await screen.findByText("New articles available")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "New articles available" }));
+    expect(await screen.findByText("Card:Fresh Story")).toBeInTheDocument();
+    expect(screen.queryByText("New articles available")).not.toBeInTheDocument();
   });
 });
