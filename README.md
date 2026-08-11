@@ -1,45 +1,146 @@
-# 📰 News Aggregator App
+# ☕ MochaReads
 
-This is a full-featured news aggregation web app built with Next.js and React. It collects open-source articles from multiple sources and RSS feeds, indexes and serves them in a responsive UI, and provides user accounts, saved-article archives, Stripe subscriptions and payments, and background processing for feed updates and maintenance.
+A fast, customizable RSS feed reader and news aggregator built with Next.js. Follow your favorite sources, browse by category, save articles to personal archives, and get notified when topics you follow get covered — all in one ad-free, algorithm-free dashboard.
 
-## Deployed link
-https://news-aggregator-app-ecru.vercel.app/
-
+> **Note on the name:** this project was originally built as "MorningFeeds" and rebranded to MochaReads in August 2026. If you find a stray reference to the old name anywhere, it's a miss — please fix it.
 
 ## 🗝️ Key features
 
-- Feed retrieval and ingestion
-  - Periodic article retrieval via cron jobs and background workers that poll external feeds (RSS, JSON APIs, Reddit) and create normalized article records.
-  - Background workers/processes handle parsing, deduplication, enrichment and indexing of incoming articles so the web app remains responsive.
+**Reading & discovery**
+- Articles pulled from hundreds of RSS sources across 13 categories (Business, Tech, Science, Sports, Health, Entertainment, Politics, World, US, Weather, plus subscriber-only Market, Finance, and Journal)
+- Full-text search with suggestions, sort by latest/trending/most-liked, "Most Covered" and "For You" personalized recommendations
+- Reader view with customizable font size/family/line-height/content width, full-screen reading mode, text-to-speech, and related-coverage links
+- List, magazine, and reader density layouts; drag-to-reorder category nav
 
-- User accounts & authentication
-  - Email/password registration and login flows, password reset and email verification.
-  - OAuth (Google sign-in) and session management via a session provider.
+**Organization**
+- Save articles to custom Archives (collections); share an archive publicly via a read-only link
+- Follow or mute keywords — followed keywords surface on `/following` and trigger notifications; muted ones are filtered out everywhere
+- Like articles, track read/unread state, "mark all as read," bulk multi-select actions (mark read / save / like) across a whole page
 
-- Articles, archives & likes
-  - Users can save articles to personal archives (collections) for later reading.
-  - Like and quickly access recently liked or saved articles.
-  - Archive management UI to create, delete and organize saved articles.
+**Market data** *(Subscribed tier)*
+- Live market indices, sector performance, a personal watchlist, and historical charts, backed by Finnhub with server-side caching (`MarketQuote`/`MarketChartCache`)
 
-- Search & discovery
-  - Full site search with filters and paginated results.
-  - Category and tag pages, curated home feeds and related-article widgets.
+**Notifications**
+- Web Push notifications (self-hosted VAPID keys, no third-party push service) when a followed keyword gets new coverage
+- Daily or weekly email digest (Resend), scoped to a specific custom Feed or to your general picks/trending
 
-- Reddit integration
-  - Special handling for Reddit-sourced content and cards/components to display Reddit posts.
+**Power-user tools**
+- Command palette (`Ctrl`/`Cmd`+K) for fast navigation and search
+- Fully customizable keyboard shortcuts (`j`/`k` navigate, `o` open, `s` save, `l` like, `/` search, `?` help — all rebindable in Settings)
+- OPML import/export for your followed feeds
 
-- Subscription billing & payments
-  - Pricing page, tier cards, and subscription management UI.
-  - Stripe integration with webhook handling for payment events and subscription lifecycle updates.
+**Accounts & billing**
+- Email/password auth with verification + password reset, and Google OAuth, via NextAuth v5
+- Single Free / Subscribed tier via Stripe (monthly or annual billing), self-serve billing portal, referral program with credit toward future bills, "cancel anytime" — no forced annual lock-in
+- Soft account deletion: request deletion, get a grace period to cancel, then a scheduled cron job finalizes it
 
-- Admin / maintenance utilities
-  - Scheduled scripts (e.g., cleanup of expired users, fetch new articles)
+**Sharing & installability**
+- Article share cards (Web Share API with clipboard/email/SMS fallback), Web Share Target so the app itself appears as a share destination on mobile
+- Installable as a PWA (manifest + service worker), light/dark theme (follows system preference by default, overridable per-account)
 
-## 🏗️ Architecture & tech stack
+**Onboarding & accessibility**
+- Guided first-run onboarding covering topic/source picks and a feature tour
+- WCAG AA-verified color contrast across both themes, real focus-trapping in every modal/dialog, full keyboard navigability
 
-- Next.js (App Router) + React
-- Server-side API routes (Next.js API routes) for webhooks, auth and feeds
-- Sequelize (or another ORM) for relational DB access 
-- Stripe for payments and webhooks 
-- Background workers / sagas for feed ingestion and long-running tasks
-- Cron/scheduled jobs for periodic maintenance 
+## 🏗️ Tech stack
+
+| Layer | Choice |
+|---|---|
+| Framework | Next.js 16 (App Router) + React 19 |
+| Database | PostgreSQL (Neon), via Sequelize |
+| Auth | NextAuth v5 (beta) — Credentials + Google OAuth, JWT sessions |
+| Payments | Stripe (Checkout + Billing Portal + webhooks) |
+| Email | Resend |
+| Push notifications | `web-push` (self-generated VAPID keypair) |
+| Market data | Finnhub API |
+| Error monitoring | Sentry |
+| Product analytics | PostHog |
+| Styling | SCSS Modules, CSS custom properties for theming |
+| Testing | Vitest + React Testing Library |
+
+## 🧩 Architecture notes
+
+- **RSS ingestion is a separate service**, not part of this repo — see the sibling `rss-fetch-app` project. It shares this app's database and runs on a GitHub Actions schedule (not Vercel Cron), fetching and normalizing articles from `feeds/*.json` source lists into the shared `Article` table.
+- **This repo's own scheduled jobs** (`vercel.json`) run on Vercel Cron: `delete-users` (finalizes soft-deleted accounts), `send-digests` (daily/weekly email digest), `send-push-notifications` (followed-keyword alerts).
+- **Vercel's free Hobby plan prohibits commercial/revenue-generating use** — once Stripe billing goes live (it currently runs in sandbox/test mode), this needs to run on a Pro plan or above.
+- **Schema changes are applied manually.** There's no migration tool — after changing a model in `src/lib/models/`, run `npm run db:sync` once (see that script's own comments for why it's not automatic).
+
+## 🚀 Getting started
+
+### Prerequisites
+- Node.js 22+
+- A PostgreSQL database (this project targets Neon specifically, but any Postgres instance will work)
+
+### Setup
+
+```bash
+npm install
+cp .env.example .env   # if present — otherwise create .env with the variables below
+npm run db:sync        # applies the current model schema to your database
+npm run dev
+```
+
+The app runs at `http://localhost:3000`.
+
+### Environment variables
+
+| Variable | Required for | Notes |
+|---|---|---|
+| `DATABASE_URL` | Everything | Postgres connection string |
+| `NEXT_PUBLIC_BASE_URL` | Everything | Public site URL (`http://localhost:3000` in dev) |
+| `NEXTAUTH_URL` / `NEXTAUTH_SECRET` | Auth | NextAuth session signing |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google sign-in | From Google Cloud Console OAuth credentials |
+| `CRON_SECRET` | Scheduled jobs | Shared secret the cron routes check for |
+| `RESEND_API_KEY` / `EMAIL_FROM` | Transactional & digest email | Free Resend tier: 3,000 emails/mo, 100/day |
+| `CONTACT_EMAIL` | Contact/legal pages, footer | Just a display address |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` / `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Billing | Use Stripe test-mode keys until ready to go live |
+| `FINNHUB_API_KEY` | Market/Finance pages | Free tier: 60 calls/min |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | Push notifications | Self-generated: `npx web-push generate-vapid-keys`. Regenerating invalidates every existing push subscription. |
+| `NEXT_PUBLIC_SENTRY_DSN` | Error monitoring | Leave blank to disable |
+| `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | Sentry source-map upload | Build-time only; build degrades gracefully without them |
+| `NEXT_PUBLIC_POSTHOG_KEY` / `NEXT_PUBLIC_POSTHOG_HOST` | Product analytics | Leave the key blank to disable; host defaults to the US region |
+
+None of these need to be set to run the test suite — see Testing below.
+
+## 📜 Available scripts
+
+| Command | Does |
+|---|---|
+| `npm run dev` | Start the dev server |
+| `npm run build` | **Runs the full test suite, then builds for production** — a failing test blocks the build (and blocks Vercel's deploy, since it reads this same script) |
+| `npm start` | Start the production server (after `build`) |
+| `npm run lint` | ESLint |
+| `npm test` | Run the test suite once |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:coverage` | Run tests with a coverage report |
+| `npm run db:sync` | Apply the current model schema to the database (run manually after changing a model) |
+| `npm run seed` | Seed demo users (development only) |
+
+## ✅ Testing
+
+Every feature, file, and behavior change ships with its own test — this is enforced by `npm run build` failing on a red test suite, not just convention.
+
+- **Framework:** Vitest + React Testing Library, colocated tests (`Foo.jsx` → `Foo.test.jsx` right next to it).
+- **Shared test infrastructure** lives in `src/test/`: `dbMock.js` (mocks the Sequelize model API so tests exercise app logic, not the ORM itself), `fixtures.js` (consistent fake data factories), `modelTestUtils.js` (lets `src/lib/models/*.js` files be unit-tested against a disconnected Sequelize instance — validators/defaults/setters, without a live DB connection).
+- **Coverage target:** ~90%, enforced as a threshold in `vitest.config.js` (currently sitting around 94% statements / 87% branches / 90% functions / 96% lines).
+- App Router `page`/`layout` files that contain JSX are named `.jsx`, not `.js` — Vite's transform (which Vitest uses) only parses JSX in `.jsx`/`.tsx` files, even though Next.js itself accepts either extension. Keep new ones consistent with this.
+
+## 📁 Project structure
+
+```
+src/
+  app/            # Next.js App Router — pages, layouts, API routes
+    api/          # ~65 route handlers (auth, archives, articles, stripe, cron, market, users, ...)
+  components/     # ~90 React components (colocated .module.scss + .test.jsx)
+  lib/            # Models, business logic, hooks — mostly framework-agnostic
+    models/       # Sequelize model definitions
+  styles/         # themes.scss (CSS custom properties) + themes.js (JS mirror for ThemeSelector)
+  test/           # Shared test mocks/fixtures/utilities
+  utils/          # Standalone Node scripts (seeding, migrations, scheduled cleanup)
+public/
+  images/         # Static assets, including the MochaReads logo family
+```
+
+## ☁️ Deployment
+
+Deployed on Vercel. `npm run build` is the build command Vercel invokes, so the test suite gates every deploy automatically. Scheduled jobs run via `vercel.json`'s `crons` config — see Architecture notes above for what each one does and why RSS ingestion isn't among them.

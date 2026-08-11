@@ -25,7 +25,7 @@ export async function generateMetadata({ params }) {
   if (!archive) return {};
 
   const count = archive.SavedArticles?.length || 0;
-  const description = `A shared MorningFeeds archive with ${count} saved article${
+  const description = `A shared MochaReads archive with ${count} saved article${
     count === 1 ? "" : "s"
   }.`;
   const firstImage = archive.SavedArticles?.find((a) => a.urlToImage)?.urlToImage;
@@ -61,7 +61,7 @@ export default async function SharedArchivePage({ params }) {
           <Bookmark size={18} strokeWidth={2} />
         </span>
         <div>
-          <p className={styles.eyebrow}>Shared MorningFeeds archive</p>
+          <p className={styles.eyebrow}>Shared MochaReads archive</p>
           <h1 className={`${styles.title} headline`}>{archive.name}</h1>
           <p className={styles.subtitle}>
             {articles.length} article{articles.length === 1 ? "" : "s"}
@@ -107,7 +107,7 @@ export default async function SharedArchivePage({ params }) {
       <p className={styles.footerNote}>
         Shared from{" "}
         <Link href="/" className={styles.footerLink}>
-          MorningFeeds
+          MochaReads
         </Link>{" "}
         — a fast, customizable RSS news aggregator.
       </p>

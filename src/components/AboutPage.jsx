@@ -5,19 +5,19 @@ import styles from "./AboutPage.module.scss";
 
 const FAQ_ITEMS = [
   {
-    question: "What is MorningFeeds?",
+    question: "What is MochaReads?",
     answer:
-      "MorningFeeds is an RSS-powered news aggregator that lets you follow your favorite news sources, read the latest headlines, and save articles — all in one personalized dashboard. You decide what to follow, and we simply fetch the content for you.",
+      "MochaReads is an RSS-powered news aggregator that lets you follow your favorite news sources, read the latest headlines, and save articles — all in one personalized dashboard. You decide what to follow, and we simply fetch the content for you.",
   },
   {
-    question: "Is MorningFeeds free to use?",
+    question: "Is MochaReads free to use?",
     answer:
       "Mostly! The Free plan gets you unlimited archives and articles from hundreds of general news sources. A paid subscription adds Market, Finance, and Journal coverage, custom feeds built from your own sources, and referral credit toward future bills. See the Pricing page for details.",
   },
   {
-    question: "What makes MorningFeeds different from other news apps?",
+    question: "What makes MochaReads different from other news apps?",
     answer:
-      "MorningFeeds doesn't use an algorithm to decide what you see. There's no upvoting, trending scores, or clickbait ranking — just direct, real-time content from sources you choose. It's fast, focused, and ad-free.",
+      "MochaReads doesn't use an algorithm to decide what you see. There's no upvoting, trending scores, or clickbait ranking — just direct, real-time content from sources you choose. It's fast, focused, and ad-free.",
   },
   {
     question: "Where does the news come from?",

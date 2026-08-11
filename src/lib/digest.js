@@ -166,7 +166,7 @@ export function buildDigestHtml({ trending, picks, frequency, baseUrl, feedTitle
   const followedSection = sectionHtml("Topics you follow", followed || []);
   return `
     <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;">
-      <h1 style="font-size:22px;color:#0a1430;">${cadence} MorningFeeds digest</h1>
+      <h1 style="font-size:22px;color:#0a1430;">${cadence} MochaReads digest</h1>
       ${followedSection}${body}
       <p style="margin-top:28px;font-size:12px;color:#999;">
         You're getting this because you turned on email digests.

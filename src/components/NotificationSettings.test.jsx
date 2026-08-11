@@ -62,7 +62,7 @@ describe("NotificationSettings", () => {
       value: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)",
     });
     render(<NotificationSettings />);
-    expect(await screen.findByText(/add mor?ningfeeds to your home screen/i)).toBeInTheDocument();
+    expect(await screen.findByText(/add mochareads to your home screen/i)).toBeInTheDocument();
   });
 
   it("shows a 'Turn on notifications' button when supported and not subscribed", async () => {

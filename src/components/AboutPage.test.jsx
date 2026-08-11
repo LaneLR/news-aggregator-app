@@ -6,8 +6,8 @@ import AboutPageComponent from "./AboutPage";
 describe("AboutPage", () => {
   it("renders every FAQ item collapsed by default", () => {
     render(<AboutPageComponent />);
-    expect(screen.getByText("What is MorningFeeds?")).toBeInTheDocument();
-    expect(screen.getByText("Is MorningFeeds free to use?")).toBeInTheDocument();
+    expect(screen.getByText("What is MochaReads?")).toBeInTheDocument();
+    expect(screen.getByText("Is MochaReads free to use?")).toBeInTheDocument();
   });
 
   it("filters FAQ items by the search query", async () => {
@@ -19,7 +19,7 @@ describe("AboutPage", () => {
     );
 
     expect(screen.getByText("How do referral codes work?")).toBeInTheDocument();
-    expect(screen.queryByText("What is MorningFeeds?")).not.toBeInTheDocument();
+    expect(screen.queryByText("What is MochaReads?")).not.toBeInTheDocument();
   });
 
   it("shows a no-results message when nothing matches", async () => {
@@ -36,7 +36,7 @@ describe("AboutPage", () => {
   it("expands an accordion item to reveal its answer", async () => {
     const user = userEvent.setup();
     render(<AboutPageComponent />);
-    await user.click(screen.getByRole("button", { name: /What is MorningFeeds\?/ }));
+    await user.click(screen.getByRole("button", { name: /What is MochaReads\?/ }));
     expect(screen.getByText(/RSS-powered news aggregator/)).toBeInTheDocument();
   });
 });

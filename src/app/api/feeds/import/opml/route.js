@@ -80,7 +80,7 @@ export async function POST(req) {
 
     if (matchedSources.length === 0) {
       return NextResponse.json({
-        error: "None of the sources in that file are ones MorningFeeds currently carries.",
+        error: "None of the sources in that file are ones MochaReads currently carries.",
         skipped,
       }, { status: 400 });
     }

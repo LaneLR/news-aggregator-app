@@ -2,7 +2,7 @@ import LegalInfoPage from "@/components/LegalInfoPage";
 
 export const metadata = {
   title: "Contact Us",
-  description: "Get in touch with the MorningFeeds team.",
+  description: "Get in touch with the MochaReads team.",
 };
 
 export default function ContactUsPage() {

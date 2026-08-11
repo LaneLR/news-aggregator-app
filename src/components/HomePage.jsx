@@ -90,7 +90,7 @@ export default function HomePage() {
           All the news. One place. No algorithm deciding what you see.
         </h1>
         <p className={styles.heroSubtitle}>
-          MorningFeeds is an RSS-powered news aggregator that lets you follow
+          MochaReads is an RSS-powered news aggregator that lets you follow
           your favorite sources, read the latest headlines, and save
           articles — all in one personalized, ad-free dashboard.
         </p>

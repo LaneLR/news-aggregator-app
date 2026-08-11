@@ -4,11 +4,16 @@
 // themes.js itself stays around only because ThemeSelector needs the raw
 // JS values to render its swatch previews of *both* themes at once.
 //
-// Palette: "Modern Editorial Paper" (light) / "Midnight Charcoal" (dark) —
-// warm off-white/paper and true zinc-charcoal instead of the blue-tinted
-// neutrals this used to use, with a warm amber accent as the primary color
-// in both modes instead of a generic SaaS blue. Keep in sync with
-// src/styles/themes.js by hand.
+// Palette: "Mocha Editorial" — true white surfaces with a coffee-brown
+// accent (sampled from the actual MochaReads logo assets, not guessed —
+// see the git history around the MochaReads rebrand for the pixel-sampling
+// script), replacing the earlier amber "Modern Editorial Paper" palette.
+// Aims for the restrained, mostly-monochrome-plus-one-accent look of
+// Stripe/Notion/Medium: color is used sparingly and deliberately, structure
+// comes from whitespace/borders/typography rather than tonal blocking —
+// which is why --theme-background and --theme-card-background are now the
+// same flat white rather than two different off-white tones. Keep in sync
+// with src/styles/themes.js by hand.
 //
 // Light is the baseline on bare :root (not gated behind a [data-theme]
 // selector) so it's always defined even before any attribute is set. Dark
@@ -21,41 +26,43 @@
 :root {
   color-scheme: light;
 
-  --theme-primary: #d97706;
-  // Amber at this saturation only clears ~3.2:1 contrast against white text
-  // (fails WCAG AA and AAA both) — near-black text against it clears ~6:1
-  // instead, which is the best a vivid amber background can offer without
-  // desaturating it. See the dark-mode primary contrast for the same reason
-  // it uses near-black text too.
-  // Text tokens use a warm near-black (Tailwind "stone", brown-leaning)
-  // rather than a neutral zinc/true-black — flat zinc-black text reads cold
-  // and slightly clashes against the warm paper background. Surface tokens
-  // just below (header/footer/buttons) stay on the cooler #18181b — that
-  // one's a deliberate near-black surface color from the original spec, not
-  // a text color, so it's unaffected by this.
-  --theme-primary-contrast: #1c1917;
-  // For amber used as TEXT/icon color on a light background (active tab
-  // labels, badges, links) — the opposite case from --theme-primary-contrast
-  // above. --theme-primary itself only clears ~3.2:1 against white as text,
-  // which fails WCAG AA's 4.5:1 for normal text (confirmed via axe-core scan).
-  // #b45309 (--theme-accent-orange's value) clears white at ~5:1, but only
-  // ~4.4:1 against NavTab's own 12%-amber-tinted active background — just
-  // under AA. Using --theme-accent-hover's value instead (~6.3:1 against
-  // that same tinted background) gives every usage real margin rather than
-  // chasing per-component exceptions.
-  --theme-primary-text: #92400e;
+  --theme-primary: #6f4225;
+  // Unlike the old amber (light enough that only near-black text passed
+  // against it), this brown is deliberately deep enough that it needs
+  // WHITE text instead — clears 8.46:1 with white, only ~2:1 with
+  // near-black. That's an intentional inversion, not an oversight: a rich,
+  // dark button with white text reads as more premium/editorial (closer to
+  // Stripe's own deep-indigo buttons) than a light pastel with dark text.
+  --theme-primary-contrast: #ffffff;
+  // Unlike the old amber (which needed a separately-darkened variant to
+  // pass as standalone text — #d97706 only cleared ~3.2:1 against white),
+  // this brown already clears 8.46:1 as-is, so it can just reuse
+  // --theme-primary directly for text/link/active-state contexts instead
+  // of maintaining a second shade.
+  --theme-primary-text: #6f4225;
   // Same problem, same fix, for the green "up"/success indicators used as
   // text (SectorPerformance, price-change badges) — --theme-success itself
   // only clears ~3.3:1 against white.
   --theme-success-text: #15803d;
   --theme-dark-blue: #1c1917;
   --theme-deep-blue: #1c1917;
-  --theme-title-contrast: #d97706;
+  // Text/icon color specifically for the header bar, which stays
+  // near-black (#18181b) in BOTH light and dark theme — so unlike
+  // --theme-primary above (deliberately too dark to read against another
+  // dark surface), this needs its own lighter caramel tone, sampled from
+  // the "Reads" half of the logo wordmark. Clears 6.54:1 against the
+  // header background; reused as-is for dark mode below since the header
+  // color itself never changes between themes.
+  --theme-title-contrast: #c9925c;
   --theme-header-background: #18181b;
   --theme-footer-background: #18181b;
   --theme-secondary-dark: #18181b;
-  --theme-background: #f9f8f6;
-  --theme-layout-background: #f9f8f6;
+  // True white, not the previous warm off-white paper (#f9f8f6) — matches
+  // --theme-card-background exactly on purpose (see the palette comment
+  // above): almost no tonal separation between page and card, borders and
+  // shadows carry the hierarchy instead.
+  --theme-background: #ffffff;
+  --theme-layout-background: #ffffff;
   --theme-card-background: #ffffff;
   --theme-button-background: #18181b;
   --theme-text: #1c1917;
@@ -64,7 +71,7 @@
   --theme-text-tertiary: #78716c;
   --theme-border: #e5e3df;
   --theme-warning: #dc2626;
-  --theme-tier-badge: #d97706;
+  --theme-tier-badge: #6f4225;
   --theme-card: #a1a1aa;
   --theme-archive-background: #fafaf9;
   --theme-slate: #71717a;
@@ -72,38 +79,41 @@
   --theme-dropdown-menu: #fff;
   --theme-search-background: #f4f4f5;
   --theme-primary-dark: #18181b;
-  // Icon/badge accent — a step darker than --theme-primary so accents
+  // Icon/badge accent — a distinct, lighter-than-primary brown so accents
   // (notification icons, header highlights) read as a deliberate second
   // tone rather than just reusing the button color everywhere.
-  --theme-accent-orange: #b45309;
-  --theme-accent-hover: #92400e;
+  --theme-accent-orange: #8a5a37;
+  --theme-accent-hover: #653a1e;
   --theme-text-light: #fafafa;
   --theme-text-white: #ffffff;
   --theme-section-gray: #f4f4f5;
   --theme-border-gray: #e4e4e7;
 
-  // Tip/callout banners (e.g. FeatureCallout) — a distinct soft-amber
-  // treatment, not just a tinted derivation of --theme-primary.
-  --theme-tip-background: #fef3c7;
-  --theme-tip-border: #fcd34d;
-  --theme-tip-text: #78350f;
+  // Tip/callout banners (e.g. FeatureCallout) — a soft warm-tan treatment
+  // in the same coffee family, not a tinted derivation of --theme-primary.
+  --theme-tip-background: #f5ebe0;
+  --theme-tip-border: #d4a373;
+  --theme-tip-text: #4a2c17;
 }
 
 @mixin dark-theme-vars {
   color-scheme: dark;
 
-  --theme-primary: #f59e0b;
+  // A lighter caramel than the light-mode primary — the same tone used for
+  // --theme-title-contrast above, since both need to read against a
+  // near-black surface. Clears 7.34:1 against the page background and
+  // 6.54:1 against card/header surfaces.
+  --theme-primary: #c9925c;
   --theme-primary-contrast: #09090b;
-  // Dark mode's --theme-primary already clears ~9.3:1 as text against the
-  // dark background — no separate darker variant needed, so this just
-  // mirrors --theme-primary itself.
-  --theme-primary-text: #f59e0b;
+  // Already light enough to double as standalone text against dark
+  // surfaces — no separate darker/lighter variant needed.
+  --theme-primary-text: #c9925c;
   --theme-success-text: #22c55e;
   // Warm near-white (stone), not flat white/zinc — same reasoning as the
   // light-mode text tokens above.
   --theme-dark-blue: #fafaf9;
   --theme-deep-blue: #fafaf9;
-  --theme-title-contrast: #f59e0b;
+  --theme-title-contrast: #c9925c;
   --theme-header-background: #18181b;
   --theme-footer-background: #18181b;
   --theme-secondary-dark: #18181b;
@@ -117,7 +127,7 @@
   --theme-text-tertiary: #a8a29e;
   --theme-border: #27272a;
   --theme-warning: #ef4444;
-  --theme-tier-badge: #f59e0b;
+  --theme-tier-badge: #c9925c;
   --theme-card: #3f3f46;
   --theme-archive-background: #18181b;
   --theme-slate: #a1a1aa;
@@ -125,16 +135,16 @@
   --theme-dropdown-menu: #fff;
   --theme-search-background: #27272a;
   --theme-primary-dark: #18181b;
-  --theme-accent-orange: #fbbf24;
-  --theme-accent-hover: #d97706;
+  --theme-accent-orange: #d4a373;
+  --theme-accent-hover: #b5804f;
   --theme-text-light: #fafafa;
   --theme-text-white: #ffffff;
   --theme-section-gray: #27272a;
   --theme-border-gray: #3f3f46;
 
-  --theme-tip-background: #1e1b18;
-  --theme-tip-border: #451a03;
-  --theme-tip-text: #fde68a;
+  --theme-tip-background: #2a1c12;
+  --theme-tip-border: #5c3319;
+  --theme-tip-text: #e0ac7a;
 }
 
 [data-theme="dark"] {

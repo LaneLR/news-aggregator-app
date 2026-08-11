@@ -209,6 +209,18 @@
   width: 100%;
   display: flex;
   align-items: center;
+
+  // The M mark's own background is a near-black espresso brown — against
+  // this bar's near-black background (--theme-secondary-dark, always dark
+  // regardless of site theme) that's only ~1.05:1 contrast, i.e. functionally
+  // invisible. A soft white ring (box-shadow, not border, so it doesn't
+  // affect the image's box size/alignment) gives it a visible edge without
+  // looking like a harsh outline; at 35% opacity it's also inert against a
+  // light background, so this doesn't need to be theme-gated.
+  img {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+    border-radius: 2px;
+  }
 }
 
 .logoLink {

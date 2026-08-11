@@ -223,16 +223,16 @@ export default function Header() {
             <div className={styles.logoContainer}>
               <Image
                 priority
-                src={"/images/morningfeeds-logo1.png"}
-                alt={"MorningFeeds logo"}
+                src={"/images/MochaReads-M.png"}
+                alt={"MochaReads logo"}
                 width={52}
                 height={48}
               />
             </div>
             <div className={styles.logoTextWrapper}>
               <div className={styles.logoText}>
-                <span>morning</span>
-                <span>feeds</span>
+                <span>mocha</span>
+                <span>reads</span>
               </div>
               <span className={styles.tagline}>All the news. One place.</span>
             </div>
@@ -261,16 +261,16 @@ export default function Header() {
                 <div className={styles.logoContainer}>
                   <Image
                     priority
-                    src={"/images/morningfeeds-logo1.png"}
-                    alt={"MorningFeeds logo"}
+                    src={"/images/MochaReads-M.png"}
+                    alt={"MochaReads logo"}
                     width={52}
                     height={48}
                   />
                 </div>
                 <div className={styles.logoTextWrapper}>
                   <div className={styles.logoText}>
-                    <span>morning</span>
-                    <span>feeds</span>
+                    <span>mocha</span>
+                    <span>reads</span>
                   </div>
                   <span className={styles.tagline}>All the news. One place.</span>
                 </div>
@@ -295,16 +295,16 @@ export default function Header() {
               <div className={styles.logoContainer}>
                 <Image
                   priority
-                  src={"/images/morningfeeds-logo1.png"}
-                  alt={"MorningFeeds logo"}
+                  src={"/images/MochaReads-M.png"}
+                  alt={"MochaReads logo"}
                   width={52}
                   height={48}
                 />
               </div>
               <div className={styles.logoTextWrapper}>
                 <div className={styles.logoText}>
-                  <span>morning</span>
-                  <span>feeds</span>
+                  <span>mocha</span>
+                  <span>reads</span>
                 </div>
                 <span className={styles.tagline}>All the news. One place.</span>
               </div>

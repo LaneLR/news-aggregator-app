@@ -11,7 +11,7 @@ const CAROUSEL_LIMIT = 12;
 
 const SUBTITLES = {
   forYou: "Picked based on the sources, categories, and articles you've liked, saved, and clicked on.",
-  trending: "The most-read stories across MorningFeeds right now.",
+  trending: "The most-read stories across MochaReads right now.",
 };
 
 // Sits where the single-article hero used to be. Subscribers get a "For

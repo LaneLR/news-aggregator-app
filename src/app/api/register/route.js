@@ -66,8 +66,8 @@ export async function POST(req) {
 
     await sendEmail({
       to: newUser.email,
-      subject: "Verify your MorningFeeds account",
-      html: `<p>Click the link below to verify your MorningFeeds account</p>
+      subject: "Verify your MochaReads account",
+      html: `<p>Click the link below to verify your MochaReads account</p>
                <a href="${verifyUrl}">Verify Account</a>
                <p>This link is only valid for 24 hours.</p>`,
     });

@@ -7,9 +7,9 @@ export default function TermsOfServiceComponent({ contactEmail }) {
       <h1>Terms of Service</h1>
       <p>Last updated: {new Date().toLocaleDateString()}</p>
 
-      <h2>What MorningFeeds is</h2>
+      <h2>What MochaReads is</h2>
       <p>
-        MorningFeeds aggregates publicly available RSS feeds from third-party
+        MochaReads aggregates publicly available RSS feeds from third-party
         news publishers and displays headlines, thumbnails, and short
         descriptions with a link back to the original source. We do not host,
         rewrite, or claim ownership of the underlying articles — all
@@ -45,10 +45,10 @@ export default function TermsOfServiceComponent({ contactEmail }) {
 
       <h2>Third-party content and copyright</h2>
       <p>
-        Article titles, images, and descriptions displayed on MorningFeeds
+        Article titles, images, and descriptions displayed on MochaReads
         are sourced from publicly available RSS feeds and are the
         intellectual property of their original publishers. If you are a
-        rights holder and believe content displayed on MorningFeeds
+        rights holder and believe content displayed on MochaReads
         infringes your rights, contact us at{" "}
         <a href={`mailto:${contactEmail}`}>{contactEmail}</a> with the
         article URL and we will review and remove it promptly if warranted.
@@ -56,7 +56,7 @@ export default function TermsOfServiceComponent({ contactEmail }) {
 
       <h2>Disclaimer of warranties</h2>
       <p>
-        MorningFeeds is provided &quot;as is&quot; without warranties of any
+        MochaReads is provided &quot;as is&quot; without warranties of any
         kind. We aggregate third-party content and can&apos;t guarantee its
         accuracy, availability, or timeliness. We do our best to keep the
         service reliable but don&apos;t guarantee uninterrupted access.
@@ -64,7 +64,7 @@ export default function TermsOfServiceComponent({ contactEmail }) {
 
       <h2>Limitation of liability</h2>
       <p>
-        To the maximum extent permitted by law, MorningFeeds is not liable
+        To the maximum extent permitted by law, MochaReads is not liable
         for any indirect, incidental, or consequential damages arising from
         your use of the service.
       </p>

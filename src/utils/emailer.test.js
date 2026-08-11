@@ -49,7 +49,7 @@ describe("sendEmail", () => {
     await sendEmail({ to: "a@b.com", subject: "Hi", html: "<p>Hi</p>" });
 
     expect(mockSend).toHaveBeenCalledWith(
-      expect.objectContaining({ from: "MorningFeeds <onboarding@resend.dev>" })
+      expect.objectContaining({ from: "MochaReads <onboarding@resend.dev>" })
     );
   });
 

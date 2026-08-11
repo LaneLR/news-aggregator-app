@@ -9,7 +9,7 @@ export default function Footer() {
     <div className={styles.footerWrapper}>
       <div className={styles.linkWrapper}>
         <div className={styles.textContainer}>
-          <p>© {year} MorningFeeds</p>
+          <p>© {year} MochaReads</p>
           <p>·</p>
           <div className={styles.linkContainer}>
             <Link href={"/privacy"}>Privacy</Link>

@@ -136,7 +136,7 @@ describe("buildDigestHtml", () => {
       baseUrl: "https://morningfeeds.example",
       followed: [],
     });
-    expect(html).toContain("This week's MorningFeeds digest");
+    expect(html).toContain("This week's MochaReads digest");
     expect(html).toContain("Trending story");
     expect(html).toContain("Picked story");
     expect(html).toContain("Picked for you");
@@ -152,7 +152,7 @@ describe("buildDigestHtml", () => {
       frequency: "daily",
       baseUrl: "https://morningfeeds.example",
     });
-    expect(html).toContain("Today's MorningFeeds digest");
+    expect(html).toContain("Today's MochaReads digest");
     expect(html).toContain('New in "My Custom Feed"');
     expect(html).toContain("Feed story");
     expect(html).not.toContain("Should not appear");

@@ -111,16 +111,16 @@ describe("RootLayout", () => {
   });
 
   it("exports metadata with the default title/description/OG/Twitter tags", () => {
-    expect(metadata.title.default).toBe("MorningFeeds — Your News, All in One Place");
-    expect(metadata.title.template).toBe("%s | MorningFeeds");
-    expect(metadata.description).toMatch(/MorningFeeds/);
+    expect(metadata.title.default).toBe("MochaReads — Your News, All in One Place");
+    expect(metadata.title.template).toBe("%s | MochaReads");
+    expect(metadata.description).toMatch(/MochaReads/);
     expect(metadata.robots).toEqual({ index: true, follow: true });
-    expect(metadata.openGraph.siteName).toBe("MorningFeeds");
+    expect(metadata.openGraph.siteName).toBe("MochaReads");
     expect(metadata.twitter.card).toBe("summary_large_image");
     expect(metadata.manifest).toBe("/manifest.json");
   });
 
   it("exports a theme-color viewport", () => {
-    expect(viewport.themeColor).toBe("#d97706");
+    expect(viewport.themeColor).toBe("#6f4225");
   });
 });

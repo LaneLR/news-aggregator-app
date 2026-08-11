@@ -22,7 +22,7 @@ export default function LegalInfoPage({ activeTab, contactEmail }) {
           <ShieldCheck className={`${styles.bannerIcon} ${styles.iconTwo}`} strokeWidth={1.5} />
           <Mail className={`${styles.bannerIcon} ${styles.iconThree}`} strokeWidth={1.5} />
           <FileText className={`${styles.bannerIcon} ${styles.iconFour}`} strokeWidth={1.5} />
-          <h1 className={styles.bannerTitle}>About MorningFeeds &amp; Legal Notices</h1>
+          <h1 className={styles.bannerTitle}>About MochaReads &amp; Legal Notices</h1>
         </div>
 
         <div className={styles.tabRow}>

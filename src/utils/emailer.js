@@ -15,7 +15,7 @@ function getResendClient() {
 
 export async function sendEmail({ to, subject, html }) {
   const resend = getResendClient();
-  const from = process.env.EMAIL_FROM || "MorningFeeds <onboarding@resend.dev>";
+  const from = process.env.EMAIL_FROM || "MochaReads <onboarding@resend.dev>";
 
   try {
     console.log(`🟡 Attempting to send email to: ${to}`);

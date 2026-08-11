@@ -28,20 +28,20 @@ export default function AuthLayout({ activeTab, children }) {
         <Link href="/" className={styles.logoLink}>
           <div className={styles.logoContainer}>
             <Image
-              src={"/images/morningfeeds-logo1.png"}
-              alt="MorningFeeds logo"
+              src={"/images/MochaReads-M.png"}
+              alt="MochaReads logo"
               width={44}
               height={40}
             />
           </div>
           <div className={styles.logoText}>
-            <span>morning</span>
-            <span>feeds</span>
+            <span>mocha</span>
+            <span>reads</span>
           </div>
         </Link>
 
         <h1 className={styles.brandHeadline}>
-          Welcome to MorningFeeds.
+          Welcome to MochaReads.
           <br />
           One place for all your news.
         </h1>
