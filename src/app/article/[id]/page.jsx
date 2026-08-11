@@ -26,7 +26,7 @@ function excerptFrom(article) {
       return plainText.length > 160 ? `${plainText.slice(0, 157)}...` : plainText;
     }
   }
-  return `Read the full story from ${article.sourceName || "the source"} on MorningFeeds.`;
+  return `Read the full story from ${article.sourceName || "the source"} on MochaReads.`;
 }
 
 export async function generateMetadata({ params }) {
@@ -78,8 +78,8 @@ export default async function ArticlePage({ params }) {
     author: { "@type": "Organization", name: article.sourceName || "Unknown" },
     publisher: {
       "@type": "Organization",
-      name: "MorningFeeds",
-      logo: { "@type": "ImageObject", url: `${BASE_URL}/images/morningfeeds-logo1.png` },
+      name: "MochaReads",
+      logo: { "@type": "ImageObject", url: `${BASE_URL}/images/MochaReads-favicon.png` },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE_URL}/article/${article.id}` },
   };

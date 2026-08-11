@@ -5,7 +5,7 @@ import LegalInfoPage from "./LegalInfoPage";
 describe("LegalInfoPage", () => {
   it("renders the About tab content and highlights its tab", () => {
     render(<LegalInfoPage activeTab="about" contactEmail="hello@morningfeeds.com" />);
-    expect(screen.getByText("What is MorningFeeds?")).toBeInTheDocument();
+    expect(screen.getByText("What is MochaReads?")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "About Us" }).className).toMatch(/activeTab/);
   });
 

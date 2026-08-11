@@ -35,7 +35,7 @@ export default async function SharePage({ searchParams }) {
         <LogIn size={32} strokeWidth={1.5} />
         <h1 className="headline">Sign in to save this article</h1>
         <p className={styles.hint}>
-          Sign in to MorningFeeds and we&apos;ll save it to your Archives.
+          Sign in to MochaReads and we&apos;ll save it to your Archives.
         </p>
         <Link href={`/login?callbackUrl=${encodeURIComponent(returnTo)}`} className={styles.primaryLink}>
           Sign In
@@ -50,11 +50,11 @@ export default async function SharePage({ searchParams }) {
         <Bookmark size={32} strokeWidth={1.5} />
         <h1 className="headline">Nothing to save</h1>
         <p className={styles.hint}>
-          That share didn&apos;t include a link MorningFeeds could find. Try sharing directly from
+          That share didn&apos;t include a link MochaReads could find. Try sharing directly from
           the article&apos;s share button instead.
         </p>
         <Link href="/news" className={styles.primaryLink}>
-          Back to MorningFeeds
+          Back to MochaReads
         </Link>
       </div>
     );

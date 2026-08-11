@@ -96,8 +96,8 @@ export async function POST(req) {
           const interval = billingIntervalForPrice(priceId);
           await sendEmail({
             to: user.email,
-            subject: "Welcome to MorningFeeds Subscribed!",
-            html: `<p>You are receiving this email because you have subscribed to MorningFeeds${interval ? ` (${interval} billing)` : ""}. Your account has been upgraded, and you now have access to Market, Finance, and Journal content plus custom feeds.</p><p>If this was a mistake, please reach out to us at ${process.env.CONTACT_EMAIL}.</p>`,
+            subject: "Welcome to MochaReads Subscribed!",
+            html: `<p>You are receiving this email because you have subscribed to MochaReads${interval ? ` (${interval} billing)` : ""}. Your account has been upgraded, and you now have access to Market, Finance, and Journal content plus custom feeds.</p><p>If this was a mistake, please reach out to us at ${process.env.CONTACT_EMAIL}.</p>`,
           });
         }
         break;
@@ -141,7 +141,7 @@ export async function POST(req) {
           await sendEmail({
             to: user.email,
             subject: "Your Subscription Has Been Updated",
-            html: `<p>Your subscription billing has been successfully updated${newInterval ? ` to ${newInterval} billing` : ""}.</p><p>- MorningFeeds Team</p>`,
+            html: `<p>Your subscription billing has been successfully updated${newInterval ? ` to ${newInterval} billing` : ""}.</p><p>- MochaReads Team</p>`,
           });
         } else if (
           subscription.cancel_at_period_end &&
@@ -153,7 +153,7 @@ export async function POST(req) {
           await sendEmail({
             to: user.email,
             subject: "Your Subscription Cancellation is Confirmed",
-            html: `<p>We've received your request to cancel your subscription. You will continue to have access until ${endDate}.</p><p>- MorningFeeds Team</p>`,
+            html: `<p>We've received your request to cancel your subscription. You will continue to have access until ${endDate}.</p><p>- MochaReads Team</p>`,
           });
         } else if (
           !subscription.cancel_at_period_end &&
@@ -162,7 +162,7 @@ export async function POST(req) {
           await sendEmail({
             to: user.email,
             subject: "Your Subscription Has Been Resumed",
-            html: `<p>Your subscription has been successfully resumed. You now have full, uninterrupted access.</p><p>- MorningFeeds Team</p>`,
+            html: `<p>Your subscription has been successfully resumed. You now have full, uninterrupted access.</p><p>- MochaReads Team</p>`,
           });
         }
         break;
@@ -203,7 +203,7 @@ export async function POST(req) {
         await sendEmail({
           to: user.email,
           subject: "We couldn't process your payment",
-          html: `<p>We were unable to process your latest payment. Please update your payment method to avoid losing access to your subscription.</p><p>- MorningFeeds Team</p>`,
+          html: `<p>We were unable to process your latest payment. Please update your payment method to avoid losing access to your subscription.</p><p>- MochaReads Team</p>`,
         });
 
         console.log(`Payment failed for ${user.email}`);

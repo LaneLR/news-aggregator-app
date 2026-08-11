@@ -48,7 +48,7 @@ ${[sourceOutlines, categoryOutlines].filter(Boolean).join("\n")}
     const opml = `<?xml version="1.0" encoding="UTF-8"?>
 <opml version="2.0">
   <head>
-    <title>MorningFeeds Feeds</title>
+    <title>MochaReads Feeds</title>
     <dateCreated>${new Date().toUTCString()}</dateCreated>
   </head>
   <body>
@@ -60,7 +60,7 @@ ${body}
       status: 200,
       headers: {
         "Content-Type": "text/x-opml; charset=utf-8",
-        "Content-Disposition": 'attachment; filename="morningfeeds-feeds.opml"',
+        "Content-Disposition": 'attachment; filename="mochareads-feeds.opml"',
       },
     });
   } catch (err) {

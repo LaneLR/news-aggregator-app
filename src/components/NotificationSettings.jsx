@@ -103,7 +103,7 @@ export default function NotificationSettings() {
   if (supportState === "ios-needs-install") {
     return (
       <p className={styles.helperText}>
-        On iPhone/iPad, add MorningFeeds to your Home Screen first (Share → Add to Home Screen), then
+        On iPhone/iPad, add MochaReads to your Home Screen first (Share → Add to Home Screen), then
         come back here to turn on notifications.
       </p>
     );

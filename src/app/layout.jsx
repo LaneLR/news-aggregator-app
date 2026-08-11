@@ -21,15 +21,15 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "MorningFeeds",
+  name: "MochaReads",
   url: BASE_URL,
-  logo: `${BASE_URL}/images/morningfeeds-logo1.png`,
+  logo: `${BASE_URL}/images/MochaReads-favicon.png`,
 };
 
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "MorningFeeds",
+  name: "MochaReads",
   url: BASE_URL,
 };
 
@@ -54,13 +54,13 @@ const lora = Lora({
 });
 
 const DEFAULT_DESCRIPTION =
-  "MorningFeeds is a fast, customizable RSS feed reader and news aggregator where you can find and save stories from your favorite news sites all in one place.";
+  "MochaReads is a fast, customizable RSS feed reader and news aggregator where you can find and save stories from your favorite news sites all in one place.";
 
 export const metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "MorningFeeds — Your News, All in One Place",
-    template: "%s | MorningFeeds",
+    default: "MochaReads — Your News, All in One Place",
+    template: "%s | MochaReads",
   },
   description: DEFAULT_DESCRIPTION,
   icons: {
@@ -74,21 +74,21 @@ export const metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "MorningFeeds",
-    title: "MorningFeeds — Your News, All in One Place",
+    siteName: "MochaReads",
+    title: "MochaReads — Your News, All in One Place",
     description: DEFAULT_DESCRIPTION,
     images: [{ url: "/images/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MorningFeeds — Your News, All in One Place",
+    title: "MochaReads — Your News, All in One Place",
     description: DEFAULT_DESCRIPTION,
     images: ["/images/og-image.png"],
   },
 };
 
 export const viewport = {
-  themeColor: "#d97706",
+  themeColor: "#6f4225",
 };
 
 export default async function RootLayout({ children }) {

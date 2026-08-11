@@ -105,8 +105,8 @@ async function handler(req) {
           to: user.email,
           subject:
             user.digestFrequency === "daily"
-              ? "Your daily MorningFeeds digest"
-              : "Your weekly MorningFeeds digest",
+              ? "Your daily MochaReads digest"
+              : "Your weekly MochaReads digest",
           html,
         });
 

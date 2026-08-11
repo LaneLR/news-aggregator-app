@@ -6,7 +6,7 @@ import Loading from "../loading";
 
 export const metadata = {
   title: "Sign Up",
-  description: "Create a free MorningFeeds account to start building your personalized news feed.",
+  description: "Create a free MochaReads account to start building your personalized news feed.",
 };
 
 export default async function Register() {

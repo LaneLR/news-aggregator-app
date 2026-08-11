@@ -7,7 +7,7 @@ import Loading from "../loading";
 
 export const metadata = {
   title: "Log In",
-  description: "Log in to MorningFeeds to access your personalized news feed.",
+  description: "Log in to MochaReads to access your personalized news feed.",
 };
 
 export default async function Login() {

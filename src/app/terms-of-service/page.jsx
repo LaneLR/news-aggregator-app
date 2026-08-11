@@ -2,7 +2,7 @@ import LegalInfoPage from "@/components/LegalInfoPage";
 
 export const metadata = {
   title: "Terms of Service",
-  description: "Read the MorningFeeds terms of service.",
+  description: "Read the MochaReads terms of service.",
 };
 
 export default function TermsOfServicePage() {

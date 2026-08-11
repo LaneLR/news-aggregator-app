@@ -10,7 +10,7 @@ export default function ShareButton({ article }) {
   const [copySuccess, setCopySuccess] = useState(false);
   const wrapperRef = useRef(null);
 
-  // Shares the MorningFeeds article page rather than the original publisher's
+  // Shares the MochaReads article page rather than the original publisher's
   // URL directly — every share becomes a branded touchpoint (with its own
   // OG/Twitter preview card) instead of an invisible pass-through, and most
   // articles have full content available there anyway. The "View original"

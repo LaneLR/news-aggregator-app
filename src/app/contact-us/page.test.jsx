@@ -18,6 +18,6 @@ describe("ContactUsPage", () => {
 
   it("exports page metadata", () => {
     expect(metadata.title).toBe("Contact Us");
-    expect(metadata.description).toMatch(/MorningFeeds/);
+    expect(metadata.description).toMatch(/MochaReads/);
   });
 });

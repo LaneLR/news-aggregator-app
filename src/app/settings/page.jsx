@@ -52,7 +52,7 @@ export default async function SettingsPage() {
           Settings
         </h1>
         <p className={styles.pageSubtitle}>
-          Manage how MorningFeeds keeps you updated and how you sign in.
+          Manage how MochaReads keeps you updated and how you sign in.
         </p>
       </div>
 

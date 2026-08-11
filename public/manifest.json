@@ -1,11 +1,11 @@
 {
-  "name": "MorningFeeds",
-  "short_name": "MorningFeeds",
+  "name": "MochaReads",
+  "short_name": "MochaReads",
   "description": "A fast, customizable RSS feed reader and news aggregator.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f9f8f6",
-  "theme_color": "#d97706",
+  "background_color": "#ffffff",
+  "theme_color": "#6f4225",
   "share_target": {
     "action": "/share",
     "method": "GET",
