@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeSession, makeFetchResponse } from "@/test/fixtures";
 
@@ -86,8 +86,22 @@ class CapturingObserver {
   disconnect = vi.fn();
 }
 globalThis.IntersectionObserver = CapturingObserver;
-function triggerIntersection() {
-  observerCallback([{ isIntersecting: true }]);
+async function triggerIntersection() {
+  // The real IntersectionObserver callback fires outside of any React event
+  // handler, so calling it directly here needs the same act() wrapping —
+  // without it, the resulting setPage() update isn't guaranteed to be
+  // flushed before the next line of the test runs, leaving it to chance
+  // (and to how many polling cycles a given findBy* happens to need)
+  // whether the update lands in time. The async form (awaited, callback
+  // itself async) matters specifically here: setPage's synchronous update
+  // is what re-triggers SearchFeed's fetch effect, and that effect's first
+  // line is another state update (setLoading(true)) — a plain sync act()
+  // only guarantees React flushes up to that point, not the microtask
+  // queue beyond it, which was enough to occasionally leave `loading`
+  // still true from the *previous* fetch when the assertion below ran.
+  await act(async () => {
+    observerCallback([{ isIntersecting: true }]);
+  });
 }
 
 describe("SearchFeed", () => {
@@ -142,7 +156,7 @@ describe("SearchFeed", () => {
     global.fetch.mockResolvedValueOnce(
       resultsPage([{ url: "https://example.com/2", title: "Page Two Article", id: "2" }])
     );
-    triggerIntersection();
+    await triggerIntersection();
 
     expect(await screen.findByText("Page Two Article")).toBeInTheDocument();
     expect(global.fetch).toHaveBeenLastCalledWith("/api/search?query=nvidia&page=2");
@@ -163,7 +177,7 @@ describe("SearchFeed", () => {
         { url: "https://example.com/3", title: "New Article", id: "3" },
       ])
     );
-    triggerIntersection();
+    await triggerIntersection();
 
     expect(await screen.findByText("New Article", {}, { timeout: 3000 })).toBeInTheDocument();
     expect(screen.getAllByText("Same Article")).toHaveLength(1);
@@ -229,7 +243,7 @@ describe("SearchFeed", () => {
     await screen.findByText("Only Result");
 
     global.fetch.mockResolvedValueOnce(resultsPage([]));
-    triggerIntersection();
+    await triggerIntersection();
 
     expect(await screen.findByText("No more results")).toBeInTheDocument();
   });
