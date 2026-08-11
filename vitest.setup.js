@@ -82,3 +82,13 @@ vi.mock("next/font/google", () => ({
   Roboto: () => ({ variable: "--font-roboto", className: "roboto" }),
   Lora: () => ({ variable: "--font-lora", className: "lora" }),
 }));
+
+// next/font/local (used for the self-hosted Roboto/Lora files — see
+// src/app/layout.jsx) relies on a Next-specific webpack/SWC loader to turn
+// a font file import into font metadata, which doesn't exist outside of
+// Next's own build pipeline — calling the real thing under Vitest throws.
+// Same reasoning as next/font/google above: only the `.variable` shape
+// matters to any consumer.
+vi.mock("next/font/local", () => ({
+  default: () => ({ variable: "--font-local", className: "local-font" }),
+}));

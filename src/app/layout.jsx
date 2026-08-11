@@ -1,4 +1,4 @@
-import { Roboto, Lora } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.scss";
 import Providers from "@/Provider";
 import Header from "@/components/Header";
@@ -33,10 +33,23 @@ const websiteSchema = {
   url: BASE_URL,
 };
 
-const roboto = Roboto({
-  weight: ["400", "700"],
-  style: ["normal", "italic"],
-  subsets: ["latin"],
+// Self-hosted (next/font/local) rather than next/font/google — the
+// google variant fetches the actual font files from fonts.gstatic.com at
+// *build* time (not runtime; the eventual output is self-hosted either
+// way), which failed the build outright in CI when that request didn't go
+// through. These files are the same Roboto/Lora weights & the latin
+// subset, pulled once from the (Google-published, OFL-licensed)
+// @fontsource/roboto and @fontsource/lora packages — see the comment in
+// README.md's font section before changing weights/styles here, since
+// adding one means pulling in another local file, not just tweaking a
+// config option.
+const roboto = localFont({
+  src: [
+    { path: "./fonts/Roboto-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/Roboto-Italic.woff2", weight: "400", style: "italic" },
+    { path: "./fonts/Roboto-Bold.woff2", weight: "700", style: "normal" },
+    { path: "./fonts/Roboto-BoldItalic.woff2", weight: "700", style: "italic" },
+  ],
   display: "swap",
   variable: "--font-roboto",
 });
@@ -46,9 +59,12 @@ const roboto = Roboto({
 // else for UI chrome. This pairing is what most polished news/reader
 // products (and print-derived publications generally) use to read as
 // "a publication" rather than "a generic app."
-const lora = Lora({
-  weight: ["500", "600", "700"],
-  subsets: ["latin"],
+const lora = localFont({
+  src: [
+    { path: "./fonts/Lora-Medium.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/Lora-SemiBold.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/Lora-Bold.woff2", weight: "700", style: "normal" },
+  ],
   display: "swap",
   variable: "--font-lora",
 });

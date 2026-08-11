@@ -22,6 +22,17 @@ export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const observerRef = useRef();
+  // Read by the IntersectionObserver callback below — kept current via the
+  // two effects further down rather than putting hasMore/loading in that
+  // effect's own dependency array, so the observer is created exactly once
+  // instead of being torn down and recreated on every loading toggle (every
+  // fetch cycle). A fresh observer instance per render was also a real
+  // source of flakiness in tests that mock IntersectionObserver globally by
+  // capturing "the callback" as a single reference — a mock built that way
+  // has no way to know which generation of observer is still "live" if
+  // multiple get constructed in quick succession.
+  const hasMoreRef = useRef(hasMore);
+  const loadingRef = useRef(loading);
 
   useEffect(() => {
     // Reset state if query changes
@@ -64,11 +75,19 @@ export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
   }, [query, page]);
 
   useEffect(() => {
+    hasMoreRef.current = hasMore;
+  }, [hasMore]);
+
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
+
+  useEffect(() => {
     if (!observerRef.current) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && hasMore && !loading) {
+        if (entry.isIntersecting && hasMoreRef.current && !loadingRef.current) {
           setPage((prev) => prev + 1);
         }
       },
@@ -81,7 +100,7 @@ export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
     return () => {
       if (current) observer.unobserve(current);
     };
-  }, [hasMore, loading]);
+  }, []);
 
   const { data: session } = useSession();
   const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
