@@ -31,6 +31,7 @@ export function createModelMock(overrides = {}) {
     update: vi.fn().mockResolvedValue([0]),
     destroy: vi.fn().mockResolvedValue(0),
     count: vi.fn().mockResolvedValue(0),
+    upsert: vi.fn().mockResolvedValue([{}, true]),
     ...overrides,
   };
 }
@@ -69,17 +70,33 @@ export function createDbMock() {
 // create in real Sequelize, as opposed to the model class's static
 // methods above) — has `.update()`/`.destroy()`/`.save()`/`.get()` plus
 // whatever plain data fields the test provides.
+//
+// update()/save()/reload() mutate and return the SAME object identity
+// (`instance`), not a fresh copy — matching real Sequelize, where calling
+// `.update()` on an instance mutates that instance in place. A route that
+// does `const row = await Model.findByPk(id); await row.update({...}); return
+// row.someField;` needs `row` itself to reflect the change, not just the
+// value `update()` resolved to.
+const INSTANCE_METHOD_KEYS = ["update", "save", "destroy", "get", "toJSON", "reload"];
+
+function plainDataOf(instance) {
+  const plain = { ...instance };
+  for (const key of INSTANCE_METHOD_KEYS) delete plain[key];
+  return plain;
+}
+
 export function createInstanceMock(data = {}) {
-  return {
+  const instance = {
     ...data,
     update: vi.fn(async (patch) => {
-      Object.assign(data, patch);
-      return { ...data };
+      Object.assign(instance, patch);
+      return instance;
     }),
-    save: vi.fn(async () => ({ ...data })),
+    save: vi.fn(async () => instance),
     destroy: vi.fn(async () => {}),
-    get: vi.fn((opts) => (opts?.plain ? { ...data } : data)),
-    toJSON: vi.fn(() => ({ ...data })),
-    reload: vi.fn(async () => ({ ...data })),
+    get: vi.fn(() => plainDataOf(instance)),
+    toJSON: vi.fn(() => plainDataOf(instance)),
+    reload: vi.fn(async () => instance),
   };
+  return instance;
 }
