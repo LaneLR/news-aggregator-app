@@ -48,7 +48,9 @@ body {
   // down could trigger a full page reload AND the in-app refresh at once.
   overscroll-behavior-y: contain;
   color: var(--light-white);
-  font-family: var(--font-roboto), Arial, Helvetica, sans-serif;
+  // Lora (not Roboto) is the site-wide default — see layout.jsx's comment
+  // on the `lora` font const for why.
+  font-family: var(--font-lora), Georgia, "Times New Roman", serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--dark-blue);
@@ -93,6 +95,21 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+// Browsers don't inherit font-family into form controls by default (they
+// use the OS's UI font instead), so without this every <button>/<input>/
+// <select>/<textarea> site-wide silently falls back off Lora onto the
+// system font — this was already being patched per-component in a few
+// places (CommandPalette, KeyboardShortcutsHelp, ...) with the same
+// `font-family: inherit` rule; this makes that the default everywhere
+// instead of something each new component has to remember to add.
+button,
+input,
+select,
+textarea,
+optgroup {
+  font-family: inherit;
 }
 
 .skipLink {
