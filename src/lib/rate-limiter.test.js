@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { authRateLimitMiddleware } from "./rate-limiter";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { authRateLimitMiddleware, cleanupExpiredRequests } from "./rate-limiter";
 
 // requestCounts is a module-level singleton Map keyed by IP, so each test
 // uses its own unique IP (via a unique x-forwarded-for value) to avoid
@@ -70,5 +70,50 @@ describe("authRateLimitMiddleware", () => {
     // across any caller lacking both headers, so we don't assert exhaustion
     // here to avoid interfering with other tests hitting the same bucket.
     await expect(authRateLimitMiddleware(req)).resolves.toBeUndefined();
+  });
+
+  describe("cleanupExpiredRequests", () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("does nothing when there are no tracked IPs", () => {
+      expect(() => cleanupExpiredRequests()).not.toThrow();
+    });
+
+    it("purges an IP's bucket once all of its timestamps are outside the rate-limit interval, resetting it to a fresh allowance", async () => {
+      vi.useFakeTimers();
+      const ip = nextIp();
+      const req = makeRequest({ "x-forwarded-for": ip });
+
+      for (let i = 0; i < 5; i++) {
+        await authRateLimitMiddleware(req);
+      }
+      await expect(authRateLimitMiddleware(req)).rejects.toMatchObject({ status: 429 });
+
+      // Move past the 1-minute rate-limit window so every stored timestamp
+      // for this IP is stale, then run the cleanup sweep directly.
+      vi.advanceTimersByTime(61 * 1000);
+      cleanupExpiredRequests();
+
+      // A fresh request should now succeed as if this IP had never been seen.
+      await expect(authRateLimitMiddleware(req)).resolves.toBeUndefined();
+    });
+
+    it("leaves an IP's still-fresh timestamps alone", async () => {
+      const ip = nextIp();
+      const req = makeRequest({ "x-forwarded-for": ip });
+      await authRateLimitMiddleware(req);
+      await authRateLimitMiddleware(req);
+
+      cleanupExpiredRequests();
+
+      // Two requests already counted and still within the window — a 3rd,
+      // 4th, and 5th should be allowed, but a 6th should exceed the limit.
+      await authRateLimitMiddleware(req);
+      await authRateLimitMiddleware(req);
+      await authRateLimitMiddleware(req);
+      await expect(authRateLimitMiddleware(req)).rejects.toMatchObject({ status: 429 });
+    });
   });
 });

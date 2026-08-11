@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeArticle, makeFetchResponse, makeSession } from "@/test/fixtures";
 
@@ -127,5 +127,127 @@ describe("NewsCardThree", () => {
     const article = makeArticle();
     const { container } = render(<NewsCardThree article={article} viewOnly isKeyboardFocused />);
     expect(container.querySelector('[class*="keyboardFocused"]')).toBeInTheDocument();
+  });
+
+  it("unlikes an already-liked article and decrements the count", async () => {
+    const user = userEvent.setup();
+    mockSession = makeSession();
+    const article = makeArticle({ isLikedByUser: true, likeCount: 3 });
+    mockRoutes([...ARCHIVE_ROUTES, ["/api/articles/like", () => makeFetchResponse({ success: true })]]);
+    render(<NewsCardThree article={article} viewOnly />);
+
+    await user.click(screen.getByRole("button", { name: /unlike this article/i }));
+
+    expect(screen.getByRole("button", { name: /like this article/i })).toHaveTextContent("2");
+  });
+
+  it("rolls back the like count and shows an error toast when the like request fails", async () => {
+    const user = userEvent.setup();
+    mockSession = makeSession();
+    const article = makeArticle({ isLikedByUser: false, likeCount: 5 });
+    mockRoutes([...ARCHIVE_ROUTES, ["/api/articles/like", () => makeFetchResponse(null, { ok: false, status: 500 })]]);
+    render(<NewsCardThree article={article} viewOnly />);
+
+    await user.click(screen.getByRole("button", { name: /like this article/i }));
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /like this article/i })).toHaveTextContent("5")
+    );
+    expect(toast.error).toHaveBeenCalledWith("Couldn't update like status. Please try again.");
+  });
+
+  it("falls back to the placeholder image when the thumbnail fails to load", async () => {
+    const article = makeArticle({ urlToImage: "https://example.com/broken.jpg" });
+    render(<NewsCardThree article={article} viewOnly />);
+    // Let ArchiveToggleButton's own mount-time fetches settle before
+    // triggering more state updates, to avoid an unrelated act() warning.
+    await screen.findByRole("button", { name: "Save to archive" });
+
+    // next/image rewrites `src` through its own /_next/image optimizer, so
+    // the original URL shows up URL-encoded inside the `url=` query param
+    // rather than as a direct substring.
+    const img = screen.getByAltText(article.title);
+    expect(img.src).toContain(encodeURIComponent("/api/image-proxy"));
+
+    fireEvent.error(img);
+
+    expect(img.src).toContain(encodeURIComponent("/images/blurimage.png"));
+  });
+
+  it("swiping right past the threshold triggers the save action on the card", async () => {
+    const article = makeArticle();
+    const { container } = render(<NewsCardThree article={article} viewOnly />);
+    const wrapper = container.firstChild;
+
+    fireEvent.touchStart(wrapper, { touches: [{ clientX: 0 }] });
+    fireEvent.touchMove(wrapper, { touches: [{ clientX: 100 }] });
+    fireEvent.touchEnd(wrapper);
+
+    const saveButton = screen.getByRole("button", { name: "Save to archive" });
+    await waitFor(() => expect(saveButton).toHaveAttribute("aria-expanded", "true"));
+  });
+
+  it("swiping left past the threshold marks the article read when signed in", async () => {
+    mockSession = makeSession();
+    const article = makeArticle({ isRead: false });
+    mockRoutes([...ARCHIVE_ROUTES, ["/api/articles/mark-all-read", () => makeFetchResponse({ success: true })]]);
+    const { container } = render(<NewsCardThree article={article} viewOnly />);
+    const wrapper = container.firstChild;
+
+    fireEvent.touchStart(wrapper, { touches: [{ clientX: 200 }] });
+    fireEvent.touchMove(wrapper, { touches: [{ clientX: 100 }] });
+    fireEvent.touchEnd(wrapper);
+
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/articles/mark-all-read",
+        expect.objectContaining({ body: JSON.stringify({ urls: [article.url] }) })
+      )
+    );
+  });
+
+  it("swiping left does nothing when signed out", () => {
+    const article = makeArticle({ isRead: false });
+    const { container } = render(<NewsCardThree article={article} viewOnly />);
+    const wrapper = container.firstChild;
+
+    fireEvent.touchStart(wrapper, { touches: [{ clientX: 200 }] });
+    fireEvent.touchMove(wrapper, { touches: [{ clientX: 100 }] });
+    fireEvent.touchEnd(wrapper);
+
+    expect(global.fetch).not.toHaveBeenCalledWith("/api/articles/mark-all-read", expect.anything());
+  });
+
+  it("swiping left does nothing when the article is already read", () => {
+    mockSession = makeSession();
+    const article = makeArticle({ isRead: true });
+    const { container } = render(<NewsCardThree article={article} viewOnly />);
+    const wrapper = container.firstChild;
+
+    fireEvent.touchStart(wrapper, { touches: [{ clientX: 200 }] });
+    fireEvent.touchMove(wrapper, { touches: [{ clientX: 100 }] });
+    fireEvent.touchEnd(wrapper);
+
+    expect(global.fetch).not.toHaveBeenCalledWith("/api/articles/mark-all-read", expect.anything());
+  });
+
+  it("tracks a click on the 'Read article' link", async () => {
+    const user = userEvent.setup();
+    const article = makeArticle();
+    render(<NewsCardThree article={article} viewOnly />);
+
+    // trackArticleClick posts to /api/articles/click fire-and-forget; just
+    // confirm the link is wired and clicking doesn't throw.
+    mockRoutes([...ARCHIVE_ROUTES, ["/api/articles/click", () => makeFetchResponse({ success: true })]]);
+    await user.click(screen.getByRole("link", { name: "Read article" }));
+
+    expect(screen.getByRole("link", { name: "Read article" })).toHaveAttribute("href", article.url);
+  });
+
+  it("renders without a category-color top border when the article has no category", () => {
+    const article = makeArticle({ category: [] });
+    const { container } = render(<NewsCardThree article={article} viewOnly />);
+    const card = container.querySelector('[class*="cardContainer"]');
+    expect(card.style.borderTopWidth).toBe("");
   });
 });

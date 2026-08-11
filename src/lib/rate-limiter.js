@@ -27,7 +27,9 @@ const getClientIp = (req) => {
 
 // --- Cleanup function for expired entries ---
 // This prevents the 'requestCounts' Map from growing indefinitely.
-function cleanupExpiredRequests() {
+// Exported only so tests can invoke it directly rather than waiting on the
+// real 5-minute setInterval below — not used by any other module.
+export function cleanupExpiredRequests() {
   const now = Date.now();
   for (const [ip, ipTimestamps] of requestCounts.entries()) {
     for (const timestamp of ipTimestamps.keys()) {

@@ -1,10 +1,16 @@
 name: CI
 
-# Runs lint + a production build on every push and PR so broken code shows
-# up as a failed check (on the commit, and on the PR alongside Vercel's own
-# preview-deployment status) before it ever reaches main/production —
-# there was previously no CI configured at all, which is why nothing showed
-# up as a "check" next to Vercel's deployments.
+# Runs lint + the test suite + a production build on every push and PR so
+# broken code shows up as a failed check (on the commit, and on the PR
+# alongside Vercel's own preview-deployment status) before it ever reaches
+# main/production — there was previously no CI configured at all, which is
+# why nothing showed up as a "check" next to Vercel's deployments.
+#
+# The test run below is technically redundant with `npm run build` (which
+# now runs `vitest run` itself before `next build`, so a broken test also
+# fails Vercel's own deploy — see package.json) — kept as its own step
+# anyway so a test failure shows up as its own clearly-labeled red X in the
+# Actions UI instead of being buried inside the build step's log.
 on:
   # No branch filter on push — work happens directly on dev/LaneR (and other
   # branches), not just main, and Vercel already deploys a preview for every
@@ -28,9 +34,13 @@ jobs:
 
       - run: npm run lint
 
-      # No DATABASE_URL/Stripe/etc. secrets on purpose — DB access in this
-      # app happens lazily inside request handlers (see src/lib/sequelize.js),
-      # not at build time, so `next build` doesn't need them. Sentry's build
-      # plugin (next.config.js) also degrades gracefully without its auth
-      # token, just skipping the source-map upload step.
+      # No DATABASE_URL/Stripe/etc. secrets on purpose — the test suite
+      # mocks the DB/every external service (see vitest.setup.js), and real
+      # DB access in the app itself happens lazily inside request handlers
+      # (see src/lib/sequelize.js), not at build time, so neither this nor
+      # `next build` below needs real secrets. Sentry's build plugin
+      # (next.config.js) also degrades gracefully without its auth token,
+      # just skipping the source-map upload step.
+      - run: npm run test
+
       - run: npm run build
