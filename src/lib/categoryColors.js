@@ -13,7 +13,6 @@ const CATEGORY_COLORS = {
   Tech: "#2e5ce6",
   Technology: "#2e5ce6",
   Science: "#7c3aed",
-  Health: "#e11d48",
   Sports: "#c2410c",
   Entertainment: "#db2777",
   Politics: "#475569",

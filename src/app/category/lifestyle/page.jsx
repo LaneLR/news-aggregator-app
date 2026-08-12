@@ -3,27 +3,27 @@ import { auth } from "@/lib/auth";
 import { getCategoryArticles } from "@/lib/categoryArticles";
 
 export const metadata = {
-  title: "Health News",
-  description: "Health, wellness, and medical news from trusted sources.",
+  title: "Lifestyle News",
+  description: "Wellness, culture, and everyday living news from trusted sources.",
 };
 
-export default async function HealthNewsPage() {
+export default async function LifestyleNewsPage() {
   const session = await auth();
   let initialArticles;
   let initialTotalPages;
   try {
     ({ articles: initialArticles, totalPages: initialTotalPages } = await getCategoryArticles({
-      category: "health",
+      category: "lifestyle",
       userId: session?.user?.id,
     }));
   } catch (err) {
-    console.error("Failed to load initial Health articles:", err);
+    console.error("Failed to load initial Lifestyle articles:", err);
   }
 
   return (
     <>
       <CategoryPageComponent
-        category={"Health"}
+        category={"Lifestyle"}
         initialArticles={initialArticles}
         initialTotalPages={initialTotalPages}
       />
