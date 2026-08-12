@@ -26,6 +26,7 @@ const CATEGORY_COLORS = {
   Journal: "#1e3a8a",
   Market: "#047857",
   Weather: "#0369a1",
+  Podcast: "#6d28d9",
 };
 
 const DEFAULT_COLOR = "#334155";

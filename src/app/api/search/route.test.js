@@ -39,24 +39,25 @@ describe("GET /api/search", () => {
     expect(body.results[0].isLikedByUser).toBe(false);
   });
 
-  it("restricts non-subscribers to sourceType 'news' results", async () => {
+  it("restricts non-subscribers to free-tier/podcast results outside Market/Journal", async () => {
     mockAuth.mockResolvedValue(makeSession({ tier: "Free" }));
     db.sequelize.query.mockResolvedValue([]);
 
     await GET(makeRequest("query=market"));
 
     const sql = db.sequelize.query.mock.calls[0][0];
-    expect(sql).toContain(`"sourceType" = 'news'`);
+    expect(sql).toContain(`"tier" = 'free' OR "sourceType" = 'podcast'`);
+    expect(sql).toContain(`NOT ("category" &&`);
   });
 
-  it("does not restrict sourceType for subscribers", async () => {
+  it("does not restrict tier/category for subscribers", async () => {
     mockAuth.mockResolvedValue(makeSession({ tier: "Subscribed" }));
     db.sequelize.query.mockResolvedValue([]);
 
     await GET(makeRequest("query=market"));
 
     const sql = db.sequelize.query.mock.calls[0][0];
-    expect(sql).not.toContain(`"sourceType" = 'news'`);
+    expect(sql).not.toContain(`"tier" = 'free'`);
   });
 
   it("attaches isLikedByUser/isRead for a signed-in user", async () => {

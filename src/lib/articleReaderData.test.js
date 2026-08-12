@@ -46,6 +46,38 @@ describe("getArticleReaderData", () => {
     expect(result.gated).toBe(false);
   });
 
+  it("returns gated: true for a premium-tier article outside Market/Journal when the user isn't subscribed", async () => {
+    db.Article.findByPk.mockResolvedValue(
+      articleInstance({ category: ["Politics"], tier: "premium", sourceType: "news" })
+    );
+    const result = await getArticleReaderData("id1", makeSession({ tier: "Free" }));
+    expect(result).toEqual({ gated: true });
+  });
+
+  it("allows a subscribed user through a premium-tier article", async () => {
+    db.Article.findByPk.mockResolvedValue(
+      articleInstance({ category: ["Politics"], tier: "premium", sourceType: "news", content: "<p>Body</p>" })
+    );
+    const result = await getArticleReaderData("id1", makeSession({ tier: "Subscribed" }));
+    expect(result.gated).toBe(false);
+  });
+
+  it("allows a non-subscriber through a premium-tier podcast episode — podcasts are always free", async () => {
+    db.Article.findByPk.mockResolvedValue(
+      articleInstance({ category: ["Finance"], tier: "premium", sourceType: "podcast", content: "<p>Body</p>" })
+    );
+    const result = await getArticleReaderData("id1", null);
+    expect(result.gated).toBe(false);
+  });
+
+  it("allows a non-subscriber through a free-tier article", async () => {
+    db.Article.findByPk.mockResolvedValue(
+      articleInstance({ category: ["Politics"], tier: "free", sourceType: "news", content: "<p>Body</p>" })
+    );
+    const result = await getArticleReaderData("id1", null);
+    expect(result.gated).toBe(false);
+  });
+
   it("allows an anonymous (no session) user through an ungated category", async () => {
     db.Article.findByPk.mockResolvedValue(
       articleInstance({ category: ["Business"], content: "<p>Body</p>" })

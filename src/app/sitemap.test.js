@@ -27,8 +27,14 @@ describe("sitemap", () => {
     expect(db.Article.findAll).not.toHaveBeenCalled();
     expect(entries.some((e) => e.url.endsWith("/"))).toBe(true);
     expect(entries.some((e) => e.url.endsWith("/category/business"))).toBe(true);
-    // Gated categories never appear even in the static fallback list.
-    expect(entries.some((e) => e.url.endsWith("/category/finance"))).toBe(false);
+    // Finance/Podcast are genuinely free (partially/fully) now, so they're
+    // in the static list; Market/Journal's teaser pages are real, unique
+    // content too, so they're included as well — only individual articles
+    // under those two stay excluded (see the test below).
+    expect(entries.some((e) => e.url.endsWith("/category/finance"))).toBe(true);
+    expect(entries.some((e) => e.url.endsWith("/category/podcast"))).toBe(true);
+    expect(entries.some((e) => e.url.endsWith("/category/market"))).toBe(true);
+    expect(entries.some((e) => e.url.endsWith("/category/journal"))).toBe(true);
   });
 
   it("includes recent articles and public archives when DATABASE_URL is set", async () => {
@@ -46,13 +52,16 @@ describe("sitemap", () => {
     expect(entries.some((e) => e.url.endsWith("/archives/shared/cool-picks"))).toBe(true);
   });
 
-  it("excludes gated categories from the free-category static entries", async () => {
+  it("excludes gated categories' individual articles from the sitemap query", async () => {
     db.Article.findAll.mockResolvedValue([]);
     db.Archive.findAll.mockResolvedValue([]);
 
-    const entries = await sitemap();
+    await sitemap();
 
-    expect(entries.some((e) => e.url.includes("/category/market"))).toBe(false);
-    expect(entries.some((e) => e.url.includes("/category/journal"))).toBe(false);
+    const where = db.Article.findAll.mock.calls[0][0].where;
+    const andKey = Object.getOwnPropertySymbols(where)[0];
+    const literalCondition = where[andKey].find((c) => c?.val);
+    expect(literalCondition.val).toContain("'Market'");
+    expect(literalCondition.val).toContain("'Journal'");
   });
 });

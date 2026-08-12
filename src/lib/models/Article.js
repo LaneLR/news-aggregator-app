@@ -54,6 +54,17 @@ export default function defineArticle(sequelize) {
         allowNull: false,
         defaultValue: "news",
       },
+      // Per-source access tier, independent of sourceType/category. "premium"
+      // rows are hidden from Free-tier/anonymous viewers everywhere except
+      // Market/Journal (those two categories are fully gated regardless of
+      // tier — see src/lib/subscriberOnlyCategories.js) and sourceType
+      // "podcast" (podcasts are always free regardless of tier). Set at
+      // ingestion time from each feed config entry's own "tier" field.
+      tier: {
+        type: DataTypes.ENUM("free", "premium"),
+        allowNull: false,
+        defaultValue: "free",
+      },
       // Full article HTML, when the source feed includes it (many WordPress
       // feeds ship this via <content:encoded>). Populated by the RSS worker
       // going forward only — existing rows stay null and the reader falls
@@ -72,6 +83,7 @@ export default function defineArticle(sequelize) {
         { fields: ["publishedAt"] },
         { fields: ["category"], using: "gin" },
         { fields: ["sourceType"] },
+        { fields: ["tier"] },
         { fields: ["likeCount"] },
         { fields: ["clickCount"] },
       ],

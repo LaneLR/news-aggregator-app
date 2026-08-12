@@ -26,6 +26,32 @@
   }
 }
 
+.upsellNudge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--theme-text-secondary);
+  padding: 0.5rem 1rem 0;
+
+  svg {
+    flex-shrink: 0;
+    color: var(--theme-primary);
+  }
+
+  a {
+    color: var(--theme-primary);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 .filterBar {
   // Header/HeaderNavBar scroll away normally (not fixed), so once this bar
   // reaches the very top of the viewport it's the first thing pinned there.

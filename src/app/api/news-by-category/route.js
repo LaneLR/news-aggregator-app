@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 import { Op } from "sequelize";
-import { excludeGatedCategoriesCondition, GATED_TAGS } from "@/lib/subscriberOnlyCategories";
+import {
+  excludeGatedCategoriesCondition,
+  excludePremiumArticlesCondition,
+  GATED_TAGS,
+} from "@/lib/subscriberOnlyCategories";
 import { buildKeywordExclusion } from "@/lib/keywordFilter";
 import { DEFAULT_HOME_SECTIONS, CATEGORY_SECTION_TAGS } from "@/lib/homeSections";
 
@@ -35,13 +39,14 @@ export async function GET(req) {
         CATEGORY_SECTION_TAGS.includes(key) && (isSubscribed || !GATED_TAGS.includes(key))
     );
 
-    // Market/Finance/Journal content is subscriber-only — exclude it from
-    // the general home feed for everyone else, otherwise gated content
-    // would leak into a requested category (e.g. an article tagged both
+    // Market/Journal content is subscriber-only, and every other category's
+    // premium-tier sources are gated per-article — exclude both from the
+    // general home feed for everyone else, otherwise gated content would
+    // leak into a requested category (e.g. an article tagged both
     // "Business" and "Market") regardless of subscription status.
     const visibilityConditions = isSubscribed
       ? []
-      : [excludeGatedCategoriesCondition()];
+      : [excludeGatedCategoriesCondition(), excludePremiumArticlesCondition()];
 
     const keywordExclusion = buildKeywordExclusion(mutedKeywords);
     if (keywordExclusion) visibilityConditions.push(keywordExclusion);

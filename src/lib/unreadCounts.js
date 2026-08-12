@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { excludeGatedCategoriesCondition } from "./subscriberOnlyCategories";
+import { excludeGatedCategoriesCondition, excludePremiumArticlesCondition } from "./subscriberOnlyCategories";
 import { buildKeywordExclusion } from "./keywordFilter";
 import { buildKeywordInclusion } from "./followedKeywords";
 
@@ -20,7 +20,10 @@ export async function getUnreadCounts(db, user, { isSubscribed } = {}) {
   const since = new Date(Date.now() - UNREAD_WINDOW_DAYS * 24 * 60 * 60 * 1000);
 
   const whereConditions = [{ publishedAt: { [Op.gte]: since } }];
-  if (!isSubscribed) whereConditions.push(excludeGatedCategoriesCondition());
+  if (!isSubscribed) {
+    whereConditions.push(excludeGatedCategoriesCondition());
+    whereConditions.push(excludePremiumArticlesCondition());
+  }
   const keywordExclusion = buildKeywordExclusion(user.mutedKeywords);
   if (keywordExclusion) whereConditions.push(keywordExclusion);
 

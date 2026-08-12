@@ -152,10 +152,12 @@ export default function OnboardingFlow() {
 
   // First-time onboarding always happens before a user could plausibly be
   // subscribed, but gate on the actual session tier rather than assuming —
-  // Journals/Market/Finance are subscriber-only, so a non-subscriber picking
-  // them here would set preferences for content they can't see yet.
+  // Journals/Market are fully subscriber-only, so a non-subscriber picking
+  // them here would set preferences for content they can't see yet. Finance
+  // is no longer in this set (see subscriberOnlyCategories.js) — it shows a
+  // curated free selection, so it's a normal pickable category now.
   const pickableCategories = CATEGORY_LINKS.filter(
-    (link) => isSubscribed || !link.subscriberOnly
+    (link) => isSubscribed || !link.gated
   );
 
   const toggleCategory = (tag) => {

@@ -36,11 +36,25 @@ describe("GET /api/articles/[category]", () => {
   it("blocks Free-tier users from a gated category", async () => {
     mockAuth.mockResolvedValue(makeSession({ tier: "Free" }));
 
+    const res = await GET(makeRequest("http://localhost/api/articles/market"), {
+      params: Promise.resolve({ category: "market" }),
+    });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("allows Free-tier users into Finance — it's no longer fully gated", async () => {
+    mockAuth.mockResolvedValue(makeSession({ tier: "Free" }));
+    mockGetCategoryArticles.mockResolvedValue({ articles: [] });
+
     const res = await GET(makeRequest("http://localhost/api/articles/finance"), {
       params: Promise.resolve({ category: "finance" }),
     });
 
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(mockGetCategoryArticles).toHaveBeenCalledWith(
+      expect.objectContaining({ category: "finance", isSubscribed: false })
+    );
   });
 
   it("allows Subscribed users into a gated category", async () => {
@@ -70,6 +84,7 @@ describe("GET /api/articles/[category]", () => {
       sort: "liked",
       userId: undefined,
       page: 2,
+      isSubscribed: false,
     });
   });
 

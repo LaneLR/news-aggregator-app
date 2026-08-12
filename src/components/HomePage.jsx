@@ -14,6 +14,8 @@ import {
   Globe,
   Flag,
   CloudSun,
+  DollarSign,
+  Mic,
   Check,
   ArrowRight,
 } from "lucide-react";
@@ -49,7 +51,11 @@ const VALUE_PROPS = [
   },
 ];
 
-// Free categories only — matches sitemap.js's FREE_CATEGORIES. Defined
+// Categories that show real, genuinely-free content to a signed-out
+// visitor — deliberately NOT the same list as sitemap.js's FREE_CATEGORIES,
+// which also includes Market/Journal now that those have an indexable
+// upsell teaser page (see GatedCategoryTeaser); showcasing them here as
+// "free" would misrepresent what a non-subscriber actually gets. Defined
 // locally rather than importing HeaderNavBar's CATEGORY_LINKS, since that
 // file is "use client" and this page is a Server Component (same pattern
 // NewNewsPage.jsx already uses for its own category icon map).
@@ -63,21 +69,24 @@ const FREE_CATEGORIES = [
   { label: "Politics", href: "/category/politics", Icon: Landmark },
   { label: "World", href: "/category/world", Icon: Globe },
   { label: "US", href: "/category/us", Icon: Flag },
+  { label: "Finance", href: "/category/finance", Icon: DollarSign },
+  { label: "Podcasts", href: "/category/podcast", Icon: Mic },
   { label: "Weather", href: "/category/weather", Icon: CloudSun },
 ];
 
 // Mirrors PricingPage.jsx's feature lists (summarized) — no dollar amounts
 // here, so this can't drift out of sync with the real pricing.
 const FREE_FEATURES = [
-  "Articles from hundreds of news sources and blogs",
+  "A curated selection of major sources in every category",
   "Unlimited archives to save your favorite articles",
   "Follow topics & keywords with instant notifications",
 ];
 
 const SUBSCRIBED_FEATURES = [
   "Everything in Free",
+  "Every source in every category",
   "Live Market dashboard with real-time charts & a watchlist",
-  "Full Market, Finance & Journal coverage",
+  "Full Market & Journal coverage",
   "Create and customize your own news feeds",
   '"For You" recommendations based on your reading habits',
 ];

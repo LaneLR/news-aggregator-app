@@ -1,0 +1,109 @@
+.widget {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 1.5rem 1.5rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--theme-border);
+  background-color: var(--theme-card-background);
+  font-size: 0.88rem;
+  color: var(--theme-text);
+}
+
+.pinIcon {
+  flex-shrink: 0;
+  color: var(--theme-text-secondary);
+}
+
+.conditionIcon {
+  flex-shrink: 0;
+  color: var(--theme-title-contrast);
+}
+
+.temp {
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.location {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--theme-text-secondary);
+}
+
+.searchArea {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.searchInput {
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--theme-text);
+  outline: none;
+
+  &::placeholder {
+    color: var(--theme-text-secondary);
+  }
+}
+
+.resultsList {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--theme-border);
+  background-color: var(--theme-background);
+  box-shadow: var(--shadow-lg);
+  z-index: 20;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.resultButton {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--theme-text);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--theme-layout-background);
+  }
+}
+
+.iconButton {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: none;
+  background: none;
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: var(--theme-layout-background);
+    color: var(--theme-text);
+  }
+}

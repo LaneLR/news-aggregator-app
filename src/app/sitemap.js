@@ -11,15 +11,20 @@ const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 // Regenerating hourly keeps it fresh without a DB hit on every crawler visit.
 export const revalidate = 3600;
 
-// Market/Finance/Journal are subscriber-only — both the category pages and
-// individual articles in those categories redirect anonymous/Free visitors
-// to /pricing, so they're excluded here rather than pointing crawlers at a
-// redirect. Matches the same exclusion already applied elsewhere (see
-// src/lib/subscriberOnlyCategories.js).
+// Every category page is publicly reachable now — Market/Journal show a
+// real upsell teaser to anonymous/Free visitors instead of a redirect (see
+// GatedCategoryTeaser), and Finance/Podcast were never redirect-gated in the
+// first place (see src/lib/subscriberOnlyCategories.js). Individual
+// articles under Market/Journal are still excluded below, since those two
+// categories' actual content stays fully locked.
 const FREE_CATEGORIES = [
   "business",
   "entertainment",
+  "finance",
+  "journal",
   "lifestyle",
+  "market",
+  "podcast",
   "politics",
   "science",
   "sports",

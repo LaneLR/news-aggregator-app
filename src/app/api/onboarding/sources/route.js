@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 import { Op } from "sequelize";
-import { GATED_TAGS } from "@/lib/subscriberOnlyCategories";
+import { GATED_TAGS, excludePremiumArticlesCondition } from "@/lib/subscriberOnlyCategories";
 
 const MAX_SOURCES = 12;
 
@@ -31,8 +31,14 @@ export async function GET(req) {
   try {
     const { Article } = await initializeDbAndModels();
 
+    // A non-subscriber shouldn't be offered a premium-tier source to "pick"
+    // here — they'd never actually see articles from it afterward (see
+    // Article.tier), which would make this step actively misleading.
+    const whereConditions = [{ category: { [Op.overlap]: categories } }];
+    if (!isSubscribed) whereConditions.push(excludePremiumArticlesCondition());
+
     const rows = await Article.findAll({
-      where: { category: { [Op.overlap]: categories } },
+      where: { [Op.and]: whereConditions },
       attributes: ["sourceName"],
       order: [["publishedAt", "DESC"]],
       limit: 500,

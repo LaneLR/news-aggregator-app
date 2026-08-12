@@ -38,21 +38,29 @@ describe("CommandPalette", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("hides subscriber-only destinations for a Free-tier session", () => {
+  it("still hides subscriber-only personal destinations (My Feeds) for a Free-tier session", () => {
     mockSession.value = { user: { tier: "Free" } };
     render(<CommandPalette />);
     fireEvent.keyDown(document, { key: "k", ctrlKey: true });
 
-    expect(screen.queryByText("Journals")).not.toBeInTheDocument();
+    expect(screen.queryByText("My Feeds")).not.toBeInTheDocument();
     expect(screen.getByText("Business")).toBeInTheDocument();
   });
 
-  it("shows subscriber-only destinations for a subscribed session", () => {
-    mockSession.value = { user: { tier: "Plus" } };
+  it("always lists Journals as a destination — it's reachable (via an upsell teaser) for every user now", () => {
+    mockSession.value = { user: { tier: "Free" } };
     render(<CommandPalette />);
     fireEvent.keyDown(document, { key: "k", ctrlKey: true });
 
     expect(screen.getByText("Journals")).toBeInTheDocument();
+  });
+
+  it("shows subscriber-only personal destinations for a subscribed session", () => {
+    mockSession.value = { user: { tier: "Plus" } };
+    render(<CommandPalette />);
+    fireEvent.keyDown(document, { key: "k", ctrlKey: true });
+
+    expect(screen.getByText("My Feeds")).toBeInTheDocument();
   });
 
   it("filters destinations as the user types", async () => {

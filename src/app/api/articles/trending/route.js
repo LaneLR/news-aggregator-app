@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { Op } from "sequelize";
 import initializeDbAndModels from "@/lib/db";
 import { auth } from "@/lib/auth";
-import { excludeGatedCategoriesCondition } from "@/lib/subscriberOnlyCategories";
+import { excludeGatedCategoriesCondition, excludePremiumArticlesCondition } from "@/lib/subscriberOnlyCategories";
 
 // "liked" = highest likeCount, "trending" = highest clickCount (reads), both
 // scoped to a recent window so old viral articles don't dominate forever.
@@ -27,6 +27,7 @@ export async function GET(req) {
     ];
     if (!isSubscribed) {
       conditions.push(excludeGatedCategoriesCondition());
+      conditions.push(excludePremiumArticlesCondition());
     }
     const where = { [Op.and]: conditions };
 

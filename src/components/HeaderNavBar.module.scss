@@ -45,6 +45,15 @@
   }
 }
 
+.lockIcon {
+  color: var(--theme-text-secondary);
+  opacity: 0.8;
+
+  .active & {
+    color: var(--theme-primary-contrast);
+  }
+}
+
 .badge {
   display: inline-flex;
   align-items: center;

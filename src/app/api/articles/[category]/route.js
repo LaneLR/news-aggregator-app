@@ -6,18 +6,19 @@ import { getCategoryArticles } from "@/lib/categoryArticles";
 export async function GET(req, { params }) {
   const { category } = await params;
   const session = await auth();
+  const isSubscribed = !!(session?.user?.tier && session.user.tier !== "Free");
 
-  // Market/Finance/Journal are subscriber-only. This mirrors the page-level
-  // redirect in src/app/category/{market,finance,journal}/page.js, but has
-  // to be enforced here too — otherwise the paywall is just a UI redirect
-  // that anyone can bypass by calling this endpoint directly.
-  if (SUBSCRIBER_ONLY_CATEGORIES.has(category.toLowerCase())) {
-    if (!session || session.user.tier === "Free") {
-      return NextResponse.json(
-        { error: "This content is for subscribers only." },
-        { status: 403 }
-      );
-    }
+  // Market/Journal are fully subscriber-only. This mirrors the page-level
+  // teaser in src/app/category/{market,journal}/page.js, but has to be
+  // enforced here too — otherwise the paywall is just a UI thing that
+  // anyone can bypass by calling this endpoint directly. Every other
+  // category (including Finance) is reachable by anyone; getCategoryArticles
+  // itself filters out premium-tier articles for non-subscribers.
+  if (SUBSCRIBER_ONLY_CATEGORIES.has(category.toLowerCase()) && !isSubscribed) {
+    return NextResponse.json(
+      { error: "This content is for subscribers only." },
+      { status: 403 }
+    );
   }
 
   const { searchParams } = new URL(req.url);
@@ -30,6 +31,7 @@ export async function GET(req, { params }) {
       sort,
       userId: session?.user?.id,
       page,
+      isSubscribed,
     });
 
     return NextResponse.json(data);

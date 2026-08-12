@@ -9,11 +9,6 @@ vi.mock("@/components/CategoryPage", () => ({
 const mockAuth = vi.fn();
 vi.mock("@/lib/auth", () => ({ auth: () => mockAuth() }));
 
-const mockRedirect = vi.fn((url) => {
-  throw new Error(`REDIRECT:${url}`);
-});
-vi.mock("next/navigation", () => ({ redirect: (url) => mockRedirect(url) }));
-
 const mockGetCategoryArticles = vi.fn(async () => ({ articles: [], totalPages: 1 }));
 vi.mock("@/lib/categoryArticles", () => ({
   getCategoryArticles: (...args) => mockGetCategoryArticles(...args),
@@ -21,23 +16,41 @@ vi.mock("@/lib/categoryArticles", () => ({
 
 const { default: FinanceNewsPage, metadata } = await import("./page");
 
+// Finance is no longer fully subscriber-only — it shows a curated free
+// selection of sources to everyone (see subscriberOnlyCategories.js), so
+// this page never redirects; getCategoryArticles itself filters premium
+// sources for non-subscribers.
 describe("FinanceNewsPage", () => {
   beforeEach(() => {
     mockAuth.mockReset();
     mockGetCategoryArticles.mockClear();
   });
 
-  it("redirects anonymous visitors to /pricing", async () => {
+  it("renders CategoryPage for anonymous visitors instead of redirecting", async () => {
     mockAuth.mockResolvedValue(null);
 
-    await expect(FinanceNewsPage()).rejects.toThrow("REDIRECT:/pricing");
-    expect(mockGetCategoryArticles).not.toHaveBeenCalled();
+    const element = await FinanceNewsPage();
+    render(element);
+
+    expect(mockGetCategoryArticles).toHaveBeenCalledWith({
+      category: "finance",
+      userId: undefined,
+      isSubscribed: false,
+    });
+    const props = JSON.parse(screen.getByTestId("category-page").textContent);
+    expect(props.category).toBe("Finance");
   });
 
-  it("redirects Free-tier users to /pricing", async () => {
-    mockAuth.mockResolvedValue(makeSession({ tier: "Free" }));
+  it("passes isSubscribed: false for a Free-tier user", async () => {
+    mockAuth.mockResolvedValue(makeSession({ id: "user-1", tier: "Free" }));
 
-    await expect(FinanceNewsPage()).rejects.toThrow("REDIRECT:/pricing");
+    await FinanceNewsPage();
+
+    expect(mockGetCategoryArticles).toHaveBeenCalledWith({
+      category: "finance",
+      userId: "user-1",
+      isSubscribed: false,
+    });
   });
 
   it("renders CategoryPage with the Finance category for subscribed users", async () => {
@@ -49,12 +62,13 @@ describe("FinanceNewsPage", () => {
     expect(mockGetCategoryArticles).toHaveBeenCalledWith({
       category: "finance",
       userId: "user-1",
+      isSubscribed: true,
     });
     const props = JSON.parse(screen.getByTestId("category-page").textContent);
     expect(props.category).toBe("Finance");
   });
 
-  it("marks the page as noindex since gated content shouldn't be crawled", () => {
-    expect(metadata.robots).toEqual({ index: false, follow: false });
+  it("is indexable — Finance is no longer redirect-gated", () => {
+    expect(metadata.robots).toBeUndefined();
   });
 });

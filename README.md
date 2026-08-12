@@ -7,7 +7,7 @@ A fast, customizable RSS feed reader and news aggregator built with Next.js. Fol
 ## 🗝️ Key features
 
 **Reading & discovery**
-- Articles pulled from hundreds of RSS sources across 13 categories (Business, Tech, Science, Sports, Lifestyle, Entertainment, Politics, World, US, Weather, plus subscriber-only Market, Finance, and Journal)
+- Articles pulled from hundreds of RSS sources across 14 categories (Business, Tech, Science, Sports, Lifestyle, Entertainment, Politics, World, US, Weather, Finance, Podcast, plus fully subscriber-only Market and Journal)
 - Full-text search with suggestions, sort by latest/trending/most-liked, "Most Covered" and "For You" personalized recommendations
 - Reader view with customizable font size/family/line-height/content width, full-screen reading mode, text-to-speech, and related-coverage links
 - List, magazine, and reader density layouts; drag-to-reorder category nav
@@ -17,8 +17,17 @@ A fast, customizable RSS feed reader and news aggregator built with Next.js. Fol
 - Follow or mute keywords — followed keywords surface on `/following` and trigger notifications; muted ones are filtered out everywhere
 - Like articles, track read/unread state, "mark all as read," bulk multi-select actions (mark read / save / like) across a whole page
 
+**Content access tiers** *(added 2026-08)*
+- Every regular category (Business, Tech, Politics, Finance, etc.) shows a curated selection of well-known/major sources to Free-tier and anonymous visitors — CNN, BBC, NPR, CNBC, and similar — with the rest of that category's sources (the long tail) reserved for Subscribers. This is a per-source `tier` (`free`/`premium`) on `Article`, not a whole-category gate — see `src/lib/subscriberOnlyCategories.js`.
+- **Market and Journal are the only two categories still fully gated** — no free sample at all. A Free/anonymous visitor who opens either now sees an in-app upsell teaser (`GatedCategoryTeaser.jsx`, with a custom in-house SVG illustration, not stock photography) explaining what's inside, rather than a bare redirect to `/pricing`.
+- **Podcasts are always free**, regardless of `tier` — `sourceType: "podcast"` is an unconditional bypass everywhere gating is enforced.
+- A small, non-dismissible nudge ("You're seeing a curated free selection... Subscribe to unlock every source in this category") appears on every partially-gated category page for non-subscribers, linking to `/pricing`.
+
 **Market data** *(Subscribed tier)*
 - Live market indices, sector performance, a personal watchlist, and historical charts, backed by Finnhub with server-side caching (`MarketQuote`/`MarketChartCache`)
+
+**Local weather**
+- Optional, opt-in current-conditions widget on `/news` (temperature + short description) — no radar, alerts, or forecast beyond right now, and no push notifications. Location is a city you search for and pick yourself, stored in `localStorage`, never inferred from IP/geolocation. Backed by OpenWeatherMap; the widget simply doesn't render if `OPENWEATHER_API_KEY` isn't set.
 
 **Notifications**
 - Web Push notifications (self-hosted VAPID keys, no third-party push service) when a followed keyword gets new coverage
@@ -65,6 +74,7 @@ A fast, customizable RSS feed reader and news aggregator built with Next.js. Fol
 - **The "no image" placeholder is category-tinted, not one flat image.** `public/images/placeholders/*.png` holds one PNG per category (`getCategoryPlaceholderImage()` in `src/lib/categoryColors.js` picks the right one from an article's category), each produced by tinting a single base glyph with that category's own badge color — a duotone-filter effect, not a separately hand-designed image per category. An article with no category (or one that isn't in `CATEGORY_COLORS`) falls back to `/images/blurimage.png`, tinted the same way with the site's brand color. There's no live generation script kept in the repo for these — they're a one-off output (like the favicon/OG image), regenerate by tinting the same base SVG glyph again if `CATEGORY_COLORS` changes.
 - **A category is not just a frontend string.** It's duplicated across `src/lib/homeSections.js` (`CATEGORY_SECTION_TAGS`), `HeaderNavBar.jsx`/`HomePage.jsx`/`NewNewsPage.jsx`'s own icon/label maps, `src/app/sitemap.js`'s `FREE_CATEGORIES`, `src/lib/categoryColors.js`, a `src/app/category/<slug>/` route folder, every `rss-fetch-app/feeds/*.json` entry tagged with it, and every already-ingested `Article.category` row (plus any `User.preferredCategories`/`homeSections` that reference it). Renaming one (e.g. Health → Lifestyle, 2026-08) means updating all of the above, including a live `UPDATE ... array_replace(category, 'Old', 'New')` against both tables — a name that only changes in the frontend leaves existing rows and any saved user preferences silently orphaned under the old name.
 - **`CATEGORY_COLORS` in `categoryColors.js` has a few keys with no live category page** (currently `Gaming`, `Food`, `Economy`) — leftover from feed sources tagged with them before those categories existed as real site sections, or reserved ahead of a category that hasn't been built yet. `Gaming` in particular already has ~19 real sources flowing into the DB (IGN, Polygon, Kotaku, PC Gamer, etc.) with nowhere to be shown — a real, ready-made next category if one ever gets added, not dead config.
+- **`Article.tier` (`free`/`premium`) is set at ingestion time** from each source's own entry in `rss-fetch-app/feeds/*.json` (an explicit `"tier": "premium"` field, or the default `"free"` when omitted) — it is *not* re-derived or corrected client-side. Changing a source's tier (e.g. deciding CNBC should go premium) means editing its feed-config entry; the change only reaches already-ingested rows once that feed's next fetch cycle re-upserts them (`Article.upsert()` updates all fields on conflict), not retroactively. A bulk `UPDATE "Articles" SET tier = ...` is the only way to apply a tier change to historical rows immediately.
 - **This repo's own scheduled jobs** (`vercel.json`) run on Vercel Cron: `delete-users` (finalizes soft-deleted accounts), `send-digests` (daily/weekly email digest), `send-push-notifications` (followed-keyword alerts).
 - **Vercel's free Hobby plan prohibits commercial/revenue-generating use** — once Stripe billing goes live (it currently runs in sandbox/test mode), this needs to run on a Pro plan or above.
 - **Schema changes are applied manually.** There's no migration tool — after changing a model in `src/lib/models/`, run `npm run db:sync` once (see that script's own comments for why it's not automatic).
@@ -102,6 +112,7 @@ The app runs at `http://localhost:3000`.
 | `CONTACT_EMAIL` | Contact/legal pages, footer | Just a display address |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` / `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Billing | Use Stripe test-mode keys until ready to go live |
 | `FINNHUB_API_KEY` | Market/Finance pages | Free tier: 60 calls/min |
+| `OPENWEATHER_API_KEY` | Local weather widget | Optional — the widget just doesn't render (no error) if unset. Free tier: 1,000 calls/day |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | Push notifications | Self-generated: `npx web-push generate-vapid-keys`. Regenerating invalidates every existing push subscription. |
 | `NEXT_PUBLIC_SENTRY_DSN` | Error monitoring | Leave blank to disable |
 | `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | Sentry source-map upload | Build-time only; build degrades gracefully without them |

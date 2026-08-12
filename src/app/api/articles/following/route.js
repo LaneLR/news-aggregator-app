@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { Op } from "sequelize";
 import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
-import { excludeGatedCategoriesCondition } from "@/lib/subscriberOnlyCategories";
+import { excludeGatedCategoriesCondition, excludePremiumArticlesCondition } from "@/lib/subscriberOnlyCategories";
 import { buildKeywordExclusion } from "@/lib/keywordFilter";
 import { buildKeywordInclusion } from "@/lib/followedKeywords";
 
@@ -30,7 +30,10 @@ export async function GET() {
     const since = new Date(Date.now() - LOOKBACK_DAYS * 24 * 60 * 60 * 1000);
 
     const whereConditions = [keywordInclusion, { publishedAt: { [Op.gte]: since } }];
-    if (!isSubscribed) whereConditions.push(excludeGatedCategoriesCondition());
+    if (!isSubscribed) {
+      whereConditions.push(excludeGatedCategoriesCondition());
+      whereConditions.push(excludePremiumArticlesCondition());
+    }
     const keywordExclusion = buildKeywordExclusion(user?.mutedKeywords);
     if (keywordExclusion) whereConditions.push(keywordExclusion);
 

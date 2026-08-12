@@ -75,11 +75,12 @@ describe("getCategoryArticles", () => {
 
   it("excludes the user's muted keywords from the query when present", async () => {
     db.User.findByPk.mockResolvedValue({ mutedKeywords: ["crypto"] });
-    await getCategoryArticles({ category: "tech", userId: "user-1" });
+    await getCategoryArticles({ category: "tech", userId: "user-1", isSubscribed: true });
 
     const whereArg = db.Article.findAndCountAll.mock.calls[0][0].where;
     const andKey = Object.getOwnPropertySymbols(whereArg)[0];
-    // category condition + keyword-exclusion condition
+    // category condition + keyword-exclusion condition (subscribed, so no
+    // premium-tier exclusion)
     expect(whereArg[andKey].length).toBe(2);
   });
 
@@ -87,5 +88,20 @@ describe("getCategoryArticles", () => {
     await getCategoryArticles({ category: "tech" });
     expect(db.User.findByPk).not.toHaveBeenCalled();
     expect(db.ArticleLike.findAll).not.toHaveBeenCalled();
+  });
+
+  it("excludes premium-tier articles for non-subscribers by default", async () => {
+    await getCategoryArticles({ category: "tech" });
+    const whereArg = db.Article.findAndCountAll.mock.calls[0][0].where;
+    const andKey = Object.getOwnPropertySymbols(whereArg)[0];
+    expect(whereArg[andKey]).toHaveLength(2); // category condition + premium-tier exclusion
+    expect(whereArg[andKey][1].val).toBe(`("tier" = 'free' OR "sourceType" = 'podcast')`);
+  });
+
+  it("does not exclude premium-tier articles when isSubscribed is true", async () => {
+    await getCategoryArticles({ category: "tech", isSubscribed: true });
+    const whereArg = db.Article.findAndCountAll.mock.calls[0][0].where;
+    const andKey = Object.getOwnPropertySymbols(whereArg)[0];
+    expect(whereArg[andKey]).toHaveLength(1); // category condition only
   });
 });

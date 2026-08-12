@@ -41,9 +41,14 @@ export async function getArticleReaderData(id, session) {
   if (!article) return null;
 
   const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
-  const isGated = (article.category || []).some((c) =>
-    SUBSCRIBER_ONLY_CATEGORIES.has(String(c).toLowerCase())
-  );
+  // Fully-gated category (Market/Journal), or a premium-tier source outside
+  // those two (every other category's long tail — see Article.tier).
+  // Podcasts are always free regardless of tier. This is the backstop that
+  // keeps a Free/anonymous viewer from reading a premium article directly
+  // by URL even though the category feed itself never showed it to them.
+  const isGated =
+    (article.category || []).some((c) => SUBSCRIBER_ONLY_CATEGORIES.has(String(c).toLowerCase())) ||
+    (article.tier === "premium" && article.sourceType !== "podcast");
   if (isGated && !isSubscribed) {
     return { gated: true };
   }

@@ -34,10 +34,10 @@ describe("robots", () => {
     );
   });
 
-  it("disallows the subscriber-only category pages", () => {
+  it("does not disallow any category pages — Market/Journal show an indexable teaser now, and Finance/Podcast were never redirect-gated", () => {
     const config = robots();
 
-    expect(config.rules.disallow).toEqual(
+    expect(config.rules.disallow).not.toEqual(
       expect.arrayContaining(["/category/market", "/category/finance", "/category/journal"])
     );
   });

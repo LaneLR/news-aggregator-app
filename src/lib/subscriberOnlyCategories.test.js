@@ -3,6 +3,9 @@ import {
   SUBSCRIBER_ONLY_CATEGORIES,
   GATED_TAGS,
   excludeGatedCategoriesCondition,
+  excludePremiumArticlesCondition,
+  FREE_TIER_SQL,
+  EXCLUDE_GATED_CATEGORIES_SQL,
 } from "./subscriberOnlyCategories";
 
 describe("subscriberOnlyCategories", () => {
@@ -12,10 +15,13 @@ describe("subscriberOnlyCategories", () => {
     );
   });
 
-  it("flags known gated slugs", () => {
+  it("flags only Market and Journal as fully gated", () => {
     expect(SUBSCRIBER_ONLY_CATEGORIES.has("market")).toBe(true);
-    expect(SUBSCRIBER_ONLY_CATEGORIES.has("finance")).toBe(true);
     expect(SUBSCRIBER_ONLY_CATEGORIES.has("journal")).toBe(true);
+  });
+
+  it("does not fully gate Finance — it's partially gated per-source via tier instead", () => {
+    expect(SUBSCRIBER_ONLY_CATEGORIES.has("finance")).toBe(false);
   });
 
   it("does not flag an ungated category", () => {
@@ -40,5 +46,18 @@ describe("subscriberOnlyCategories", () => {
     // contents, since none of the real tags contain a quote.
     const escaped = "O'Brien".replace(/'/g, "''");
     expect(escaped).toBe("O''Brien");
+  });
+
+  it("builds a literal SQL fragment allowing free-tier or podcast rows", () => {
+    const condition = excludePremiumArticlesCondition();
+    expect(condition.val).toBe(`("tier" = 'free' OR "sourceType" = 'podcast')`);
+  });
+
+  it("exposes matching plain-SQL fragments for raw-query callers", () => {
+    expect(FREE_TIER_SQL).toBe(`("tier" = 'free' OR "sourceType" = 'podcast')`);
+    expect(EXCLUDE_GATED_CATEGORIES_SQL).toContain('NOT ("category" &&');
+    for (const tag of GATED_TAGS) {
+      expect(EXCLUDE_GATED_CATEGORIES_SQL).toContain(`'${tag}'`);
+    }
   });
 });

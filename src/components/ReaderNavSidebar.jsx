@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { LayoutGrid, Sparkles, Layers, Search, Bookmark } from "lucide-react";
+import { LayoutGrid, Sparkles, Layers, Search, Bookmark, Lock } from "lucide-react";
 import { CATEGORY_LINKS } from "./HeaderNavBar";
 import styles from "./ReaderNavSidebar.module.scss";
 
@@ -25,7 +25,8 @@ export default function ReaderNavSidebar() {
   const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
 
   const visibleTop = TOP_LINKS.filter((l) => isSubscribed || !l.subscriberOnly);
-  const visibleCategories = CATEGORY_LINKS.filter((l) => isSubscribed || !l.subscriberOnly);
+  // Every category is shown now — Market/Journal get a lock badge instead
+  // of being hidden, matching HeaderNavBar's own CATEGORY_LINKS treatment.
 
   return (
     <nav className={styles.sidebar}>
@@ -44,7 +45,7 @@ export default function ReaderNavSidebar() {
       </ul>
       <div className={styles.sectionLabel}>Categories</div>
       <ul className={styles.linkList}>
-        {visibleCategories.map(({ label, href, Icon }) => (
+        {CATEGORY_LINKS.map(({ label, href, Icon, gated }) => (
           <li key={href}>
             <Link
               href={href}
@@ -52,6 +53,9 @@ export default function ReaderNavSidebar() {
             >
               <Icon size={16} strokeWidth={2} />
               {label}
+              {gated && !isSubscribed && (
+                <Lock size={11} strokeWidth={2.5} className={styles.lockIcon} aria-label="Subscribers only" />
+              )}
             </Link>
           </li>
         ))}

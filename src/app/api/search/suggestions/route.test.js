@@ -44,14 +44,15 @@ describe("GET /api/search/suggestions", () => {
     expect(body.suggestions).toHaveLength(1);
   });
 
-  it("restricts non-subscribers to sourceType 'news'", async () => {
+  it("restricts non-subscribers to free-tier/podcast results outside Market/Journal", async () => {
     mockAuth.mockResolvedValue(makeSession({ tier: "Free" }));
     db.sequelize.query.mockResolvedValue([]);
 
     await GET(makeRequest("query=market"));
 
     const sql = db.sequelize.query.mock.calls[0][0];
-    expect(sql).toContain(`"sourceType" = 'news'`);
+    expect(sql).toContain(`"tier" = 'free' OR "sourceType" = 'podcast'`);
+    expect(sql).toContain(`NOT ("category" &&`);
   });
 
   it("returns an empty list (with 500) on an unexpected error", async () => {

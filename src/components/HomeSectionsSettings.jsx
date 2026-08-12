@@ -39,7 +39,7 @@ export default function HomeSectionsSettings({ initialSections, isSubscribed }) 
     key: categoryTag(link.href),
     label: link.label,
     Icon: link.Icon,
-    locked: !!link.subscriberOnly && !isSubscribed,
+    locked: !!link.gated && !isSubscribed,
   }));
 
   const persist = async (next) => {

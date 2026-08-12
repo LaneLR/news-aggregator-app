@@ -1,5 +1,6 @@
 import initializeDbAndModels from "@/lib/db";
 import { QueryTypes } from "sequelize";
+import { FREE_TIER_SQL, EXCLUDE_GATED_CATEGORIES_SQL } from "@/lib/subscriberOnlyCategories";
 
 export async function GET(req) {
   const { sequelize } = await initializeDbAndModels();
@@ -25,10 +26,12 @@ export async function GET(req) {
       whereParts.push(`"category"::text ILIKE :category`);
     }
 
-    // Only "news" articles here — Market/Finance/Journal content is
-    // subscriber-only and this endpoint has no auth check, so it must never
-    // include gated sourceTypes.
-    whereParts.push(`"sourceType" = 'news'`);
+    // This endpoint has no auth check at all, so it must always apply the
+    // same restriction an anonymous visitor gets everywhere else: free-tier
+    // (or podcast) sources only, and nothing from the fully-gated
+    // Market/Journal categories. See subscriberOnlyCategories.js.
+    whereParts.push(FREE_TIER_SQL);
+    whereParts.push(EXCLUDE_GATED_CATEGORIES_SQL);
 
     const whereClauseSQL = `WHERE ${whereParts.join(" AND ")}`;
 

@@ -18,6 +18,7 @@ export const CATEGORY_SECTION_TAGS = [
   "Journal",
   "Market",
   "Finance",
+  "Podcast",
 ];
 
 export const HERO_SECTION_KEYS = ["forYou", "topStories"];
