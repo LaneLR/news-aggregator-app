@@ -55,6 +55,19 @@
   }
 }
 
+.footerLink {
+  margin: 0.55rem 0 0;
+  font-size: 0.8rem;
+  color: var(--theme-tip-text);
+  opacity: 0.85;
+
+  a {
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+}
+
 .closeButton {
   flex-shrink: 0;
   display: flex;

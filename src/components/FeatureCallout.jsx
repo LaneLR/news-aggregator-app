@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Sparkles, X } from "lucide-react";
 import styles from "./FeatureCallout.module.scss";
 
@@ -41,6 +42,10 @@ export default function FeatureCallout() {
           </li>
           <li>Drag the category tabs and header icons to reorder them however you like.</li>
         </ul>
+        <p className={styles.footerLink}>
+          Once you dismiss this, it's gone for good on this device — rebind shortcuts or revisit
+          other preferences anytime in <Link href="/settings">Settings</Link>.
+        </p>
       </div>
       <button type="button" className={styles.closeButton} onClick={dismiss} aria-label="Dismiss this tip">
         <X size={16} strokeWidth={2.5} />
