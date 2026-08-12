@@ -19,7 +19,7 @@ export const revalidate = 3600;
 const FREE_CATEGORIES = [
   "business",
   "entertainment",
-  "health",
+  "lifestyle",
   "politics",
   "science",
   "sports",

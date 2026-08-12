@@ -9,7 +9,7 @@ export const CATEGORY_SECTION_TAGS = [
   "Tech",
   "Science",
   "Sports",
-  "Health",
+  "Lifestyle",
   "Entertainment",
   "Politics",
   "World",

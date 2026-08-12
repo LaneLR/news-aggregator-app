@@ -65,8 +65,8 @@ describe("HeaderNavBar", () => {
     render(<HeaderNavBar />);
     // Business/Tech/Science/Sports are `primary: true` and free — visible directly.
     expect(screen.getByText("Business").closest("a")).toHaveAttribute("href", "/category/business");
-    // Health is not `primary` — lives behind "More" instead.
-    expect(screen.queryByText("Health")).not.toBeInTheDocument();
+    // Lifestyle is not `primary` — lives behind "More" instead.
+    expect(screen.queryByText("Lifestyle")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /more/i })).toBeInTheDocument();
   });
 
@@ -84,10 +84,10 @@ describe("HeaderNavBar", () => {
     render(<HeaderNavBar />);
 
     await user.click(screen.getByRole("button", { name: /more/i }));
-    expect(screen.getByText("Health").closest("a")).toHaveAttribute("href", "/category/health");
+    expect(screen.getByText("Lifestyle").closest("a")).toHaveAttribute("href", "/category/lifestyle");
 
     await user.click(document.body);
-    await waitFor(() => expect(screen.queryByText("Health")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText("Lifestyle")).not.toBeInTheDocument());
   });
 
   it("closes the More menu when a menu item is clicked", async () => {
@@ -97,9 +97,9 @@ describe("HeaderNavBar", () => {
     render(<HeaderNavBar />);
 
     await user.click(screen.getByRole("button", { name: /more/i }));
-    await user.click(screen.getByText("Health"));
+    await user.click(screen.getByText("Lifestyle"));
 
-    await waitFor(() => expect(screen.queryByText("Health")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText("Lifestyle")).not.toBeInTheDocument());
   });
 
   it("closes the More menu on window resize and on scroll", async () => {
@@ -109,26 +109,26 @@ describe("HeaderNavBar", () => {
     render(<HeaderNavBar />);
 
     await user.click(screen.getByRole("button", { name: /more/i }));
-    expect(screen.getByText("Health")).toBeInTheDocument();
+    expect(screen.getByText("Lifestyle")).toBeInTheDocument();
     fireEvent(window, new Event("resize"));
-    await waitFor(() => expect(screen.queryByText("Health")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText("Lifestyle")).not.toBeInTheDocument());
 
     await user.click(screen.getByRole("button", { name: /more/i }));
-    expect(screen.getByText("Health")).toBeInTheDocument();
+    expect(screen.getByText("Lifestyle")).toBeInTheDocument();
     fireEvent(window, new Event("scroll"));
-    await waitFor(() => expect(screen.queryByText("Health")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText("Lifestyle")).not.toBeInTheDocument());
   });
 
   it("shows unread-count badges on personal links, primary categories, and the More button", () => {
     mockSession = makeSession({ tier: "Subscribed" });
     mockPathname = "/news";
-    unreadCounts.value = { categories: { business: 3, health: 150 }, feeds: 7, following: 2 };
+    unreadCounts.value = { categories: { business: 3, lifestyle: 150 }, feeds: 7, following: 2 };
     render(<HeaderNavBar />);
 
     expect(screen.getByText("Following").closest("a")).toHaveTextContent("2");
     expect(screen.getByText("My Feeds").closest("a")).toHaveTextContent("7");
     expect(screen.getByText("Business").closest("a")).toHaveTextContent("3");
-    // Health (150, capped display) is in the overflow "More" menu — its
+    // Lifestyle (150, capped display) is in the overflow "More" menu — its
     // count rolls up into the More button's own badge, capped at "99+".
     expect(screen.getByRole("button", { name: /more/i })).toHaveTextContent("99+");
   });

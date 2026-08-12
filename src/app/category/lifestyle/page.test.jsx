@@ -13,21 +13,21 @@ vi.mock("@/lib/categoryArticles", () => ({
   getCategoryArticles: (...args) => mockGetCategoryArticles(...args),
 }));
 
-const { default: HealthNewsPage, metadata } = await import("./page");
+const { default: LifestyleNewsPage, metadata } = await import("./page");
 
-describe("HealthNewsPage", () => {
-  it("passes the Health category to CategoryPage and queries the health category key", async () => {
-    const element = await HealthNewsPage();
+describe("LifestyleNewsPage", () => {
+  it("passes the Lifestyle category to CategoryPage and queries the lifestyle category key", async () => {
+    const element = await LifestyleNewsPage();
     render(element);
 
     expect(mockGetCategoryArticles).toHaveBeenCalledWith(
-      expect.objectContaining({ category: "health" })
+      expect.objectContaining({ category: "lifestyle" })
     );
     const props = JSON.parse(screen.getByTestId("category-page").textContent);
-    expect(props.category).toBe("Health");
+    expect(props.category).toBe("Lifestyle");
   });
 
   it("exports page metadata", () => {
-    expect(metadata.title).toBe("Health News");
+    expect(metadata.title).toBe("Lifestyle News");
   });
 });
