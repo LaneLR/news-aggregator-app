@@ -4,9 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { Bookmark } from "lucide-react";
 import initializeDbAndModels from "@/lib/db";
+import { getCategoryPlaceholderImage } from "@/lib/categoryColors";
 import styles from "./page.module.scss";
 
-const FALLBACK_IMAGE_URL = "/images/blurimage.png";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 // Shared by generateMetadata and the page component so a single request
@@ -86,7 +86,9 @@ export default async function SharedArchivePage({ params }) {
                     src={
                       article.urlToImage
                         ? `/api/image-proxy?url=${encodeURIComponent(article.urlToImage)}`
-                        : FALLBACK_IMAGE_URL
+                        : getCategoryPlaceholderImage(
+                            Array.isArray(article.category) ? article.category[0] : null
+                          )
                     }
                     alt=""
                     fill

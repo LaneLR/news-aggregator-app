@@ -9,7 +9,7 @@ import ShareButton from "./ShareButton";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
-import { getCategoryColor } from "@/lib/categoryColors";
+import { getCategoryColor, getCategoryPlaceholderImage } from "@/lib/categoryColors";
 import { timeAgo } from "@/lib/timeAgo";
 import { useToast } from "./ToastProvider";
 import styles from "./CarouselArticleCard.module.scss";
@@ -22,7 +22,8 @@ export default function CarouselCard({ article, archiveId }) {
   const [isLiked, setIsLiked] = useState(article.isLikedByUser || false);
   const [likeCount, setLikeCount] = useState(article.likeCount || 0);
 
-  const FALLBACK_IMAGE_URL = "/images/blurimage.png";
+  const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
+  const FALLBACK_IMAGE_URL = getCategoryPlaceholderImage(badgeCategory);
   const proxiedImageUrl = article.urlToImage
     ? `/api/image-proxy?url=${encodeURIComponent(article.urlToImage)}`
     : FALLBACK_IMAGE_URL;
@@ -57,7 +58,6 @@ export default function CarouselCard({ article, archiveId }) {
   const cleanSourceName =
     article.sourceName || article.source?.name || "Unknown";
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
-  const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
 
   return (
     <div className={`${styles.cardWrapper} ${article.isRead ? styles.read : ""}`}>

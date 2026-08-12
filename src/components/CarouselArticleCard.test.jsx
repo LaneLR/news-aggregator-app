@@ -95,4 +95,12 @@ describe("CarouselArticleCard", () => {
     render(<CarouselCard article={article} />);
     expect(screen.getByTitle("This source could be behind a paywall.")).toBeInTheDocument();
   });
+
+  it("uses the matching category placeholder when the article has no image", () => {
+    const article = makeArticle({ urlToImage: null, category: ["Entertainment"], title: "No Image Article" });
+    render(<CarouselCard article={article} />);
+
+    const img = screen.getByAltText("No Image Article");
+    expect(img.src).toContain(encodeURIComponent("/images/placeholders/entertainment.png"));
+  });
 });

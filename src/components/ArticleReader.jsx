@@ -74,11 +74,6 @@ export default function ArticleReader({
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
   const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
 
-  const FALLBACK_IMAGE_URL = "/images/blurimage.png";
-  const proxiedImageUrl = article.urlToImage
-    ? `/api/image-proxy?url=${encodeURIComponent(article.urlToImage)}`
-    : FALLBACK_IMAGE_URL;
-
   const handleLike = async () => {
     if (!session) {
       toast.info("Sign in to like articles.");
@@ -176,7 +171,7 @@ export default function ArticleReader({
         {article.urlToImage && (
           <div className={styles.heroImage}>
             <Image
-              src={proxiedImageUrl}
+              src={`/api/image-proxy?url=${encodeURIComponent(article.urlToImage)}`}
               alt={article.title}
               fill
               sizes="(max-width: 768px) 100vw, 720px"

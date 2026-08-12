@@ -54,13 +54,17 @@ const roboto = localFont({
   variable: "--font-roboto",
 });
 
-// Editorial serif used selectively for article titles and section
-// headings (via the `.headline` utility class) — sans-serif everywhere
-// else for UI chrome. This pairing is what most polished news/reader
-// products (and print-derived publications generally) use to read as
-// "a publication" rather than "a generic app."
+// Site-wide UI typeface (globals.scss sets this as the body default) as
+// well as the editorial face for article titles/section headings (the
+// `.headline` utility class) — one serif throughout rather than pairing a
+// separate sans for chrome, for a more distinct, "designed" feel than
+// Roboto gave every piece of UI text. Roboto is still self-hosted (below)
+// for the article-reader font-preference toggle, which offers it as the
+// alternate/"default" reading option — see readerPrefs.js.
 const lora = localFont({
   src: [
+    { path: "./fonts/Lora-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/Lora-Italic.woff2", weight: "400", style: "italic" },
     { path: "./fonts/Lora-Medium.woff2", weight: "500", style: "normal" },
     { path: "./fonts/Lora-SemiBold.woff2", weight: "600", style: "normal" },
     { path: "./fonts/Lora-Bold.woff2", weight: "700", style: "normal" },

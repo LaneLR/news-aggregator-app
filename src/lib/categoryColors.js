@@ -34,3 +34,16 @@ const DEFAULT_COLOR = "#334155";
 export function getCategoryColor(category) {
   return CATEGORY_COLORS[category] || DEFAULT_COLOR;
 }
+
+const DEFAULT_PLACEHOLDER_IMAGE = "/images/blurimage.png";
+
+// "No image available" state for articles a source never gave a photo for
+// (see public/images/placeholders/ — one PNG per category here, generated
+// by tinting a single base glyph with that category's own color, same idea
+// as a duotone photo filter, not a separate hand-made image per category).
+// Falls back to the generic brand-colored default for an article with no
+// category, or a category string that isn't one of the keys above.
+export function getCategoryPlaceholderImage(category) {
+  if (!category || !(category in CATEGORY_COLORS)) return DEFAULT_PLACEHOLDER_IMAGE;
+  return `/images/placeholders/${category.toLowerCase()}.png`;
+}

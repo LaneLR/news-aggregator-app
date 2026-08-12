@@ -35,8 +35,8 @@ export default function AuthLayout({ activeTab, children }) {
             />
           </div>
           <div className={styles.logoText}>
-            <span>mocha</span>
-            <span>reads</span>
+            <span>Mocha</span>
+            <span>Reads</span>
           </div>
         </Link>
 
