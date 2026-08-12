@@ -83,6 +83,29 @@ describe("CategoryPage", () => {
     markAllRead.value = { hasUnread: false, markingAllRead: false, handleMarkAllRead: vi.fn() };
   });
 
+  it("shows the free-tier upsell nudge for a non-subscriber on a partially-gated category", () => {
+    mockFetchRoutes([[/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })]]);
+    render(<CategoryPage category="business" initialArticles={[]} initialTotalPages={1} />);
+
+    expect(screen.getByText(/curated free selection of Business sources/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Subscribe" })).toHaveAttribute("href", "/pricing");
+  });
+
+  it("does not show the upsell nudge for a subscribed user", () => {
+    mockSession.value = { user: { id: "user-1", tier: "Subscribed" } };
+    mockFetchRoutes([[/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })]]);
+    render(<CategoryPage category="business" initialArticles={[]} initialTotalPages={1} />);
+
+    expect(screen.queryByText(/curated free selection/i)).not.toBeInTheDocument();
+  });
+
+  it("does not show the upsell nudge on the Podcast category — it's fully free", () => {
+    mockFetchRoutes([[/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })]]);
+    render(<CategoryPage category="Podcast" initialArticles={[]} initialTotalPages={1} />);
+
+    expect(screen.queryByText(/curated free selection/i)).not.toBeInTheDocument();
+  });
+
   it("renders SSR-provided initial articles without an extra loading state", () => {
     mockFetchRoutes([[/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })]]);
     const initialArticles = [makeArticle({ title: "SSR Story" })];

@@ -53,11 +53,43 @@ describe("HeaderNavBar", () => {
     expect(screen.getByText("My Feeds").closest("a")).toHaveAttribute("href", "/feeds");
   });
 
-  it("hides subscriber-only categories (Market, Journals, Finance) for a free user", () => {
+  it("always shows Market/Journal/Finance, with a lock badge on Market/Journal for a free user", () => {
     mockSession = makeSession({ tier: "Free" });
     render(<HeaderNavBar />);
-    expect(screen.queryByText("Market")).not.toBeInTheDocument();
-    expect(screen.queryByText("Journals")).not.toBeInTheDocument();
+    expect(screen.getByText("Market").closest("a")).toHaveAttribute("href", "/category/market");
+    expect(screen.getByText("Journals").closest("a")).toHaveAttribute("href", "/category/journal");
+    expect(screen.getByText("Market").closest("a").querySelector('[aria-label="Subscribers only"]')).toBeInTheDocument();
+    expect(screen.getByText("Journals").closest("a").querySelector('[aria-label="Subscribers only"]')).toBeInTheDocument();
+  });
+
+  it("does not show a lock badge on Market/Journal for a subscribed user", () => {
+    mockSession = makeSession({ tier: "Subscribed" });
+    render(<HeaderNavBar />);
+    expect(screen.getByText("Market").closest("a").querySelector('[aria-label="Subscribers only"]')).not.toBeInTheDocument();
+  });
+
+  it("shows Finance in the 'More' menu without a lock badge — it's not fully gated", async () => {
+    const user = userEvent.setup();
+    mockSession = makeSession({ tier: "Free" });
+    mockPathname = "/news";
+    render(<HeaderNavBar />);
+
+    await user.click(screen.getByRole("button", { name: /more/i }));
+
+    expect(screen.getByText("Finance").closest("a")).toHaveAttribute("href", "/category/finance");
+    expect(screen.getByText("Finance").closest("a").querySelector('[aria-label="Subscribers only"]')).not.toBeInTheDocument();
+  });
+
+  it("shows Podcasts as a normal, unlocked category", async () => {
+    const user = userEvent.setup();
+    mockSession = makeSession({ tier: "Free" });
+    mockPathname = "/news";
+    render(<HeaderNavBar />);
+
+    await user.click(screen.getByRole("button", { name: /more/i }));
+
+    expect(screen.getByText("Podcasts").closest("a")).toHaveAttribute("href", "/category/podcast");
+    expect(screen.getByText("Podcasts").closest("a").querySelector('[aria-label="Subscribers only"]')).not.toBeInTheDocument();
   });
 
   it("shows primary categories directly and puts overflow behind a 'More' button", () => {
@@ -147,8 +179,12 @@ describe("HeaderNavBar", () => {
     fireEvent.drop(second, { dataTransfer: {} });
     fireEvent.dragEnd(first);
 
+    // Market/Journal are primary too now (always visible, just locked for
+    // free users — see the lock-badge tests above), so Business/Tech aren't
+    // necessarily first in the primary list any more; assert their relative
+    // order instead of an absolute index.
     const saved = JSON.parse(localStorage.getItem("morningfeeds:categoryOrder"));
-    expect(saved[0]).toBe("/category/tech");
+    expect(saved.indexOf("/category/tech")).toBeLessThan(saved.indexOf("/category/business"));
   });
 
   it("does not make primary categories draggable for a signed-out user", () => {

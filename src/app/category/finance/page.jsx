@@ -1,28 +1,26 @@
 import CategoryPageComponent from "@/components/CategoryPage";
 import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { getCategoryArticles } from "@/lib/categoryArticles";
 
-// Subscriber-only — redirects anonymous/Free visitors to /pricing, so a
-// crawler never sees real content here (also disallowed in robots.js).
+// Finance is no longer fully subscriber-only — it shows a curated free
+// selection of sources to everyone, with the rest gated per-article via
+// Article.tier (see src/lib/subscriberOnlyCategories.js). Market and
+// Journal are the only two categories still fully locked.
 export const metadata = {
   title: "Finance News",
-  robots: { index: false, follow: false },
+  description: "Personal finance, markets, and money news from a curated set of sources.",
 };
 
 export default async function FinanceNewsPage() {
   const session = await auth();
-  const isNotSubscribed = session?.user?.tier === "Free" || !session;
-  if (isNotSubscribed) {
-    return redirect("/pricing");
-  }
-
+  const isSubscribed = !!(session?.user?.tier && session.user.tier !== "Free");
   let initialArticles;
   let initialTotalPages;
   try {
     ({ articles: initialArticles, totalPages: initialTotalPages } = await getCategoryArticles({
       category: "finance",
-      userId: session.user.id,
+      userId: session?.user?.id,
+      isSubscribed,
     }));
   } catch (err) {
     console.error("Failed to load initial Finance articles:", err);

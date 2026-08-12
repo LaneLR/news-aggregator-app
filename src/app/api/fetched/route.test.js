@@ -17,7 +17,7 @@ describe("GET /api/fetched", () => {
     db.sequelize.query.mockReset();
   });
 
-  it("returns matching news-only articles for a bare query", async () => {
+  it("returns matching free-tier articles for a bare query", async () => {
     db.sequelize.query.mockResolvedValue([{ id: 1, title: "Match", sourceType: "news" }]);
 
     const res = await GET(makeRequest("http://localhost/api/fetched?q=nvidia"));
@@ -26,7 +26,8 @@ describe("GET /api/fetched", () => {
     expect(res.status).toBe(200);
     expect(body.articles).toHaveLength(1);
     const sql = db.sequelize.query.mock.calls[0][0];
-    expect(sql).toContain(`"sourceType" = 'news'`);
+    expect(sql).toContain(`"tier" = 'free' OR "sourceType" = 'podcast'`);
+    expect(sql).toContain(`NOT ("category" &&`);
   });
 
   it("applies a category filter when provided", async () => {

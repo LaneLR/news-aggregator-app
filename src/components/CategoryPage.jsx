@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Newspaper, RefreshCw, ListChecks, X } from "lucide-react";
+import Link from "next/link";
+import { Newspaper, RefreshCw, ListChecks, X, Sparkles } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 import ThreePaneLayout from "./ThreePaneLayout";
@@ -283,6 +284,14 @@ export default function CategoryPage({
           </div>
         )}
       </div>
+
+      {!isSubscribed && categoryNameForDisplay !== "Podcast" && (
+        <p className={styles.upsellNudge}>
+          <Sparkles size={14} strokeWidth={2} />
+          You&apos;re seeing a curated free selection of {categoryNameForDisplay} sources.{" "}
+          <Link href="/pricing">Subscribe</Link> to unlock every source in this category.
+        </p>
+      )}
 
       {category === "Market" && (
         <>

@@ -22,6 +22,7 @@ Object.assign(process.env, {
   STRIPE_SECRET_KEY: "sk_test_dummy",
   STRIPE_WEBHOOK_SECRET: "whsec_test_dummy",
   FINNHUB_API_KEY: "test-finnhub-key",
+  OPENWEATHER_API_KEY: "test-openweather-key",
   NEXT_PUBLIC_VAPID_PUBLIC_KEY: "test-vapid-public",
   VAPID_PRIVATE_KEY: "test-vapid-private",
 });

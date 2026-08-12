@@ -27,6 +27,8 @@ import {
   CloudSun,
   ChevronDown,
   Rss,
+  Mic,
+  Lock,
 } from "lucide-react";
 import styles from "./HeaderNavBar.module.scss";
 
@@ -43,9 +45,17 @@ export const PERSONAL_LINKS = [
 // `primary` links stay visible in the bar; the rest live behind "More" so
 // the bar doesn't turn into an ever-scrolling wall of 15 pills. Exported so
 // the onboarding flow can reuse the same category/icon list.
+//
+// Every category link is always shown to everyone now — Market and Journal
+// are the only two still fully locked for Free/anonymous visitors (`gated:
+// true`), but clicking them now lands on an in-app teaser/upsell page
+// instead of a silent redirect, so the nav needs to actually surface them
+// rather than hide them. Every other category (including Finance) shows a
+// curated free selection of sources to non-subscribers and the rest gated
+// per-source — see src/lib/subscriberOnlyCategories.js.
 export const CATEGORY_LINKS = [
-  { label: "Journals", href: "/category/journal", Icon: BookOpen, subscriberOnly: true, primary: true },
-  { label: "Market", href: "/category/market", Icon: LineChart, subscriberOnly: true, primary: true },
+  { label: "Journals", href: "/category/journal", Icon: BookOpen, gated: true, primary: true },
+  { label: "Market", href: "/category/market", Icon: LineChart, gated: true, primary: true },
   { label: "Business", href: "/category/business", Icon: Briefcase, primary: true },
   { label: "Tech", href: "/category/tech", Icon: Cpu, primary: true },
   { label: "Science", href: "/category/science", Icon: FlaskConical, primary: true },
@@ -55,7 +65,8 @@ export const CATEGORY_LINKS = [
   { label: "Politics", href: "/category/politics", Icon: Landmark },
   { label: "World", href: "/category/world", Icon: Globe },
   { label: "US", href: "/category/us", Icon: Flag },
-  { label: "Finance", href: "/category/finance", Icon: DollarSign, subscriberOnly: true },
+  { label: "Finance", href: "/category/finance", Icon: DollarSign },
+  { label: "Podcasts", href: "/category/podcast", Icon: Mic },
   { label: "Weather", href: "/category/weather", Icon: CloudSun },
 ];
 
@@ -68,7 +79,7 @@ const slugFromHref = (href) => href.split("/").pop();
 // Defined outside the component (rather than as a closure inside
 // HeaderNavBar) so it isn't redefined — and every <NavLink> forcibly
 // remounted — on every single render.
-const NavLink = ({ label, href, Icon, dragProps, dragState, pathname, count }) => (
+const NavLink = ({ label, href, Icon, dragProps, dragState, pathname, count, locked }) => (
   <Link
     href={href}
     className={`${styles.link} ${pathname === href ? styles.active : ""} ${
@@ -80,6 +91,7 @@ const NavLink = ({ label, href, Icon, dragProps, dragState, pathname, count }) =
   >
     <Icon size={15} strokeWidth={2.25} />
     {label}
+    {locked && <Lock size={11} strokeWidth={2.5} className={styles.lockIcon} aria-label="Subscribers only" />}
     {count > 0 && <span className={styles.badge}>{count > 99 ? "99+" : count}</span>}
   </Link>
 );
@@ -138,11 +150,10 @@ export default function HeaderNavBar() {
   const [categoryOrder, setCategoryOrder] = useLocalOrder("morningfeeds:categoryOrder");
   const canReorder = !!session?.user?.id;
 
-  const visibleCategories = CATEGORY_LINKS.filter(
-    (link) => isSubscribed || !link.subscriberOnly
-  );
-  const primaryCategoriesDefault = visibleCategories.filter((link) => link.primary);
-  const moreCategories = visibleCategories.filter((link) => !link.primary);
+  // Every category is always visible — Market/Journal show a lock badge
+  // instead of being hidden (see CATEGORY_LINKS above).
+  const primaryCategoriesDefault = CATEGORY_LINKS.filter((link) => link.primary);
+  const moreCategories = CATEGORY_LINKS.filter((link) => !link.primary);
 
   const primaryCategories = canReorder
     ? applyCustomOrder(primaryCategoriesDefault, categoryOrder, (l) => l.href)
@@ -186,6 +197,7 @@ export default function HeaderNavBar() {
           count={unreadCounts.categories[slugFromHref(link.href)]}
           dragProps={canReorder ? getHandlers(i) : undefined}
           dragState={draggedIndex === i ? "dragging" : dragOverIndex === i ? "dragOver" : undefined}
+          locked={link.gated && !isSubscribed}
         />
       ))}
       {moreCategories.length > 0 && (
@@ -209,7 +221,7 @@ export default function HeaderNavBar() {
                 className={styles.moreMenu}
                 style={{ top: menuPosition.top, right: menuPosition.right }}
               >
-                {moreCategories.map(({ label, href, Icon }) => {
+                {moreCategories.map(({ label, href, Icon, gated }) => {
                   const count = unreadCounts.categories[slugFromHref(href)];
                   return (
                     <li key={href}>
@@ -220,6 +232,9 @@ export default function HeaderNavBar() {
                       >
                         <Icon size={16} strokeWidth={2} />
                         {label}
+                        {gated && !isSubscribed && (
+                          <Lock size={11} strokeWidth={2.5} className={styles.lockIcon} aria-label="Subscribers only" />
+                        )}
                         {count > 0 && <span className={styles.badge}>{count > 99 ? "99+" : count}</span>}
                       </Link>
                     </li>

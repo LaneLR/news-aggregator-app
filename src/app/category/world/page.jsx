@@ -9,12 +9,14 @@ export const metadata = {
 
 export default async function WorldNewsPage() {
   const session = await auth();
+  const isSubscribed = !!(session?.user?.tier && session.user.tier !== "Free");
   let initialArticles;
   let initialTotalPages;
   try {
     ({ articles: initialArticles, totalPages: initialTotalPages } = await getCategoryArticles({
       category: "world",
       userId: session?.user?.id,
+      isSubscribed,
     }));
   } catch (err) {
     console.error("Failed to load initial World articles:", err);

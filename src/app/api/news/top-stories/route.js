@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { Op } from "sequelize";
 import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
-import { excludeGatedCategoriesCondition } from "@/lib/subscriberOnlyCategories";
+import { excludeGatedCategoriesCondition, excludePremiumArticlesCondition } from "@/lib/subscriberOnlyCategories";
 import { clusterArticles } from "@/lib/storyClustering";
 
 const WINDOW_HOURS = 48;
@@ -18,7 +18,10 @@ export async function GET() {
     const since = new Date(Date.now() - WINDOW_HOURS * 60 * 60 * 1000);
 
     const conditions = [{ publishedAt: { [Op.gte]: since } }];
-    if (!isSubscribed) conditions.push(excludeGatedCategoriesCondition());
+    if (!isSubscribed) {
+      conditions.push(excludeGatedCategoriesCondition());
+      conditions.push(excludePremiumArticlesCondition());
+    }
 
     const articles = await Article.findAll({
       where: { [Op.and]: conditions },

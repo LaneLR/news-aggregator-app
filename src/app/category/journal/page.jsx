@@ -1,20 +1,23 @@
 import CategoryPageComponent from "@/components/CategoryPage";
+import GatedCategoryTeaser from "@/components/GatedCategoryTeaser";
 import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { getCategoryArticles } from "@/lib/categoryArticles";
 
-// Subscriber-only — redirects anonymous/Free visitors to /pricing, so a
-// crawler never sees real content here (also disallowed in robots.js).
+// Fully subscriber-only — Free/anonymous visitors get an upsell teaser
+// instead of the real article list, not a redirect, so the nav entry and
+// this page can stay genuinely reachable (see HeaderNavBar's `gated` flag)
+// rather than bouncing people to /pricing with no context.
 export const metadata = {
   title: "Journals",
-  robots: { index: false, follow: false },
+  description: "Peer-reviewed research and long-form analysis — for Subscribers.",
 };
 
 export default async function JournalNewsPage() {
   const session = await auth();
-  const isNotSubscribed = session?.user?.tier === "Free" || !session;
-  if (isNotSubscribed) {
-    return redirect("/pricing");
+  const isSubscribed = !!(session?.user?.tier && session.user.tier !== "Free");
+
+  if (!isSubscribed) {
+    return <GatedCategoryTeaser category="Journal" />;
   }
 
   let initialArticles;
@@ -23,6 +26,7 @@ export default async function JournalNewsPage() {
     ({ articles: initialArticles, totalPages: initialTotalPages } = await getCategoryArticles({
       category: "journal",
       userId: session.user.id,
+      isSubscribed,
     }));
   } catch (err) {
     console.error("Failed to load initial Journal articles:", err);

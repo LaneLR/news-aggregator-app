@@ -1,6 +1,7 @@
 import initializeDbAndModels from "@/lib/db";
 import { QueryTypes } from "sequelize";
 import { auth } from "@/lib/auth";
+import { FREE_TIER_SQL, EXCLUDE_GATED_CATEGORIES_SQL } from "@/lib/subscriberOnlyCategories";
 
 // Deliberately separate from /api/search: this fires on nearly every
 // keystroke, so it skips the muted-keyword/like/read joins that route does
@@ -22,7 +23,8 @@ export async function GET(req) {
     const replacements = { query: `%${query}%`, limit: 6 };
 
     if (!isSubscribed) {
-      whereParts.push(`"sourceType" = 'news'`);
+      whereParts.push(FREE_TIER_SQL);
+      whereParts.push(EXCLUDE_GATED_CATEGORIES_SQL);
     }
 
     const rows = await sequelize.query(

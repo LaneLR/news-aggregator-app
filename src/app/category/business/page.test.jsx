@@ -33,6 +33,7 @@ describe("BusinessNewsPage", () => {
     expect(mockGetCategoryArticles).toHaveBeenCalledWith({
       category: "business",
       userId: "user-1",
+      isSubscribed: false,
     });
 
     const props = JSON.parse(screen.getByTestId("category-page").textContent);
@@ -51,6 +52,21 @@ describe("BusinessNewsPage", () => {
     expect(mockGetCategoryArticles).toHaveBeenCalledWith({
       category: "business",
       userId: undefined,
+      isSubscribed: false,
+    });
+  });
+
+  it("passes isSubscribed: true for a Subscribed session", async () => {
+    mockAuth.mockResolvedValue(makeSession({ id: "user-1", tier: "Subscribed" }));
+    mockGetCategoryArticles.mockResolvedValue({ articles: [], totalPages: 1 });
+
+    const element = await BusinessNewsPage();
+    render(element);
+
+    expect(mockGetCategoryArticles).toHaveBeenCalledWith({
+      category: "business",
+      userId: "user-1",
+      isSubscribed: true,
     });
   });
 

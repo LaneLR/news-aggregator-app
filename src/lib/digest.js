@@ -1,10 +1,12 @@
 import { Op } from "sequelize";
-import { excludeGatedCategoriesCondition } from "./subscriberOnlyCategories";
+import { excludeGatedCategoriesCondition, excludePremiumArticlesCondition } from "./subscriberOnlyCategories";
 import { buildKeywordExclusion } from "./keywordFilter";
 import { buildKeywordInclusion } from "./followedKeywords";
 
 function visibilityCondition(isSubscribed, mutedKeywords) {
-  const conditions = isSubscribed ? [] : [excludeGatedCategoriesCondition()];
+  const conditions = isSubscribed
+    ? []
+    : [excludeGatedCategoriesCondition(), excludePremiumArticlesCondition()];
 
   const keywordExclusion = buildKeywordExclusion(mutedKeywords);
   if (keywordExclusion) conditions.push(keywordExclusion);

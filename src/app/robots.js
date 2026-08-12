@@ -21,11 +21,11 @@ export default function robots() {
         "/forgot-password",
         "/news",
         "/search",
-        // Subscriber-only category pages redirect anonymous/Free visitors to
-        // /pricing, same as /news — a crawler never sees real content here.
-        "/category/market",
-        "/category/finance",
-        "/category/journal",
+        // Market/Journal show a real upsell teaser page to anonymous/Free
+        // visitors now (see GatedCategoryTeaser), not a redirect, so they're
+        // legitimately crawlable/indexable — same treatment as /pricing.
+        // Finance is no longer fully gated at all (see
+        // subscriberOnlyCategories.js), so it isn't listed here either.
       ],
     },
     sitemap: `${BASE_URL}/sitemap.xml`,

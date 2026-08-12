@@ -32,7 +32,8 @@ describe("getTrendingArticles", () => {
     await getTrendingArticles(Article, { isSubscribed: false, mutedKeywords: [] });
     const whereArg = Article.findAll.mock.calls[0][0].where;
     const andKey = Object.getOwnPropertySymbols(whereArg)[0];
-    expect(whereArg[andKey].length).toBe(3); // date, clickCount, gating literal
+    // date, clickCount, gated-category literal, premium-tier literal
+    expect(whereArg[andKey].length).toBe(4);
   });
 });
 

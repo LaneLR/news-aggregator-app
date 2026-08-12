@@ -9,11 +9,6 @@ vi.mock("@/components/CategoryPage", () => ({
 const mockAuth = vi.fn();
 vi.mock("@/lib/auth", () => ({ auth: () => mockAuth() }));
 
-const mockRedirect = vi.fn((url) => {
-  throw new Error(`REDIRECT:${url}`);
-});
-vi.mock("next/navigation", () => ({ redirect: (url) => mockRedirect(url) }));
-
 const mockGetCategoryArticles = vi.fn(async () => ({ articles: [], totalPages: 1 }));
 vi.mock("@/lib/categoryArticles", () => ({
   getCategoryArticles: (...args) => mockGetCategoryArticles(...args),
@@ -21,22 +16,34 @@ vi.mock("@/lib/categoryArticles", () => ({
 
 const { default: MarketNewsPage, metadata } = await import("./page");
 
+// Market is still fully subscriber-only, but a Free/anonymous visitor now
+// gets an in-app upsell teaser instead of a redirect (see
+// GatedCategoryTeaser) so the page stays genuinely reachable/indexable.
 describe("MarketNewsPage", () => {
   beforeEach(() => {
     mockAuth.mockReset();
     mockGetCategoryArticles.mockClear();
   });
 
-  it("redirects anonymous visitors to /pricing", async () => {
+  it("renders the Market teaser (not the article list) for anonymous visitors", async () => {
     mockAuth.mockResolvedValue(null);
 
-    await expect(MarketNewsPage()).rejects.toThrow("REDIRECT:/pricing");
+    const element = await MarketNewsPage();
+    render(element);
+
+    expect(mockGetCategoryArticles).not.toHaveBeenCalled();
+    expect(screen.getByText("Market coverage is for Subscribers")).toBeInTheDocument();
+    expect(screen.queryByTestId("category-page")).not.toBeInTheDocument();
   });
 
-  it("redirects Free-tier users to /pricing", async () => {
+  it("renders the Market teaser for Free-tier users", async () => {
     mockAuth.mockResolvedValue(makeSession({ tier: "Free" }));
 
-    await expect(MarketNewsPage()).rejects.toThrow("REDIRECT:/pricing");
+    const element = await MarketNewsPage();
+    render(element);
+
+    expect(mockGetCategoryArticles).not.toHaveBeenCalled();
+    expect(screen.getByText("Market coverage is for Subscribers")).toBeInTheDocument();
   });
 
   it("renders CategoryPage with the Market category for subscribed users", async () => {
@@ -48,12 +55,13 @@ describe("MarketNewsPage", () => {
     expect(mockGetCategoryArticles).toHaveBeenCalledWith({
       category: "market",
       userId: "user-1",
+      isSubscribed: true,
     });
     const props = JSON.parse(screen.getByTestId("category-page").textContent);
     expect(props.category).toBe("Market");
   });
 
-  it("marks the page as noindex since gated content shouldn't be crawled", () => {
-    expect(metadata.robots).toEqual({ index: false, follow: false });
+  it("is indexable — the teaser is real, unique marketing content", () => {
+    expect(metadata.robots).toBeUndefined();
   });
 });

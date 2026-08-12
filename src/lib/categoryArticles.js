@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
 import initializeDbAndModels from "@/lib/db";
 import { buildKeywordExclusion } from "@/lib/keywordFilter";
+import { excludePremiumArticlesCondition } from "@/lib/subscriberOnlyCategories";
 
 const SORT_COLUMNS = {
   liked: "likeCount",
@@ -17,6 +18,7 @@ export async function getCategoryArticles({
   userId,
   page = 1,
   limit = 20,
+  isSubscribed = false,
 }) {
   const { Article, ArticleLike, ReadArticle, User } = await initializeDbAndModels();
   const offset = (page - 1) * limit;
@@ -24,6 +26,12 @@ export async function getCategoryArticles({
   const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
 
   const whereConditions = [{ category: { [Op.contains]: [categoryName] } }];
+  // Free/anonymous viewers only see this category's curated free sources
+  // (plus podcasts, always free) — Market/Journal are excluded entirely
+  // before this function is ever reached (see the 403 in
+  // /api/articles/[category]/route.js), so this only matters for the
+  // partially-gated categories.
+  if (!isSubscribed) whereConditions.push(excludePremiumArticlesCondition());
 
   let likedUrls = new Set();
   let readUrls = new Set();

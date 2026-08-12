@@ -1,6 +1,7 @@
 import initializeDbAndModels from "@/lib/db";
 import { QueryTypes } from "sequelize";
 import { auth } from "@/lib/auth";
+import { FREE_TIER_SQL, EXCLUDE_GATED_CATEGORIES_SQL } from "@/lib/subscriberOnlyCategories";
 
 export async function GET(req) {
   const { sequelize, User, ArticleLike, ReadArticle } = await initializeDbAndModels();
@@ -38,10 +39,13 @@ export async function GET(req) {
       whereParts.push(`"category"::text ILIKE :category`);
     }
 
-    // Market/Finance/Journal content is subscriber-only — non-subscribers
-    // (including anonymous visitors) only get "news" results here.
+    // Market/Journal are fully subscriber-only, and every other category's
+    // premium-tier sources are gated per-article — non-subscribers
+    // (including anonymous visitors) only get free-tier/podcast results
+    // outside Market/Journal here. See subscriberOnlyCategories.js.
     if (!isSubscribed) {
-      whereParts.push(`"sourceType" = 'news'`);
+      whereParts.push(FREE_TIER_SQL);
+      whereParts.push(EXCLUDE_GATED_CATEGORIES_SQL);
     }
 
     let likedUrls = new Set();

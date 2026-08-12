@@ -14,18 +14,20 @@ const stripePromise = loadStripe(
 );
 
 const FREE_FEATURES = [
-  { included: true, text: "Hundreds of trusted sources across every major category" },
+  { included: true, text: "A curated selection of major sources (CNN, BBC, NPR, CNBC & more) in every category" },
   { included: true, text: "Unlimited archives to save and organize your articles" },
   { included: true, text: "Follow topics & keywords, with notifications when they're covered" },
   { included: true, text: "Install as an app, with swipe gestures and pull-to-refresh" },
+  { included: false, text: "Every source in every category — not just the curated free selection" },
   { included: false, text: "Live Market dashboard — indices, sectors, charts & watchlist" },
-  { included: false, text: "Full Market, Finance & Journal coverage" },
+  { included: false, text: "Full Market & Journal coverage" },
 ];
 
 const SUBSCRIBED_FEATURES = [
   { included: true, text: "Everything in Free" },
+  { included: true, text: "Every source in every category — the full source list, not just the curated free selection" },
   { included: true, text: "Live Market dashboard — real-time indices, sector performance, historical charts & a personal watchlist" },
-  { included: true, text: "Full Market, Finance & Journal coverage" },
+  { included: true, text: "Full Market & Journal coverage" },
   { included: true, text: "Create and customize your own news feeds" },
   { included: true, text: '"For You" recommendations based on your reading habits' },
   { included: true, text: "List & Magazine view layouts" },
@@ -157,10 +159,10 @@ export default function PricingPage() {
           Simple, Transparent Pricing
         </h1>
         <p className={styles.pageSubtitle}>
-          Subscribe for a live Market dashboard, full Market, Finance &amp;
-          Journal coverage, custom feeds built from your own sources, a
-          &quot;For You&quot; feed that learns what you like, and referral
-          credit toward future bills.
+          Subscribe for every source in every category, a live Market
+          dashboard, full Market &amp; Journal coverage, custom feeds built
+          from your own sources, a &quot;For You&quot; feed that learns what
+          you like, and referral credit toward future bills.
         </p>
       </div>
 
