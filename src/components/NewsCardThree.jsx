@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation.js";
 import { Heart, Lock, Bookmark, Check, Compass, CheckSquare, Square } from "lucide-react";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
-import { getCategoryColor } from "@/lib/categoryColors";
+import { getCategoryColor, getCategoryPlaceholderImage } from "@/lib/categoryColors";
 import { useSwipeGesture } from "@/lib/useSwipeGesture";
 import { useToast } from "./ToastProvider";
 import styles from "./NewsCardThree.module.scss";
@@ -60,7 +60,8 @@ export default function NewsCardThree({
     onSwipeRight: handleSwipeSave,
   });
 
-  const FALLBACK_IMAGE_URL = "/images/blurimage.png";
+  const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
+  const FALLBACK_IMAGE_URL = getCategoryPlaceholderImage(badgeCategory);
 
   const rawUrl =
     typeof article?.urlToImage === "string" ? article.urlToImage.trim() : "";
@@ -109,7 +110,6 @@ export default function NewsCardThree({
     article.sourceName || article.source?.name || "Unknown source";
 
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
-  const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
 
   return (
     <div

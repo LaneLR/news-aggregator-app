@@ -156,7 +156,8 @@ describe("NewsCardThree", () => {
     expect(toast.error).toHaveBeenCalledWith("Couldn't update like status. Please try again.");
   });
 
-  it("falls back to the placeholder image when the thumbnail fails to load", async () => {
+  it("falls back to a category-specific placeholder when the thumbnail fails to load", async () => {
+    // makeArticle defaults to category: ["Business"] (see src/test/fixtures.js).
     const article = makeArticle({ urlToImage: "https://example.com/broken.jpg" });
     render(<NewsCardThree article={article} viewOnly />);
     // Let ArchiveToggleButton's own mount-time fetches settle before
@@ -171,6 +172,22 @@ describe("NewsCardThree", () => {
 
     fireEvent.error(img);
 
+    expect(img.src).toContain(encodeURIComponent("/images/placeholders/business.png"));
+  });
+
+  it("uses the matching category placeholder as the initial image when there's no urlToImage at all", () => {
+    const article = makeArticle({ urlToImage: null, category: ["Entertainment"] });
+    render(<NewsCardThree article={article} viewOnly />);
+
+    const img = screen.getByAltText(article.title);
+    expect(img.src).toContain(encodeURIComponent("/images/placeholders/entertainment.png"));
+  });
+
+  it("falls back to the generic placeholder when the article has no category", () => {
+    const article = makeArticle({ urlToImage: null, category: [] });
+    render(<NewsCardThree article={article} viewOnly />);
+
+    const img = screen.getByAltText(article.title);
     expect(img.src).toContain(encodeURIComponent("/images/blurimage.png"));
   });
 
