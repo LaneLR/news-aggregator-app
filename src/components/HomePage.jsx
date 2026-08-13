@@ -110,7 +110,11 @@ export default function HomePage() {
             </Button>
           </Link>
           <Link href="/login">
-            <Button bgColor="var(--theme-layout-background)" clr="var(--theme-dark-blue)">
+            <Button
+              bgColor="var(--theme-layout-background)"
+              clr="var(--theme-dark-blue)"
+              className={styles.heroLoginButton}
+            >
               Log in
             </Button>
           </Link>
