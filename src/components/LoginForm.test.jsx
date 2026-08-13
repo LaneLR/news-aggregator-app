@@ -17,6 +17,7 @@ vi.mock("next/navigation", () => ({
 // "Invalid URL" inside next/image's real getImgProps() in this test
 // environment (no base URL configured) — render it as a plain <img> instead.
 vi.mock("next/image", () => ({
+  // eslint-disable-next-line @next/next/no-img-element
   default: (props) => <img {...props} alt={props.alt || ""} />,
 }));
 

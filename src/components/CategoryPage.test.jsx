@@ -341,4 +341,32 @@ describe("CategoryPage", () => {
     expect(await screen.findByText("Card:Fresh Story")).toBeInTheDocument();
     expect(screen.queryByText("New articles available")).not.toBeInTheDocument();
   });
+
+  it("doesn't re-show the banner on a later focus once the same 'latest' article has already been loaded in", async () => {
+    // Regression test: the focus listener used to close over latestTimestamp
+    // directly, so once refreshed via something other than a category/sort
+    // change, the listener kept comparing against the stale pre-refresh
+    // timestamp and could re-fire for an article the user had already seen.
+    const older = makeArticle({ title: "Old Story", publishedAt: "2020-01-01T00:00:00.000Z" });
+    const newer = makeArticle({ title: "Fresh Story", publishedAt: "2030-01-01T00:00:00.000Z" });
+    mockFetchRoutes([
+      [/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })],
+      [/\/api\/articles\/business\?sort=latest&page=1/, () => makeFetchResponse({ articles: [newer], totalPages: 1 })],
+    ]);
+
+    render(<CategoryPage category="business" initialArticles={[older]} initialTotalPages={1} />);
+
+    window.dispatchEvent(new Event("focus"));
+    expect(await screen.findByText("New articles available")).toBeInTheDocument();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "New articles available" }));
+    expect(await screen.findByText("Card:Fresh Story")).toBeInTheDocument();
+
+    // Same "latest" article as what's already displayed — a second focus
+    // shouldn't treat it as new again.
+    window.dispatchEvent(new Event("focus"));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(screen.queryByText("New articles available")).not.toBeInTheDocument();
+  });
 });

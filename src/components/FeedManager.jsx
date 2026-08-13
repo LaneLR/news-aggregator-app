@@ -37,6 +37,10 @@ export default function FeedManager() {
     if (session) {
       fetchFeeds();
     }
+    // fetchFeeds is intentionally omitted — it's a plain function re-created
+    // every render, so including it would re-fetch on every render instead
+    // of only on a real session/isSubscribed change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, isSubscribed]);
 
   const handleOpenEditModal = () => {

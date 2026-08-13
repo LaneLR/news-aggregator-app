@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 // MAINTENANCE_MODE=true in Vercel's env vars and redeploy when you notice a
 // real problem (a bad deploy that passed the build but breaks at runtime,
 // the DB timing out/hitting its connection limit, traffic overwhelming the
-// app) — this middleware then serves a static, self-contained maintenance
+// app) — this proxy then serves a static, self-contained maintenance
 // response for every request before Next.js ever renders anything.
 //
 // That "before Next.js ever renders anything" part is the whole point: the
@@ -12,7 +12,7 @@ import { NextResponse } from "next/server";
 // src/lib/auth.js's jwt callback), so if the *reason* you're in maintenance
 // mode is a dead database, a normal page — even a custom one rendered
 // through the normal app shell — would just throw right along with
-// everything else. Returning a raw Response directly from middleware skips
+// everything else. Returning a raw Response directly from proxy skips
 // layout/auth/React entirely, so this keeps working exactly when it matters
 // most. Toggling it off is the same process in reverse: unset the env var,
 // redeploy.
@@ -126,7 +126,7 @@ export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico|images/|manifest.json|sw.js).*)"],
 };
 
-export function middleware() {
+export function proxy() {
   if (!isMaintenanceMode()) {
     return NextResponse.next();
   }

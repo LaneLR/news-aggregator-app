@@ -72,6 +72,10 @@ export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
     };
 
     fetchArticles();
+    // hasMore/loading are intentionally omitted — see the hasMoreRef/
+    // loadingRef comment above for why including them here would fight the
+    // IntersectionObserver effect's one-time setup.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, page]);
 
   useEffect(() => {

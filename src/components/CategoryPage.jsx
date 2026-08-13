@@ -118,7 +118,25 @@ export default function CategoryPage({
         loadArticles();
       }
     }
+    // loadArticles is intentionally omitted below — it's a plain function
+    // re-created every render, so including it would re-fetch on every
+    // render instead of only on a real category/sort change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category, sort]);
 
+  // Read via a ref rather than closing over latestTimestamp directly: the
+  // focus listener below is only re-registered when category/sort change,
+  // so a closure over the state value would go stale the moment
+  // loadArticles() (or refreshArticles(), e.g. from pull-to-refresh) updates
+  // latestTimestamp without category/sort also changing — the "new articles
+  // available" banner would then compare against an outdated baseline and
+  // could re-fire for articles the user has already seen.
+  const latestTimestampRef = useRef(latestTimestamp);
+  useEffect(() => {
+    latestTimestampRef.current = latestTimestamp;
+  }, [latestTimestamp]);
+
+  useEffect(() => {
     const handleFocus = async () => {
       if (!category) return;
       try {
@@ -128,7 +146,7 @@ export default function CategoryPage({
           const latestDate = new Date(
             latestArticle.publishedAt || latestArticle.updatedAt
           );
-          if (latestTimestamp && latestDate > latestTimestamp) {
+          if (latestTimestampRef.current && latestDate > latestTimestampRef.current) {
             setNewAvailable(true);
           }
         }
