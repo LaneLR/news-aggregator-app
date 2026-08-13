@@ -29,10 +29,14 @@
     cursor: not-allowed;
   }
 
+  // --theme-primary, not --theme-success — "Public" isn't a success/error
+  // state, just a selection (like any other active toggle in the app), so
+  // it gets the same brand accent every other toggle's active state uses
+  // rather than an arbitrary green.
   &.active {
-    background-color: color-mix(in srgb, var(--theme-success) 12%, transparent);
-    border-color: var(--theme-success);
-    color: var(--theme-success);
+    background-color: color-mix(in srgb, var(--theme-primary) 12%, transparent);
+    border-color: var(--theme-primary);
+    color: var(--theme-primary-text);
   }
 }
 

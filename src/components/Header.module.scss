@@ -57,6 +57,12 @@
   align-items: center;
   text-align: right;
   justify-content: right;
+  // Weather sits before the icon group as a sibling (see Header.jsx) — this
+  // gap is what pushes it left, away from the icons, without pinning it to
+  // an exact position between the search bar and the icon group (which
+  // would need to account for how much the search bar itself shrinks at
+  // the breakpoints below).
+  gap: 10px;
   width: 33%;
   height: 100%;
   padding: 0 24px 0 0;

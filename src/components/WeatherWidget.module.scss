@@ -1,53 +1,86 @@
-.widget {
+.container {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin: 0 1.5rem 1.5rem;
-  padding: 0.65rem 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--theme-border);
-  background-color: var(--theme-card-background);
-  font-size: 0.88rem;
-  color: var(--theme-text);
+  height: 100%;
+  flex-shrink: 0;
+
+  // Matches Header's own breakpoint for conceding space (its wordmark hides
+  // at the same width) — the icon button group already gets tight on a
+  // phone-sized viewport, so weather steps aside rather than fighting it
+  // for room.
+  @media (max-width: 860px) {
+    display: none;
+  }
 }
 
-.pinIcon {
+// Sits in Header's always-dark rightContainer, so this — like .iconButton
+// in Header.module.scss — uses the "always light" button-text token and a
+// translucent-white fill rather than theme-following colors.
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 12px;
   flex-shrink: 0;
-  color: var(--theme-text-secondary);
-}
-
-.conditionIcon {
-  flex-shrink: 0;
-  color: var(--theme-title-contrast);
-}
-
-.temp {
-  flex-shrink: 0;
+  border: none;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--theme-button-text);
   font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+  }
 }
 
-.location {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.tempLabel {
   white-space: nowrap;
-  color: var(--theme-text-secondary);
+}
+
+// The popover itself floats over the page, not the header bar, so it
+// follows the site's normal theme — same treatment as Header's own
+// .dropdownMenu (light/dark-aware background, bordered, shadow-lg).
+.popover {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 260px;
+  padding: 14px;
+  background-color: var(--theme-background);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  color: var(--theme-text);
+  z-index: 1000;
+
+  @media (max-width: 430px) {
+    right: -20%;
+  }
 }
 
 .searchArea {
-  flex: 1;
-  min-width: 0;
   position: relative;
 }
 
 .searchInput {
   width: 100%;
-  border: none;
-  background: none;
+  padding: 8px 10px;
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-sm);
+  background: var(--theme-layout-background);
   font: inherit;
+  font-size: 0.85rem;
   color: var(--theme-text);
   outline: none;
+
+  &:focus {
+    border-color: var(--theme-primary);
+  }
 
   &::placeholder {
     color: var(--theme-text-secondary);
@@ -55,19 +88,10 @@
 }
 
 .resultsList {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  margin: 0;
-  padding: 6px;
+  margin: 8px 0 0;
+  padding: 0;
   list-style: none;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--theme-border);
-  background-color: var(--theme-background);
-  box-shadow: var(--shadow-lg);
-  z-index: 20;
-  max-height: 220px;
+  max-height: 180px;
   overflow-y: auto;
 }
 
@@ -75,12 +99,13 @@
   display: block;
   width: 100%;
   text-align: left;
-  padding: 8px 10px;
+  padding: 7px 9px;
   border: none;
   border-radius: var(--radius-sm);
   background: none;
   color: var(--theme-text);
   font: inherit;
+  font-size: 0.85rem;
   cursor: pointer;
 
   &:hover {
@@ -88,22 +113,84 @@
   }
 }
 
-.iconButton {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
+.cancelLink {
+  display: block;
+  margin-top: 8px;
   border: none;
   background: none;
   color: var(--theme-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
   cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    color: var(--theme-text);
+    text-decoration: underline;
+  }
+}
+
+.conditionsArea {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.conditionsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.conditionIcon {
+  flex-shrink: 0;
+  color: var(--theme-title-contrast);
+}
+
+.conditionsTemp {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--theme-text);
+}
+
+.conditionsLabel {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--theme-text-secondary);
+}
+
+.actionsRow {
+  display: flex;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--theme-border);
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: none;
+  color: var(--theme-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 
   &:hover {
     background-color: var(--theme-layout-background);
     color: var(--theme-text);
   }
+}
+
+.loadingText {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--theme-text-secondary);
+  text-align: center;
+  padding: 0.5rem 0;
 }

@@ -44,6 +44,7 @@
   margin: 0 auto 2.5rem;
   background-color: var(--theme-layout-background);
   padding: 4px;
+  border: 1px solid var(--theme-border);
   border-radius: 999px;
 }
 
@@ -61,17 +62,28 @@
   cursor: pointer;
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 
+  // Solid fill instead of same-color-as-track + faint shadow — see the
+  // matching comment in CategoryPage.module.scss's .sortOption.
   &.active {
-    background: var(--theme-card-background);
-    color: var(--theme-primary-text);
+    background: var(--theme-primary);
+    color: var(--theme-primary-contrast);
     box-shadow: var(--shadow-sm);
   }
 }
 
 .savingsBadge {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  color: var(--theme-success-text);
+  color: #ffffff;
+  // A fixed near-black chip (--theme-primary-dark is identical in both
+  // light and dark themes, unlike --theme-primary itself) rather than
+  // green or the button's own --theme-primary — stays legible against
+  // both the Annual button's active (solid --theme-primary fill) and
+  // inactive (transparent) states, in either theme.
+  background-color: var(--theme-primary-dark);
+  padding: 2px 7px;
+  border-radius: 999px;
+  margin-left: 2px;
 }
 
 .referralCard {

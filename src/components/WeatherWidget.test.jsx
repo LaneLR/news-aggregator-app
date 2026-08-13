@@ -13,9 +13,21 @@ describe("WeatherWidget", () => {
     localStorage.clear();
   });
 
-  it("shows a location search prompt when no location is saved", async () => {
+  it("shows a plain location trigger when no location is saved, with the popover closed", async () => {
     render(<WeatherWidget />);
-    expect(await screen.findByPlaceholderText(/add your location/i)).toBeInTheDocument();
+    const trigger = await screen.findByRole("button", { name: /add your location/i });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("opens the popover with a search input when the trigger is clicked", async () => {
+    const user = userEvent.setup();
+    render(<WeatherWidget />);
+
+    await user.click(await screen.findByRole("button", { name: /add your location/i }));
+
+    expect(screen.getByRole("dialog", { name: "Weather" })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/add your location/i)).toBeInTheDocument();
   });
 
   it("searches for a location (debounced) and lists results", async () => {
@@ -25,7 +37,8 @@ describe("WeatherWidget", () => {
     );
     render(<WeatherWidget />);
 
-    await user.type(await screen.findByPlaceholderText(/add your location/i), "Cincinnati");
+    await user.click(await screen.findByRole("button", { name: /add your location/i }));
+    await user.type(screen.getByPlaceholderText(/add your location/i), "Cincinnati");
 
     await waitFor(() =>
       expect(global.fetch).toHaveBeenCalledWith("/api/weather/search?q=Cincinnati")
@@ -37,13 +50,14 @@ describe("WeatherWidget", () => {
     const user = userEvent.setup();
     render(<WeatherWidget />);
 
-    await user.type(await screen.findByPlaceholderText(/add your location/i), "c");
+    await user.click(await screen.findByRole("button", { name: /add your location/i }));
+    await user.type(screen.getByPlaceholderText(/add your location/i), "c");
     await new Promise((resolve) => setTimeout(resolve, 350));
 
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
-  it("picking a search result saves the location and shows current conditions", async () => {
+  it("picking a search result saves the location, closes the popover, and updates the trigger", async () => {
     const user = userEvent.setup();
     global.fetch.mockResolvedValueOnce(
       makeFetchResponse({ results: [CINCINNATI], configured: true })
@@ -60,15 +74,16 @@ describe("WeatherWidget", () => {
     );
     render(<WeatherWidget />);
 
-    await user.type(await screen.findByPlaceholderText(/add your location/i), "Cincinnati");
+    await user.click(await screen.findByRole("button", { name: /add your location/i }));
+    await user.type(screen.getByPlaceholderText(/add your location/i), "Cincinnati");
     await user.click(await screen.findByText("Cincinnati, Ohio, US"));
 
-    expect(await screen.findByText("72°F")).toBeInTheDocument();
-    expect(screen.getByText("Clear in Cincinnati")).toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY))).toEqual(CINCINNATI);
+    expect(await screen.findByText("72°F")).toBeInTheDocument();
   });
 
-  it("fetches and shows conditions on mount when a location is already saved", async () => {
+  it("fetches conditions and shows them on the trigger when a location is already saved", async () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(CINCINNATI));
     global.fetch.mockResolvedValueOnce(
       makeFetchResponse({
@@ -87,10 +102,9 @@ describe("WeatherWidget", () => {
       expect(global.fetch).toHaveBeenCalledWith("/api/weather?lat=39.1&lon=-84.5")
     );
     expect(await screen.findByText("45°F")).toBeInTheDocument();
-    expect(screen.getByText("Snow in Cincinnati")).toBeInTheDocument();
   });
 
-  it("clicking the pencil icon goes back to search mode", async () => {
+  it("opens the popover to show full conditions and edit/remove actions for a saved location", async () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(CINCINNATI));
     global.fetch.mockResolvedValueOnce(
       makeFetchResponse({ configured: true, tempF: 45, conditionId: 601, isDay: true, locationName: "Cincinnati" })
@@ -99,12 +113,30 @@ describe("WeatherWidget", () => {
     render(<WeatherWidget />);
     await screen.findByText("45°F");
 
-    await user.click(screen.getByRole("button", { name: "Change weather location" }));
+    await user.click(screen.getByRole("button", { name: /weather:/i }));
+
+    expect(screen.getByText("Snow in Cincinnati")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Change location" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+  });
+
+  it("clicking 'Change location' switches the popover to search mode", async () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(CINCINNATI));
+    global.fetch.mockResolvedValueOnce(
+      makeFetchResponse({ configured: true, tempF: 45, conditionId: 601, isDay: true, locationName: "Cincinnati" })
+    );
+    const user = userEvent.setup();
+    render(<WeatherWidget />);
+    await screen.findByText("45°F");
+
+    await user.click(screen.getByRole("button", { name: /weather:/i }));
+    await user.click(screen.getByRole("button", { name: "Change location" }));
 
     expect(screen.getByPlaceholderText(/add your location/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
   });
 
-  it("clicking the remove icon clears the saved location", async () => {
+  it("clicking 'Remove' clears the saved location", async () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(CINCINNATI));
     global.fetch.mockResolvedValueOnce(
       makeFetchResponse({ configured: true, tempF: 45, conditionId: 601, isDay: true, locationName: "Cincinnati" })
@@ -113,10 +145,37 @@ describe("WeatherWidget", () => {
     render(<WeatherWidget />);
     await screen.findByText("45°F");
 
-    await user.click(screen.getByRole("button", { name: "Remove weather location" }));
+    await user.click(screen.getByRole("button", { name: /weather:/i }));
+    await user.click(screen.getByRole("button", { name: "Remove" }));
 
     expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
-    expect(screen.getByPlaceholderText(/add your location/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /add your location/i })).toBeInTheDocument()
+    );
+  });
+
+  it("closes the popover on an outside click", async () => {
+    const user = userEvent.setup();
+    render(<WeatherWidget />);
+
+    await user.click(await screen.findByRole("button", { name: /add your location/i }));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+    await user.click(document.body);
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("closes the popover on Escape", async () => {
+    const user = userEvent.setup();
+    render(<WeatherWidget />);
+
+    await user.click(await screen.findByRole("button", { name: /add your location/i }));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("renders nothing once a search confirms the API isn't configured", async () => {
@@ -124,7 +183,8 @@ describe("WeatherWidget", () => {
     global.fetch.mockResolvedValueOnce(makeFetchResponse({ results: [], configured: false }));
     const { container } = render(<WeatherWidget />);
 
-    await user.type(await screen.findByPlaceholderText(/add your location/i), "Cincinnati");
+    await user.click(await screen.findByRole("button", { name: /add your location/i }));
+    await user.type(screen.getByPlaceholderText(/add your location/i), "Cincinnati");
 
     await waitFor(() => expect(container).toBeEmptyDOMElement());
   });

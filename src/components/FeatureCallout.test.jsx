@@ -24,4 +24,20 @@ describe("FeatureCallout", () => {
     expect(screen.queryByText("A couple of things worth knowing")).not.toBeInTheDocument();
     expect(localStorage.getItem(STORAGE_KEY)).toBe("1");
   });
+
+  it("stays dismissed across a fresh mount (simulating a page revisit)", async () => {
+    const user = userEvent.setup();
+    const { unmount } = render(<FeatureCallout />);
+    await user.click(await screen.findByRole("button", { name: "Dismiss this tip" }));
+    unmount();
+
+    render(<FeatureCallout />);
+    expect(screen.queryByText("A couple of things worth knowing")).not.toBeInTheDocument();
+  });
+
+  it("links to Settings for revisiting related preferences", async () => {
+    render(<FeatureCallout />);
+    const link = await screen.findByRole("link", { name: "Settings" });
+    expect(link).toHaveAttribute("href", "/settings");
+  });
 });

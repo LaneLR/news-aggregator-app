@@ -78,6 +78,7 @@
   margin: 1rem 0 0.5rem;
   background-color: var(--theme-card-background);
   padding: 4px;
+  border: 1px solid var(--theme-border);
   border-radius: 999px;
   box-shadow: var(--shadow-sm);
 }
@@ -93,9 +94,15 @@
   cursor: pointer;
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 
+  // Solid fill, not a same-color-as-track background + faint shadow — the
+  // previous version relied on --shadow-sm alone to separate the active
+  // pill from its track, but --theme-card-background and
+  // --theme-layout-background/--theme-background are the same flat white
+  // in light mode (see themes.scss's "Mocha Editorial" palette comment),
+  // so there was effectively zero contrast between "selected" and "not."
   &.active {
-    background: var(--theme-card-background);
-    color: var(--theme-primary-text);
+    background: var(--theme-primary);
+    color: var(--theme-primary-contrast);
     box-shadow: var(--shadow-sm);
   }
 }

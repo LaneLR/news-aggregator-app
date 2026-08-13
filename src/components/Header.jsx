@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Menu, Newspaper, Bookmark, User, Crown, Settings, LogOut, Sun, Moon } from "lucide-react";
 import SearchBar from "./SearchBar";
+import WeatherWidget from "./WeatherWidget";
 import HeaderNavBar from "./HeaderNavBar";
 import HeaderSubscribeBanner from "./SubscribeHeaderBanner";
 import { applyCustomOrder } from "@/lib/useLayoutPrefs";
@@ -280,6 +281,7 @@ export default function Header() {
               <SearchBar />
             </div>
             <div className={styles.rightContainer}>
+              <WeatherWidget />
               <div className={styles.iconButtonGroup}>
                 {orderedIconIds.map((id, i) => renderIconItem(id, i))}
               </div>
