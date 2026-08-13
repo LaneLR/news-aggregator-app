@@ -43,7 +43,7 @@ export default function FeatureCallout() {
           <li>Drag the category tabs and header icons to reorder them however you like.</li>
         </ul>
         <p className={styles.footerLink}>
-          Once you dismiss this, it's gone for good on this device — rebind shortcuts or revisit
+          Once you dismiss this, it&apos;s gone for good on this device — rebind shortcuts or revisit
           other preferences anytime in <Link href="/settings">Settings</Link>.
         </p>
       </div>
