@@ -6,6 +6,7 @@ import { Sparkles, Check, X, Gift } from "lucide-react";
 import Button from "./Button";
 import Loading from "@/app/loading";
 import { MONTHLY_PRICE_ID, ANNUAL_PRICE_ID } from "@/lib/stripePrices";
+import { isRunningInNativeApp, openPaymentUrl } from "@/lib/nativeApp";
 import { useToast } from "./ToastProvider";
 import styles from "./PricingPage.module.scss";
 
@@ -95,10 +96,19 @@ export default function PricingPage() {
           promotionCodeId,
         }),
       });
-      const { sessionId, error } = await res.json();
+      const { sessionId, url, error } = await res.json();
       if (error) throw new Error(error);
-      const stripe = await stripePromise;
-      await stripe.redirectToCheckout({ sessionId });
+      // Inside the wrapped mobile app, Stripe's checkout page has to open in
+      // the system browser rather than navigate the app's own WebView — see
+      // src/lib/nativeApp.js. stripe.redirectToCheckout always navigates the
+      // current window, so it's only used on the normal web path.
+      if (isRunningInNativeApp()) {
+        await openPaymentUrl(url);
+        setIsLoading(false);
+      } else {
+        const stripe = await stripePromise;
+        await stripe.redirectToCheckout({ sessionId });
+      }
     } catch (err) {
       console.error(err);
       toast.error(err.message || "Something went wrong starting checkout.");
@@ -114,7 +124,7 @@ export default function PricingPage() {
       });
       const { url, error } = await res.json();
       if (error) throw new Error(error);
-      window.location.href = url;
+      await openPaymentUrl(url);
     } catch (err) {
       console.error(err);
       toast.error("Could not open the subscription management page. Please try again.");

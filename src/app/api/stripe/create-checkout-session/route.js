@@ -105,7 +105,10 @@ export async function POST(req) {
     const stripeSession = await stripe.checkout.sessions.create(sessionParams);
 
     revalidatePath("/pricing");
-    return NextResponse.json({ sessionId: stripeSession.id });
+    // `url` is only consumed by the mobile app wrapper's native-app branch
+    // (see src/lib/nativeApp.js) — normal web checkout still uses sessionId
+    // with stripe.redirectToCheckout, unchanged.
+    return NextResponse.json({ sessionId: stripeSession.id, url: stripeSession.url });
   } catch (err) {
     console.error("Error creating Stripe session:", err);
     return NextResponse.json(

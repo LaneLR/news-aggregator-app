@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeFetchResponse } from "@/test/fixtures";
@@ -6,13 +6,26 @@ import { makeFetchResponse } from "@/test/fixtures";
 const toast = { success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn(), show: vi.fn(), dismiss: vi.fn() };
 vi.mock("./ToastProvider", () => ({ useToast: () => toast }));
 
+const browserOpen = vi.fn().mockResolvedValue(undefined);
+vi.mock("@capacitor/browser", () => ({ Browser: { open: browserOpen } }));
+
+const ORIGINAL_USER_AGENT = navigator.userAgent;
+function setUserAgent(value) {
+  Object.defineProperty(navigator, "userAgent", { configurable: true, value });
+}
+
 const { default: ManageSubscriptionButton } = await import("./ManageSubscriptionButton");
 
 describe("ManageSubscriptionButton", () => {
   beforeEach(() => {
     toast.error.mockClear();
+    browserOpen.mockClear();
     delete window.location;
     window.location = { href: "" };
+  });
+
+  afterEach(() => {
+    setUserAgent(ORIGINAL_USER_AGENT);
   });
 
   it("renders the button", () => {
@@ -33,6 +46,25 @@ describe("ManageSubscriptionButton", () => {
     await user.click(screen.getByRole("button", { name: /manage subscription/i }));
 
     await waitFor(() => expect(window.location.href).toBe("https://billing.stripe.com/session/abc"));
+  });
+
+  it("opens the portal URL in the system browser when inside the wrapped app", async () => {
+    setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) MochaReads-Mobile-App");
+    const user = userEvent.setup();
+    global.fetch.mockImplementation((url) => {
+      if (url === "/api/stripe/manage-subscription") {
+        return Promise.resolve(makeFetchResponse({ url: "https://billing.stripe.com/session/abc" }));
+      }
+      return Promise.reject(new Error(`Unmocked fetch: ${url}`));
+    });
+
+    render(<ManageSubscriptionButton />);
+    await user.click(screen.getByRole("button", { name: /manage subscription/i }));
+
+    await waitFor(() =>
+      expect(browserOpen).toHaveBeenCalledWith({ url: "https://billing.stripe.com/session/abc" })
+    );
+    expect(window.location.href).toBe("");
   });
 
   it("shows an error toast when the API returns an error", async () => {

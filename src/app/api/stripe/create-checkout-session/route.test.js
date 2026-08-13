@@ -114,13 +114,20 @@ describe("POST /api/stripe/create-checkout-session", () => {
     db.User.findByPk.mockResolvedValue(
       createInstanceMock({ id: "user-1", tier: "Free", email: "a@example.com", stripeCustomerId: null })
     );
-    mockStripe.checkout.sessions.create.mockResolvedValue({ id: "cs_test_123" });
+    mockStripe.checkout.sessions.create.mockResolvedValue({
+      id: "cs_test_123",
+      url: "https://checkout.stripe.com/pay/cs_test_123",
+    });
 
     const res = await POST(makeRequest({ priceId: "price_123" }));
     const body = await res.json();
 
     expect(res.status).toBe(200);
     expect(body.sessionId).toBe("cs_test_123");
+    // The mobile app wrapper's native-app branch opens this URL directly in
+    // the system browser instead of using stripe.redirectToCheckout — see
+    // src/lib/nativeApp.js.
+    expect(body.url).toBe("https://checkout.stripe.com/pay/cs_test_123");
     expect(mockStripe.checkout.sessions.create).toHaveBeenCalledWith(
       expect.objectContaining({
         line_items: [{ price: "price_123", quantity: 1 }],

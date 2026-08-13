@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeSession, makeFetchResponse } from "@/test/fixtures";
@@ -19,6 +19,14 @@ vi.mock("@stripe/stripe-js", () => ({
   loadStripe: vi.fn(() => Promise.resolve(stripeInstance)),
 }));
 
+const browserOpen = vi.fn().mockResolvedValue(undefined);
+vi.mock("@capacitor/browser", () => ({ Browser: { open: browserOpen } }));
+
+const ORIGINAL_USER_AGENT = navigator.userAgent;
+function setUserAgent(value) {
+  Object.defineProperty(navigator, "userAgent", { configurable: true, value });
+}
+
 const { default: PricingPage } = await import("./PricingPage");
 
 describe("PricingPage", () => {
@@ -26,8 +34,13 @@ describe("PricingPage", () => {
     toast.error.mockClear();
     update.mockClear();
     redirectToCheckout.mockClear();
+    browserOpen.mockClear();
     delete window.location;
     window.location = { href: "" };
+  });
+
+  afterEach(() => {
+    setUserAgent(ORIGINAL_USER_AGENT);
   });
 
   it("renders both plan cards", () => {
@@ -119,6 +132,24 @@ describe("PricingPage", () => {
     await vi.waitFor(() => expect(redirectToCheckout).toHaveBeenCalledWith({ sessionId: "cs_test_1" }));
   });
 
+  it("opens checkout in the system browser instead of redirectToCheckout when inside the wrapped app", async () => {
+    setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) MochaReads-Mobile-App");
+    mockSession = makeSession({ tier: "Free" });
+    mockStatus = "authenticated";
+    global.fetch.mockResolvedValueOnce(
+      makeFetchResponse({ sessionId: "cs_test_1", url: "https://checkout.stripe.com/pay/cs_test_1" })
+    );
+    const user = userEvent.setup();
+    render(<PricingPage />);
+
+    await user.click(screen.getByRole("button", { name: "Subscribe" }));
+
+    await vi.waitFor(() =>
+      expect(browserOpen).toHaveBeenCalledWith({ url: "https://checkout.stripe.com/pay/cs_test_1" })
+    );
+    expect(redirectToCheckout).not.toHaveBeenCalled();
+  });
+
   it("shows a toast error if starting checkout fails", async () => {
     mockSession = makeSession({ tier: "Free" });
     mockStatus = "authenticated";
@@ -142,5 +173,21 @@ describe("PricingPage", () => {
 
     await vi.waitFor(() => expect(update).toHaveBeenCalled());
     expect(window.location.href).toBe("https://billing.stripe.com/session");
+  });
+
+  it("opens the billing portal in the system browser when inside the wrapped app", async () => {
+    setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) MochaReads-Mobile-App");
+    mockSession = makeSession({ tier: "Subscribed" });
+    mockStatus = "authenticated";
+    global.fetch.mockResolvedValueOnce(makeFetchResponse({ url: "https://billing.stripe.com/session" }));
+    const user = userEvent.setup();
+    render(<PricingPage />);
+
+    await user.click(screen.getByRole("button", { name: "Manage Subscription" }));
+
+    await vi.waitFor(() =>
+      expect(browserOpen).toHaveBeenCalledWith({ url: "https://billing.stripe.com/session" })
+    );
+    expect(window.location.href).toBe("");
   });
 });

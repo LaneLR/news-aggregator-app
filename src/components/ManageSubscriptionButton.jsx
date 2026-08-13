@@ -1,5 +1,6 @@
 "use client";
 import Button from "./Button";
+import { openPaymentUrl } from "@/lib/nativeApp";
 import { useToast } from "./ToastProvider";
 
 export default function ManageSubscriptionButton() {
@@ -15,7 +16,7 @@ export default function ManageSubscriptionButton() {
         throw new Error(error);
       }
 
-      window.location.href = url;
+      await openPaymentUrl(url);
     } catch (err) {
       console.error(err);
       toast.error("Could not open the subscription management page. Please try again.");
