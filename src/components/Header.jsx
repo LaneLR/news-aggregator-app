@@ -315,7 +315,11 @@ export default function Header() {
           <div className={styles.rightContainer}>
             <nav style={{ display: "flex", columnGap: "10px" }}>
               <Link style={{ display: "flex" }} href={"/login"}>
-                <Button bgColor={"var(--theme-title-contrast)"} clr={"var(--theme-primary-contrast)"}>
+                <Button
+                  bgColor={"var(--theme-title-contrast)"}
+                  clr={"var(--theme-primary-contrast)"}
+                  className={styles.logInButton}
+                >
                   Log in
                 </Button>
               </Link>

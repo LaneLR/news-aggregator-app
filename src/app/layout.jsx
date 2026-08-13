@@ -118,12 +118,18 @@ export default async function RootLayout({ children }) {
   // land on a stale "unauthenticated" state until a manual refresh.
   const session = await auth();
 
-  // No data-theme attribute at all when the user hasn't explicitly chosen —
-  // themes.scss then follows prefers-color-scheme via a media query (pure
-  // CSS, evaluated at first paint, no flash) instead of defaulting everyone
-  // to light.
+  // Logged-out visitors always get light, full stop — dark mode is an
+  // opt-in a signed-in user makes for themselves (ThemeSelector), never
+  // something a visitor's OS setting should impose on the marketing pages,
+  // login/register, pricing, or any other page reachable without an
+  // account. Signed-in users keep the existing three-way choice: an
+  // explicit theme, or "Auto" (selectedTheme === null) which follows
+  // prefers-color-scheme via the media query in themes.scss — that's the
+  // `undefined` case below, distinct from "no session at all".
+  const dataTheme = session ? session.user.selectedTheme || undefined : "default";
+
   return (
-    <html lang="en" data-theme={session?.user?.selectedTheme || undefined}>
+    <html lang="en" data-theme={dataTheme}>
       <body
         style={{ backgroundColor: "var(--dark-blue)", color: "var(--light-white)" }}
         className={`${roboto.variable} ${lora.variable}`}

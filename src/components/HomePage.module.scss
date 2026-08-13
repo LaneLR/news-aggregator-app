@@ -1,3 +1,8 @@
+// This is the logged-out marketing/landing page. It used to need a local
+// light-mode override here, but that's now handled site-wide — every page
+// reachable without a session renders light unconditionally (see
+// RootLayout/ThemeProvider's data-theme logic) — so this can just use the
+// normal shared theme tokens like everything else.
 .wrapper {
   display: flex;
   flex-direction: column;

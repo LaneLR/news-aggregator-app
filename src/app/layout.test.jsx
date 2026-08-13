@@ -99,11 +99,13 @@ describe("RootLayout", () => {
     expect(element.props["data-theme"]).toBe("dark");
   });
 
-  it("renders without a session for anonymous visitors", async () => {
+  it("renders without a session for anonymous visitors, always forced to light", async () => {
     mockAuth.mockResolvedValue(null);
 
     const element = await RootLayout({ children: <div /> });
-    expect(element.props["data-theme"]).toBeUndefined();
+    // Logged-out visitors always get light, regardless of OS preference —
+    // dark is an opt-in only a signed-in user can make (ThemeSelector).
+    expect(element.props["data-theme"]).toBe("default");
 
     render(element);
 
