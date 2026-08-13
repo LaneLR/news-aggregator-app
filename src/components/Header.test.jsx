@@ -58,6 +58,13 @@ describe("Header", () => {
     expect(screen.getByTitle("Archives").closest("a")).toHaveAttribute("href", "/archives");
   });
 
+  it("shows the weather widget trigger between the search bar and icon group when logged in", () => {
+    mockSession = makeSession();
+    mockStatus = "authenticated";
+    render(<Header />);
+    expect(screen.getByRole("button", { name: /add your location/i })).toBeInTheDocument();
+  });
+
   it("opens the account dropdown menu and navigates on item click", async () => {
     const user = userEvent.setup();
     mockSession = makeSession();

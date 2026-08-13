@@ -25,7 +25,6 @@ import CarouselRow from "@/components/CarouselRow";
 import CarouselSkeleton from "@/components/CarouselSkeleton";
 import HeroCarousel from "@/components/HeroCarousel";
 import FeatureCallout from "@/components/FeatureCallout";
-import WeatherWidget from "@/components/WeatherWidget";
 import PullToRefreshIndicator from "@/components/PullToRefreshIndicator";
 import { usePullToRefresh } from "@/lib/usePullToRefresh";
 import { DEFAULT_HOME_SECTIONS } from "@/lib/homeSections";
@@ -125,7 +124,6 @@ export default function NewsPage() {
       <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
       <h1 className={styles.srOnly}>Your News Feed</h1>
       <FeatureCallout />
-      <WeatherWidget />
       {showForYou && <HeroCarousel />}
 
       {showTopStories && (topStories === null || topStories.length > 0) && (

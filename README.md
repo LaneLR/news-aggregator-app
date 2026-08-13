@@ -27,7 +27,7 @@ A fast, customizable RSS feed reader and news aggregator built with Next.js. Fol
 - Live market indices, sector performance, a personal watchlist, and historical charts, backed by Finnhub with server-side caching (`MarketQuote`/`MarketChartCache`)
 
 **Local weather**
-- Optional, opt-in current-conditions widget on `/news` (temperature + short description) — no radar, alerts, or forecast beyond right now, and no push notifications. Location is a city you search for and pick yourself, stored in `localStorage`, never inferred from IP/geolocation. Backed by OpenWeatherMap; the widget simply doesn't render if `OPENWEATHER_API_KEY` isn't set.
+- Optional, opt-in current-conditions trigger in the header, between the search bar and the icon button group (temperature + short description in a popover) — no radar, alerts, or forecast beyond right now, and no push notifications. Location is a city or US ZIP code you search for and pick yourself (a 5-digit query routes to OpenWeatherMap's dedicated zip-lookup endpoint instead of city search), stored in `localStorage`, never inferred from IP/geolocation. Backed by OpenWeatherMap; renders nothing at all if `OPENWEATHER_API_KEY` isn't set. Hidden below 860px width (same breakpoint the header's own wordmark hides at) rather than competing with the icon group for room on a phone-sized screen.
 
 **Notifications**
 - Web Push notifications (self-hosted VAPID keys, no third-party push service) when a followed keyword gets new coverage
