@@ -41,6 +41,15 @@ describe("ArticleReader", () => {
     likeCount: 4,
   });
 
+  it("preloads the hero image — it's the reader's own LCP element", () => {
+    render(
+      <ArticleReader article={article} sanitizedContent="<p>Body text</p>" relatedCoverage={[]} readingTime={3} />
+    );
+    // A preloaded next/image omits the `loading` attribute entirely rather
+    // than setting loading="eager".
+    expect(screen.getByAltText("Big Story")).not.toHaveAttribute("loading");
+  });
+
   it("renders title, source, and category badge", () => {
     render(
       <ArticleReader article={article} sanitizedContent="<p>Body text</p>" relatedCoverage={[]} readingTime={3} />

@@ -15,6 +15,9 @@ import ArticleFallbackArt from "./ArticleFallbackArt";
 import { useToast } from "./ToastProvider";
 import styles from "./NewsCardFour.module.scss";
 
+// See the identical comment in NewsCardThree.jsx — unconditional preload
+// defeated lazy loading for every card past the first row.
+const PRELOAD_THRESHOLD_INDEX = 4;
 export default function NewsCardFour({
   article,
   archiveId,
@@ -145,7 +148,7 @@ export default function NewsCardFour({
             src={proxiedImageUrl}
             alt={article?.title || "News article image"}
             onError={handleImageError}
-            priority
+            preload={index != null && index < PRELOAD_THRESHOLD_INDEX}
             fill
             sizes="(max-width: 768px) 100vw, 33vw"
             style={{

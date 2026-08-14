@@ -49,6 +49,14 @@ describe("Header", () => {
     expect(screen.getByRole("link", { name: /log in/i })).toHaveAttribute("href", "/login");
   });
 
+  it("preloads the logo — it's the one image on every page guaranteed to be above the fold", () => {
+    mockStatus = "unauthenticated";
+    render(<Header />);
+    // A preloaded next/image omits the `loading` attribute entirely rather
+    // than setting loading="eager".
+    expect(screen.getByAltText("MochaReads logo")).not.toHaveAttribute("loading");
+  });
+
   it("shows the search bar and icon group when logged in", () => {
     mockSession = makeSession();
     mockStatus = "authenticated";

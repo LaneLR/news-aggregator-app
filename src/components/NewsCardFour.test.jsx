@@ -53,6 +53,20 @@ describe("NewsCardFour", () => {
     expect(screen.getByText("Example News")).toBeInTheDocument();
   });
 
+  it("eagerly loads only the first few cards by index, lazy-loading the rest", () => {
+    const article = makeArticle({ title: "Big News Story" });
+
+    // A preloaded next/image omits the `loading` attribute entirely rather
+    // than setting loading="eager" — its absence, contrasted with the
+    // explicit "lazy" below, is what distinguishes the two states here.
+    const { unmount } = render(<NewsCardFour article={article} viewOnly index={0} />);
+    expect(screen.getByAltText("Big News Story")).not.toHaveAttribute("loading");
+    unmount();
+
+    render(<NewsCardFour article={article} viewOnly index={4} />);
+    expect(screen.getByAltText("Big News Story")).toHaveAttribute("loading", "lazy");
+  });
+
   it("strips a trailing ' - Source' suffix from the title", () => {
     const article = makeArticle({ title: "Big News Story - Example News" });
     render(<NewsCardFour article={article} viewOnly />);

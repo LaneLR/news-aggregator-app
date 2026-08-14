@@ -15,6 +15,15 @@ import ArticleFallbackArt from "./ArticleFallbackArt";
 import { useToast } from "./ToastProvider";
 import styles from "./NewsCardThree.module.scss";
 
+// Every card used to set `preload` (formerly `priority`) unconditionally,
+// which told the browser to eagerly fetch every single article image on
+// the page immediately, defeating lazy loading entirely for anything past
+// the first row — a real, unnecessary bandwidth/load-time cost on category
+// pages with dozens of cards. Only the first row or so is actually visible
+// without scrolling on common desktop widths (the grid is a fluid
+// auto-fill with a 340px minimum card width), so only those get preloaded;
+// everything else keeps next/image's own default lazy loading.
+const PRELOAD_THRESHOLD_INDEX = 4;
 export default function NewsCardThree({
   article,
   archiveId,
@@ -174,7 +183,7 @@ export default function NewsCardThree({
             src={proxiedImageUrl}
             alt={article?.title || "News article image"}
             onError={handleImageError}
-            priority
+            preload={index != null && index < PRELOAD_THRESHOLD_INDEX}
             fill
             sizes="(max-width: 768px) 100vw, 33vw"
             style={{
