@@ -34,4 +34,10 @@ describe("AuthLayout", () => {
 
     expect(container.querySelector('[class*="brandOverlay"]')).toBeInTheDocument();
   });
+
+  it("renders 'Mocha' before 'Reads', matching Header.module.scss's :first-child accent / :last-child plain color split", () => {
+    const { container } = render(<AuthLayout>{null}</AuthLayout>);
+    const spans = container.querySelectorAll('[class*="logoText"] span');
+    expect([...spans].map((s) => s.textContent)).toEqual(["Mocha", "Reads"]);
+  });
 });
