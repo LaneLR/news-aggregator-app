@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Bookmark } from "lucide-react";
 import initializeDbAndModels from "@/lib/db";
-import { getCategoryPlaceholderImage } from "@/lib/categoryColors";
+import ArticleFallbackArt from "@/components/ArticleFallbackArt";
 import styles from "./page.module.scss";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -82,19 +82,17 @@ export default async function SharedArchivePage({ params }) {
                 rel="noopener noreferrer"
               >
                 <div className={styles.thumbnail}>
-                  <Image
-                    src={
-                      article.urlToImage
-                        ? `/api/image-proxy?url=${encodeURIComponent(article.urlToImage)}`
-                        : getCategoryPlaceholderImage(
-                            Array.isArray(article.category) ? article.category[0] : null
-                          )
-                    }
-                    alt=""
-                    fill
-                    sizes="90px"
-                    style={{ objectFit: "cover" }}
-                  />
+                  {article.urlToImage ? (
+                    <Image
+                      src={`/api/image-proxy?url=${encodeURIComponent(article.urlToImage)}`}
+                      alt=""
+                      fill
+                      sizes="90px"
+                      style={{ objectFit: "cover" }}
+                    />
+                  ) : (
+                    <ArticleFallbackArt category={article.category} />
+                  )}
                 </div>
                 <div className={styles.articleInfo}>
                   <h2 className={styles.articleTitle}>{article.title}</h2>

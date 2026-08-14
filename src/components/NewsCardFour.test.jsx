@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeArticle, makeFetchResponse, makeSession } from "@/test/fixtures";
 
@@ -57,6 +57,27 @@ describe("NewsCardFour", () => {
     const article = makeArticle({ title: "Big News Story - Example News" });
     render(<NewsCardFour article={article} viewOnly />);
     expect(screen.getByText("Big News Story")).toBeInTheDocument();
+  });
+
+  it("renders the category-colored fallback art instead of a broken image when there's no urlToImage", () => {
+    const article = makeArticle({ urlToImage: null, category: ["Business"], title: "No Image Story" });
+    const { container } = render(<NewsCardFour article={article} viewOnly />);
+
+    expect(screen.queryByAltText("No Image Story")).not.toBeInTheDocument();
+    const art = container.querySelector('[style*="linear-gradient"]');
+    expect(art).toBeInTheDocument();
+    expect(art.style.background).toContain("rgb(21, 128, 61)"); // Business: #15803d
+  });
+
+  it("swaps to the fallback art when the thumbnail fails to load", () => {
+    const article = makeArticle({ urlToImage: "https://example.com/broken.jpg", title: "Broken Thumbnail" });
+    const { container } = render(<NewsCardFour article={article} viewOnly />);
+
+    const img = screen.getByAltText("Broken Thumbnail");
+    fireEvent.error(img);
+
+    expect(screen.queryByAltText("Broken Thumbnail")).not.toBeInTheDocument();
+    expect(container.querySelector('[style*="linear-gradient"]')).toBeInTheDocument();
   });
 
   it("shows a lock icon for paywalled sources", () => {

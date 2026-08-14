@@ -11,6 +11,7 @@ import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { useSwipeGesture } from "@/lib/useSwipeGesture";
+import ArticleFallbackArt from "./ArticleFallbackArt";
 import { useToast } from "./ToastProvider";
 import styles from "./NewsCardFour.module.scss";
 
@@ -48,18 +49,17 @@ export default function NewsCardFour({
     onSwipeRight: handleSwipeSave,
   });
 
-  const FALLBACK_IMAGE_URL = "/images/morningfeedsplaceholder.png";
-
   const rawUrl =
     typeof article?.urlToImage === "string" ? article.urlToImage.trim() : "";
+  const proxiedImageUrl = rawUrl ? `/api/image-proxy?url=${encodeURIComponent(rawUrl)}` : null;
 
-  const proxiedImageUrl = rawUrl
-    ? `/api/image-proxy?url=${encodeURIComponent(rawUrl)}`
-    : FALLBACK_IMAGE_URL;
+  // Covers both "never had an image" (no rawUrl) and "had one but it failed
+  // to load at runtime" (imageFailed, set via onError below) — either way,
+  // ArticleFallbackArt takes over instead of a broken <Image>.
+  const [imageFailed, setImageFailed] = useState(false);
+  const showFallbackArt = !proxiedImageUrl || imageFailed;
 
-  const [imageSrc, setImageSrc] = useState(proxiedImageUrl);
-
-  const handleImageError = () => setImageSrc(FALLBACK_IMAGE_URL);
+  const handleImageError = () => setImageFailed(true);
 
   const handleLike = async () => {
     if (!session) {
@@ -138,18 +138,22 @@ export default function NewsCardFour({
         target={"_blank"}
         onClick={() => trackArticleClick(article)}
       >
-        <Image
-          src={imageSrc}
-          alt={article?.title || "News article image"}
-          onError={handleImageError}
-          priority
-          fill
-          sizes="(max-width: 768px) 100vw, 33vw"
-          style={{
-            objectFit: "cover",
-            objectPosition: "top",
-          }}
-        />
+        {showFallbackArt ? (
+          <ArticleFallbackArt category={badgeCategory} title={cleanTitle} />
+        ) : (
+          <Image
+            src={proxiedImageUrl}
+            alt={article?.title || "News article image"}
+            onError={handleImageError}
+            priority
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            style={{
+              objectFit: "cover",
+              objectPosition: "top",
+            }}
+          />
+        )}
       </Link>
       <div className={styles.contentArea}>
         <div className={styles.titleBlock}>

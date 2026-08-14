@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getCategoryColor, getCategoryPlaceholderImage } from "./categoryColors";
+import { getCategoryColor } from "./categoryColors";
 
 describe("getCategoryColor", () => {
   it("returns the mapped color for a known category", () => {
@@ -18,25 +18,5 @@ describe("getCategoryColor", () => {
   it("falls back to the default color for undefined/empty input", () => {
     expect(getCategoryColor(undefined)).toBe("#334155");
     expect(getCategoryColor("")).toBe("#334155");
-  });
-});
-
-describe("getCategoryPlaceholderImage", () => {
-  it("returns the category-specific placeholder for a known category", () => {
-    expect(getCategoryPlaceholderImage("Business")).toBe("/images/placeholders/business.png");
-    expect(getCategoryPlaceholderImage("Entertainment")).toBe("/images/placeholders/entertainment.png");
-  });
-
-  it("lowercases the category to build the filename", () => {
-    expect(getCategoryPlaceholderImage("US")).toBe("/images/placeholders/us.png");
-  });
-
-  it("falls back to the generic default for an unknown category", () => {
-    expect(getCategoryPlaceholderImage("NotACategory")).toBe("/images/blurimage.png");
-  });
-
-  it("falls back to the generic default for null/undefined input", () => {
-    expect(getCategoryPlaceholderImage(null)).toBe("/images/blurimage.png");
-    expect(getCategoryPlaceholderImage(undefined)).toBe("/images/blurimage.png");
   });
 });

@@ -79,20 +79,19 @@ describe("SharedArchivePage", () => {
       ],
     });
 
-    const element = await SharedArchivePage(makeParams("picks"));
-    render(element);
+    const { container } = render(await SharedArchivePage(makeParams("picks")));
 
     const titles = screen.getAllByRole("heading", { level: 2 }).map((el) => el.textContent);
     expect(titles).toEqual(["Newer article", "Older article"]);
 
-    // alt="" makes these decorative/presentational, so they're excluded
-    // from the accessible role tree — query the DOM directly instead.
-    const images = document.querySelectorAll("img");
-    // Sorted newest-first: the newer article has no urlToImage (fallback
-    // image), the older article has one (routed through the image proxy).
+    // Sorted newest-first: the newer article has no urlToImage, so it gets
+    // the gradient fallback art (no <img> at all) instead of a real photo;
+    // the older article has one, routed through the image proxy.
     // next/image rewrites src through its optimizer and URL-encodes it.
-    expect(images[0].src).toContain("blurimage.png");
-    expect(images[1].src).toContain(encodeURIComponent("/api/image-proxy?url="));
+    const images = document.querySelectorAll("img");
+    expect(images).toHaveLength(1);
+    expect(images[0].src).toContain(encodeURIComponent("/api/image-proxy?url="));
+    expect(container.querySelector('[style*="linear-gradient"]')).toBeInTheDocument();
   });
 
   describe("generateMetadata", () => {

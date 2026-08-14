@@ -156,10 +156,10 @@ describe("NewsCardThree", () => {
     expect(toast.error).toHaveBeenCalledWith("Couldn't update like status. Please try again.");
   });
 
-  it("falls back to a category-specific placeholder when the thumbnail fails to load", async () => {
+  it("swaps to the category-colored fallback art when the thumbnail fails to load", async () => {
     // makeArticle defaults to category: ["Business"] (see src/test/fixtures.js).
     const article = makeArticle({ urlToImage: "https://example.com/broken.jpg" });
-    render(<NewsCardThree article={article} viewOnly />);
+    const { container } = render(<NewsCardThree article={article} viewOnly />);
     // Let ArchiveToggleButton's own mount-time fetches settle before
     // triggering more state updates, to avoid an unrelated act() warning.
     await screen.findByRole("button", { name: "Save to archive" });
@@ -172,23 +172,31 @@ describe("NewsCardThree", () => {
 
     fireEvent.error(img);
 
-    expect(img.src).toContain(encodeURIComponent("/images/placeholders/business.png"));
+    expect(screen.queryByAltText(article.title)).not.toBeInTheDocument();
+    expect(container.querySelector('[style*="linear-gradient"]')).toBeInTheDocument();
   });
 
-  it("uses the matching category placeholder as the initial image when there's no urlToImage at all", () => {
-    const article = makeArticle({ urlToImage: null, category: ["Entertainment"] });
-    render(<NewsCardThree article={article} viewOnly />);
+  it("renders the category-colored fallback art with the headline overlaid when there's no urlToImage at all", () => {
+    const article = makeArticle({ urlToImage: null, category: ["Entertainment"], title: "No Image Article" });
+    const { container } = render(<NewsCardThree article={article} viewOnly />);
 
-    const img = screen.getByAltText(article.title);
-    expect(img.src).toContain(encodeURIComponent("/images/placeholders/entertainment.png"));
+    expect(screen.queryByAltText("No Image Article")).not.toBeInTheDocument();
+    const art = container.querySelector('[style*="linear-gradient"]');
+    expect(art).toBeInTheDocument();
+    expect(art.style.background).toContain("rgb(219, 39, 119)"); // Entertainment: #db2777
+    // Headline appears as the fallback art's overlay, in addition to its
+    // normal spot below — see ArticleFallbackArt.jsx for why it isn't
+    // deduplicated (the below-image title is a distinct link, to the
+    // in-app reader, not just decoration).
+    expect(screen.getAllByText("No Image Article").length).toBeGreaterThan(0);
   });
 
-  it("falls back to the generic placeholder when the article has no category", () => {
+  it("falls back to the generic color for an article with no category", () => {
     const article = makeArticle({ urlToImage: null, category: [] });
-    render(<NewsCardThree article={article} viewOnly />);
+    const { container } = render(<NewsCardThree article={article} viewOnly />);
 
-    const img = screen.getByAltText(article.title);
-    expect(img.src).toContain(encodeURIComponent("/images/blurimage.png"));
+    const art = container.querySelector('[style*="linear-gradient"]');
+    expect(art.style.background).toContain("rgb(51, 65, 85)"); // default: #334155
   });
 
   it("swiping right past the threshold triggers the save action on the card", async () => {

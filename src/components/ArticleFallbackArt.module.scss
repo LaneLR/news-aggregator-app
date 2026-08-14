@@ -1,0 +1,29 @@
+.art {
+  position: absolute;
+  inset: 0;
+}
+
+// Matches CarouselArticleCard's own .titleOverlay/.title exactly, so a
+// fallback card and a real-photo card read as the same visual language, not
+// two different treatments bolted together.
+.titleOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2rem 0.9rem 0.8rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+.title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

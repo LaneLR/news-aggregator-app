@@ -9,8 +9,9 @@ import ShareButton from "./ShareButton";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
-import { getCategoryColor, getCategoryPlaceholderImage } from "@/lib/categoryColors";
+import { getCategoryColor } from "@/lib/categoryColors";
 import { timeAgo } from "@/lib/timeAgo";
+import ArticleFallbackArt from "./ArticleFallbackArt";
 import { useToast } from "./ToastProvider";
 import styles from "./CarouselArticleCard.module.scss";
 
@@ -23,10 +24,10 @@ export default function CarouselCard({ article, archiveId }) {
   const [likeCount, setLikeCount] = useState(article.likeCount || 0);
 
   const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
-  const FALLBACK_IMAGE_URL = getCategoryPlaceholderImage(badgeCategory);
-  const proxiedImageUrl = article.urlToImage
+  const hasRealImage = typeof article.urlToImage === "string" && article.urlToImage.trim();
+  const proxiedImageUrl = hasRealImage
     ? `/api/image-proxy?url=${encodeURIComponent(article.urlToImage)}`
-    : FALLBACK_IMAGE_URL;
+    : null;
 
   const handleLike = async () => {
     if (!session) {
@@ -62,13 +63,17 @@ export default function CarouselCard({ article, archiveId }) {
   return (
     <div className={`${styles.cardWrapper} ${article.isRead ? styles.read : ""}`}>
       <Link className={styles.imageLink} href={`/article/${article.id}`}>
-        <Image
-          src={proxiedImageUrl}
-          alt={article.title}
-          fill
-          sizes="320px"
-          style={{ objectFit: "cover" }}
-        />
+        {proxiedImageUrl ? (
+          <Image
+            src={proxiedImageUrl}
+            alt={article.title}
+            fill
+            sizes="320px"
+            style={{ objectFit: "cover" }}
+          />
+        ) : (
+          <ArticleFallbackArt category={badgeCategory} />
+        )}
         {badgeCategory && (
           <span
             className={styles.categoryBadge}
