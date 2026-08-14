@@ -26,7 +26,7 @@ describe("getCategoryArticles", () => {
 
     const result = await getCategoryArticles({ category: "business" });
     expect(db.Article.findAndCountAll).toHaveBeenCalledWith(
-      expect.objectContaining({ order: [["publishedAt", "DESC"]] })
+      expect.objectContaining({ order: [{ __literal: '"publishedAt" DESC NULLS LAST' }] })
     );
     expect(result.articles).toHaveLength(1);
     expect(result.total).toBe(1);
@@ -36,20 +36,29 @@ describe("getCategoryArticles", () => {
   it("maps 'liked' and 'trending' sort keys to their DB columns", async () => {
     await getCategoryArticles({ category: "tech", sort: "liked" });
     expect(db.Article.findAndCountAll).toHaveBeenCalledWith(
-      expect.objectContaining({ order: [["likeCount", "DESC"]] })
+      expect.objectContaining({ order: [{ __literal: '"likeCount" DESC NULLS LAST' }] })
     );
 
     await getCategoryArticles({ category: "tech", sort: "trending" });
     expect(db.Article.findAndCountAll).toHaveBeenCalledWith(
-      expect.objectContaining({ order: [["clickCount", "DESC"]] })
+      expect.objectContaining({ order: [{ __literal: '"clickCount" DESC NULLS LAST' }] })
     );
   });
 
   it("falls back to the latest column for an unrecognized sort key", async () => {
     await getCategoryArticles({ category: "tech", sort: "bogus" });
     expect(db.Article.findAndCountAll).toHaveBeenCalledWith(
-      expect.objectContaining({ order: [["publishedAt", "DESC"]] })
+      expect.objectContaining({ order: [{ __literal: '"publishedAt" DESC NULLS LAST' }] })
     );
+  });
+
+  it("sorts NULLs last so an article with no publish date doesn't get stuck at the top of Latest forever", async () => {
+    // Postgres sorts NULLs first in a plain DESC order — without NULLS
+    // LAST, a malformed/dead feed item with no publishedAt would outrank
+    // every genuinely recent article indefinitely.
+    await getCategoryArticles({ category: "tech" });
+    const orderArg = db.Article.findAndCountAll.mock.calls[0][0].order[0];
+    expect(orderArg.__literal).toMatch(/DESC NULLS LAST$/);
   });
 
   it("computes pagination offset/totalPages from page and limit", async () => {

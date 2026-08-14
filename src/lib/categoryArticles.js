@@ -29,7 +29,7 @@ export async function getCategoryArticles({
   limit = 20,
   isSubscribed = false,
 }) {
-  const { Article, ArticleLike, ReadArticle, User } = await initializeDbAndModels();
+  const { Article, ArticleLike, ReadArticle, User, sequelize } = await initializeDbAndModels();
   const effectiveLimit = userId ? limit : Math.min(limit, ANONYMOUS_ARTICLE_LIMIT);
   const offset = (page - 1) * effectiveLimit;
   const sortColumn = SORT_COLUMNS[sort] || SORT_COLUMNS.latest;
@@ -68,7 +68,12 @@ export async function getCategoryArticles({
 
   const { rows, count } = await Article.findAndCountAll({
     where: { [Op.and]: whereConditions },
-    order: [[sortColumn, "DESC"]],
+    // Postgres sorts NULLs first in a DESC order by default — an article
+    // with no publishedAt (a dead/malformed feed item, e.g.) would then sit
+    // permanently at the top of "Latest" regardless of how stale it is,
+    // never aging out. sortColumn only ever comes from the SORT_COLUMNS
+    // whitelist above, never user input, so this is safe to inline.
+    order: [sequelize.literal(`"${sortColumn}" DESC NULLS LAST`)],
     limit: effectiveLimit,
     offset,
   });

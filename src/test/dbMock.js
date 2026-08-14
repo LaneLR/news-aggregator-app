@@ -62,6 +62,10 @@ export function createDbMock() {
       const t = { commit: vi.fn(), rollback: vi.fn(), LOCK: {} };
       return fn ? fn(t) : t;
     }),
+    // Real Sequelize wraps a raw SQL fragment in a Literal instance; this
+    // stand-in keeps the raw string inspectable so tests can assert on it
+    // directly rather than needing to know Sequelize's internal shape.
+    literal: vi.fn((sql) => ({ __literal: sql })),
   };
   return db;
 }
