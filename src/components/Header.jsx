@@ -231,7 +231,7 @@ export default function Header() {
               />
             </div>
             <div className={styles.logoTextWrapper}>
-              <div className={`${styles.logoText} headline`}>
+              <div className={`${styles.logoText}`}>
                 <span>Mocha</span>
                 <span>Reads</span>
               </div>

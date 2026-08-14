@@ -10,15 +10,53 @@
   display: none;
 
   @media (min-width: 900px) {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 2.5rem;
+    display: block;
+    position: relative;
     flex: 1 1 45%;
-    padding: 4rem;
+    overflow: hidden;
     background-color: var(--theme-layout-background);
     border-right: 1px solid var(--theme-border);
   }
+}
+
+.brandPhoto {
+  // Grayscale, not the source photo's own color — reads as a deliberate
+  // editorial choice rather than a random stock photo, and keeps the warm
+  // caramel accent below the one spot of color in the whole panel.
+  filter: grayscale(1);
+}
+
+.brandOverlay {
+  position: absolute;
+  inset: 0;
+  // A near-black wash, not a top/bottom gradient — the content is
+  // vertically centered rather than anchored to one edge, so a uniform
+  // scrim (dark enough alone to guarantee the white text below stays
+  // legible over any part of the photo) fits better than a directional one.
+  background-color: rgba(15, 15, 17, 0.74);
+}
+
+.brandContent {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 4rem;
+
+  // This panel is now a dark photo background regardless of whether the
+  // rest of the page is forced light (see RootLayout/ThemeProvider) or a
+  // signed-in user's dark theme — --theme-primary in light mode is a deep
+  // brown tuned for contrast against white, not near-black. Same fix as
+  // HomePage.module.scss/ArticleFallbackArt: scope the specific tokens this
+  // subtree needs to fixed values rather than the page-wide theme
+  // variables. Values match the site's own dark-theme accent
+  // (--theme-primary in themes.scss's dark block) so it's not a new color,
+  // just reused where a dark surface calls for it.
+  --brand-accent: #c9925c;
+  --brand-text: #ffffff;
+  --brand-text-secondary: rgba(255, 255, 255, 0.78);
 }
 
 .logoLink {
@@ -34,9 +72,9 @@
   justify-content: center;
 
   // See the identical rule in Header.module.scss — the M mark's own
-  // background is nearly the same near-black as this panel's background in
-  // dark mode (~1.18:1 contrast), so it needs a visible edge. Inert (and
-  // harmless) against the light-mode white background this panel also uses.
+  // background is near-black, same as this panel's dark photo background,
+  // so it needs a visible edge to read as a logo mark rather than
+  // disappearing into the scrim behind it.
   img {
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
     border-radius: 2px;
@@ -45,16 +83,20 @@
 
 .logoText {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   line-height: 1.05;
   font-family: var(--font-lora), serif;
-  font-weight: 700;
-  font-size: 1.3rem;
-  color: var(--theme-text);
+  font-weight: 600;
+  font-size: 2rem;
+  color: var(--brand-text);
   text-transform: capitalize;
 
-  span:last-child {
-    color: var(--theme-primary);
+  // Matches Header.module.scss's own .logoText exactly: "Mocha" (first) is
+  // the accent color, "Reads" (last) is the plain text color — this used to
+  // be backwards here (a pre-existing inconsistency, not something this
+  // session's photo-background change introduced).
+  span:first-child {
+    color: var(--brand-accent);
   }
 }
 
@@ -62,7 +104,7 @@
   font-size: 2.1rem;
   font-weight: 700;
   line-height: 1.35;
-  color: var(--theme-text);
+  color: var(--brand-text);
   margin: 0;
   max-width: 420px;
 }
@@ -91,21 +133,21 @@
   height: 40px;
   flex-shrink: 0;
   border-radius: var(--radius-sm);
-  background-color: color-mix(in srgb, var(--theme-primary) 12%, transparent);
-  color: var(--theme-primary);
+  background-color: color-mix(in srgb, var(--brand-accent) 20%, transparent);
+  color: var(--brand-accent);
 }
 
 .highlightTitle {
   margin: 0 0 2px 0;
   font-weight: 600;
-  color: var(--theme-text);
+  color: var(--brand-text);
   font-size: 0.95rem;
 }
 
 .highlightDescription {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--theme-text-secondary);
+  color: var(--brand-text-secondary);
   line-height: 1.4;
 }
 
