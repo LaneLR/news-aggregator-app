@@ -25,6 +25,18 @@ export async function GET(req, { params }) {
   const page = Math.max(1, parseInt(searchParams.get("page"), 10) || 1);
   const sort = searchParams.get("sort") || "latest";
 
+  // Anonymous visitors get a fixed, page-1/"latest"-only teaser of a
+  // category (see ANONYMOUS_ARTICLE_LIMIT in categoryArticles.js) — Trending
+  // and Most Liked reflect this app's own click/like activity, and paging
+  // past the teaser, both require an account. Reject either directly here
+  // too, not just in the UI, for the same reason as the 403 above.
+  if (!session && (sort !== "latest" || page > 1)) {
+    return NextResponse.json(
+      { error: "Sign in to view this content." },
+      { status: 401 }
+    );
+  }
+
   try {
     const data = await getCategoryArticles({
       category: category.toLowerCase(),

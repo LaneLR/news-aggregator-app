@@ -68,11 +68,11 @@ describe("GET /api/articles/[category]", () => {
     expect(res.status).toBe(200);
   });
 
-  it("allows anonymous visitors into a non-gated category", async () => {
+  it("allows anonymous visitors into a non-gated category on the default latest/page-1 view", async () => {
     mockAuth.mockResolvedValue(null);
     mockGetCategoryArticles.mockResolvedValue({ articles: [] });
 
-    const res = await GET(makeRequest("http://localhost/api/articles/business?page=2&sort=liked"), {
+    const res = await GET(makeRequest("http://localhost/api/articles/business"), {
       params: Promise.resolve({ category: "business" }),
     });
     const body = await res.json();
@@ -81,11 +81,47 @@ describe("GET /api/articles/[category]", () => {
     expect(body.articles).toEqual([]);
     expect(mockGetCategoryArticles).toHaveBeenCalledWith({
       category: "business",
-      sort: "liked",
+      sort: "latest",
       userId: undefined,
-      page: 2,
+      page: 1,
       isSubscribed: false,
     });
+  });
+
+  it("blocks anonymous visitors from Trending/Most Liked sorts", async () => {
+    mockAuth.mockResolvedValue(null);
+
+    const res = await GET(makeRequest("http://localhost/api/articles/business?sort=liked"), {
+      params: Promise.resolve({ category: "business" }),
+    });
+
+    expect(res.status).toBe(401);
+    expect(mockGetCategoryArticles).not.toHaveBeenCalled();
+  });
+
+  it("blocks anonymous visitors from paging past the teaser", async () => {
+    mockAuth.mockResolvedValue(null);
+
+    const res = await GET(makeRequest("http://localhost/api/articles/business?page=2"), {
+      params: Promise.resolve({ category: "business" }),
+    });
+
+    expect(res.status).toBe(401);
+    expect(mockGetCategoryArticles).not.toHaveBeenCalled();
+  });
+
+  it("allows a signed-in user to request Trending sort and page 2", async () => {
+    mockAuth.mockResolvedValue(makeSession({ tier: "Free" }));
+    mockGetCategoryArticles.mockResolvedValue({ articles: [] });
+
+    const res = await GET(makeRequest("http://localhost/api/articles/business?page=2&sort=liked"), {
+      params: Promise.resolve({ category: "business" }),
+    });
+
+    expect(res.status).toBe(200);
+    expect(mockGetCategoryArticles).toHaveBeenCalledWith(
+      expect.objectContaining({ sort: "liked", page: 2 })
+    );
   });
 
   it("returns 500 when the data layer throws", async () => {

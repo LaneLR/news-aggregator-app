@@ -156,8 +156,9 @@ describe("CategoryPage", () => {
     expect(screen.queryByText("MarketTicker")).not.toBeInTheDocument();
   });
 
-  it("switches sort and reloads articles", async () => {
+  it("switches sort and reloads articles for a signed-in user", async () => {
     const user = userEvent.setup();
+    mockSession.value = { user: { id: "user-1" } };
     mockFetchRoutes([
       [/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })],
       [/\/api\/articles\/business\?sort=trending/, () => makeFetchResponse({ articles: [makeArticle({ title: "Trending Story" })], totalPages: 1 })],
@@ -169,8 +170,9 @@ describe("CategoryPage", () => {
     expect(await screen.findByText("Card:Trending Story")).toBeInTheDocument();
   });
 
-  it("loads more articles and appends them, then shows 'caught up' at the last page", async () => {
+  it("loads more articles and appends them, then shows 'caught up' at the last page, for a signed-in user", async () => {
     const user = userEvent.setup();
+    mockSession.value = { user: { id: "user-1" } };
     mockFetchRoutes([
       [/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })],
       [/\/api\/articles\/business\?sort=latest&page=2/, () => makeFetchResponse({ articles: [makeArticle({ title: "Page Two Story" })], totalPages: 2 })],
@@ -188,6 +190,42 @@ describe("CategoryPage", () => {
     expect(await screen.findByText("Card:Page Two Story")).toBeInTheDocument();
     expect(screen.getByText("Card:Page One Story")).toBeInTheDocument();
     expect(await screen.findByText("You're all caught up.")).toBeInTheDocument();
+  });
+
+  it("shows a sign-in prompt instead of fetching when a signed-out user selects Trending", async () => {
+    const user = userEvent.setup();
+    mockFetchRoutes([
+      [/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })],
+      [
+        /\/api\/articles\/business\?sort=trending/,
+        () => {
+          throw new Error("Should not fetch a gated sort while signed out");
+        },
+      ],
+    ]);
+
+    render(<CategoryPage category="business" initialArticles={[makeArticle({ title: "Latest Story" })]} initialTotalPages={1} />);
+    await user.click(screen.getByRole("button", { name: /Trending/ }));
+
+    expect(await screen.findByText(/Sign in to see Trending Business articles\./)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Sign In" })).toHaveAttribute("href", "/login");
+    expect(screen.getByRole("link", { name: "Create Account" })).toHaveAttribute("href", "/register");
+    expect(screen.queryByText("Card:Latest Story")).not.toBeInTheDocument();
+  });
+
+  it("shows a sign-in prompt instead of a Load More button for a signed-out user", async () => {
+    mockFetchRoutes([[/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })]]);
+
+    render(
+      <CategoryPage
+        category="business"
+        initialArticles={[makeArticle({ title: "Page One Story" })]}
+        initialTotalPages={2}
+      />
+    );
+
+    expect(await screen.findByText("Sign in to load more articles.")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Load More" })).not.toBeInTheDocument();
   });
 
   it("toggles select mode and enters bulk-selection for a signed-in user", async () => {

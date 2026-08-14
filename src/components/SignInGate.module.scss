@@ -1,0 +1,79 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+  color: var(--theme-text-secondary);
+
+  svg {
+    color: var(--theme-border);
+  }
+}
+
+.message {
+  font-size: 0.95rem;
+  max-width: 380px;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+}
+
+.primaryLink {
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
+  background-color: var(--theme-primary);
+  color: var(--theme-primary-contrast);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: filter 0.15s ease-in-out;
+
+  &:hover {
+    filter: brightness(1.06);
+  }
+}
+
+.secondaryLink {
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: border-color 0.15s ease-in-out, color 0.15s ease-in-out;
+
+  &:hover {
+    border-color: var(--theme-primary);
+    color: var(--theme-primary);
+  }
+}
+
+// Used inline next to a Load More slot rather than as a full content-area
+// takeover — smaller footprint so it doesn't dominate the page the way the
+// sort-tab gate (the default, non-compact size) does.
+.compact {
+  padding: 1.5rem 1rem;
+  gap: 0.4rem;
+
+  .message {
+    font-size: 0.85rem;
+  }
+
+  .actions {
+    gap: 0.5rem;
+  }
+
+  .primaryLink,
+  .secondaryLink {
+    padding: 6px 14px;
+    font-size: 0.82rem;
+  }
+}

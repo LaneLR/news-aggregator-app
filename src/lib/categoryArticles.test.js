@@ -54,11 +54,37 @@ describe("getCategoryArticles", () => {
 
   it("computes pagination offset/totalPages from page and limit", async () => {
     db.Article.findAndCountAll.mockResolvedValue({ rows: [], count: 45 });
-    const result = await getCategoryArticles({ category: "tech", page: 2, limit: 20 });
+    const result = await getCategoryArticles({
+      category: "tech",
+      userId: "user-1",
+      page: 2,
+      limit: 20,
+    });
     expect(db.Article.findAndCountAll).toHaveBeenCalledWith(
       expect.objectContaining({ limit: 20, offset: 20 })
     );
     expect(result.totalPages).toBe(3);
+  });
+
+  it("caps the limit to ANONYMOUS_ARTICLE_LIMIT when there's no userId", async () => {
+    // Rejecting page 2+ for an anonymous caller is the API route's job (see
+    // route.js's 401 check) — this function just makes sure the *limit*
+    // itself can never be widened past the teaser size, protecting the SSR
+    // category page's own initial-load call too.
+    db.Article.findAndCountAll.mockResolvedValue({ rows: [], count: 45 });
+    const result = await getCategoryArticles({ category: "tech", page: 1, limit: 20 });
+    expect(db.Article.findAndCountAll).toHaveBeenCalledWith(
+      expect.objectContaining({ limit: 10, offset: 0 })
+    );
+    expect(result.totalPages).toBe(5);
+  });
+
+  it("does not cap the limit for a logged-in user, even below ANONYMOUS_ARTICLE_LIMIT", async () => {
+    db.Article.findAndCountAll.mockResolvedValue({ rows: [], count: 3 });
+    await getCategoryArticles({ category: "tech", userId: "user-1", limit: 5 });
+    expect(db.Article.findAndCountAll).toHaveBeenCalledWith(
+      expect.objectContaining({ limit: 5 })
+    );
   });
 
   it("marks articles the user has liked and read", async () => {

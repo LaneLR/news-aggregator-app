@@ -9,6 +9,15 @@ const SORT_COLUMNS = {
   latest: "publishedAt",
 };
 
+// Logged-out visitors get a small teaser of a category instead of the full
+// paginated list — see the route-level check in
+// /api/articles/[category]/route.js, which rejects any request for page 2+
+// or a non-"latest" sort while signed out. Capping the limit here too
+// protects the SSR category page's own initial-load call, which always
+// requests the ordinary page-1 default and would otherwise hand back a
+// full page.
+export const ANONYMOUS_ARTICLE_LIMIT = 10;
+
 // Shared by /api/articles/[category] (client-side sort-toggle re-fetches)
 // and the category page Server Components (initial server-rendered paint) —
 // one query, not two copies that could drift.
@@ -21,7 +30,8 @@ export async function getCategoryArticles({
   isSubscribed = false,
 }) {
   const { Article, ArticleLike, ReadArticle, User } = await initializeDbAndModels();
-  const offset = (page - 1) * limit;
+  const effectiveLimit = userId ? limit : Math.min(limit, ANONYMOUS_ARTICLE_LIMIT);
+  const offset = (page - 1) * effectiveLimit;
   const sortColumn = SORT_COLUMNS[sort] || SORT_COLUMNS.latest;
   const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
 
@@ -59,7 +69,7 @@ export async function getCategoryArticles({
   const { rows, count } = await Article.findAndCountAll({
     where: { [Op.and]: whereConditions },
     order: [[sortColumn, "DESC"]],
-    limit,
+    limit: effectiveLimit,
     offset,
   });
 
@@ -71,6 +81,6 @@ export async function getCategoryArticles({
     })),
     total: count,
     page,
-    totalPages: Math.ceil(count / limit),
+    totalPages: Math.ceil(count / effectiveLimit),
   };
 }
