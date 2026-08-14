@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Bookmark } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useToast } from "./ToastProvider";
 import styles from "./ArchiveToggleButton.module.scss";
 
@@ -9,6 +11,8 @@ export default function ArchiveToggleButton({
   archiveId: propArchiveId,
   viewOnly = false,
 }) {
+  const { data: session } = useSession();
+  const router = useRouter();
   const toast = useToast();
   const [archives, setArchives] = useState([]);
   const [selectedArchiveId, setSelectedArchiveId] = useState(
@@ -26,6 +30,11 @@ export default function ArchiveToggleButton({
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
   useEffect(() => {
+    // No point calling an authenticated endpoint for a signed-out visitor —
+    // it would just 401. The save button itself redirects them to /login
+    // before this list is ever needed (see handleSaveClick below).
+    if (!session) return;
+
     const fetchArchives = async () => {
       try {
         const res = await fetch("/api/archives");
@@ -36,7 +45,7 @@ export default function ArchiveToggleButton({
       }
     };
     fetchArchives();
-  }, []);
+  }, [session]);
 
   useEffect(() => {
     // propArchiveId means the parent already told us exactly which archive
@@ -46,7 +55,7 @@ export default function ArchiveToggleButton({
     // pages all render with viewOnly=true and no archiveId), where this
     // check is the only way the bookmark icon ever reflects an article the
     // user already saved in a previous session.
-    if (isSaved || !article.url || propArchiveId) return;
+    if (isSaved || !article.url || propArchiveId || !session) return;
 
     const checkIfSaved = async () => {
       try {
@@ -70,7 +79,7 @@ export default function ArchiveToggleButton({
     };
 
     checkIfSaved();
-  }, [article.url, propArchiveId, isSaved]);
+  }, [article.url, propArchiveId, isSaved, session]);
 
   const handleArchiveSelect = async (archiveId) => {
     setLoading(true);
@@ -102,6 +111,15 @@ export default function ArchiveToggleButton({
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSaveClick = () => {
+    if (!session) {
+      toast.info("Sign in to save articles.");
+      router.push("/login");
+      return;
+    }
+    setDropdownVisible(!dropdownVisible);
   };
 
   const handleRemove = async () => {
@@ -165,7 +183,7 @@ export default function ArchiveToggleButton({
             type="button"
             data-action="save"
             className={`${styles.saveButton} ${isSaved ? styles.saved : ""}`}
-            onClick={() => setDropdownVisible(!dropdownVisible)}
+            onClick={handleSaveClick}
             disabled={loading}
             title={isSaved ? "Saved" : "Save to archive"}
             aria-label={isSaved ? "Saved" : "Save to archive"}

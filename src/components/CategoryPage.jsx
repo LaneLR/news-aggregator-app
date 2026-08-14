@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Newspaper, RefreshCw, ListChecks, X, Sparkles } from "lucide-react";
+import { Newspaper, RefreshCw, ListChecks, X, Sparkles, Lock } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 import ThreePaneLayout from "./ThreePaneLayout";
@@ -18,12 +18,18 @@ import SectorPerformance from "./SectorPerformance";
 import MostCovered from "./MostCovered";
 import Watchlist from "./Watchlist";
 import BulkActionBar from "./BulkActionBar";
+import SignInGate from "./SignInGate";
 import { useArticleShortcuts } from "@/lib/useArticleShortcuts";
 import { useMarkAllRead } from "@/lib/useMarkAllRead";
 import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
 import styles from "./CategoryPage.module.scss";
 
 const GATED_DENSITIES = new Set(["list", "magazine"]);
+// Trending/Most Liked reflect this app's own click/like activity rather
+// than a plain chronological feed — signed-out visitors get Latest only
+// (see ANONYMOUS_ARTICLE_LIMIT server-side); picking either of these while
+// signed out shows a sign-in prompt instead of fetching.
+const GATED_SORTS = new Set(["trending", "liked"]);
 
 async function fetchCategoryArticles(category, sort, page = 1) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -45,6 +51,7 @@ export default function CategoryPage({
   initialTotalPages,
 }) {
   const { data: session } = useSession();
+  const isLoggedIn = !!session;
   const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
   const { viewDensity, setViewDensity } = useLayoutPrefs();
   const effectiveDensity = GATED_DENSITIES.has(viewDensity) && !isSubscribed ? "card" : viewDensity;
@@ -72,6 +79,7 @@ export default function CategoryPage({
 
   const categoryNameForDisplay =
     category.charAt(0).toUpperCase() + category.slice(1);
+  const sortRequiresLogin = !isLoggedIn && GATED_SORTS.has(sort);
 
   const loadArticles = async () => {
     setIsLoading(true);
@@ -111,18 +119,20 @@ export default function CategoryPage({
   };
 
   useEffect(() => {
-    if (category) {
-      if (skipNextFetch.current) {
-        skipNextFetch.current = false;
-      } else {
-        loadArticles();
-      }
+    if (!category) return;
+    // A gated sort with no session renders SignInGate instead of the grid —
+    // nothing to fetch, and fetching would just surface as an error.
+    if (sortRequiresLogin) return;
+    if (skipNextFetch.current) {
+      skipNextFetch.current = false;
+    } else {
+      loadArticles();
     }
     // loadArticles is intentionally omitted below — it's a plain function
     // re-created every render, so including it would re-fetch on every
     // render instead of only on a real category/sort change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [category, sort]);
+  }, [category, sort, sortRequiresLogin]);
 
   // Read via a ref rather than closing over latestTimestamp directly: the
   // focus listener below is only re-registered when category/sort change,
@@ -138,7 +148,7 @@ export default function CategoryPage({
 
   useEffect(() => {
     const handleFocus = async () => {
-      if (!category) return;
+      if (!category || sortRequiresLogin) return;
       try {
         const latest = await fetchCategoryArticles(category.toLowerCase(), sort, 1);
         const latestArticle = latest.articles[0];
@@ -157,7 +167,7 @@ export default function CategoryPage({
 
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
-  }, [category, sort]);
+  }, [category, sort, sortRequiresLogin]);
 
   const refreshArticles = async () => {
     setNewAvailable(false);
@@ -335,6 +345,7 @@ export default function CategoryPage({
             className={`${styles.sortOption} ${sort === "trending" ? styles.active : ""}`}
             onClick={() => setSort("trending")}
           >
+            {!isLoggedIn && <Lock size={11} strokeWidth={2.5} />}
             Trending
           </button>
           <button
@@ -342,6 +353,7 @@ export default function CategoryPage({
             className={`${styles.sortOption} ${sort === "liked" ? styles.active : ""}`}
             onClick={() => setSort("liked")}
           >
+            {!isLoggedIn && <Lock size={11} strokeWidth={2.5} />}
             Most Liked
           </button>
         </div>
@@ -361,7 +373,13 @@ export default function CategoryPage({
         )}
       </div>
 
-      {isLoading ? (
+      {sortRequiresLogin ? (
+        <SignInGate
+          message={`Sign in to see ${
+            sort === "trending" ? "Trending" : "Most Liked"
+          } ${categoryNameForDisplay} articles.`}
+        />
+      ) : isLoading ? (
         <NewsGridWrapper density={skeletonDensity}>
           {Array.from({ length: 6 }).map((_, i) => (
             <CardSkeleton key={i} density={skeletonDensity} />
@@ -403,14 +421,18 @@ export default function CategoryPage({
 
           <div className={styles.loadMoreRow}>
             {page < totalPages ? (
-              <Button
-                bgColor={"var(--theme-layout-background)"}
-                clr={"var(--theme-dark-blue)"}
-                onClick={loadMoreArticles}
-                disabled={isLoadingMore}
-              >
-                {isLoadingMore ? "Loading…" : "Load More"}
-              </Button>
+              isLoggedIn ? (
+                <Button
+                  bgColor={"var(--theme-layout-background)"}
+                  clr={"var(--theme-dark-blue)"}
+                  onClick={loadMoreArticles}
+                  disabled={isLoadingMore}
+                >
+                  {isLoadingMore ? "Loading…" : "Load More"}
+                </Button>
+              ) : (
+                <SignInGate message="Sign in to load more articles." compact />
+              )
             ) : (
               <p className={styles.caughtUpText}>You&apos;re all caught up.</p>
             )}

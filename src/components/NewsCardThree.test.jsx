@@ -214,6 +214,7 @@ describe("NewsCardThree", () => {
   });
 
   it("swiping right past the threshold triggers the save action on the card", async () => {
+    mockSession = makeSession();
     const article = makeArticle();
     const { container } = render(<NewsCardThree article={article} viewOnly />);
     const wrapper = container.firstChild;
@@ -224,6 +225,19 @@ describe("NewsCardThree", () => {
 
     const saveButton = screen.getByRole("button", { name: "Save to archive" });
     await waitFor(() => expect(saveButton).toHaveAttribute("aria-expanded", "true"));
+  });
+
+  it("swiping right while signed out redirects to login instead of opening the archive dropdown", async () => {
+    const article = makeArticle();
+    const { container } = render(<NewsCardThree article={article} viewOnly />);
+    const wrapper = container.firstChild;
+
+    fireEvent.touchStart(wrapper, { touches: [{ clientX: 0 }] });
+    fireEvent.touchMove(wrapper, { touches: [{ clientX: 100 }] });
+    fireEvent.touchEnd(wrapper);
+
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/login"));
+    expect(screen.getByRole("button", { name: "Save to archive" })).toHaveAttribute("aria-expanded", "false");
   });
 
   it("swiping left past the threshold marks the article read when signed in", async () => {

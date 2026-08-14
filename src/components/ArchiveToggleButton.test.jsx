@@ -1,12 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { makeFetchResponse } from "@/test/fixtures";
+import { makeFetchResponse, makeSession } from "@/test/fixtures";
+
+// Defaults to signed-in — every existing test here exercises the normal
+// save/remove flow, which requires a session. The signed-out case (redirect
+// to /login instead of opening the dropdown) gets its own test below.
+let mockSession = makeSession();
+const push = vi.fn();
+vi.mock("next-auth/react", () => ({
+  useSession: () => ({ data: mockSession, status: mockSession ? "authenticated" : "unauthenticated" }),
+}));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push }),
+}));
 
 const toast = { success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn(), show: vi.fn(), dismiss: vi.fn() };
 vi.mock("./ToastProvider", () => ({ useToast: () => toast }));
 
-// Imported after the mock so ArchiveToggleButton picks up the mocked hook.
+// Imported after the mocks so ArchiveToggleButton picks up the mocked hooks.
 const { default: ArchiveToggleButton } = await import("./ArchiveToggleButton");
 
 const article = {
@@ -33,8 +45,27 @@ function mockFetchRoutes(routes) {
 
 describe("ArchiveToggleButton", () => {
   beforeEach(() => {
+    mockSession = makeSession();
+    push.mockClear();
     toast.success.mockClear();
     toast.error.mockClear();
+    toast.info.mockClear();
+  });
+
+  it("redirects to login instead of opening the dropdown when signed out", async () => {
+    const user = userEvent.setup();
+    mockSession = null;
+
+    render(<ArchiveToggleButton article={article} viewOnly />);
+
+    await user.click(screen.getByRole("button", { name: "Save to archive" }));
+
+    expect(toast.info).toHaveBeenCalledWith("Sign in to save articles.");
+    expect(push).toHaveBeenCalledWith("/login");
+    expect(screen.getByRole("button", { name: "Save to archive" })).toHaveAttribute("aria-expanded", "false");
+    // No authenticated calls attempted for a visitor who was never going to
+    // see their result anyway.
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 
   it("shows 'Save to archive' when the article isn't saved yet (ordinary feed card)", async () => {

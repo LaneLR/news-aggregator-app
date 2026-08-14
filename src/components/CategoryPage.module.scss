@@ -84,6 +84,9 @@
 }
 
 .sortOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 6px 16px;
   border-radius: 999px;
   border: none;
