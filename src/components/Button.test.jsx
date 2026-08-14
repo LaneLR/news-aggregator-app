@@ -53,4 +53,12 @@ describe("Button", () => {
     const button = screen.getByRole("button");
     expect(button).toHaveStyle({ backgroundColor: "rgb(1, 2, 3)", color: "rgb(4, 5, 6)", width: "100%" });
   });
+
+  it("merges an optional className onto the button's own wrapper class", () => {
+    render(<Button className="extraClass">Go</Button>);
+    const button = screen.getByRole("button");
+    expect(button.className).toContain("extraClass");
+    // The button's own base styling class should still be present, not replaced.
+    expect(button.className.split(" ").length).toBeGreaterThan(1);
+  });
 });

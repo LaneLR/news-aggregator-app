@@ -223,7 +223,7 @@ export default function Header() {
           <div className={styles.logoLink}>
             <div className={styles.logoContainer}>
               <Image
-                priority
+                preload
                 src={"/images/MochaReads-M.png"}
                 alt={"MochaReads logo"}
                 width={52}
@@ -261,7 +261,7 @@ export default function Header() {
               <Link className={styles.logoLink} href={"/news"}>
                 <div className={styles.logoContainer}>
                   <Image
-                    priority
+                    preload
                     src={"/images/MochaReads-M.png"}
                     alt={"MochaReads logo"}
                     width={52}
@@ -296,7 +296,7 @@ export default function Header() {
             <Link className={styles.logoLink} href={"/"}>
               <div className={styles.logoContainer}>
                 <Image
-                  priority
+                  preload
                   src={"/images/MochaReads-M.png"}
                   alt={"MochaReads logo"}
                   width={52}
@@ -315,7 +315,11 @@ export default function Header() {
           <div className={styles.rightContainer}>
             <nav style={{ display: "flex", columnGap: "10px" }}>
               <Link style={{ display: "flex" }} href={"/login"}>
-                <Button bgColor={"var(--theme-title-contrast)"} clr={"var(--theme-primary-contrast)"}>
+                <Button
+                  bgColor={"var(--theme-title-contrast)"}
+                  clr={"var(--theme-primary-contrast)"}
+                  className={styles.logInButton}
+                >
                   Log in
                 </Button>
               </Link>

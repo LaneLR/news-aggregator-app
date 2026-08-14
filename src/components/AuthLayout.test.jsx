@@ -5,7 +5,7 @@ import AuthLayout from "./AuthLayout";
 describe("AuthLayout", () => {
   it("renders the brand highlights and children", () => {
     render(
-      <AuthLayout activeTab="signin">
+      <AuthLayout>
         <p>Login form</p>
       </AuthLayout>
     );
@@ -15,16 +15,13 @@ describe("AuthLayout", () => {
     expect(screen.getByText("Login form")).toBeInTheDocument();
   });
 
-  it("shows the sign in / register tabs with the active one marked when activeTab is signin or register", () => {
-    render(<AuthLayout activeTab="signin">{null}</AuthLayout>);
-    const signInTab = screen.getByRole("link", { name: "Sign In" });
-    const registerTab = screen.getByRole("link", { name: "Create Account" });
-    expect(signInTab).toHaveAttribute("href", "/login");
-    expect(registerTab).toHaveAttribute("href", "/register");
+  it("renders whatever tabs node it's given", () => {
+    render(<AuthLayout tabs={<div>My Tabs</div>}>{null}</AuthLayout>);
+    expect(screen.getByText("My Tabs")).toBeInTheDocument();
   });
 
-  it("hides the tab row for other activeTab values (e.g. forgot-password)", () => {
-    render(<AuthLayout activeTab="forgot-password">{null}</AuthLayout>);
+  it("renders nothing where the tab row would go when no tabs prop is passed", () => {
+    render(<AuthLayout>{null}</AuthLayout>);
     expect(screen.queryByRole("link", { name: "Sign In" })).not.toBeInTheDocument();
   });
 });

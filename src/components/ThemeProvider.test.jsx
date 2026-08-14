@@ -9,8 +9,17 @@ vi.mock("next-auth/react", () => ({
 const { default: ThemeProvider } = await import("./ThemeProvider");
 
 describe("ThemeProvider", () => {
-  it("removes the data-theme attribute when no theme is selected (follow system)", () => {
+  it("forces light when there's no session at all — logged-out visitors never get dark", () => {
     mockSession = null;
+    document.documentElement.setAttribute("data-theme", "dark");
+
+    render(<ThemeProvider>child</ThemeProvider>);
+
+    expect(document.documentElement).toHaveAttribute("data-theme", "default");
+  });
+
+  it("removes the data-theme attribute for a signed-in user with no explicit choice (Auto follows system)", () => {
+    mockSession = { user: { selectedTheme: null } };
     document.documentElement.setAttribute("data-theme", "dark");
 
     render(<ThemeProvider>child</ThemeProvider>);

@@ -52,6 +52,21 @@
   }
 }
 
+// The default Button box-shadow (--shadow-sm) is a near-black, low-opacity
+// shadow — meant to read as depth against a light card/page background.
+// Against the header's near-black bar it's essentially invisible, so the
+// logged-out "Log in" button had no visual lift at all. A warm glow tinted
+// with the button's own fill color (--theme-title-contrast) reads clearly
+// against dark and looks intentional rather than like a generic drop
+// shadow.
+.logInButton {
+  box-shadow: 0 0 0 1px rgba(201, 146, 92, 0.35), 0 4px 14px rgba(201, 146, 92, 0.45);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 0 0 1px rgba(201, 146, 92, 0.5), 0 6px 18px rgba(201, 146, 92, 0.6);
+  }
+}
+
 .rightContainer {
   display: flex;
   align-items: center;

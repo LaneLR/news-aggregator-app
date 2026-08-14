@@ -8,7 +8,6 @@ import { Mail, Lock, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import Button from "@/components/Button";
 import Loading from "@/app/loading";
 import GoogleSignInButton from "./GoogleSignInButton";
-import AuthLayout from "./AuthLayout";
 import styles from "./LoginForm.module.scss";
 
 // Keyed on the custom `code` each CredentialsSignin subclass sets in
@@ -94,84 +93,82 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthLayout activeTab="signin">
-      <div className={styles.formBody}>
-        <h2 className={styles.formTitle}>Sign In</h2>
+    <div className={styles.formBody}>
+      <h2 className={styles.formTitle}>Sign In</h2>
 
-        {justVerified && (
-          <div className={styles.verifiedBanner}>
-            <CheckCircle2 size={16} strokeWidth={2} />
-            Email verified — you can now sign in.
+      {justVerified && (
+        <div className={styles.verifiedBanner}>
+          <CheckCircle2 size={16} strokeWidth={2} />
+          Email verified — you can now sign in.
+        </div>
+      )}
+
+      <form className={styles.form} onSubmit={handleLoginUser}>
+        <label className={styles.field}>
+          <span className={styles.fieldLabel}>Email Address</span>
+          <div className={styles.inputGroup}>
+            <Mail size={17} strokeWidth={2} className={styles.inputIcon} />
+            <input
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              required
+              value={user.email}
+              onChange={handleChange}
+            />
           </div>
-        )}
+        </label>
 
-        <form className={styles.form} onSubmit={handleLoginUser}>
-          <label className={styles.field}>
-            <span className={styles.fieldLabel}>Email Address</span>
-            <div className={styles.inputGroup}>
-              <Mail size={17} strokeWidth={2} className={styles.inputIcon} />
-              <input
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                required
-                value={user.email}
-                onChange={handleChange}
-              />
-            </div>
-          </label>
+        <label className={styles.field}>
+          <div className={styles.fieldLabelRow}>
+            <span className={styles.fieldLabel}>Password</span>
+            <Link href="/forgot-password" className={styles.inlineLink}>
+              Forgot Password?
+            </Link>
+          </div>
+          <div className={styles.inputGroup}>
+            <Lock size={17} strokeWidth={2} className={styles.inputIcon} />
+            <input
+              name="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              required
+              value={user.password}
+              onChange={handleChange}
+            />
+            <button
+              type="button"
+              className={styles.togglePasswordButton}
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+            </button>
+          </div>
+        </label>
 
-          <label className={styles.field}>
-            <div className={styles.fieldLabelRow}>
-              <span className={styles.fieldLabel}>Password</span>
-              <Link href="/forgot-password" className={styles.inlineLink}>
-                Forgot Password?
-              </Link>
-            </div>
-            <div className={styles.inputGroup}>
-              <Lock size={17} strokeWidth={2} className={styles.inputIcon} />
-              <input
-                name="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                required
-                value={user.password}
-                onChange={handleChange}
-              />
-              <button
-                type="button"
-                className={styles.togglePasswordButton}
-                onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-              </button>
-            </div>
-          </label>
+        {error && <p className={styles.errorText}>{error}</p>}
 
-          {error && <p className={styles.errorText}>{error}</p>}
+        <Button
+          bgColor={"var(--theme-primary)"}
+          clr={"var(--theme-primary-contrast)"}
+          type="submit"
+          disabled={loading}
+          wide={"100%"}
+        >
+          {loading ? "Signing in..." : "Sign In"}
+        </Button>
+      </form>
 
-          <Button
-            bgColor={"var(--theme-primary)"}
-            clr={"var(--theme-primary-contrast)"}
-            type="submit"
-            disabled={loading}
-            wide={"100%"}
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </Button>
-        </form>
-
-        <div className={styles.divider}>
-          <span>Or continue with</span>
-        </div>
-
-        <div className={styles.socialRow}>
-          <GoogleSignInButton
-            onClick={() => signIn("google", { callbackUrl: "/news" })}
-          />
-        </div>
+      <div className={styles.divider}>
+        <span>Or continue with</span>
       </div>
-    </AuthLayout>
+
+      <div className={styles.socialRow}>
+        <GoogleSignInButton
+          onClick={() => signIn("google", { callbackUrl: "/news" })}
+        />
+      </div>
+    </div>
   );
 }

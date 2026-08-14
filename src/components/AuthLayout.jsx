@@ -21,7 +21,7 @@ const HIGHLIGHTS = [
   },
 ];
 
-export default function AuthLayout({ activeTab, children }) {
+export default function AuthLayout({ tabs, children }) {
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.brandPanel}>
@@ -63,22 +63,7 @@ export default function AuthLayout({ activeTab, children }) {
 
       <div className={styles.formPanel}>
         <div className={styles.card}>
-          {(activeTab === "signin" || activeTab === "register") && (
-            <div className={styles.tabRow}>
-              <Link
-                href="/login"
-                className={`${styles.tab} ${activeTab === "signin" ? styles.activeTab : ""}`}
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/register"
-                className={`${styles.tab} ${activeTab === "register" ? styles.activeTab : ""}`}
-              >
-                Create Account
-              </Link>
-            </div>
-          )}
+          {tabs}
           {children}
         </div>
       </div>

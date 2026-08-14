@@ -13,12 +13,6 @@ vi.mock("next-auth/react", () => ({
 vi.mock("next/navigation", () => ({
   useSearchParams: () => mockSearchParams,
 }));
-// AuthLayout renders next/image with a plain relative src, which throws
-// "Invalid URL" inside next/image's real getImgProps() in this test
-// environment (no base URL configured) — render it as a plain <img> instead.
-vi.mock("next/image", () => ({
-  default: (props) => <img {...props} alt={props.alt || ""} />,
-}));
 
 const { default: LoginPage } = await import("./LoginForm");
 

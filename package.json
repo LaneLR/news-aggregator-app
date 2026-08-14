@@ -15,6 +15,8 @@
     "db:sync": "node scripts/sync-db.mjs"
   },
   "dependencies": {
+    "@capacitor/browser": "^8.0.4",
+    "@capacitor/core": "^8.5.0",
     "@faker-js/faker": "^9.9.0",
     "@sentry/nextjs": "^10.69.0",
     "@stripe/stripe-js": "^7.8.0",

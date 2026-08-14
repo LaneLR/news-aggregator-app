@@ -1,3 +1,8 @@
+// This is the logged-out marketing/landing page. It used to need a local
+// light-mode override here, but that's now handled site-wide — every page
+// reachable without a session renders light unconditionally (see
+// RootLayout/ThemeProvider's data-theme logic) — so this can just use the
+// normal shared theme tokens like everything else.
 .wrapper {
   display: flex;
   flex-direction: column;
@@ -37,6 +42,16 @@
   margin-top: 0.5rem;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+// Same white fill as the page itself, by design (it's the secondary action
+// next to "Sign up free"'s solid brown fill) — but with nothing else, that
+// meant no visible edge against the equally-white hero background, just a
+// near-invisible default shadow. A border in the theme's own accent color
+// gives it a clear boundary without competing with the primary CTA's solid
+// fill — a standard solid-primary/outline-secondary pairing.
+.heroLoginButton {
+  border: 1.5px solid var(--theme-primary);
 }
 
 .section {

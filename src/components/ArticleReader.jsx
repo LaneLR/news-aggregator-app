@@ -176,7 +176,7 @@ export default function ArticleReader({
               fill
               sizes="(max-width: 768px) 100vw, 720px"
               style={{ objectFit: "cover" }}
-              priority
+              preload
             />
           </div>
         )}
