@@ -25,40 +25,51 @@ export default function AuthLayout({ tabs, children }) {
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.brandPanel}>
-        <Link href="/" className={styles.logoLink}>
-          <div className={styles.logoContainer}>
-            <Image
-              src={"/images/MochaReads-M.png"}
-              alt="MochaReads logo"
-              width={44}
-              height={40}
-            />
-          </div>
-          <div className={styles.logoText}>
-            <span>Mocha</span>
-            <span>Reads</span>
-          </div>
-        </Link>
+        <Image
+          src="/images/phone-held-news.png"
+          alt=""
+          fill
+          sizes="(min-width: 900px) 45vw, 0px"
+          style={{ objectFit: "cover", objectPosition: "center" }}
+          className={styles.brandPhoto}
+        />
+        <div className={styles.brandOverlay} />
+        <div className={styles.brandContent}>
+          <Link href="/" className={styles.logoLink}>
+            <div className={styles.logoContainer}>
+              <Image
+                src={"/images/MochaReads-M.png"}
+                alt="MochaReads logo"
+                width={44}
+                height={40}
+              />
+            </div>
+            <div className={styles.logoText}>
+              <span>Mocha</span>
+              <span>Reads</span>
+            </div>
+          </Link>
 
-        <h1 className={styles.brandHeadline}>
-          Welcome to MochaReads.
-          <br />
-          One place for all your news.
-        </h1>
+          <h1 className={styles.brandHeadline}>
+            Welcome to MochaReads.
+            <br />
+            One place for all your news.
+          </h1>
 
-        <ul className={styles.highlightList}>
-          {HIGHLIGHTS.map(({ Icon, title, description }) => (
-            <li key={title} className={styles.highlightItem}>
-              <span className={styles.highlightIcon}>
-                <Icon size={20} strokeWidth={2} />
-              </span>
-              <div>
-                <p className={styles.highlightTitle}>{title}</p>
-                <p className={styles.highlightDescription}>{description}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
+          <ul className={styles.highlightList}>
+            {HIGHLIGHTS.map(({ Icon, title, description }) => (
+              <li key={title} className={styles.highlightItem}>
+                <span className={styles.highlightIcon}>
+                  <Icon size={20} strokeWidth={2} />
+                </span>
+                <div>
+                  <p className={styles.highlightTitle}>{title}</p>
+                  <p className={styles.highlightDescription}>{description}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <div className={styles.formPanel}>

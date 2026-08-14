@@ -24,4 +24,14 @@ describe("AuthLayout", () => {
     render(<AuthLayout>{null}</AuthLayout>);
     expect(screen.queryByRole("link", { name: "Sign In" })).not.toBeInTheDocument();
   });
+
+  it("renders the brand photo as a decorative, grayscale background with a dark scrim behind the text", () => {
+    const { container } = render(<AuthLayout>{null}</AuthLayout>);
+
+    const photo = screen.getByAltText("");
+    expect(photo).toHaveAttribute("src", expect.stringContaining("phone-held-news"));
+    expect(photo.className).toContain("brandPhoto");
+
+    expect(container.querySelector('[class*="brandOverlay"]')).toBeInTheDocument();
+  });
 });
