@@ -64,14 +64,6 @@ export default function defineUser(sequelize) {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
-      isPendingDeletion: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      deletionRequestedAt: {
-        type: DataTypes.DATE,
-        allowNull: true,
-      },
       status: {
         type: DataTypes.ENUM("active", "inactive"),
         defaultValue: "active",
