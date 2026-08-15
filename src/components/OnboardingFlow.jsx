@@ -19,7 +19,7 @@ import {
   Mail,
   Command,
 } from "lucide-react";
-import { CATEGORY_LINKS } from "./HeaderNavBar";
+import { CATEGORY_LINKS } from "@/lib/navLinks";
 import styles from "./OnboardingFlow.module.scss";
 
 // Shown as a short, skimmable multi-screen tour right before landing on the

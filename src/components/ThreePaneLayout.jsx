@@ -3,17 +3,19 @@ import { useEffect, useRef, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import NewsCardThree from "./NewsCardThree";
 import ArticleReader from "./ArticleReader";
-import ReaderNavSidebar from "./ReaderNavSidebar";
 import ReaderSkeleton from "./ReaderSkeleton";
 import { useFocusTrap } from "@/lib/useFocusTrap";
 import styles from "./ThreePaneLayout.module.scss";
 
-// The "reader" view density option — nav sidebar (ReaderNavSidebar) + a
-// compact list pane + an inline reading pane, modeled on the
-// Spotify-style library/list/detail layout the user asked for. Selecting
-// an article fetches its content via /api/articles/reader/[id] instead of
-// navigating away, so j/k + Enter (see useArticleShortcuts' onOpen param)
-// can move through a whole category without ever leaving the list.
+// The "reader" view density option — a compact list pane + an inline
+// reading pane, modeled on the Spotify-style list/detail layout the user
+// asked for. The nav sidebar that used to live here as this layout's own
+// left pane is now MainContentWrapper's persistent, always-on sidebar
+// (ReaderNavSidebar) shared by every density/view, not just this one.
+// Selecting an article fetches its content via /api/articles/reader/[id]
+// instead of navigating away, so j/k + Enter (see useArticleShortcuts'
+// onOpen param) can move through a whole category without ever leaving the
+// list.
 //
 // The reading pane column has zero width until an article is selected —
 // see .readingPane/.readingPaneCollapsed in the stylesheet — so with
@@ -143,10 +145,6 @@ export default function ThreePaneLayout({
 
   return (
     <div className={styles.threePane}>
-      <div className={styles.navPane}>
-        <ReaderNavSidebar />
-      </div>
-
       <div className={`${styles.listPane} ${selectedArticleId ? styles.listPaneHidden : ""}`}>
         {articles.map((article, i) => (
           <div

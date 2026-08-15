@@ -1,10 +1,38 @@
+// Persistent left column for every content page (see MainContentWrapper,
+// which decides which pages get this at all) — sticky alongside whatever
+// scrolls past it above a certain width, and a plain full-width block
+// stacked above the content below it, so narrow viewports get an ordinary
+// vertical scroll through nav-then-content instead of a horizontally
+// scrolling nav strip.
 .sidebar {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem 0.75rem;
-  height: 100%;
+  flex: 0 0 240px;
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
   overflow-y: auto;
+  // <body> itself defaults to the always-dark header/footer chrome
+  // background (see globals.scss/layout.jsx) — this sits outside <main>
+  // (which is what normally resets that back to the page's real theme), so
+  // without its own explicit light-following background it silently
+  // inherits <body>'s dark one, taking --theme-text's light-mode dark color
+  // down to unreadable along with it.
+  background-color: var(--theme-background);
+  border-right: 1px solid var(--theme-border);
+
+  @media (max-width: 900px) {
+    position: static;
+    max-height: none;
+    flex-basis: auto;
+    width: 100%;
+    overflow-y: visible;
+    border-right: none;
+    border-bottom: 1px solid var(--theme-border);
+    padding-bottom: 1.25rem;
+  }
 }
 
 .linkList {
@@ -20,7 +48,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 10px;
+  padding: 10px 10px;
   border-radius: var(--radius-sm);
   font-size: 0.88rem;
   font-weight: 600;
@@ -33,7 +61,13 @@
   }
 
   &:hover {
-    background-color: var(--theme-layout-background);
+    // Not --theme-layout-background — in both themes it's set to the exact
+    // same value as this sidebar's own background (see themes.scss), so a
+    // hover fill using it was invisible regardless of theme. A tint mixed
+    // from the accent color is guaranteed to differ from a flat background
+    // fill either way, and stays visually distinct from .active's solid
+    // fill below rather than looking like a second selected state.
+    background-color: color-mix(in srgb, var(--theme-primary) 10%, transparent);
   }
 
   &.active {
@@ -49,6 +83,27 @@
 .lockIcon {
   margin-left: auto;
   opacity: 0.8;
+}
+
+.badge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background-color: var(--theme-primary);
+  color: var(--theme-primary-contrast);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+
+  .active & {
+    background-color: var(--theme-primary-contrast);
+    color: var(--theme-primary);
+  }
 }
 
 .sectionLabel {

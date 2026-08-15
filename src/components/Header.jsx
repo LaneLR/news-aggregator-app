@@ -8,7 +8,6 @@ import { useEffect, useRef, useState } from "react";
 import { Menu, Newspaper, Bookmark, User, Crown, Settings, LogOut, Sun, Moon } from "lucide-react";
 import SearchBar from "./SearchBar";
 import WeatherWidget from "./WeatherWidget";
-import HeaderNavBar from "./HeaderNavBar";
 import HeaderSubscribeBanner from "./SubscribeHeaderBanner";
 import { applyCustomOrder } from "@/lib/useLayoutPrefs";
 import { useLocalOrder } from "@/lib/useLocalOrder";
@@ -288,7 +287,6 @@ export default function Header() {
             </div>
           </div>
           <HeaderSubscribeBanner />
-          <HeaderNavBar />
         </div>
       ) : (
         <div className={styles.wrapper}>

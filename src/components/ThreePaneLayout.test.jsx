@@ -65,7 +65,7 @@ describe("ThreePaneLayout", () => {
     mockSession = makeSession({ tier: "Free" });
   });
 
-  it("renders the nav sidebar and a list item per article", () => {
+  it("renders a list item per article", () => {
     renderLayout();
     expect(screen.getByRole("button", { name: "Article One" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Article Two" })).toBeInTheDocument();

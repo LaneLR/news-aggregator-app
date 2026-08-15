@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sparkles, Flame, Lock } from "lucide-react";
-import { CATEGORY_LINKS } from "./HeaderNavBar";
+import { CATEGORY_LINKS } from "@/lib/navLinks";
 import { useToast } from "./ToastProvider";
 import styles from "./HomeSectionsSettings.module.scss";
 

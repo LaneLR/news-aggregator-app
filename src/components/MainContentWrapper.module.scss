@@ -1,8 +1,26 @@
+.shell {
+  flex-grow: 1;
+  display: flex;
+
+  // Matches ReaderNavSidebar.module.scss's own breakpoint — the sidebar
+  // switches from a sticky left column to a stacked full-width block at
+  // the same point this switches from a row to a column, so the two line
+  // up into one coherent layout change instead of fighting each other.
+  @media (max-width: 900px) {
+    flex-direction: column;
+  }
+}
+
 .wrapper {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  // A flex item's default min-width is auto (its content's natural size),
+  // which can force this column wider than the viewport once it's sitting
+  // next to the sidebar — this lets it actually shrink instead of pushing
+  // the whole page into horizontal overflow.
+  min-width: 0;
   background-color: var(--theme-background);
   // body's own `color` (globals.scss) is deliberately the "always-light
   // chrome text" token for the dark header/footer bars, not a sane default

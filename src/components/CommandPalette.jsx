@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Search, Bookmark, Heart, Settings, User, LayoutGrid, CornerDownLeft } from "lucide-react";
-import { CATEGORY_LINKS, PERSONAL_LINKS } from "./HeaderNavBar";
+import { CATEGORY_LINKS, PERSONAL_LINKS } from "@/lib/navLinks";
 import { useFocusTrap } from "@/lib/useFocusTrap";
 import styles from "./CommandPalette.module.scss";
 
