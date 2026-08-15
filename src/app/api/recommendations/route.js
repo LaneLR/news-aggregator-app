@@ -3,6 +3,7 @@ import { Op } from "sequelize";
 import initializeDbAndModels from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { buildKeywordExclusion } from "@/lib/keywordFilter";
+import { orderByDesc } from "@/lib/dbOrder";
 
 const RESULT_LIMIT = 40;
 const MIN_RESULTS_BEFORE_BACKFILL = 24;
@@ -139,7 +140,7 @@ export async function GET() {
 
       const candidates = await Article.findAll({
         where: candidateWhere,
-        order: [["publishedAt", "DESC"]],
+        order: [orderByDesc(Article, "publishedAt")],
         limit: CANDIDATE_POOL_LIMIT,
       });
 

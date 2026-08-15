@@ -1,4 +1,5 @@
 import { Op } from "sequelize";
+import { orderByDesc } from "./dbOrder";
 
 // Heuristic story-similarity, not ML/embeddings — deliberately simple given
 // there's no vector-search infra in this stack. Computed on demand over a
@@ -50,7 +51,7 @@ export async function getRelatedCoverage(Article, article, limit = 6) {
       category: { [Op.overlap]: article.category },
       publishedAt: { [Op.gte]: since },
     },
-    order: [["publishedAt", "DESC"]],
+    order: [orderByDesc(Article, "publishedAt")],
     limit: CANDIDATE_LIMIT,
   });
 

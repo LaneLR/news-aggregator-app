@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 import { Op } from "sequelize";
+import { orderByDesc } from "@/lib/dbOrder";
 import { buildKeywordExclusion } from "@/lib/keywordFilter";
 
 export async function GET(req, context) {
@@ -96,7 +97,7 @@ export async function GET(req, context) {
     const combinedArticles = await Article.findAll({
       where: whereClause,
       limit: 100,
-      order: [["publishedAt", "DESC"]],
+      order: [orderByDesc(Article, "publishedAt")],
     });
 
     if (session?.user?.id) {

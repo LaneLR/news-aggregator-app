@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import { excludeGatedCategoriesCondition, excludePremiumArticlesCondition } from "./subscriberOnlyCategories";
 import { buildKeywordExclusion } from "./keywordFilter";
 import { buildKeywordInclusion } from "./followedKeywords";
+import { orderByDesc } from "./dbOrder";
 
 function visibilityCondition(isSubscribed, mutedKeywords) {
   const conditions = isSubscribed
@@ -89,7 +90,7 @@ export async function getPersonalizedPicks(db, user, { isSubscribed, limit = 6 }
         ...visibilityCondition(isSubscribed, user.mutedKeywords),
       ],
     },
-    order: [["publishedAt", "DESC"]],
+    order: [orderByDesc(Article, "publishedAt")],
     limit,
   });
 }
@@ -109,7 +110,7 @@ export async function getFeedScopedArticles(Article, feed, { mutedKeywords, limi
 
   return Article.findAll({
     where: { [Op.and]: conditions },
-    order: [["publishedAt", "DESC"]],
+    order: [orderByDesc(Article, "publishedAt")],
     limit,
   });
 }
@@ -132,7 +133,7 @@ export async function getFollowedArticles(Article, { isSubscribed, mutedKeywords
         ...visibilityCondition(isSubscribed, mutedKeywords),
       ],
     },
-    order: [["publishedAt", "DESC"]],
+    order: [orderByDesc(Article, "publishedAt")],
     limit,
   });
 }

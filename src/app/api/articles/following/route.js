@@ -5,6 +5,7 @@ import initializeDbAndModels from "@/lib/db";
 import { excludeGatedCategoriesCondition, excludePremiumArticlesCondition } from "@/lib/subscriberOnlyCategories";
 import { buildKeywordExclusion } from "@/lib/keywordFilter";
 import { buildKeywordInclusion } from "@/lib/followedKeywords";
+import { orderByDesc } from "@/lib/dbOrder";
 
 const RESULT_LIMIT = 40;
 const LOOKBACK_DAYS = 30;
@@ -40,7 +41,7 @@ export async function GET() {
     const [articles, userReads] = await Promise.all([
       Article.findAll({
         where: { [Op.and]: whereConditions },
-        order: [["publishedAt", "DESC"]],
+        order: [orderByDesc(Article, "publishedAt")],
         limit: RESULT_LIMIT,
       }),
       ReadArticle.findAll({ where: { userId: session.user.id }, attributes: ["articleUrl"] }),

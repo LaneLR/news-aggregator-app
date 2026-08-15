@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import initializeDbAndModels from "@/lib/db";
 import { buildKeywordExclusion } from "@/lib/keywordFilter";
 import { excludePremiumArticlesCondition } from "@/lib/subscriberOnlyCategories";
+import { orderByDesc } from "@/lib/dbOrder";
 
 const SORT_COLUMNS = {
   liked: "likeCount",
@@ -26,10 +27,14 @@ export async function getCategoryArticles({
   sort = "latest",
   userId,
   page = 1,
-  limit = 20,
+  // 24, not 20 — divides evenly into a 2/3/4/6/8-column grid with no
+  // orphaned partial row at the end, in both card-grid and magazine
+  // density. 20 only divides evenly by 2/4/5/10, which is why a 3-column
+  // grid was landing on a lone 2-card final row.
+  limit = 24,
   isSubscribed = false,
 }) {
-  const { Article, ArticleLike, ReadArticle, User, sequelize } = await initializeDbAndModels();
+  const { Article, ArticleLike, ReadArticle, User } = await initializeDbAndModels();
   const effectiveLimit = userId ? limit : Math.min(limit, ANONYMOUS_ARTICLE_LIMIT);
   const offset = (page - 1) * effectiveLimit;
   const sortColumn = SORT_COLUMNS[sort] || SORT_COLUMNS.latest;
@@ -68,12 +73,7 @@ export async function getCategoryArticles({
 
   const { rows, count } = await Article.findAndCountAll({
     where: { [Op.and]: whereConditions },
-    // Postgres sorts NULLs first in a DESC order by default — an article
-    // with no publishedAt (a dead/malformed feed item, e.g.) would then sit
-    // permanently at the top of "Latest" regardless of how stale it is,
-    // never aging out. sortColumn only ever comes from the SORT_COLUMNS
-    // whitelist above, never user input, so this is safe to inline.
-    order: [sequelize.literal(`"${sortColumn}" DESC NULLS LAST`)],
+    order: [orderByDesc(Article, sortColumn)],
     limit: effectiveLimit,
     offset,
   });

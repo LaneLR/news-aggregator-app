@@ -1,5 +1,6 @@
 import { Op } from "sequelize";
 import { TRACKED_COMPANIES } from "./trackedCompanies";
+import { orderByDesc } from "./dbOrder";
 
 const LOOKBACK_DAYS = 7;
 const ARTICLE_SCAN_LIMIT = 500;
@@ -28,7 +29,7 @@ export async function getMostCoveredCompanies(Article) {
       publishedAt: { [Op.gte]: since },
     },
     attributes: ["id", "title", "url", "publishedAt"],
-    order: [["publishedAt", "DESC"]],
+    order: [orderByDesc(Article, "publishedAt")],
     limit: ARTICLE_SCAN_LIMIT,
   });
 
