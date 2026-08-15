@@ -1,0 +1,36 @@
+// Same tabRow/tab/activeTab pattern as LegalInfoPage.module.scss and
+// AuthLayout.module.scss (this codebase's two other tab-row implementations)
+// — kept as its own small duplicate rather than a shared import, matching
+// how those two already relate to each other.
+.tabRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--theme-border);
+  margin-bottom: 1.5rem;
+}
+
+.tab {
+  padding: 0.85rem 1.4rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--theme-text-secondary);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out;
+
+  &:hover {
+    color: var(--theme-text);
+    background-color: var(--theme-layout-background);
+  }
+}
+
+.activeTab {
+  color: var(--theme-primary);
+  border-bottom-color: var(--theme-primary);
+
+  &:hover {
+    background-color: transparent;
+  }
+}

@@ -100,13 +100,6 @@
   padding: 1.5rem;
 }
 
-.helperText {
-  margin: 0;
-  color: var(--theme-text-secondary);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
 .cardSubheading {
   margin: 0 0 0.75rem;
   font-size: 0.72rem;
@@ -119,28 +112,6 @@
     margin-top: 1.5rem;
     padding-top: 1.5rem;
     border-top: 1px solid var(--theme-border);
-  }
-}
-
-.cardFooter {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid var(--theme-border);
-  display: flex;
-  justify-content: flex-end;
-}
-
-.footerLink {
-  padding: 9px 18px;
-  border-radius: var(--radius-sm);
-  background-color: var(--theme-primary);
-  color: var(--theme-primary-contrast);
-  font-weight: 600;
-  font-size: 0.9rem;
-  text-decoration: none;
-  transition: filter 0.15s ease;
-
-  &:hover {
-    filter: brightness(1.06);
   }
 }
 
