@@ -1,8 +1,21 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { LayoutGrid, Sparkles, Layers, Search, Bookmark, Lock } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
+import {
+  LayoutGrid,
+  Sparkles,
+  Layers,
+  Search,
+  Bookmark,
+  Lock,
+  User,
+  Heart,
+  Crown,
+  CreditCard,
+  Settings,
+  LogOut,
+} from "lucide-react";
 import { CATEGORY_LINKS, PERSONAL_LINKS, slugFromHref } from "@/lib/navLinks";
 import { useUnreadCounts } from "@/lib/useUnreadCounts";
 import styles from "./ReaderNavSidebar.module.scss";
@@ -12,8 +25,21 @@ const TOP_LINKS = [
   { label: "For You", href: "/for-you", Icon: Sparkles, subscriberOnly: true },
   { label: "My Feeds", href: "/feeds", Icon: Layers, subscriberOnly: true, countKey: "feeds" },
   ...PERSONAL_LINKS.filter((l) => l.label === "Following"),
-  { label: "Search", href: "/search", Icon: Search },
+  { label: "Liked Articles", href: "/liked", Icon: Heart },
   { label: "Archives", href: "/archives", Icon: Bookmark },
+];
+
+// Formerly split across SideNavBar (its own separate sidebar on
+// account/archives/liked/following pages) and the header's burger-menu
+// dropdown (Profile/Premium/Settings/Log out) — both now redundant once
+// every page already has this one persistent sidebar. "Premium" is the
+// only genuinely new addition from the burger menu; Profile/Settings were
+// already covered by SideNavBar's own equivalents.
+const ACCOUNT_LINKS = [
+  { label: "Profile", href: "/account", Icon: User },
+  { label: "Premium", href: "/pricing", Icon: Crown },
+  { label: "Subscription & Billing", href: "/account/subscription", Icon: CreditCard },
+  { label: "Settings", href: "/settings", Icon: Settings },
 ];
 
 // The persistent, always-on primary nav — not just the reader/3-pane
@@ -73,6 +99,33 @@ export default function ReaderNavSidebar() {
           );
         })}
       </ul>
+      {isLoggedIn && (
+        <>
+          <div className={styles.sectionLabel}>Account</div>
+          <ul className={styles.linkList}>
+            {ACCOUNT_LINKS.map(({ label, href, Icon }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className={`${styles.link} ${pathname === href ? styles.active : ""}`}
+                >
+                  <Icon size={16} strokeWidth={2} />
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className={styles.divider} />
+          <button
+            type="button"
+            className={styles.logoutButton}
+            onClick={() => signOut({ callbackUrl: "/login" })}
+          >
+            <LogOut size={16} strokeWidth={2} />
+            Log Out
+          </button>
+        </>
+      )}
     </nav>
   );
 }

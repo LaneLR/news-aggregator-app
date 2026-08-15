@@ -48,7 +48,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 10px;
+  padding: 7px 10px;
   border-radius: var(--radius-sm);
   font-size: 0.88rem;
   font-weight: 600;
@@ -113,4 +113,31 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--theme-text-secondary);
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--theme-border);
+  margin: 4px 10px;
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--theme-text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--theme-primary) 10%, transparent);
+    color: var(--theme-text);
+  }
 }
