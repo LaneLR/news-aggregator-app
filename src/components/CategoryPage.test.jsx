@@ -64,6 +64,9 @@ vi.mock("@/lib/usePullToRefresh", () => ({
   usePullToRefresh: () => ({ pullDistance: 0, isRefreshing: false, pullHandlers: {} }),
 }));
 
+const toast = { success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn(), show: vi.fn(), dismiss: vi.fn() };
+vi.mock("./ToastProvider", () => ({ useToast: () => toast }));
+
 const { default: CategoryPage } = await import("./CategoryPage");
 
 function mockFetchRoutes(routes) {
@@ -81,6 +84,7 @@ describe("CategoryPage", () => {
     mockSession.value = null;
     layoutPrefs.value = { loaded: true, viewDensity: "card", setViewDensity: vi.fn() };
     markAllRead.value = { hasUnread: false, markingAllRead: false, handleMarkAllRead: vi.fn() };
+    toast.error.mockClear();
   });
 
   it("shows the free-tier upsell nudge for a non-subscriber on a partially-gated category", () => {
@@ -135,6 +139,27 @@ describe("CategoryPage", () => {
 
     render(<CategoryPage category="business" />);
     expect(await screen.findByText(/Error:/)).toBeInTheDocument();
+  });
+
+  it("keeps showing already-loaded articles instead of an error when a re-fetch fails", async () => {
+    // Regression test: switching sort (or any other trigger of loadArticles)
+    // after articles are already on screen used to replace a perfectly
+    // good, already-loaded list with a bare "Error: Failed to fetch" the
+    // moment any re-fetch failed — even though the old list was still
+    // completely valid to keep showing.
+    const user = userEvent.setup();
+    mockSession.value = { user: { id: "user-1" } };
+    mockFetchRoutes([
+      [/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })],
+      [/\/api\/articles\/business\?sort=trending/, () => makeFetchResponse(null, { ok: false, status: 500 })],
+    ]);
+
+    render(<CategoryPage category="business" initialArticles={[makeArticle({ title: "Latest Story" })]} initialTotalPages={1} />);
+    await user.click(screen.getByRole("button", { name: "Trending" }));
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith("Couldn't refresh articles. Showing what's already loaded."));
+    expect(screen.getByText("Card:Latest Story")).toBeInTheDocument();
+    expect(screen.queryByText(/Error:/)).not.toBeInTheDocument();
   });
 
   it("shows an empty state when there are no articles", () => {
