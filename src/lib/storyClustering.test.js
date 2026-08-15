@@ -1,6 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import { getRelatedCoverage, clusterArticles } from "./storyClustering";
 
+// getRelatedCoverage orders via src/lib/dbOrder.js's orderByDesc, which
+// reads the bound Sequelize instance off the model itself.
+function makeArticleModel(resolvedValue) {
+  return {
+    findAll: vi.fn().mockResolvedValue(resolvedValue),
+    sequelize: { literal: vi.fn((sql) => ({ __literal: sql })) },
+  };
+}
+
 describe("getRelatedCoverage", () => {
   it("returns an empty array when the target article has no category", async () => {
     const Article = { findAll: vi.fn() };
@@ -12,7 +21,7 @@ describe("getRelatedCoverage", () => {
   it("returns candidates whose title overlaps significantly with the target", async () => {
     const target = { id: "1", title: "Federal Reserve raises interest rates sharply", category: ["Business"] };
     const candidate = { id: "2", title: "Federal Reserve raises interest rates again", category: ["Business"] };
-    const Article = { findAll: vi.fn().mockResolvedValue([candidate]) };
+    const Article = makeArticleModel([candidate]);
 
     const result = await getRelatedCoverage(Article, target);
     expect(result).toEqual([candidate]);
@@ -21,7 +30,7 @@ describe("getRelatedCoverage", () => {
   it("excludes candidates below the similarity threshold", async () => {
     const target = { id: "1", title: "Federal Reserve raises interest rates", category: ["Business"] };
     const unrelated = { id: "2", title: "Local bakery wins award for best pie", category: ["Business"] };
-    const Article = { findAll: vi.fn().mockResolvedValue([unrelated]) };
+    const Article = makeArticleModel([unrelated]);
 
     const result = await getRelatedCoverage(Article, target);
     expect(result).toEqual([]);
@@ -34,7 +43,7 @@ describe("getRelatedCoverage", () => {
       title: "Stock market rallies on earnings news today",
       category: ["Business"],
     }));
-    const Article = { findAll: vi.fn().mockResolvedValue(candidates) };
+    const Article = makeArticleModel(candidates);
 
     const result = await getRelatedCoverage(Article, target, 3);
     expect(result.length).toBe(3);

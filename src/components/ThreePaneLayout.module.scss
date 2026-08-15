@@ -14,33 +14,14 @@
   margin: 0 auto;
   padding: 0.5rem 2rem 3rem;
 
-  @media (max-width: 1280px) {
-    .navPane {
-      display: none;
-    }
-  }
-
-  // iPad-class tablets in portrait (744-834px CSS width) are wider than this
-  // cutoff, so they still get the 2-pane list+reader layout above (nav
-  // sidebar already hidden at 1280px) — only true phone-width screens fall
-  // back to a single stacked pane. Matches the 700px "mobile" cutoff already
-  // used elsewhere in this file (.fullScreenOverlay/.fullScreenPanel) and
-  // across the app (CarouselRow, LegalInfoPage).
+  // MainContentWrapper's persistent sidebar already stacks above content
+  // below its own breakpoint — this only needs to stop being a row layout
+  // once the viewport is too narrow for list+reader side by side. Matches
+  // the 700px "mobile" cutoff already used elsewhere in this file
+  // (.fullScreenOverlay/.fullScreenPanel) and across the app (CarouselRow,
+  // LegalInfoPage).
   @media (max-width: 700px) {
     flex-direction: column;
-  }
-}
-
-.navPane {
-  flex: 0 0 240px;
-  margin-right: 2rem;
-  position: sticky;
-  top: 0;
-  max-height: 100vh;
-  overflow-y: auto;
-
-  @media (max-width: 1500px) {
-    flex-basis: 220px;
   }
 }
 
@@ -188,7 +169,6 @@
 }
 
 @media (max-width: 700px) {
-  .navPane,
   .listPane {
     position: static;
     max-height: none;

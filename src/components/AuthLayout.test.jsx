@@ -31,6 +31,11 @@ describe("AuthLayout", () => {
     const photo = screen.getByAltText("");
     expect(photo).toHaveAttribute("src", expect.stringContaining("phone-held-news"));
     expect(photo.className).toContain("brandPhoto");
+    // A preloaded next/image omits the `loading` attribute entirely rather
+    // than setting loading="eager" — this is the site's one login-page hero
+    // image, above the fold, so it should be preloaded to avoid Next.js's
+    // "detected as LCP but loading=lazy" warning.
+    expect(photo).not.toHaveAttribute("loading");
 
     expect(container.querySelector('[class*="brandOverlay"]')).toBeInTheDocument();
   });

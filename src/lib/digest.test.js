@@ -17,6 +17,18 @@ function article(overrides = {}) {
   };
 }
 
+// getPersonalizedPicks/getFeedScopedArticles/getFollowedArticles order via
+// src/lib/dbOrder.js's orderByDesc, which reads the bound Sequelize
+// instance off the model itself — getTrendingArticles doesn't (it sorts by
+// the NOT NULL clickCount column), so its own plain `{ findAll }` mocks
+// above are left as-is.
+function makeArticleModel(resolvedValue) {
+  return {
+    findAll: vi.fn().mockResolvedValue(resolvedValue),
+    sequelize: { literal: vi.fn((sql) => ({ __literal: sql })) },
+  };
+}
+
 describe("getTrendingArticles", () => {
   it("queries for recent, clicked articles ordered by clickCount", async () => {
     const Article = { findAll: vi.fn().mockResolvedValue([article()]) };
@@ -60,6 +72,7 @@ describe("getPersonalizedPicks", () => {
           .fn()
           .mockResolvedValueOnce([{ category: ["Business"] }, { category: ["Business"] }, { category: ["Tech"] }])
           .mockResolvedValueOnce([article()]),
+        sequelize: { literal: vi.fn((sql) => ({ __literal: sql })) },
       },
     };
 
@@ -91,7 +104,7 @@ describe("getFeedScopedArticles", () => {
   });
 
   it("queries by sourceNames OR categories when present", async () => {
-    const Article = { findAll: vi.fn().mockResolvedValue([article()]) };
+    const Article = makeArticleModel([article()]);
     const result = await getFeedScopedArticles(Article, {
       sourceNames: ["TechCrunch"],
       categories: ["Tech"],
@@ -101,7 +114,7 @@ describe("getFeedScopedArticles", () => {
   });
 
   it("applies keyword exclusion when mutedKeywords are given", async () => {
-    const Article = { findAll: vi.fn().mockResolvedValue([]) };
+    const Article = makeArticleModel([]);
     await getFeedScopedArticles(Article, { sourceNames: ["X"] }, { mutedKeywords: ["spam"] });
     const whereArg = Article.findAll.mock.calls[0][0].where;
     const andKey = Object.getOwnPropertySymbols(whereArg)[0];
@@ -118,7 +131,7 @@ describe("getFollowedArticles", () => {
   });
 
   it("queries recent articles matching followed keywords", async () => {
-    const Article = { findAll: vi.fn().mockResolvedValue([article()]) };
+    const Article = makeArticleModel([article()]);
     const result = await getFollowedArticles(Article, {
       followedKeywords: ["tesla"],
       isSubscribed: true,

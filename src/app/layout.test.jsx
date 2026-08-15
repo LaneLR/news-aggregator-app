@@ -47,6 +47,9 @@ vi.mock("@/components/ToastProvider", () => ({
 vi.mock("@/components/ConfirmDialogProvider", () => ({
   default: ({ children }) => <div data-testid="confirm-dialog-provider">{children}</div>,
 }));
+vi.mock("@/components/FollowedSourcesProvider", () => ({
+  default: ({ children }) => <div data-testid="followed-sources-provider">{children}</div>,
+}));
 
 const mockAuth = vi.fn();
 vi.mock("@/lib/auth", () => ({ auth: () => mockAuth() }));

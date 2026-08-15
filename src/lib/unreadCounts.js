@@ -60,11 +60,16 @@ export async function getUnreadCounts(db, user, { isSubscribed } = {}) {
 
   let followingCount = 0;
   const keywordInclusion = buildKeywordInclusion(user.followedKeywords);
-  if (keywordInclusion) {
+  const followedSourceSet = new Set(user.followedSources || []);
+  if (keywordInclusion || followedSourceSet.size > 0) {
     const lowered = (user.followedKeywords || []).map((k) => k.toLowerCase());
-    followingCount = unread.filter((article) =>
-      lowered.some((keyword) => (article.title || "").toLowerCase().includes(keyword))
-    ).length;
+    followingCount = unread.filter((article) => {
+      const matchesKeyword =
+        keywordInclusion &&
+        lowered.some((keyword) => (article.title || "").toLowerCase().includes(keyword));
+      const matchesSource = followedSourceSet.has(article.sourceName);
+      return matchesKeyword || matchesSource;
+    }).length;
   }
 
   return { categories, feeds: feedsCount, following: followingCount };

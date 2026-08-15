@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 import { Op } from "sequelize";
 import { GATED_TAGS, excludePremiumArticlesCondition } from "@/lib/subscriberOnlyCategories";
+import { orderByDesc } from "@/lib/dbOrder";
 
 const MAX_SOURCES = 12;
 
@@ -40,7 +41,7 @@ export async function GET(req) {
     const rows = await Article.findAll({
       where: { [Op.and]: whereConditions },
       attributes: ["sourceName"],
-      order: [["publishedAt", "DESC"]],
+      order: [orderByDesc(Article, "publishedAt")],
       limit: 500,
     });
 

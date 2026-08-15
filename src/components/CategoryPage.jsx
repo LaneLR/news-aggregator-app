@@ -19,6 +19,7 @@ import MostCovered from "./MostCovered";
 import Watchlist from "./Watchlist";
 import BulkActionBar from "./BulkActionBar";
 import SignInGate from "./SignInGate";
+import { useToast } from "./ToastProvider";
 import { useArticleShortcuts } from "@/lib/useArticleShortcuts";
 import { useMarkAllRead } from "@/lib/useMarkAllRead";
 import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
@@ -31,11 +32,16 @@ const GATED_DENSITIES = new Set(["list", "magazine"]);
 // signed out shows a sign-in prompt instead of fetching.
 const GATED_SORTS = new Set(["trending", "liked"]);
 
+// A relative path, not NEXT_PUBLIC_BASE_URL — this runs in the browser
+// (the component is "use client"), where a relative fetch already resolves
+// against the current origin on its own. NEXT_PUBLIC_BASE_URL is inlined at
+// build time, so if it were ever missing or wrong for a given deployment,
+// every sort switch/load-more/refresh here would silently try to hit the
+// build machine's own placeholder origin and fail with "Failed to fetch"
+// for every visitor, regardless of environment.
 async function fetchCategoryArticles(category, sort, page = 1) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-
   const res = await fetch(
-    `${baseUrl}/api/articles/${category}?sort=${sort}&page=${page}`,
+    `/api/articles/${category}?sort=${sort}&page=${page}`,
     { next: { revalidate: 3600 } }
   );
 
@@ -51,6 +57,7 @@ export default function CategoryPage({
   initialTotalPages,
 }) {
   const { data: session } = useSession();
+  const toast = useToast();
   const isLoggedIn = !!session;
   const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
   const { viewDensity, setViewDensity } = useLayoutPrefs();
@@ -96,7 +103,17 @@ export default function CategoryPage({
         setLatestTimestamp(newest);
       }
     } catch (err) {
-      setError(err.message);
+      // A failed refresh shouldn't blow away articles already on screen —
+      // e.g. switching from Trending back to Latest after a transient
+      // network hiccup used to replace a perfectly good, already-loaded
+      // list with a bare "Error: Failed to fetch" instead of just leaving
+      // it alone. Only the very first load, with nothing cached yet to
+      // fall back on, still needs the full error state.
+      if (articles.length === 0) {
+        setError(err.message);
+      } else {
+        toast.error("Couldn't refresh articles. Showing what's already loaded.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -385,7 +402,7 @@ export default function CategoryPage({
             <CardSkeleton key={i} density={skeletonDensity} />
           ))}
         </NewsGridWrapper>
-      ) : error ? (
+      ) : error && articles.length === 0 ? (
         <p className={styles.caughtUpText}>Error: {error}</p>
       ) : articles.length > 0 ? (
         <>

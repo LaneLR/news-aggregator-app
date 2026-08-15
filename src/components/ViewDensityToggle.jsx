@@ -30,7 +30,7 @@ export default function ViewDensityToggle({ density, onChange, isSubscribed }) {
             aria-label={locked ? `${label} view — Subscribed feature` : `${label} view`}
             aria-pressed={density === value}
           >
-            {locked ? <Lock size={12} strokeWidth={2} /> : <Icon size={15} strokeWidth={2} />}
+            {locked ? <Lock size={15} strokeWidth={2} /> : <Icon size={15} strokeWidth={2} />}
           </button>
         );
       })}

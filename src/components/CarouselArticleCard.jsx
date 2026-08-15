@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Heart, Lock } from "lucide-react";
 import ShareButton from "./ShareButton";
 import ArchiveToggleButton from "./ArchiveToggleButton";
+import FollowSourceButton from "./FollowSourceButton";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
 import { getCategoryColor } from "@/lib/categoryColors";
@@ -87,7 +88,10 @@ export default function CarouselCard({ article, archiveId }) {
         </div>
       </Link>
       <div className={styles.metaRow}>
-        <span className={styles.source}>{cleanSourceName}</span>
+        <span className={styles.sourceGroup}>
+          <span className={styles.source}>{cleanSourceName}</span>
+          <FollowSourceButton sourceName={cleanSourceName} />
+        </span>
         <span className={styles.metaRight}>
           {isPaywalled && (
             <Lock size={12} strokeWidth={2.5} title="This source could be behind a paywall." />

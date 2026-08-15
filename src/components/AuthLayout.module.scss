@@ -86,17 +86,23 @@
   flex-direction: row;
   line-height: 1.05;
   font-family: var(--font-lora), serif;
-  font-weight: 600;
   font-size: 2rem;
   color: var(--brand-text);
   text-transform: capitalize;
 
   // Matches Header.module.scss's own .logoText exactly: "Mocha" (first) is
-  // the accent color, "Reads" (last) is the plain text color — this used to
-  // be backwards here (a pre-existing inconsistency, not something this
-  // session's photo-background change introduced).
+  // bold and the accent color, "Reads" (last) is regular weight and the
+  // plain text color. Font-weight used to be a single uniform 600 on both
+  // spans here, which made "Reads" read visibly heavier than the header's
+  // 400 — the color-only split was already correct, this was the other
+  // half of the same pre-existing inconsistency.
   span:first-child {
     color: var(--brand-accent);
+    font-weight: 700;
+  }
+
+  span:last-child {
+    font-weight: 400;
   }
 }
 

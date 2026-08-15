@@ -5,7 +5,7 @@ import styles from "./SignInGate.module.scss";
 export default function SignInGate({ message, compact = false }) {
   return (
     <div className={`${styles.wrapper} ${compact ? styles.compact : ""}`}>
-      <Lock size={compact ? 16 : 28} strokeWidth={1.5} />
+      <Lock size={compact ? 16 : 28} strokeWidth={1.5} stroke="var(--theme-text-secondary)" />
       <p className={styles.message}>{message}</p>
       <div className={styles.actions}>
         <Link href="/login" className={styles.primaryLink}>

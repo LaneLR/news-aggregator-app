@@ -67,6 +67,13 @@ export function createDbMock() {
     // directly rather than needing to know Sequelize's internal shape.
     literal: vi.fn((sql) => ({ __literal: sql })),
   };
+  // Every real Sequelize model carries a `.sequelize` back-reference to its
+  // bound instance — src/lib/dbOrder.js's orderByDesc relies on that
+  // (`Model.sequelize.literal(...)`) instead of taking a separate
+  // `sequelize` argument, so the mock needs the same shape.
+  for (const name of MODEL_NAMES) {
+    db[name].sequelize = db.sequelize;
+  }
   return db;
 }
 

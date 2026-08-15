@@ -9,6 +9,7 @@ import {
 } from "@/lib/subscriberOnlyCategories";
 import { buildKeywordExclusion } from "@/lib/keywordFilter";
 import { DEFAULT_HOME_SECTIONS, CATEGORY_SECTION_TAGS } from "@/lib/homeSections";
+import { orderByDesc } from "@/lib/dbOrder";
 
 export async function GET(req) {
   const session = await auth();
@@ -63,7 +64,7 @@ export async function GET(req) {
             ],
           },
           limit: 10,
-          order: [["publishedAt", "DESC"]],
+          order: [orderByDesc(Article, "publishedAt")],
         }),
       }))
     );

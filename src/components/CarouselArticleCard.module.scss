@@ -83,6 +83,13 @@
   font-size: 0.85rem;
 }
 
+.sourceGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
 .source {
   font-weight: 700;
   color: var(--theme-text);

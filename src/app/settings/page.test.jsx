@@ -21,6 +21,9 @@ vi.mock("@/components/KeywordFilters", () => ({
 vi.mock("@/components/FollowedKeywords", () => ({
   default: (props) => <div data-testid="followed-keywords">{JSON.stringify(props)}</div>,
 }));
+vi.mock("@/components/FollowedSources", () => ({
+  default: (props) => <div data-testid="followed-sources">{JSON.stringify(props)}</div>,
+}));
 vi.mock("@/components/NotificationSettings", () => ({
   default: () => <div data-testid="notification-settings" />,
 }));
@@ -51,6 +54,7 @@ describe("SettingsPage", () => {
     db.User.findByPk.mockResolvedValue({
       mutedKeywords: ["politics"],
       followedKeywords: ["ai"],
+      followedSources: ["Reuters"],
       keyboardShortcuts: { next: "j" },
       homeSections: ["forYou"],
     });
@@ -61,7 +65,13 @@ describe("SettingsPage", () => {
     expect(db.User.findByPk).toHaveBeenCalledWith(
       "user-1",
       expect.objectContaining({
-        attributes: ["mutedKeywords", "followedKeywords", "keyboardShortcuts", "homeSections"],
+        attributes: [
+          "mutedKeywords",
+          "followedKeywords",
+          "followedSources",
+          "keyboardShortcuts",
+          "homeSections",
+        ],
       })
     );
 
@@ -71,6 +81,9 @@ describe("SettingsPage", () => {
     expect(
       JSON.parse(screen.getByTestId("followed-keywords").textContent).initialKeywords
     ).toEqual(["ai"]);
+    expect(
+      JSON.parse(screen.getByTestId("followed-sources").textContent).initialSources
+    ).toEqual(["Reuters"]);
     expect(
       JSON.parse(screen.getByTestId("keyboard-shortcuts-settings").textContent).initialShortcuts
     ).toEqual({ next: "j" });

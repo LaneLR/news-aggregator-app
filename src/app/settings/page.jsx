@@ -1,6 +1,7 @@
 import DigestSettings from "@/components/DigestSettings";
 import KeywordFilters from "@/components/KeywordFilters";
 import FollowedKeywords from "@/components/FollowedKeywords";
+import FollowedSources from "@/components/FollowedSources";
 import NotificationSettings from "@/components/NotificationSettings";
 import KeyboardShortcutsSettings from "@/components/KeyboardShortcutsSettings";
 import HomeSectionsSettings from "@/components/HomeSectionsSettings";
@@ -40,7 +41,13 @@ export default async function SettingsPage() {
   // fetched directly here instead.
   const { User } = await initializeDbAndModels();
   const currentUser = await User.findByPk(session.user.id, {
-    attributes: ["mutedKeywords", "followedKeywords", "keyboardShortcuts", "homeSections"],
+    attributes: [
+      "mutedKeywords",
+      "followedKeywords",
+      "followedSources",
+      "keyboardShortcuts",
+      "homeSections",
+    ],
   });
   const isSubscribed = session.user.tier && session.user.tier !== "Free";
 
@@ -105,7 +112,10 @@ export default async function SettingsPage() {
               Following
             </h2>
             <div className={styles.cardContent}>
+              <h3 className={styles.cardSubheading}>Topics</h3>
               <FollowedKeywords initialKeywords={currentUser?.followedKeywords} />
+              <h3 className={styles.cardSubheading}>Sources</h3>
+              <FollowedSources initialSources={currentUser?.followedSources} />
             </div>
           </div>
 

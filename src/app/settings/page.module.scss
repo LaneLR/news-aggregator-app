@@ -107,6 +107,21 @@
   line-height: 1.5;
 }
 
+.cardSubheading {
+  margin: 0 0 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--theme-text-secondary);
+
+  &:not(:first-child) {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--theme-border);
+  }
+}
+
 .cardFooter {
   padding: 1rem 1.5rem;
   border-top: 1px solid var(--theme-border);

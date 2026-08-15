@@ -7,12 +7,13 @@ import Button from "./Button";
 import Loading from "@/app/loading";
 import styles from "./NewsFeed.module.scss";
 
+// A relative path, not NEXT_PUBLIC_BASE_URL — see the identical comment in
+// CategoryPage.jsx's fetchCategoryArticles for why: this runs in the
+// browser, where a relative fetch already resolves against the current
+// origin, and the env-var version would silently break in any deployment
+// where that build-time value doesn't match reality.
 async function fetchArticles(feedId) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-
-  const url = feedId
-    ? `${baseUrl}/api/feeds/${feedId}/articles`
-    : `${baseUrl}/api/fetched`;
+  const url = feedId ? `/api/feeds/${feedId}/articles` : `/api/fetched`;
 
   const res = await fetch(url, {
     next: { revalidate: 3600 },

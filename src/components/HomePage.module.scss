@@ -9,13 +9,65 @@
 }
 
 .hero {
+  position: relative;
+  overflow: hidden;
+  // Fallback behind the photo — invisible once it loads, but avoids a
+  // flash of the wrong-theme background color while it's still loading in.
+  background-color: var(--theme-layout-background);
+}
+
+// Landscape crop of the same photo used on the login page's brand panel —
+// grayscale for the same reason (a deliberate editorial choice, not a
+// random stock photo), with the coffee cup/phone cluster kept to the right
+// so the headline has clear table space to sit over on the left.
+.heroPhoto {
+  filter: grayscale(1);
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  // Left-weighted, not uniform: the headline sits over the open tabletop on
+  // the photo's left side, so that's where contrast matters most — the
+  // right side (coffee cup, phone, plant) can stay a little more visible
+  // under a lighter wash.
+  background: linear-gradient(
+    100deg,
+    rgba(15, 15, 17, 0.82) 0%,
+    rgba(15, 15, 17, 0.72) 45%,
+    rgba(15, 15, 17, 0.45) 100%
+  );
+}
+
+.heroContent {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
   gap: 1.2rem;
-  padding: 4rem 1.5rem 3.5rem;
-  background-color: var(--theme-layout-background);
+  max-width: 620px;
+  padding: 4.5rem 1.5rem 4rem;
+  margin: 0 2.5rem 0 0;
+
+  @media (max-width: 800px) {
+    // The photo's open tabletop is on its left — once the coffee cup/phone
+    // cluster starts taking up most of the width on a narrower viewport,
+    // there's no clean "empty" side left to anchor left-aligned text
+    // against, so it goes back to the centered layout that works over any
+    // part of the photo.
+    align-items: center;
+    text-align: center;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  // Matches AuthLayout.module.scss's identical pattern: this section is now
+  // a dark photo background regardless of the page-wide (always-light, see
+  // RootLayout) theme, so it needs its own fixed text tokens rather than
+  // the light-mode theme variables the rest of this page still uses.
+  --brand-text: #ffffff;
+  --brand-text-secondary: rgba(255, 255, 255, 0.82);
 }
 
 .heroTitle {
@@ -23,7 +75,7 @@
   font-size: 2.6rem;
   font-weight: 700;
   line-height: 1.2;
-  color: var(--theme-dark-blue);
+  color: var(--brand-text);
 
   @media (max-width: 600px) {
     font-size: 1.9rem;
@@ -33,7 +85,7 @@
 .heroSubtitle {
   max-width: 560px;
   font-size: 1.05rem;
-  color: var(--theme-text-secondary);
+  color: var(--brand-text-secondary);
 }
 
 .heroActions {
@@ -41,7 +93,11 @@
   gap: 0.75rem;
   margin-top: 0.5rem;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
+
+  @media (max-width: 800px) {
+    justify-content: center;
+  }
 }
 
 // Same white fill as the page itself, by design (it's the secondary action

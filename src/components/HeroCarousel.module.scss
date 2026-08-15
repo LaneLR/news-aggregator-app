@@ -3,7 +3,14 @@
   // followed by `margin: 0 1.5rem`, and the second declaration silently
   // zeroed the first (later same-property wins in CSS), so sections had no
   // gap between them at all and ran together visually.
-  max-width: 95vw;
+  //
+  // max-width is 100%, not a vw unit — vw is computed against the full
+  // browser viewport regardless of how much of it this element's own
+  // containing block actually has (e.g. once MainContentWrapper's
+  // persistent sidebar is taking up its own share), so a vw-based width
+  // can overflow past the real available space instead of ever shrinking
+  // to fit it. 100% correctly tracks the actual container width.
+  max-width: 100%;
   margin: 0 1.5rem 3rem;
 
   @media (max-width: 440px) {

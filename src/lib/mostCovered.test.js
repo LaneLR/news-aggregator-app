@@ -2,7 +2,12 @@ import { describe, expect, it, vi } from "vitest";
 import { getMostCoveredCompanies } from "./mostCovered";
 
 function makeArticleModel(articles) {
-  return { findAll: vi.fn().mockResolvedValue(articles) };
+  return {
+    findAll: vi.fn().mockResolvedValue(articles),
+    // getMostCoveredCompanies orders via src/lib/dbOrder.js's orderByDesc,
+    // which reads the bound Sequelize instance off the model itself.
+    sequelize: { literal: vi.fn((sql) => ({ __literal: sql })) },
+  };
 }
 
 describe("getMostCoveredCompanies", () => {

@@ -1,6 +1,7 @@
 "use client";
 import ArchiveToggleButton from "./ArchiveToggleButton.jsx";
 import ShareButton from "./ShareButton.jsx";
+import FollowSourceButton from "./FollowSourceButton.jsx";
 import Link from "next/link.js";
 import Image from "next/image.js";
 import { useRef, useState } from "react";
@@ -225,7 +226,10 @@ export default function NewsCardThree({
               {cleanTitle}
             </Link>
           </h3>
-          <p className={styles.articleSnippetText}>{cleanSourceName}</p>
+          <div className={styles.sourceRow}>
+            <p className={styles.articleSnippetText}>{cleanSourceName}</p>
+            <FollowSourceButton sourceName={cleanSourceName} />
+          </div>
         </div>
         <div className={styles.actionsRow}>
           <a

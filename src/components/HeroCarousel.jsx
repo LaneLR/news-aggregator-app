@@ -10,7 +10,7 @@ import styles from "./HeroCarousel.module.scss";
 const CAROUSEL_LIMIT = 12;
 
 const SUBTITLES = {
-  forYou: "Picked based on the sources, categories, and articles you've liked, saved, and clicked on.",
+  forYou: "Picked based on the sources you follow, plus categories and articles you've liked, saved, and clicked on.",
   trending: "The most-read stories across MochaReads right now.",
 };
 
