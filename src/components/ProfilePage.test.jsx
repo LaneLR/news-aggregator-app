@@ -1,13 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { makeSession } from "@/test/fixtures";
 
 let mockSession = null;
 let mockStatus = "unauthenticated";
-const update = vi.fn();
 vi.mock("next-auth/react", () => ({
-  useSession: () => ({ data: mockSession, status: mockStatus, update }),
+  useSession: () => ({ data: mockSession, status: mockStatus }),
 }));
 
 // Each has its own dedicated test file covering its internal fetch/error
@@ -29,8 +27,8 @@ const { default: ProfilePage } = await import("./ProfilePage");
 
 describe("ProfilePage", () => {
   beforeEach(() => {
-    update.mockClear();
-    localStorage.clear();
+    mockSession = null;
+    mockStatus = "unauthenticated";
   });
 
   it("shows a loading state while the session loads", () => {
@@ -82,58 +80,6 @@ describe("ProfilePage", () => {
     expect(screen.getByText("REF999")).toBeInTheDocument();
   });
 
-  it("switches between grid and list layout and persists the choice to localStorage", async () => {
-    mockSession = makeSession({ tier: "Free" });
-    mockStatus = "authenticated";
-    const user = userEvent.setup();
-    render(<ProfilePage />);
-
-    await user.click(screen.getByTitle("List view"));
-
-    expect(localStorage.getItem("accountCardLayout")).toBe("list");
-  });
-
-  it("shows the pending-deletion notice and a Cancel Deletion button when isPendingDeletion is true", () => {
-    mockSession = makeSession({ tier: "Free", isPendingDeletion: true });
-    mockStatus = "authenticated";
-    render(<ProfilePage />);
-
-    expect(screen.getByText(/scheduled for deletion/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cancel Deletion" })).toBeInTheDocument();
-  });
-
-  it("requests account deletion and refreshes the session when Delete Account is clicked", async () => {
-    mockSession = makeSession({ tier: "Free", isPendingDeletion: false });
-    mockStatus = "authenticated";
-    global.fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ success: true }) });
-    const user = userEvent.setup();
-    render(<ProfilePage />);
-
-    await user.click(screen.getByRole("button", { name: "Delete Account" }));
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      "/api/users/request-deletion",
-      expect.objectContaining({ method: "PATCH" })
-    );
-    await vi.waitFor(() => expect(update).toHaveBeenCalled());
-  });
-
-  it("cancels a scheduled deletion and refreshes the session", async () => {
-    mockSession = makeSession({ tier: "Free", isPendingDeletion: true });
-    mockStatus = "authenticated";
-    global.fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ success: true }) });
-    const user = userEvent.setup();
-    render(<ProfilePage />);
-
-    await user.click(screen.getByRole("button", { name: "Cancel Deletion" }));
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      "/api/users/cancel-deletion",
-      expect.objectContaining({ method: "PATCH" })
-    );
-    await vi.waitFor(() => expect(update).toHaveBeenCalled());
-  });
-
   it("shows 'Cancels on', a Resume button, and no Cancel button when subscriptionWillCancel is true", () => {
     mockSession = makeSession({
       tier: "Subscribed",
@@ -164,18 +110,43 @@ describe("ProfilePage", () => {
     expect(img.src).toContain(encodeURIComponent("/images/default-avatar.png"));
   });
 
-  it("restores a previously-saved layout preference from localStorage", () => {
-    localStorage.setItem("accountCardLayout", "list");
-    mockSession = makeSession({ tier: "Free" });
-    mockStatus = "authenticated";
-    render(<ProfilePage />);
-    expect(screen.getByTitle("List view").className).toMatch(/active/);
-  });
-
   it("does not show the referral-count line for a subscriber with zero referrals", () => {
     mockSession = makeSession({ tier: "Subscribed", referralCount: 0, referralCode: "REF000" });
     mockStatus = "authenticated";
     render(<ProfilePage />);
     expect(screen.queryByText(/Users referred:/)).not.toBeInTheDocument();
+  });
+
+  it("shows a 'Member since' date derived from the account's creation date", () => {
+    mockSession = makeSession({ tier: "Free", createdAt: "2025-03-14T00:00:00.000Z" });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+    expect(screen.getByText("Member since March 2025")).toBeInTheDocument();
+  });
+
+  it("shows quick links to Settings, Pricing, and Contact Us", () => {
+    mockSession = makeSession({ tier: "Free" });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+
+    expect(screen.getByRole("link", { name: /Settings/ })).toHaveAttribute("href", "/settings");
+    expect(screen.getByRole("link", { name: /Plans & Pricing/ })).toHaveAttribute("href", "/pricing");
+    expect(screen.getByRole("link", { name: /Contact Us/ })).toHaveAttribute("href", "/contact-us");
+  });
+
+  it("has no account-deletion UI", () => {
+    mockSession = makeSession({ tier: "Free" });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+
+    expect(screen.queryByRole("button", { name: /Delete Account/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/scheduled for deletion/i)).not.toBeInTheDocument();
+  });
+
+  it("keeps the #privacy anchor target Settings deep-links to", () => {
+    mockSession = makeSession({ tier: "Free" });
+    mockStatus = "authenticated";
+    const { container } = render(<ProfilePage />);
+    expect(container.querySelector("#privacy")).toBeInTheDocument();
   });
 });
