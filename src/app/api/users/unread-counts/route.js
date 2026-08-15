@@ -14,7 +14,7 @@ export async function GET() {
   try {
     const db = await initializeDbAndModels();
     const user = await db.User.findByPk(session.user.id, {
-      attributes: ["id", "mutedKeywords", "followedKeywords"],
+      attributes: ["id", "mutedKeywords", "followedKeywords", "followedSources"],
     });
     if (!user) return NextResponse.json(EMPTY);
 

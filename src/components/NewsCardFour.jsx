@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation.js";
 import { Heart, Lock, Bookmark, Check } from "lucide-react";
 import ShareButton from "./ShareButton.jsx";
+import FollowSourceButton from "./FollowSourceButton.jsx";
 import { PAYWALLED_SOURCES } from "@/lib/paywalledSources";
 import { trackArticleClick } from "@/lib/trackClick";
 import { getCategoryColor } from "@/lib/categoryColors";
@@ -163,7 +164,10 @@ export default function NewsCardFour({
           <h3 className={`${styles.articleTitle} headline`}>
             <Link href={`/article/${article.id}`}>{cleanTitle}</Link>
           </h3>
-          <p className={styles.articleSnippetText}>{cleanSourceName}</p>
+          <div className={styles.sourceRow}>
+            <p className={styles.articleSnippetText}>{cleanSourceName}</p>
+            <FollowSourceButton sourceName={cleanSourceName} />
+          </div>
         </div>
         <div className={styles.actionsRow}>
           <a

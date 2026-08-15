@@ -92,4 +92,27 @@ describe("getUnreadCounts", () => {
     const result = await getUnreadCounts(db, user, { isSubscribed: true });
     expect(result.following).toBe(0);
   });
+
+  it("counts unread articles matching a followed source", async () => {
+    const db = makeDb({
+      articles: [
+        { url: "u1", title: "Unrelated headline", category: ["Business"], sourceName: "Reuters" },
+        { url: "u2", title: "Other headline", category: ["Business"], sourceName: "Other" },
+      ],
+    });
+    const user = makeUser({ followedKeywords: [], followedSources: ["Reuters"] });
+
+    const result = await getUnreadCounts(db, user, { isSubscribed: true });
+    expect(result.following).toBe(1);
+  });
+
+  it("counts an article once when it matches both a followed keyword and a followed source", async () => {
+    const db = makeDb({
+      articles: [{ url: "u1", title: "Tesla stock jumps", category: ["Business"], sourceName: "Reuters" }],
+    });
+    const user = makeUser({ followedKeywords: ["tesla"], followedSources: ["Reuters"] });
+
+    const result = await getUnreadCounts(db, user, { isSubscribed: true });
+    expect(result.following).toBe(1);
+  });
 });

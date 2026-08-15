@@ -6,7 +6,6 @@ import {
   LayoutGrid,
   Sparkles,
   Layers,
-  Search,
   Bookmark,
   Lock,
   User,

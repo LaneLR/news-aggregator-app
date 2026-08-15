@@ -60,9 +60,10 @@ export default function FollowingPage() {
       ) : !hasFollows ? (
         <div className={styles.emptyState}>
           <Rss size={32} strokeWidth={1.5} />
-          <p>You&apos;re not following any topics yet.</p>
+          <p>You&apos;re not following any sources or topics yet.</p>
           <p className={styles.emptyStateHint}>
-            Add a word, topic, or company to follow in <Link href="/settings">Settings</Link> and new
+            Follow a source from the icon next to its name on any article card, or add a
+            word, topic, or company to follow in <Link href="/settings">Settings</Link> — new
             matching articles will show up here.
           </p>
         </div>

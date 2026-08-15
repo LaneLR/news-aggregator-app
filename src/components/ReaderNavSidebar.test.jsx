@@ -1,11 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { makeSession } from "@/test/fixtures";
 
 let mockSession = null;
 let mockPathname = "/news";
+const signOut = vi.fn();
 vi.mock("next-auth/react", () => ({
   useSession: () => ({ data: mockSession }),
+  signOut: (...args) => signOut(...args),
 }));
 vi.mock("next/navigation", () => ({
   usePathname: () => mockPathname,
@@ -19,6 +22,7 @@ const { default: ReaderNavSidebar } = await import("./ReaderNavSidebar");
 describe("ReaderNavSidebar", () => {
   beforeEach(() => {
     unreadCounts.value = { categories: {}, feeds: 0, following: 0 };
+    signOut.mockClear();
   });
 
   it("hides subscriber-only top links but always shows categories (with a lock badge) for a Free user", () => {
@@ -65,11 +69,11 @@ describe("ReaderNavSidebar", () => {
     expect(screen.getByRole("link", { name: /Following/ })).toHaveAttribute("href", "/following");
   });
 
-  it("shows Search and Archives links even when signed out", () => {
+  it("shows Liked Articles and Archives links even when signed out", () => {
     mockSession = null;
     mockPathname = "/news";
     render(<ReaderNavSidebar />);
-    expect(screen.getByRole("link", { name: /Search/ })).toHaveAttribute("href", "/search");
+    expect(screen.getByRole("link", { name: /Liked Articles/ })).toHaveAttribute("href", "/liked");
     expect(screen.getByRole("link", { name: /Archives/ })).toHaveAttribute("href", "/archives");
   });
 
@@ -93,5 +97,42 @@ describe("ReaderNavSidebar", () => {
     render(<ReaderNavSidebar />);
 
     expect(screen.getByRole("link", { name: /Business/ })).not.toHaveTextContent("3");
+  });
+
+  it("shows the account section and log out button for a signed-in user", () => {
+    mockSession = makeSession({ tier: "Free" });
+    mockPathname = "/news";
+    render(<ReaderNavSidebar />);
+
+    expect(screen.getByText("Account")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Profile/ })).toHaveAttribute("href", "/account");
+    expect(screen.getByRole("link", { name: /Liked Articles/ })).toHaveAttribute("href", "/liked");
+    expect(screen.getByRole("link", { name: /Premium/ })).toHaveAttribute("href", "/pricing");
+    expect(screen.getByRole("link", { name: /Subscription & Billing/ })).toHaveAttribute(
+      "href",
+      "/account/subscription"
+    );
+    expect(screen.getByRole("link", { name: /Settings/ })).toHaveAttribute("href", "/settings");
+    expect(screen.getByRole("button", { name: /Log Out/ })).toBeInTheDocument();
+  });
+
+  it("hides the account section for a signed-out visitor", () => {
+    mockSession = null;
+    mockPathname = "/news";
+    render(<ReaderNavSidebar />);
+
+    expect(screen.queryByText("Account")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Log Out/ })).not.toBeInTheDocument();
+  });
+
+  it("logs out when Log Out is clicked", async () => {
+    const user = userEvent.setup();
+    mockSession = makeSession({ tier: "Free" });
+    mockPathname = "/news";
+    render(<ReaderNavSidebar />);
+
+    await user.click(screen.getByRole("button", { name: /Log Out/ }));
+
+    expect(signOut).toHaveBeenCalledWith({ callbackUrl: "/login" });
   });
 });

@@ -71,8 +71,8 @@ export default function ForYouFeed() {
           For You
         </h1>
         <p className={styles.pageSubtitle}>
-          Picked based on the sources, categories, and articles you&apos;ve
-          liked, saved, and clicked on.
+          Picked based on the sources you follow, plus categories and
+          articles you&apos;ve liked, saved, and clicked on.
         </p>
       </div>
 

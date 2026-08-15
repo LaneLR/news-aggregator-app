@@ -53,6 +53,12 @@ describe("NewsCardFour", () => {
     expect(screen.getByText("Example News")).toBeInTheDocument();
   });
 
+  it("renders a follow-source button for the article's source", () => {
+    const article = makeArticle({ sourceName: "Example News" });
+    render(<NewsCardFour article={article} viewOnly />);
+    expect(screen.getByRole("button", { name: "Follow Example News" })).toBeInTheDocument();
+  });
+
   it("eagerly loads only the first few cards by index, lazy-loading the rest", () => {
     const article = makeArticle({ title: "Big News Story" });
 

@@ -14,6 +14,7 @@ import KeyboardShortcutsProvider from "@/components/KeyboardShortcutsProvider";
 import CommandPalette from "@/components/CommandPalette";
 import ToastProvider from "@/components/ToastProvider";
 import ConfirmDialogProvider from "@/components/ConfirmDialogProvider";
+import FollowedSourcesProvider from "@/components/FollowedSourcesProvider";
 import { auth } from "@/lib/auth";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -143,17 +144,19 @@ export default async function RootLayout({ children }) {
           <PostHogProvider>
             <ThemeProvider>
               <ToastProvider>
-                <ConfirmDialogProvider>
-                  <KeyboardShortcutsProvider>
-                    <AppWrapper>
-                      <Header />
-                      <MainContentWrapper>{children}</MainContentWrapper>
-                      <Footer />
-                      <MobileTabBar />
-                    </AppWrapper>
-                    <CommandPalette />
-                  </KeyboardShortcutsProvider>
-                </ConfirmDialogProvider>
+                <FollowedSourcesProvider>
+                  <ConfirmDialogProvider>
+                    <KeyboardShortcutsProvider>
+                      <AppWrapper>
+                        <Header />
+                        <MainContentWrapper>{children}</MainContentWrapper>
+                        <Footer />
+                        <MobileTabBar />
+                      </AppWrapper>
+                      <CommandPalette />
+                    </KeyboardShortcutsProvider>
+                  </ConfirmDialogProvider>
+                </FollowedSourcesProvider>
               </ToastProvider>
             </ThemeProvider>
           </PostHogProvider>

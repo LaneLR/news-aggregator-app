@@ -20,6 +20,9 @@ vi.mock("./ToastProvider", () => ({ useToast: () => toast }));
 // internals (each has its own dedicated test file already).
 vi.mock("./ArchiveToggleButton", () => ({ default: () => <div>ArchiveToggle</div> }));
 vi.mock("./ShareButton", () => ({ default: () => <div>Share</div> }));
+vi.mock("./FollowSourceButton", () => ({
+  default: ({ sourceName }) => <button aria-label={`Follow ${sourceName}`}>Follow</button>,
+}));
 
 const { default: CarouselCard } = await import("./CarouselArticleCard");
 
@@ -48,6 +51,12 @@ describe("CarouselArticleCard", () => {
     expect(screen.getByText("BBC")).toBeInTheDocument();
     expect(screen.getByText("Tech")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Big Headline/ })).toHaveAttribute("href", "/article/a1");
+  });
+
+  it("renders a follow-source button for the article's source", () => {
+    const article = makeArticle({ sourceName: "BBC" });
+    render(<CarouselCard article={article} />);
+    expect(screen.getByRole("button", { name: "Follow BBC" })).toBeInTheDocument();
   });
 
   it("redirects to login instead of liking when signed out", async () => {

@@ -26,9 +26,11 @@ describe("GET /api/articles/following", () => {
     expect(res.status).toBe(401);
   });
 
-  it("returns hasFollows:false when the user follows no keywords", async () => {
+  it("returns hasFollows:false when the user follows no keywords or sources", async () => {
     mockAuth.mockResolvedValue(makeSession());
-    db.User.findByPk.mockResolvedValue(createInstanceMock({ followedKeywords: [] }));
+    db.User.findByPk.mockResolvedValue(
+      createInstanceMock({ followedKeywords: [], followedSources: [] })
+    );
 
     const res = await GET();
     const body = await res.json();
@@ -41,7 +43,7 @@ describe("GET /api/articles/following", () => {
   it("returns matching articles with read status for a Subscribed user", async () => {
     mockAuth.mockResolvedValue(makeSession({ tier: "Subscribed" }));
     db.User.findByPk.mockResolvedValue(
-      createInstanceMock({ followedKeywords: ["nvidia"], mutedKeywords: [] })
+      createInstanceMock({ followedKeywords: ["nvidia"], followedSources: [], mutedKeywords: [] })
     );
     const article = createInstanceMock(makeArticle({ url: "https://x.com" }));
     db.Article.findAll.mockResolvedValue([article]);
@@ -53,6 +55,23 @@ describe("GET /api/articles/following", () => {
     expect(res.status).toBe(200);
     expect(body.hasFollows).toBe(true);
     expect(body.articles[0].isRead).toBe(true);
+  });
+
+  it("returns hasFollows:true and queries articles when the user only follows a source, no keywords", async () => {
+    mockAuth.mockResolvedValue(makeSession({ tier: "Subscribed" }));
+    db.User.findByPk.mockResolvedValue(
+      createInstanceMock({ followedKeywords: [], followedSources: ["Reuters"], mutedKeywords: [] })
+    );
+    const article = createInstanceMock(makeArticle({ url: "https://x.com", sourceName: "Reuters" }));
+    db.Article.findAll.mockResolvedValue([article]);
+    db.ReadArticle.findAll.mockResolvedValue([]);
+
+    const res = await GET();
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.hasFollows).toBe(true);
+    expect(body.articles).toHaveLength(1);
   });
 
   it("returns 500 on an unexpected error", async () => {

@@ -32,13 +32,15 @@ describe("FollowingPage", () => {
     expect(screen.queryByText("Please sign in to see articles you follow.")).not.toBeInTheDocument();
   });
 
-  it("shows an empty state prompting the user to follow topics when they have none", async () => {
+  it("shows an empty state prompting the user to follow sources or topics when they have none", async () => {
     mockAuth.status = "authenticated";
     mockAuth.data = { user: { id: "user-1" } };
     global.fetch.mockResolvedValueOnce(makeFetchResponse({ articles: [], hasFollows: false }));
 
     render(<FollowingPage />);
-    expect(await screen.findByText("You're not following any topics yet.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("You're not following any sources or topics yet.")
+    ).toBeInTheDocument();
   });
 
   it("shows a different empty state when following topics but nothing matches yet", async () => {

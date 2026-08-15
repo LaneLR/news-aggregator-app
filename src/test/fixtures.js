@@ -54,6 +54,7 @@ export function makeUser(overrides = {}) {
     onboardingCompleted: true,
     mutedKeywords: [],
     followedKeywords: [],
+    followedSources: [],
     preferredCategories: [],
     preferredSources: [],
     watchlistSymbols: [],

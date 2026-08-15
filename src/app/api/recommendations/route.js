@@ -58,7 +58,7 @@ export async function GET() {
         attributes: ["articleUrl", "sourceName", "category"],
       }),
       User.findByPk(userId, {
-        attributes: ["mutedKeywords", "preferredCategories", "preferredSources"],
+        attributes: ["mutedKeywords", "preferredCategories", "preferredSources", "followedSources"],
       }),
     ]);
     const keywordExclusion = buildKeywordExclusion(currentUser?.mutedKeywords);
@@ -101,6 +101,11 @@ export async function GET() {
     // real activity.
     (currentUser?.preferredSources || []).forEach((s) => addSignal(s, null, 2));
     (currentUser?.preferredCategories || []).forEach((c) => addSignal(null, [c], 2));
+    // A followed source (see FollowSourceButton) is the strongest signal of
+    // all — a standing, explicit "show me more of this" the user opted
+    // into, not a one-off action on a single article, so it outweighs even
+    // a saved article.
+    (currentUser?.followedSources || []).forEach((s) => addSignal(s, null, 6));
 
     const excludedUrls = Array.from(
       new Set([

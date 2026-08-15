@@ -130,7 +130,7 @@
       margin: 0 0 0.4rem 0;
     }
 
-    .articleSnippetText {
+    .sourceRow {
       margin: 0;
     }
 
@@ -234,13 +234,25 @@
   }
 }
 
+.sourceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin: 0 0 1rem 0;
+}
+
 .articleSnippetText {
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--theme-text-secondary);
-  margin: 0 0 1rem 0;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .actionsRow {

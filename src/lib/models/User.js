@@ -166,6 +166,17 @@ export default function defineUser(sequelize) {
         allowNull: false,
         defaultValue: [],
       },
+      // Sources explicitly followed via the follow icon on an article card
+      // (see FollowSourceButton/FollowedSourcesProvider) — distinct from
+      // preferredSources (a one-time onboarding pick used only as a weak
+      // recommendation signal). Followed sources are a standing preference:
+      // they feed /following alongside followedKeywords, count toward its
+      // nav badge, and are the strongest signal in /api/recommendations.
+      followedSources: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
+      },
       keyboardShortcuts: {
         type: DataTypes.JSONB,
         allowNull: false,

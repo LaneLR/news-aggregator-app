@@ -100,6 +100,42 @@ describe("GET /api/recommendations", () => {
     expect(body.articles[0].recommendationReason).toBe("Because you follow Reuters");
   });
 
+  it("weights a followed source above likes/saves/onboarding picks when choosing the reason", async () => {
+    mockAuth.mockResolvedValue(makeSession({ tier: "Subscribed", id: "user-1" }));
+    // A like on a different source, so the followed source has to outweigh
+    // it to win the "Because you..." reason below.
+    db.ArticleLike.findAll.mockResolvedValue([{ articleUrl: "https://example.com/liked" }]);
+    db.Archive.findAll.mockResolvedValue([]);
+    db.UserInteraction.findAll.mockResolvedValue([]);
+    db.User.findByPk.mockResolvedValue({
+      mutedKeywords: [],
+      preferredCategories: [],
+      preferredSources: [],
+      followedSources: ["Reuters"],
+    });
+
+    const candidate = articleInstance({
+      url: "https://example.com/candidate",
+      sourceName: "Reuters",
+      category: ["Business"],
+    });
+
+    db.Article.findAll
+      .mockResolvedValueOnce([
+        { url: "https://example.com/liked", sourceName: "AP", category: ["Business"] },
+      ]) // likedArticles lookup
+      .mockResolvedValueOnce([candidate]) // ranked candidates
+      .mockResolvedValueOnce([]); // backfill trending
+
+    db.ReadArticle.findAll.mockResolvedValue([]);
+
+    const res = await GET();
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.articles[0].recommendationReason).toBe("Because you follow Reuters");
+  });
+
   it("marks liked/read articles based on the user's own history", async () => {
     mockAuth.mockResolvedValue(makeSession({ tier: "Subscribed", id: "user-1" }));
     db.ArticleLike.findAll.mockResolvedValue([]);
