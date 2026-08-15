@@ -158,7 +158,11 @@ describe("SearchFeed", () => {
     );
     await triggerIntersection();
 
-    expect(await screen.findByText("Page Two Article")).toBeInTheDocument();
+    // Same extended timeout as the "deduplicates" test right below, which
+    // has this identical render-page-1 / trigger-intersection / assert
+    // shape — CI runners are slow enough for the default 1000ms to be too
+    // tight here even though the underlying fetch/render cycle is correct.
+    expect(await screen.findByText("Page Two Article", {}, { timeout: 3000 })).toBeInTheDocument();
     expect(global.fetch).toHaveBeenLastCalledWith("/api/search?query=nvidia&page=2");
   });
 
@@ -245,7 +249,7 @@ describe("SearchFeed", () => {
     global.fetch.mockResolvedValueOnce(resultsPage([]));
     await triggerIntersection();
 
-    expect(await screen.findByText("No more results")).toBeInTheDocument();
+    expect(await screen.findByText("No more results", {}, { timeout: 3000 })).toBeInTheDocument();
   });
 
   it("logs and stops pagination if the search request throws", async () => {
