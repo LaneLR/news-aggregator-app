@@ -17,7 +17,6 @@ export async function GET(req) {
         id: token.id,
         email: token.email,
         tier: token.tier,
-        isPendingDeletion: token.isPendingDeletion,
         emailIsVerified: token.emailIsVerified,
         stripeSubscriptionStatus: token.stripeSubscriptionStatus,
         stripeSubscriptionEndsAt: token.stripeSubscriptionEndsAt,

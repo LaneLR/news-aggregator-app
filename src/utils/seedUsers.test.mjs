@@ -17,7 +17,6 @@ function makeUserRecord(overrides = {}) {
     tier: "Free",
     emailIsVerified: false,
     status: "inactive",
-    isPendingDeletion: true,
     save: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
@@ -83,7 +82,6 @@ describe("seedUsers.mjs", () => {
     expect(subscriber.tier).toBe("Subscribed");
     expect(subscriber.emailIsVerified).toBe(true);
     expect(subscriber.status).toBe("active");
-    expect(subscriber.isPendingDeletion).toBe(false);
     expect(subscriber.save).toHaveBeenCalled();
     expect(freeUser.tier).toBe("Free");
     expect(freeUser.save).toHaveBeenCalled();

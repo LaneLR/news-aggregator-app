@@ -52,7 +52,6 @@ async function seed() {
       user.tier = demoUser.tier;
       user.emailIsVerified = true;
       user.status = "active";
-      user.isPendingDeletion = false;
       await user.save();
     }
 

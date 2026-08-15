@@ -1,110 +1,41 @@
 .profileWrapper {
-  max-width: 1100px;
+  max-width: 1000px;
   margin: 2rem auto;
-  padding: 0 1rem;
+  padding: 0 1rem 3rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
-.cardsGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  align-items: start;
-
-  @media (max-width: 1000px) {
-    grid-template-columns: 1fr;
-  }
-
-  // User-selected list view (persisted in localStorage, see ProfilePage) —
-  // higher specificity than the base rule above so it wins at every
-  // viewport width, not just above the responsive collapse breakpoint.
-  &.listLayout {
-    grid-template-columns: 1fr;
-  }
-}
-
-.layoutToggleRow {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.layoutToggle {
-  display: flex;
-  gap: 0.3rem;
-  background-color: var(--theme-layout-background);
-  padding: 4px;
-  border: 1px solid var(--theme-border);
-  border-radius: 999px;
-}
-
-.layoutButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  border: none;
-  background: transparent;
-  color: var(--theme-text-secondary);
-  cursor: pointer;
-  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
-
-  &:hover {
-    color: var(--theme-text);
-  }
-
-  // Solid fill instead of same-color-as-track + faint shadow — see the
-  // matching comment in CategoryPage.module.scss's .sortOption.
-  &.active {
-    background-color: var(--theme-primary);
-    color: var(--theme-primary-contrast);
-    box-shadow: var(--shadow-sm);
-  }
-}
-
-// Account Settings (the danger/deletion card) stays full-width — it's a
-// high-stakes section that deserves visual separation rather than being
-// paired arbitrarily next to whichever card comes before it in the grid.
-.spanFull {
-  grid-column: 1 / -1;
-}
-
-.card {
-  background-color: var(--theme-card-background);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--theme-border);
-  overflow: hidden;
-  scroll-margin-top: 1.5rem;
-}
-
+// Matches Settings' pageHeader/layoutRow pattern (src/app/settings/page.module.scss)
+// so the two account-management pages read as the same product instead of
+// two different ones bolted together — see the card/cardHeader/etc. tokens
+// below, reused verbatim from there too.
 .profileHeader {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 2rem;
+  padding: 2.5rem 2rem;
   border-radius: var(--radius-md);
   background-color: var(--theme-card-background);
   border: 1px solid var(--theme-border);
+  box-shadow: var(--shadow-sm);
 }
 
 .avatar {
-  width: 120px;
-  height: 120px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   overflow: hidden;
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
   border: 4px solid var(--theme-border);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   user-select: none;
 }
 
 .userName {
-  font-size: 2rem;
+  font-size: 1.9rem;
   font-weight: 600;
   margin: 0;
   display: flex;
@@ -115,11 +46,19 @@
 .userEmail {
   font-size: 1rem;
   color: var(--theme-text-secondary);
-  margin: 0.25rem 0 0 0;
+  margin: 0.35rem 0 0 0;
+}
+
+.memberSince {
+  font-size: 0.82rem;
+  color: var(--theme-text-secondary);
+  margin: 0.6rem 0 0 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .tierBadge {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: bold;
   padding: 4px 12px;
   border-radius: 16px;
@@ -130,13 +69,52 @@
   // background with the same white --theme-button-text used for the
   // primary-colored badge — in light mode that's ~2.6:1 contrast, well
   // under WCAG's 4.5:1 minimum for text. Swapped for the same muted
-  // secondary treatment used elsewhere (Pricing's "Your Current Plan",
-  // ProfilePage's inactive layout toggle), which contrasts correctly in
-  // both themes.
+  // secondary treatment used elsewhere (Pricing's "Your Current Plan"),
+  // which contrasts correctly in both themes.
   &.free {
     background-color: var(--theme-layout-background);
     color: var(--theme-text-secondary);
   }
+}
+
+.layoutRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+
+  @media (max-width: 800px) {
+    flex-direction: column;
+  }
+}
+
+.mainColumn {
+  flex: 1 1 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.sideColumn {
+  flex: 1 1 280px;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  @media (max-width: 800px) {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+.card {
+  background-color: var(--theme-card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--theme-border);
+  overflow: hidden;
+  scroll-margin-top: 1.5rem;
 }
 
 .cardHeader {
@@ -196,22 +174,86 @@
   }
 }
 
+.helperText {
+  color: var(--theme-text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
 .cardFooter {
   padding: 1rem 1.5rem;
   background-color: inherit;
-  border: 1px solid var(--theme-border);
+  border-top: 1px solid var(--theme-border);
   display: flex;
   justify-content: flex-end;
+  gap: 0.75rem;
 }
 
-.dangerCardHeader {
-  background-color: var(--theme-card-background);
-  color: var(--theme-warning);
-  border-bottom-color: var(--theme-border);
+.tipCard {
+  display: flex;
+  gap: 10px;
+  padding: 1.1rem 1.25rem;
+  border-radius: var(--radius-md);
+  background-color: color-mix(in srgb, var(--theme-primary) 8%, var(--theme-card-background));
+  border: 1px solid color-mix(in srgb, var(--theme-primary) 25%, transparent);
+  color: var(--theme-primary);
 
-  .cardHeaderIcon {
-    background-color: color-mix(in srgb, var(--theme-warning) 12%, transparent);
-    color: var(--theme-warning);
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
   }
 }
 
+.tipTitle {
+  margin: 0 0 4px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--theme-text);
+}
+
+.tipText {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--theme-text-secondary);
+}
+
+.linksCard {
+  padding: 1.1rem 1.25rem;
+  border-radius: var(--radius-md);
+  background-color: var(--theme-card-background);
+  border: 1px solid var(--theme-border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.linksTitle {
+  margin: 0 0 0.25rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--theme-text-secondary);
+}
+
+.quickLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  color: var(--theme-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  svg {
+    color: var(--theme-primary);
+  }
+
+  &:hover {
+    color: var(--theme-primary);
+  }
+}

@@ -76,7 +76,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           id: user.id,
           email: user.email,
           tier: user.tier,
-          isPendingDeletion: user.isPendingDeletion,
+          createdAt: user.createdAt,
           emailIsVerified: user.emailIsVerified,
           stripeSubscriptionStatus: user.stripeSubscriptionStatus,
           stripeSubscriptionEndsAt: user.stripeSubscriptionEndsAt,
@@ -123,7 +123,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         user.name = dbUser.name;
         user.image = dbUser.image;
         user.tier = dbUser.tier;
-        user.isPendingDeletion = dbUser.isPendingDeletion;
+        user.createdAt = dbUser.createdAt;
         user.stripeSubscriptionStatus = dbUser.stripeSubscriptionStatus;
         user.stripeSubscriptionEndsAt = dbUser.stripeSubscriptionEndsAt;
         user.referralCode = dbUser.referralCode;
@@ -149,7 +149,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.name = user.name;
         token.image = user.image;
         token.tier = user.tier;
-        token.isPendingDeletion = user.isPendingDeletion;
+        token.createdAt = user.createdAt;
         token.stripeSubscriptionStatus = user.stripeSubscriptionStatus;
         token.stripeSubscriptionEndsAt = user.stripeSubscriptionEndsAt;
         token.referralCode = user.referralCode;
@@ -176,7 +176,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         tier: dbUser.tier,
         name: dbUser.name,
         image: dbUser.image,
-        isPendingDeletion: dbUser.isPendingDeletion,
+        createdAt: dbUser.createdAt,
         stripeSubscriptionStatus: dbUser.stripeSubscriptionStatus,
         stripeSubscriptionEndsAt: dbUser.stripeSubscriptionEndsAt,
         referralCode: dbUser.referralCode,
@@ -198,7 +198,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.name = token.name;
         session.user.image = token.image;
         session.user.tier = token.tier;
-        session.user.isPendingDeletion = token.isPendingDeletion;
+        session.user.createdAt = token.createdAt;
         session.user.emailIsVerified = token.emailIsVerified;
         session.user.stripeSubscriptionStatus = token.stripeSubscriptionStatus;
         session.user.stripeSubscriptionEndsAt = token.stripeSubscriptionEndsAt;
