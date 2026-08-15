@@ -16,7 +16,13 @@ import styles from "./SearchFeed.module.scss";
 const GATED_DENSITIES = new Set(["list", "magazine"]);
 
 export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
-  const [query, setQuery] = useState(initialQuery);
+  // Not local state — the parent (src/app/search/page.jsx) remounts this
+  // component via `key={query}` on every new search, so `query` is fixed
+  // for the lifetime of a given mount. A `useState` reset-on-change effect
+  // used to live here, but with `query` constant post-mount it never fired
+  // after the initial render — it just reset results/page/hasMore back to
+  // the exact values useState below already initializes them to.
+  const query = initialQuery;
   const [results, setResults] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -33,13 +39,6 @@ export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
   // multiple get constructed in quick succession.
   const hasMoreRef = useRef(hasMore);
   const loadingRef = useRef(loading);
-
-  useEffect(() => {
-    // Reset state if query changes
-    setResults([]);
-    setPage(1);
-    setHasMore(true);
-  }, [query]);
 
   useEffect(() => {
     const fetchArticles = async () => {
