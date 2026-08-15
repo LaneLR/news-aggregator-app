@@ -21,7 +21,13 @@ import styles from "./ReaderNavSidebar.module.scss";
 const TOP_LINKS = [
   { label: "All Articles", href: "/news", Icon: LayoutGrid },
   { label: "For You", href: "/for-you", Icon: Sparkles, subscriberOnly: true },
-  { label: "My Feeds", href: "/feeds", Icon: Layers, subscriberOnly: true, countKey: "feeds" },
+  {
+    label: "My Feeds",
+    href: "/feeds",
+    Icon: Layers,
+    subscriberOnly: true,
+    countKey: "feeds",
+  },
   ...PERSONAL_LINKS.filter((l) => l.label === "Following"),
   { label: "Liked Articles", href: "/liked", Icon: Heart },
   { label: "Archives", href: "/archives", Icon: Bookmark },
@@ -60,7 +66,8 @@ export default function ReaderNavSidebar() {
     <nav className={styles.sidebar} aria-label="Categories">
       <ul className={styles.linkList}>
         {visibleTop.map(({ label, href, Icon, countKey }) => {
-          const count = isLoggedIn && countKey ? unreadCounts[countKey] : undefined;
+          const count =
+            isLoggedIn && countKey ? unreadCounts[countKey] : undefined;
           return (
             <li key={href}>
               <Link
@@ -69,7 +76,11 @@ export default function ReaderNavSidebar() {
               >
                 <Icon size={16} strokeWidth={2} />
                 {label}
-                {count > 0 && <span className={styles.badge}>{count > 99 ? "99+" : count}</span>}
+                {count > 0 && (
+                  <span className={styles.badge}>
+                    {count > 99 ? "99+" : count}
+                  </span>
+                )}
               </Link>
             </li>
           );
@@ -78,7 +89,9 @@ export default function ReaderNavSidebar() {
       <div className={styles.sectionLabel}>Categories</div>
       <ul className={styles.linkList}>
         {CATEGORY_LINKS.map(({ label, href, Icon, gated }) => {
-          const count = isLoggedIn ? unreadCounts.categories[slugFromHref(href)] : undefined;
+          const count = isLoggedIn
+            ? unreadCounts.categories[slugFromHref(href)]
+            : undefined;
           return (
             <li key={href}>
               <Link
@@ -88,9 +101,18 @@ export default function ReaderNavSidebar() {
                 <Icon size={16} strokeWidth={2} />
                 {label}
                 {gated && !isSubscribed && (
-                  <Lock size={14} strokeWidth={2.5} className={styles.lockIcon} aria-label="Subscribers only" />
+                  <Lock
+                    size={14}
+                    strokeWidth={2.5}
+                    className={styles.lockIcon}
+                    aria-label="Subscribers only"
+                  />
                 )}
-                {count > 0 && <span className={styles.badge}>{count > 99 ? "99+" : count}</span>}
+                {count > 0 && (
+                  <span className={styles.badge}>
+                    {count > 99 ? "99+" : count}
+                  </span>
+                )}
               </Link>
             </li>
           );
@@ -111,16 +133,15 @@ export default function ReaderNavSidebar() {
                 </Link>
               </li>
             ))}
+            <button
+              type="button"
+              className={styles.logoutButton}
+              onClick={() => signOut({ callbackUrl: "/login" })}
+            >
+              <LogOut size={16} strokeWidth={2} />
+              Log Out
+            </button>
           </ul>
-          <div className={styles.divider} />
-          <button
-            type="button"
-            className={styles.logoutButton}
-            onClick={() => signOut({ callbackUrl: "/login" })}
-          >
-            <LogOut size={16} strokeWidth={2} />
-            Log Out
-          </button>
         </>
       )}
     </nav>
