@@ -11,9 +11,9 @@ export default function SideBarNav() {
       <NavTab href={"/account"} Icon={User}>
         Profile
       </NavTab>
-      <NavTab href={"/archives"} Icon={Bookmark}>
+      {/* <NavTab href={"/archives"} Icon={Bookmark}>
         Your Archives
-      </NavTab>
+      </NavTab> */}
       <NavTab href={"/liked"} Icon={Heart}>
         Liked Articles
       </NavTab>

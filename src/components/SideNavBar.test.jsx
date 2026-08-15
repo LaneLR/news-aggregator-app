@@ -15,7 +15,7 @@ const { default: SideNavBar } = await import("./SideNavBar");
 describe("SideNavBar", () => {
   it("renders a link for every account nav destination", () => {
     render(<SideNavBar />);
-    ["Profile", "Your Archives", "Liked Articles", "Subscription & Billing", "Settings"].forEach((label) => {
+    ["Profile", "Liked Articles", "Subscription & Billing", "Settings"].forEach((label) => {
       expect(screen.getByRole("link", { name: new RegExp(label) })).toBeInTheDocument();
     });
   });

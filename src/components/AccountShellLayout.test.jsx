@@ -22,6 +22,6 @@ describe("AccountShellLayout", () => {
     );
     expect(await screen.findByText("Account content")).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: /Profile/ })).toHaveAttribute("href", "/account");
-    expect(screen.getByRole("link", { name: /Your Archives/ })).toHaveAttribute("href", "/archives");
+    expect(screen.getByRole("link", { name: /Liked Articles/ })).toHaveAttribute("href", "/liked");
   });
 });
