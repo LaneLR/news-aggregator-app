@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   EyeOff,
   Rss,
@@ -95,29 +96,41 @@ export default function HomePage() {
   return (
     <div className={styles.wrapper}>
       <section className={styles.hero}>
-        <h1 className={`${styles.heroTitle} headline`}>
-          All the news. One place. No algorithm deciding what you see.
-        </h1>
-        <p className={styles.heroSubtitle}>
-          MochaReads is an RSS-powered news aggregator that lets you follow
-          your favorite sources, read the latest headlines, and save
-          articles — all in one personalized, ad-free dashboard.
-        </p>
-        <div className={styles.heroActions}>
-          <Link href="/register">
-            <Button bgColor="var(--theme-primary)" clr="var(--theme-primary-contrast)">
-              Sign up free
-            </Button>
-          </Link>
-          <Link href="/login">
-            <Button
-              bgColor="var(--theme-layout-background)"
-              clr="var(--theme-dark-blue)"
-              className={styles.heroLoginButton}
-            >
-              Log in
-            </Button>
-          </Link>
+        <Image
+          src="/images/phone-coffee-news.png"
+          alt=""
+          fill
+          preload
+          sizes="100vw"
+          style={{ objectFit: "cover", objectPosition: "center 60%" }}
+          className={styles.heroPhoto}
+        />
+        <div className={styles.heroOverlay} />
+        <div className={styles.heroContent}>
+          <h1 className={`${styles.heroTitle} headline`}>
+            All the news. One place. No algorithm deciding what you see.
+          </h1>
+          <p className={styles.heroSubtitle}>
+            MochaReads is an RSS-powered news aggregator that lets you follow
+            your favorite sources, read the latest headlines, and save
+            articles — all in one personalized, ad-free dashboard.
+          </p>
+          <div className={styles.heroActions}>
+            <Link href="/register">
+              <Button bgColor="var(--theme-primary)" clr="var(--theme-primary-contrast)">
+                Sign up free
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button
+                bgColor="var(--theme-layout-background)"
+                clr="var(--theme-dark-blue)"
+                className={styles.heroLoginButton}
+              >
+                Log in
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

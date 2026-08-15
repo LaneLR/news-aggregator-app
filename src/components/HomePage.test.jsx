@@ -12,6 +12,13 @@ describe("HomePage", () => {
     expect(screen.getByRole("link", { name: "Log in" })).toHaveAttribute("href", "/login");
   });
 
+  it("renders the hero photo as a decorative, grayscale background", () => {
+    render(<HomePage />);
+    const photo = screen.getByAltText("");
+    expect(photo).toHaveAttribute("src", expect.stringContaining("phone-coffee-news"));
+    expect(photo.className).toContain("heroPhoto");
+  });
+
   it("renders the free category links", () => {
     render(<HomePage />);
     expect(screen.getByRole("link", { name: /business/i })).toHaveAttribute("href", "/category/business");
