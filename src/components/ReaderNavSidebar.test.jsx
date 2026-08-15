@@ -108,10 +108,6 @@ describe("ReaderNavSidebar", () => {
     expect(screen.getByRole("link", { name: /Profile/ })).toHaveAttribute("href", "/account");
     expect(screen.getByRole("link", { name: /Liked Articles/ })).toHaveAttribute("href", "/liked");
     expect(screen.getByRole("link", { name: /Premium/ })).toHaveAttribute("href", "/pricing");
-    expect(screen.getByRole("link", { name: /Subscription & Billing/ })).toHaveAttribute(
-      "href",
-      "/account/subscription"
-    );
     expect(screen.getByRole("link", { name: /Settings/ })).toHaveAttribute("href", "/settings");
     expect(screen.getByRole("button", { name: /Log Out/ })).toBeInTheDocument();
   });

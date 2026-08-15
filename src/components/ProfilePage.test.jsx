@@ -10,6 +10,21 @@ vi.mock("next-auth/react", () => ({
   useSession: () => ({ data: mockSession, status: mockStatus, update }),
 }));
 
+// Each has its own dedicated test file covering its internal fetch/error
+// behavior — this file only tests ProfilePage's own composition (which
+// button shows in which subscription state), not their internals.
+vi.mock("./ManageSubscriptionButton", () => ({
+  default: () => <button>Manage Subscription</button>,
+}));
+vi.mock("./CancelSubscriptionButton", () => ({
+  default: () => <button>Cancel Subscription</button>,
+}));
+vi.mock("./ResumeSubscriptionButton", () => ({
+  default: ({ subscriptionEndDate }) => (
+    <button data-end={subscriptionEndDate}>Resume Subscription</button>
+  ),
+}));
+
 const { default: ProfilePage } = await import("./ProfilePage");
 
 describe("ProfilePage", () => {
@@ -42,7 +57,7 @@ describe("ProfilePage", () => {
     expect(screen.getByRole("button", { name: "Upgrade to Pro" })).toBeInTheDocument();
   });
 
-  it("shows subscription details and a Manage Subscription button for a subscribed user", () => {
+  it("shows subscription details and Manage/Cancel buttons for a subscribed user", () => {
     mockSession = makeSession({
       tier: "Subscribed",
       stripeSubscriptionStatus: "active",
@@ -56,7 +71,13 @@ describe("ProfilePage", () => {
 
     expect(screen.getAllByText("Subscribed").length).toBeGreaterThan(0);
     expect(screen.getByText("active")).toBeInTheDocument();
+    expect(screen.getByText("Renews on")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Manage Subscription" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cancel Subscription" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Resume Subscription" })).not.toBeInTheDocument();
+    expect(
+      screen.getByText("Payment methods and billing history are managed securely through Stripe.")
+    ).toBeInTheDocument();
     expect(screen.getByText("Users referred: 3")).toBeInTheDocument();
     expect(screen.getByText("REF999")).toBeInTheDocument();
   });
@@ -113,19 +134,7 @@ describe("ProfilePage", () => {
     await vi.waitFor(() => expect(update).toHaveBeenCalled());
   });
 
-  it("opens the Stripe billing portal when Manage Subscription is clicked", async () => {
-    mockSession = makeSession({ tier: "Subscribed", stripeSubscriptionStatus: "active" });
-    mockStatus = "authenticated";
-    global.fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ url: "https://billing.stripe.com/session" }) });
-    const user = userEvent.setup();
-    render(<ProfilePage />);
-
-    await user.click(screen.getByRole("button", { name: "Manage Subscription" }));
-
-    expect(global.fetch).toHaveBeenCalledWith("/api/stripe/manage-subscription", { method: "POST" });
-  });
-
-  it("shows 'Cancels on' when subscriptionWillCancel is true, and 'Renews on' otherwise", () => {
+  it("shows 'Cancels on', a Resume button, and no Cancel button when subscriptionWillCancel is true", () => {
     mockSession = makeSession({
       tier: "Subscribed",
       stripeSubscriptionStatus: "active",
@@ -136,6 +145,10 @@ describe("ProfilePage", () => {
     render(<ProfilePage />);
     expect(screen.getByText("Cancels on")).toBeInTheDocument();
     expect(screen.queryByText("Renews on")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Resume Subscription" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Cancel Subscription" })).not.toBeInTheDocument();
+    // Manage Subscription (billing portal access) stays available either way.
+    expect(screen.getByRole("button", { name: "Manage Subscription" })).toBeInTheDocument();
   });
 
   it("falls back to the placeholder avatar when the profile image fails to load", () => {

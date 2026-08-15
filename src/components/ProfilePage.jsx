@@ -8,6 +8,9 @@ import CopyButton from "./CopyButton";
 import Link from "next/link";
 import { CreditCard, Gift, Palette, Shield, ShieldAlert, LayoutGrid, Rows3 } from "lucide-react";
 import ThemeSelector from "./ThemeSelector";
+import ManageSubscriptionButton from "./ManageSubscriptionButton";
+import CancelSubscriptionButton from "./CancelSubscriptionButton";
+import ResumeSubscriptionButton from "./ResumeSubscriptionButton";
 import styles from "./ProfilePage.module.scss";
 
 const FALLBACK_IMAGE_URL = "/images/default-avatar.png";
@@ -56,14 +59,6 @@ export default function ProfilePage() {
   }
 
   const { user } = session;
-
-  const handleManageSubscription = async () => {
-    const response = await fetch("/api/stripe/manage-subscription", {
-      method: "POST",
-    });
-    const { url } = await response.json();
-    window.location.href = url;
-  };
 
   const handleRequestDeletion = async () => {
     await fetch("/api/users/request-deletion", {
@@ -183,6 +178,15 @@ export default function ProfilePage() {
                     </strong>
                   </div>
                 )}
+                {user.subscriptionWillCancel && (
+                  <ResumeSubscriptionButton
+                    subscriptionEndDate={user.stripeSubscriptionEndsAt}
+                  />
+                )}
+                <p className={styles.helperText}>
+                  Payment methods and billing history are managed securely
+                  through Stripe.
+                </p>
               </>
             )}
           </div>
@@ -196,13 +200,10 @@ export default function ProfilePage() {
                 Upgrade to Pro
               </Button>
             ) : (
-              <Button
-                bgColor={"var(--theme-primary)"}
-                clr={"var(--theme-primary-contrast)"}
-                onClick={handleManageSubscription}
-              >
-                Manage Subscription
-              </Button>
+              <>
+                <ManageSubscriptionButton />
+                {!user.subscriptionWillCancel && <CancelSubscriptionButton />}
+              </>
             )}
           </div>
         </div>

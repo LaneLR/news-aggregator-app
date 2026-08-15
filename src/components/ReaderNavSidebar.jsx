@@ -11,7 +11,6 @@ import {
   User,
   Heart,
   Crown,
-  CreditCard,
   Settings,
   LogOut,
 } from "lucide-react";
@@ -37,7 +36,6 @@ const TOP_LINKS = [
 const ACCOUNT_LINKS = [
   { label: "Profile", href: "/account", Icon: User },
   { label: "Premium", href: "/pricing", Icon: Crown },
-  { label: "Subscription & Billing", href: "/account/subscription", Icon: CreditCard },
   { label: "Settings", href: "/settings", Icon: Settings },
 ];
 
