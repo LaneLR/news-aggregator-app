@@ -29,6 +29,7 @@ export default function AuthLayout({ tabs, children }) {
           src="/images/phone-held-news.png"
           alt=""
           fill
+          preload
           sizes="(min-width: 900px) 45vw, 0px"
           style={{ objectFit: "cover", objectPosition: "center" }}
           className={styles.brandPhoto}
