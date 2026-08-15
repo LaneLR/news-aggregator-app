@@ -6,11 +6,24 @@ import Button from "./Button";
 import { useEffect, useState } from "react";
 import CopyButton from "./CopyButton";
 import Link from "next/link";
-import { CreditCard, Gift, Palette, Shield, Settings as SettingsIcon, Crown, Mail, Info } from "lucide-react";
+import {
+  CreditCard,
+  Gift,
+  Palette,
+  Shield,
+  Settings as SettingsIcon,
+  Crown,
+  Mail,
+  Info,
+  User,
+  Lock,
+} from "lucide-react";
 import ThemeSelector from "./ThemeSelector";
 import ManageSubscriptionButton from "./ManageSubscriptionButton";
 import CancelSubscriptionButton from "./CancelSubscriptionButton";
 import ResumeSubscriptionButton from "./ResumeSubscriptionButton";
+import DigestSettings from "./DigestSettings";
+import AccountTabs from "./AccountTabs";
 import styles from "./ProfilePage.module.scss";
 
 const FALLBACK_IMAGE_URL = "/images/default-avatar.png";
@@ -51,28 +64,46 @@ export default function ProfilePage() {
 
   return (
     <div className={styles.profileWrapper}>
-      <div className={styles.profileHeader}>
-        <div className={styles.avatar}>
-          <Image
-            src={imageSrc}
-            width={110}
-            height={110}
-            alt={"User profile image"}
-            onError={handleImageError}
-          />
-        </div>
-        <h1 className={`${styles.userName} headline`}>
-          {user.name}
-          <span className={`${styles.tierBadge} ${user.tier === "Free" ? styles.free : ""}`}>
-            {user.tier === "Free" ? "Free Tier" : "Subscribed"}
-          </span>
-        </h1>
-        <p className={styles.userEmail}>{user.email}</p>
-        {memberSince && <p className={styles.memberSince}>Member since {memberSince}</p>}
-      </div>
+      <AccountTabs />
 
       <div className={styles.layoutRow}>
         <div className={styles.mainColumn}>
+          <div className={styles.card}>
+            <h2 className={styles.cardHeader}>
+              <span className={styles.cardHeaderIcon}>
+                <User size={17} />
+              </span>
+              Account Information
+            </h2>
+            <div className={styles.cardContent}>
+              <div className={styles.accountInfoRow}>
+                <div className={styles.avatar}>
+                  <Image
+                    src={imageSrc}
+                    width={72}
+                    height={72}
+                    alt={"User profile image"}
+                    onError={handleImageError}
+                  />
+                </div>
+                <div>
+                  <h1 className={`${styles.userName} headline`}>
+                    {user.name}
+                    <span
+                      className={`${styles.tierBadge} ${user.tier === "Free" ? styles.free : ""}`}
+                    >
+                      {user.tier === "Free" ? "Free Tier" : "Subscribed"}
+                    </span>
+                  </h1>
+                  <p className={styles.userEmail}>{user.email}</p>
+                  {memberSince && (
+                    <p className={styles.memberSince}>Member since {memberSince}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
@@ -217,6 +248,40 @@ export default function ProfilePage() {
                   </div>
                 </>
               )}
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <h2 className={styles.cardHeader}>
+              <span className={styles.cardHeaderIcon}>
+                <Lock size={17} />
+              </span>
+              Security
+            </h2>
+            <div className={styles.cardContent}>
+              <div className={styles.settingsRow}>
+                <div>
+                  <p className={styles.settingsRowLabel}>Password</p>
+                  <p className={styles.settingsRowDescription}>
+                    Reset your password by email.
+                  </p>
+                </div>
+                <Link href="/forgot-password" className={styles.settingsRowAction}>
+                  Change Password
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <h2 className={styles.cardHeader}>
+              <span className={styles.cardHeaderIcon}>
+                <Mail size={17} />
+              </span>
+              Email Preferences
+            </h2>
+            <div className={styles.cardContent}>
+              <DigestSettings />
             </div>
           </div>
 

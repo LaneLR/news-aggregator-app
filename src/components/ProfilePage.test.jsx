@@ -22,6 +22,12 @@ vi.mock("./ResumeSubscriptionButton", () => ({
     <button data-end={subscriptionEndDate}>Resume Subscription</button>
   ),
 }));
+vi.mock("./DigestSettings", () => ({
+  default: () => <div data-testid="digest-settings">DigestSettings</div>,
+}));
+vi.mock("./AccountTabs", () => ({
+  default: () => <div data-testid="account-tabs" />,
+}));
 
 const { default: ProfilePage } = await import("./ProfilePage");
 
@@ -148,5 +154,34 @@ describe("ProfilePage", () => {
     mockStatus = "authenticated";
     const { container } = render(<ProfilePage />);
     expect(container.querySelector("#privacy")).toBeInTheDocument();
+  });
+
+  it("shows a Security card with a Change Password link to /forgot-password", () => {
+    mockSession = makeSession({ tier: "Free" });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+
+    expect(screen.getByText("Password")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Change Password" })).toHaveAttribute(
+      "href",
+      "/forgot-password"
+    );
+  });
+
+  it("shows an Email Preferences card", () => {
+    mockSession = makeSession({ tier: "Free" });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+
+    expect(screen.getByText("Email Preferences")).toBeInTheDocument();
+    expect(screen.getByTestId("digest-settings")).toBeInTheDocument();
+  });
+
+  it("shows the Profile/Settings account tabs", () => {
+    mockSession = makeSession({ tier: "Free" });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+
+    expect(screen.getByTestId("account-tabs")).toBeInTheDocument();
   });
 });

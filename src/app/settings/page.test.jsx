@@ -14,7 +14,7 @@ const mockRedirect = vi.fn((url) => {
 });
 vi.mock("next/navigation", () => ({ redirect: (url) => mockRedirect(url) }));
 
-vi.mock("@/components/DigestSettings", () => ({ default: () => <div data-testid="digest-settings" /> }));
+vi.mock("@/components/AccountTabs", () => ({ default: () => <div data-testid="account-tabs" /> }));
 vi.mock("@/components/KeywordFilters", () => ({
   default: (props) => <div data-testid="keyword-filters">{JSON.stringify(props)}</div>,
 }));
@@ -94,8 +94,8 @@ describe("SettingsPage", () => {
       JSON.parse(screen.getByTestId("home-sections-settings").textContent).isSubscribed
     ).toBe(true);
 
-    expect(screen.getByTestId("digest-settings")).toBeInTheDocument();
     expect(screen.getByTestId("notification-settings")).toBeInTheDocument();
+    expect(screen.getByTestId("account-tabs")).toBeInTheDocument();
   });
 
   it("passes isSubscribed=false for Free-tier users", async () => {
