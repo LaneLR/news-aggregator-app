@@ -23,6 +23,19 @@
   background-color: var(--theme-background);
   border-right: 1px solid var(--theme-border);
 
+  // Matches CarouselRow's horizontal scrollbar (thinner than the 12px
+  // global default, and tinted with the brand accent instead of plain
+  // slate) rather than the generic global scrollbar this otherwise
+  // inherits, which read too wide and out of place against the accent
+  // color used everywhere else in the sidebar.
+  &::-webkit-scrollbar {
+    width: 9px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--theme-primary);
+  }
+
   @media (max-width: 900px) {
     position: static;
     max-height: none;
