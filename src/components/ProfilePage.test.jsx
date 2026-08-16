@@ -103,17 +103,49 @@ describe("ProfilePage", () => {
     expect(screen.getByRole("button", { name: "Manage Subscription" })).toBeInTheDocument();
   });
 
-  it("falls back to the placeholder avatar when the profile image fails to load", () => {
+  it("shows the proxied profile image when the session has one", () => {
     mockSession = makeSession({ tier: "Free", image: "https://example.com/avatar.jpg" });
     mockStatus = "authenticated";
     render(<ProfilePage />);
 
     const img = screen.getByAltText("User profile image");
     expect(img.src).toContain(encodeURIComponent("/api/image-proxy"));
+  });
 
+  it("falls back to initials when the profile image fails to load", () => {
+    mockSession = makeSession({ tier: "Free", name: "Jane Doe", image: "https://example.com/avatar.jpg" });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+
+    const img = screen.getByAltText("User profile image");
     fireEvent.error(img);
 
-    expect(img.src).toContain(encodeURIComponent("/images/default-avatar.png"));
+    expect(screen.queryByAltText("User profile image")).not.toBeInTheDocument();
+    expect(screen.getByText("JD")).toBeInTheDocument();
+  });
+
+  it("shows first+last initials for a two-word name when there's no profile image", () => {
+    mockSession = makeSession({ tier: "Free", name: "Lane Richardson", image: null });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+
+    expect(screen.getByText("LR")).toBeInTheDocument();
+  });
+
+  it("shows the first two letters for a single-word name when there's no profile image", () => {
+    mockSession = makeSession({ tier: "Free", name: "Lane", image: null });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+
+    expect(screen.getByText("LA")).toBeInTheDocument();
+  });
+
+  it("falls back to the email's first two letters when the account has no name at all", () => {
+    mockSession = makeSession({ tier: "Free", name: null, email: "quinn@example.com", image: null });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+
+    expect(screen.getByText("QU")).toBeInTheDocument();
   });
 
   it("does not show the referral-count line for a subscriber with zero referrals", () => {

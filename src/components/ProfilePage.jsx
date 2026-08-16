@@ -26,26 +26,31 @@ import DigestSettings from "./DigestSettings";
 import AccountTabs from "./AccountTabs";
 import styles from "./ProfilePage.module.scss";
 
-const FALLBACK_IMAGE_URL = "/images/default-avatar.png";
+// Two-letter fallback for accounts with no profile photo (i.e. anyone who
+// didn't sign in with Google — credentials signup never collects/sets one).
+// "Lane Richardson" -> "LR" (first + last initial); a single-word name (or,
+// for credentials accounts that never set a name at all, the email's local
+// part) -> its own first two letters, e.g. "Lane" -> "LA".
+function getInitials(name, email) {
+  const trimmed = (name || "").trim();
+  if (trimmed) {
+    const parts = trimmed.split(/\s+/);
+    if (parts.length > 1) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  const local = (email || "").split("@")[0];
+  return local ? local.slice(0, 2).toUpperCase() : "?";
+}
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
-
-  const [imageSrc, setImageSrc] = useState(FALLBACK_IMAGE_URL);
+  const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
-    if (session?.user?.image) {
-      const rawUrl = session.user.image;
-      const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(rawUrl)}`;
-      setImageSrc(proxiedUrl);
-    } else {
-      setImageSrc(FALLBACK_IMAGE_URL);
-    }
-  }, [session]);
-
-  const handleImageError = () => {
-    setImageSrc(FALLBACK_IMAGE_URL);
-  };
+    setImageFailed(false);
+  }, [session?.user?.image]);
 
   if (status === "loading") {
     return <Loading />;
@@ -61,6 +66,10 @@ export default function ProfilePage() {
         month: "long",
       })
     : null;
+  const proxiedImageUrl = user.image
+    ? `/api/image-proxy?url=${encodeURIComponent(user.image)}`
+    : null;
+  const showImage = !!proxiedImageUrl && !imageFailed;
 
   return (
     <div className={styles.profileWrapper}>
@@ -71,20 +80,26 @@ export default function ProfilePage() {
           <div className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
-                <User size={17} />
+                <User size={15} />
               </span>
               Account Information
             </h2>
             <div className={styles.cardContent}>
               <div className={styles.accountInfoRow}>
                 <div className={styles.avatar}>
-                  <Image
-                    src={imageSrc}
-                    width={72}
-                    height={72}
-                    alt={"User profile image"}
-                    onError={handleImageError}
-                  />
+                  {showImage ? (
+                    <Image
+                      src={proxiedImageUrl}
+                      width={72}
+                      height={72}
+                      alt={"User profile image"}
+                      onError={() => setImageFailed(true)}
+                    />
+                  ) : (
+                    <div className={styles.avatarInitials} aria-hidden="true">
+                      {getInitials(user.name, user.email)}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <h1 className={`${styles.userName} headline`}>
@@ -107,7 +122,7 @@ export default function ProfilePage() {
           <div className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
-                <CreditCard size={17} />
+                <CreditCard size={15} />
               </span>
               Subscription
             </h2>
@@ -175,7 +190,7 @@ export default function ProfilePage() {
           <div className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
-                <Gift size={17} />
+                <Gift size={15} />
               </span>
               Your Referral Code
             </h2>
@@ -191,7 +206,7 @@ export default function ProfilePage() {
                       filter: "blur(5px)",
                       backgroundColor: "var(--theme-background)",
                       padding: "9px",
-                      borderRadius: "10px",
+                      borderRadius: "var(--radius-sm)",
                       textAlign: "center",
                       userSelect: "none",
                     }}
@@ -234,8 +249,8 @@ export default function ProfilePage() {
                         letterSpacing: "2px",
                         backgroundColor: "var(--theme-layout-background)",
                         padding: "9px",
-                        borderTopLeftRadius: "10px",
-                        borderBottomLeftRadius: "10px",
+                        borderTopLeftRadius: "var(--radius-sm)",
+                        borderBottomLeftRadius: "var(--radius-sm)",
                         width: "100%",
                         display: "flex",
                         justifyContent: "center",
@@ -254,7 +269,7 @@ export default function ProfilePage() {
           <div className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
-                <Lock size={17} />
+                <Lock size={15} />
               </span>
               Security
             </h2>
@@ -276,7 +291,7 @@ export default function ProfilePage() {
           <div className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
-                <Mail size={17} />
+                <Mail size={15} />
               </span>
               Email Preferences
             </h2>
@@ -288,7 +303,7 @@ export default function ProfilePage() {
           <div id="privacy" className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
-                <Shield size={17} />
+                <Shield size={15} />
               </span>
               Privacy
             </h2>
@@ -303,7 +318,7 @@ export default function ProfilePage() {
           <div className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
-                <Palette size={17} />
+                <Palette size={15} />
               </span>
               Appearance
             </h2>

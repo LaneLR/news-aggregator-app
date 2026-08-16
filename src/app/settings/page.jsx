@@ -67,7 +67,7 @@ export default async function SettingsPage() {
           <div className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
-                <LayoutGrid size={17} />
+                <LayoutGrid size={15} />
               </span>
               Home Page Sections
             </h2>
@@ -82,7 +82,7 @@ export default async function SettingsPage() {
           <div className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
-                <VolumeX size={17} />
+                <VolumeX size={15} />
               </span>
               Keyword Filters
             </h2>
@@ -94,7 +94,7 @@ export default async function SettingsPage() {
           <div className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
-                <Rss size={17} />
+                <Rss size={15} />
               </span>
               Following
             </h2>
@@ -109,7 +109,7 @@ export default async function SettingsPage() {
           <div className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
-                <Bell size={17} />
+                <Bell size={15} />
               </span>
               Push Notifications
             </h2>
@@ -121,7 +121,7 @@ export default async function SettingsPage() {
           <div className={styles.card}>
             <h2 className={styles.cardHeader}>
               <span className={styles.cardHeaderIcon}>
-                <Keyboard size={17} />
+                <Keyboard size={15} />
               </span>
               Keyboard Shortcuts
             </h2>
