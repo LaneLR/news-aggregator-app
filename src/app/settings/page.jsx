@@ -132,7 +132,7 @@ export default async function SettingsPage() {
         </div>
 
         <aside className={styles.sideColumn}>
-          <div className={styles.tipCard}>
+          {/* <div className={styles.tipCard}>
             <Info size={18} strokeWidth={2} />
             <div>
               <p className={styles.tipTitle}>Settings Tip</p>
@@ -141,7 +141,7 @@ export default async function SettingsPage() {
                 shows up in your feeds and Following page.
               </p>
             </div>
-          </div>
+          </div> */}
 
           <div className={styles.linksCard}>
             <p className={styles.linksTitle}>Quick Links</p>

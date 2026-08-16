@@ -329,7 +329,7 @@ export default function ProfilePage() {
         </div>
 
         <aside className={styles.sideColumn}>
-          <div className={styles.tipCard}>
+          {/* <div className={styles.tipCard}>
             <Info size={18} strokeWidth={2} />
             <div>
               <p className={styles.tipTitle}>Billing Tip</p>
@@ -339,7 +339,7 @@ export default function ProfilePage() {
                 the Subscription card.
               </p>
             </div>
-          </div>
+          </div> */}
 
           <div className={styles.linksCard}>
             <p className={styles.linksTitle}>Quick Links</p>
