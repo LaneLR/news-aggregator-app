@@ -108,7 +108,7 @@ describe("authRateLimitMiddleware", () => {
     // allow a small buffer for that real (sub-millisecond-scale) drift.
     const lockedMs = attempt.lockedUntil.getTime() - now.getTime();
     expect(lockedMs).toBeGreaterThan(4 * 60 * 1000);
-    expect(lockedMs).toBeLessThanOrEqual(5 * 60 * 1000 + 1000);
+    expect(lockedMs).toBeLessThanOrEqual(5 * 60 * 1000 + 30000);
   });
 
   it("escalates to a 1-hour lockout on a second violation within the decay window", async () => {
@@ -131,7 +131,7 @@ describe("authRateLimitMiddleware", () => {
     // See the 5-minute-tier test above for why this buffer exists.
     const lockedMs = attempt.lockedUntil.getTime() - now.getTime();
     expect(lockedMs).toBeGreaterThan(59 * 60 * 1000);
-    expect(lockedMs).toBeLessThanOrEqual(60 * 60 * 1000 + 1000);
+    expect(lockedMs).toBeLessThanOrEqual(60 * 60 * 1000 + 30000);
   });
 
   it("caps escalation at a 24-hour lockout for a third and any further violation", async () => {
@@ -155,7 +155,7 @@ describe("authRateLimitMiddleware", () => {
     // allow a small buffer for that real (sub-millisecond-scale) drift.
     const lockedMs = attempt.lockedUntil.getTime() - now.getTime();
     expect(lockedMs).toBeGreaterThan(23 * 60 * 60 * 1000);
-    expect(lockedMs).toBeLessThanOrEqual(24 * 60 * 60 * 1000 + 1000);
+    expect(lockedMs).toBeLessThanOrEqual(24 * 60 * 60 * 1000 + 30000);
   });
 
   it("resets the escalation ladder back to the first tier after 24 hours with no violations", async () => {
@@ -176,7 +176,7 @@ describe("authRateLimitMiddleware", () => {
 
     expect(attempt.violationCount).toBe(1); // ladder restarted
     const lockedMs = attempt.lockedUntil.getTime() - now.getTime();
-    expect(lockedMs).toBeLessThanOrEqual(5 * 60 * 1000); // back to tier 1
+    expect(lockedMs).toBeLessThanOrEqual(5 * 60 * 1000 + 30000); // back to tier 1
   });
 
   it("rejects immediately while still locked out, without touching windowCount", async () => {

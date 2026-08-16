@@ -2,12 +2,12 @@ import initializeDbAndModels from "@/lib/db";
 import { sendEmail } from "@/utils/emailer";
 import {
   getTrendingArticles,
-  getPersonalizedPicks,
   getFeedScopedArticles,
-  getFollowedArticles,
+  getDigestArticles,
   buildDigestHtml,
 } from "@/lib/digest";
-import { filterByMutedKeywords } from "@/lib/keywordFilter";
+
+const DIGEST_ARTICLE_LIMIT = 5;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -44,11 +44,13 @@ async function handler(req) {
     const now = Date.now();
     const dueUsers = subscribers.filter((user) => isDue(user, now));
 
-    // Trending is the same for every user of a given tier — compute once.
-    const [trendingFree, trendingSubscribed] = await Promise.all([
-      getTrendingArticles(Article, { isSubscribed: false }),
-      getTrendingArticles(Article, { isSubscribed: true }),
-    ]);
+    // Trending (Free-tier visibility) is the same for every Free user —
+    // compute once instead of re-querying it per user in the loop below.
+    // Subscribed users don't use this: getDigestArticles routes them
+    // through the same real "For You" ranking the site itself uses, which
+    // does its own trending fallback internally when a user has no
+    // engagement signal yet.
+    const trendingFree = await getTrendingArticles(Article, { isSubscribed: false });
 
     let sent = 0;
     let failed = 0;
@@ -65,42 +67,32 @@ async function handler(req) {
           });
         }
 
-        let picks = [];
-        let trending = [];
-        let feedArticles = [];
-
+        let picks;
         if (feed) {
-          feedArticles = await getFeedScopedArticles(Article, feed, {
+          const feedArticles = await getFeedScopedArticles(Article, feed, {
             mutedKeywords: user.mutedKeywords,
+            limit: DIGEST_ARTICLE_LIMIT,
           });
+          picks = feedArticles.map((article) => ({ article, reason: null }));
         } else {
-          picks = await getPersonalizedPicks(db, user, { isSubscribed });
-          trending = filterByMutedKeywords(
-            isSubscribed ? trendingSubscribed : trendingFree,
-            user.mutedKeywords
-          );
+          picks = await getDigestArticles(db, user, {
+            isSubscribed,
+            limit: DIGEST_ARTICLE_LIMIT,
+            days: user.digestFrequency === "daily" ? 1 : 7,
+            trendingPool: trendingFree,
+          });
         }
-
-        const followed = await getFollowedArticles(Article, {
-          isSubscribed,
-          mutedKeywords: user.mutedKeywords,
-          followedKeywords: user.followedKeywords,
-          days: user.digestFrequency === "daily" ? 1 : 7,
-        });
 
         // Nothing worth sending — still mark as processed so it isn't
         // retried every run until fresh content shows up.
-        if (picks.length === 0 && trending.length === 0 && feedArticles.length === 0 && followed.length === 0) {
+        if (picks.length === 0) {
           await user.update({ lastDigestSentAt: new Date() });
           continue;
         }
 
         const html = buildDigestHtml({
-          trending,
           picks,
           feedTitle: feed?.title,
-          feedArticles,
-          followed,
           frequency: user.digestFrequency,
           baseUrl,
         });

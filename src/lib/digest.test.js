@@ -1,14 +1,20 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getTrendingArticles,
-  getPersonalizedPicks,
   getFeedScopedArticles,
   getFollowedArticles,
+  getDigestArticles,
   buildDigestHtml,
 } from "./digest";
 
+vi.mock("./recommendations", () => ({
+  getRecommendedArticles: vi.fn(),
+}));
+const { getRecommendedArticles } = await import("./recommendations");
+
 function article(overrides = {}) {
   return {
+    id: 1,
     title: "Headline",
     url: "https://example.com/a",
     sourceName: "Example",
@@ -17,11 +23,11 @@ function article(overrides = {}) {
   };
 }
 
-// getPersonalizedPicks/getFeedScopedArticles/getFollowedArticles order via
-// src/lib/dbOrder.js's orderByDesc, which reads the bound Sequelize
-// instance off the model itself — getTrendingArticles doesn't (it sorts by
-// the NOT NULL clickCount column), so its own plain `{ findAll }` mocks
-// above are left as-is.
+// getFeedScopedArticles/getFollowedArticles order via src/lib/dbOrder.js's
+// orderByDesc, which reads the bound Sequelize instance off the model
+// itself — getTrendingArticles doesn't (it sorts by the NOT NULL
+// clickCount column), so its own plain `{ findAll }` mocks above are
+// left as-is.
 function makeArticleModel(resolvedValue) {
   return {
     findAll: vi.fn().mockResolvedValue(resolvedValue),
@@ -46,52 +52,6 @@ describe("getTrendingArticles", () => {
     const andKey = Object.getOwnPropertySymbols(whereArg)[0];
     // date, clickCount, gated-category literal, premium-tier literal
     expect(whereArg[andKey].length).toBe(4);
-  });
-});
-
-describe("getPersonalizedPicks", () => {
-  it("returns an empty array when the user has no like/save history", async () => {
-    const db = {
-      ArticleLike: { findAll: vi.fn().mockResolvedValue([]) },
-      SavedArticle: { findAll: vi.fn().mockResolvedValue([]) },
-      Archive: {},
-      Article: { findAll: vi.fn() },
-    };
-    const result = await getPersonalizedPicks(db, { id: "u1", mutedKeywords: [] });
-    expect(result).toEqual([]);
-    expect(db.Article.findAll).not.toHaveBeenCalled();
-  });
-
-  it("derives top categories from liked/saved article history and queries similar unseen articles", async () => {
-    const db = {
-      ArticleLike: { findAll: vi.fn().mockResolvedValue([{ articleUrl: "u1" }]) },
-      SavedArticle: { findAll: vi.fn().mockResolvedValue([{ url: "u2" }]) },
-      Archive: {},
-      Article: {
-        findAll: vi
-          .fn()
-          .mockResolvedValueOnce([{ category: ["Business"] }, { category: ["Business"] }, { category: ["Tech"] }])
-          .mockResolvedValueOnce([article()]),
-        sequelize: { literal: vi.fn((sql) => ({ __literal: sql })) },
-      },
-    };
-
-    const result = await getPersonalizedPicks(db, { id: "u1", mutedKeywords: [] }, { isSubscribed: true });
-    expect(result).toHaveLength(1);
-    // Second findAll call is the "similar articles" query.
-    const secondCallWhere = db.Article.findAll.mock.calls[1][0].where;
-    expect(secondCallWhere).toBeDefined();
-  });
-
-  it("returns an empty array when history articles have no categories", async () => {
-    const db = {
-      ArticleLike: { findAll: vi.fn().mockResolvedValue([{ articleUrl: "u1" }]) },
-      SavedArticle: { findAll: vi.fn().mockResolvedValue([]) },
-      Archive: {},
-      Article: { findAll: vi.fn().mockResolvedValue([{ category: [] }]) },
-    };
-    const result = await getPersonalizedPicks(db, { id: "u1", mutedKeywords: [] });
-    expect(result).toEqual([]);
   });
 });
 
@@ -141,64 +101,145 @@ describe("getFollowedArticles", () => {
   });
 });
 
-describe("buildDigestHtml", () => {
-  it("renders trending/picked sections when there's no feedTitle", () => {
-    const html = buildDigestHtml({
-      trending: [article({ title: "Trending story" })],
-      picks: [article({ title: "Picked story" })],
-      frequency: "weekly",
-      baseUrl: "https://morningfeeds.example",
-      followed: [],
-    });
-    expect(html).toContain("This week's MochaReads digest");
-    expect(html).toContain("Trending story");
-    expect(html).toContain("Picked story");
-    expect(html).toContain("Picked for you");
-    expect(html).toContain("Trending now");
+describe("getDigestArticles", () => {
+  beforeEach(() => {
+    getRecommendedArticles.mockReset();
   });
 
-  it("renders the feed-scoped section instead when feedTitle is given", () => {
+  it("routes Subscribed users through the real recommendation ranking, capped at the limit", async () => {
+    const ranked = [
+      { article: article({ id: 1 }), reason: "Because you follow Reuters" },
+      { article: article({ id: 2 }), reason: null },
+      { article: article({ id: 3 }), reason: null },
+    ];
+    getRecommendedArticles.mockResolvedValue(ranked);
+
+    const db = { Article: { findAll: vi.fn() } };
+    const user = { id: "u1", mutedKeywords: [] };
+    const result = await getDigestArticles(db, user, { isSubscribed: true, limit: 2 });
+
+    expect(getRecommendedArticles).toHaveBeenCalledWith(db, "u1", { limit: 2 });
+    expect(result).toHaveLength(2);
+    expect(result[0].reason).toBe("Because you follow Reuters");
+  });
+
+  it("does not call the gated recommender for Free users — 'For You' is subscriber-only on the site too", async () => {
+    const Article = {
+      findAll: vi.fn().mockResolvedValue([]),
+      sequelize: { literal: vi.fn((sql) => ({ __literal: sql })) },
+    };
+    const db = { Article };
+    const user = { id: "u1", mutedKeywords: [], followedKeywords: [] };
+
+    await getDigestArticles(db, user, { isSubscribed: false, limit: 5 });
+
+    expect(getRecommendedArticles).not.toHaveBeenCalled();
+  });
+
+  it("for Free users, leads with followed-topic matches before backfilling with trending", async () => {
+    const followedArticle = article({ id: 10, title: "Followed match", url: "https://example.com/followed" });
+    const trendingArticle = article({ id: 20, title: "Trending pick", url: "https://example.com/trending" });
+    const Article = {
+      findAll: vi
+        .fn()
+        .mockResolvedValueOnce([followedArticle]) // getFollowedArticles
+        .mockResolvedValueOnce([trendingArticle]), // getTrendingArticles
+      sequelize: { literal: vi.fn((sql) => ({ __literal: sql })) },
+    };
+    const db = { Article };
+    const user = { id: "u1", mutedKeywords: [], followedKeywords: ["tesla"] };
+
+    const result = await getDigestArticles(db, user, { isSubscribed: false, limit: 5 });
+
+    expect(result).toEqual([
+      { article: followedArticle, reason: "From a topic you follow" },
+      { article: trendingArticle, reason: null },
+    ]);
+  });
+
+  it("for Free users, dedupes an article that shows up in both followed and trending", async () => {
+    const shared = article({ id: 10, url: "https://example.com/shared" });
+    const Article = {
+      findAll: vi.fn().mockResolvedValueOnce([shared]).mockResolvedValueOnce([shared]),
+      sequelize: { literal: vi.fn((sql) => ({ __literal: sql })) },
+    };
+    const db = { Article };
+    const user = { id: "u1", mutedKeywords: [], followedKeywords: ["tesla"] };
+
+    const result = await getDigestArticles(db, user, { isSubscribed: false, limit: 5 });
+
+    expect(result).toHaveLength(1);
+  });
+
+  it("for Free users, uses a pre-fetched trendingPool instead of re-querying trending", async () => {
+    const followedArticle = article({ id: 10, url: "https://example.com/followed" });
+    const trendingArticle = article({ id: 20, url: "https://example.com/trending" });
+    const Article = {
+      // Only ever resolved once — if the trending branch queried instead of
+      // using trendingPool, this mock would be consumed a second time and
+      // the call count assertion below would fail.
+      findAll: vi.fn().mockResolvedValueOnce([followedArticle]),
+      sequelize: { literal: vi.fn((sql) => ({ __literal: sql })) },
+    };
+    const db = { Article };
+    const user = { id: "u1", mutedKeywords: [], followedKeywords: ["tesla"] };
+
+    const result = await getDigestArticles(db, user, {
+      isSubscribed: false,
+      limit: 5,
+      trendingPool: [trendingArticle],
+    });
+
+    expect(Article.findAll).toHaveBeenCalledTimes(1); // getFollowedArticles only
+    expect(result).toEqual([
+      { article: followedArticle, reason: "From a topic you follow" },
+      { article: trendingArticle, reason: null },
+    ]);
+  });
+});
+
+describe("buildDigestHtml", () => {
+  it("renders a 'Your <cadence> picks' heading and every pick's title/link", () => {
     const html = buildDigestHtml({
-      feedTitle: "My Custom Feed",
-      feedArticles: [article({ title: "Feed story" })],
-      trending: [article({ title: "Should not appear" })],
-      picks: [],
+      picks: [
+        { article: article({ id: 42, title: "Pick one" }), reason: "Because you follow Reuters" },
+        { article: article({ id: 43, title: "Pick two" }), reason: null },
+      ],
+      frequency: "weekly",
+      baseUrl: "https://morningfeeds.example",
+    });
+
+    expect(html).toContain("Your weekly picks");
+    expect(html).toContain("Pick one");
+    expect(html).toContain("Pick two");
+    expect(html).toContain("Because you follow Reuters");
+    expect(html).toContain("Trending now"); // fallback pill for a null reason
+  });
+
+  it("links each article to its own page on the site, not the raw source url", () => {
+    const html = buildDigestHtml({
+      picks: [{ article: article({ id: 99, url: "https://the-source.example/story" }), reason: null }],
       frequency: "daily",
       baseUrl: "https://morningfeeds.example",
     });
-    expect(html).toContain("Today's MochaReads digest");
-    expect(html).toContain('New in "My Custom Feed"');
+
+    expect(html).toContain('href="https://morningfeeds.example/article/99"');
+    expect(html).not.toContain("the-source.example");
+  });
+
+  it("renders the feed-scoped heading instead when feedTitle is given", () => {
+    const html = buildDigestHtml({
+      feedTitle: "My Custom Feed",
+      picks: [{ article: article({ title: "Feed story" }), reason: null }],
+      frequency: "daily",
+      baseUrl: "https://morningfeeds.example",
+    });
+    expect(html).toContain("My Custom Feed");
     expect(html).toContain("Feed story");
-    expect(html).not.toContain("Should not appear");
-  });
-
-  it("renders the followed-topics section when provided", () => {
-    const html = buildDigestHtml({
-      trending: [],
-      picks: [],
-      followed: [article({ title: "Followed story" })],
-      frequency: "weekly",
-      baseUrl: "https://morningfeeds.example",
-    });
-    expect(html).toContain("Topics you follow");
-    expect(html).toContain("Followed story");
-  });
-
-  it("omits a section entirely when its article list is empty", () => {
-    const html = buildDigestHtml({
-      trending: [],
-      picks: [],
-      frequency: "weekly",
-      baseUrl: "https://morningfeeds.example",
-    });
-    expect(html).not.toContain("Picked for you");
-    expect(html).not.toContain("Trending now");
-    expect(html).not.toContain("Topics you follow");
   });
 
   it("includes a settings link with the base URL", () => {
     const html = buildDigestHtml({
-      trending: [],
       picks: [],
       frequency: "weekly",
       baseUrl: "https://morningfeeds.example",
@@ -212,8 +253,7 @@ describe("buildDigestHtml", () => {
   // template into markup/attributes that land in a real subscriber's inbox.
   it("escapes a malicious article title instead of injecting raw markup", () => {
     const html = buildDigestHtml({
-      trending: [article({ title: '<img src=x onerror=alert(1)>' })],
-      picks: [],
+      picks: [{ article: article({ title: '<img src=x onerror=alert(1)>' }), reason: null }],
       frequency: "weekly",
       baseUrl: "https://morningfeeds.example",
     });
@@ -221,46 +261,19 @@ describe("buildDigestHtml", () => {
     expect(html).toContain("&lt;img src=x onerror=alert(1)&gt;");
   });
 
-  it("escapes a quote-breakout attempt in an article url instead of breaking out of the href attribute", () => {
-    const html = buildDigestHtml({
-      trending: [
-        article({ url: 'http://evil.example/x?a=1" onmouseover="alert(1)' }),
-      ],
-      picks: [],
-      frequency: "weekly",
-      baseUrl: "https://morningfeeds.example",
-    });
-    expect(html).not.toContain('onmouseover="alert(1)"');
-    expect(html).toContain("&quot;");
-  });
-
-  it("renders a non-http(s) article url as plain text instead of a clickable link", () => {
-    const html = buildDigestHtml({
-      trending: [article({ title: "Suspicious", url: "javascript:alert(1)" })],
-      picks: [],
-      frequency: "weekly",
-      baseUrl: "https://morningfeeds.example",
-    });
-    expect(html).not.toContain('href="javascript:alert(1)"');
-    expect(html).toContain("Suspicious");
-  });
-
   it("drops a non-http(s) urlToImage instead of rendering it as an <img> src", () => {
     const html = buildDigestHtml({
-      trending: [article({ urlToImage: "javascript:alert(1)" })],
-      picks: [],
+      picks: [{ article: article({ urlToImage: "javascript:alert(1)" }), reason: null }],
       frequency: "weekly",
       baseUrl: "https://morningfeeds.example",
     });
     expect(html).not.toContain('src="javascript:alert(1)"');
   });
 
-  it("escapes a malicious feed title in the feed-scoped section heading", () => {
+  it("escapes a malicious feed title in the feed-scoped heading", () => {
     const html = buildDigestHtml({
       feedTitle: '"><script>alert(1)</script>',
-      feedArticles: [article()],
-      trending: [],
-      picks: [],
+      picks: [{ article: article(), reason: null }],
       frequency: "daily",
       baseUrl: "https://morningfeeds.example",
     });

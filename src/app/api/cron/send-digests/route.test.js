@@ -9,15 +9,13 @@ const mockSendEmail = vi.fn();
 vi.mock("@/utils/emailer", () => ({ sendEmail: (...args) => mockSendEmail(...args) }));
 
 const mockGetTrendingArticles = vi.fn();
-const mockGetPersonalizedPicks = vi.fn();
 const mockGetFeedScopedArticles = vi.fn();
-const mockGetFollowedArticles = vi.fn();
+const mockGetDigestArticles = vi.fn();
 const mockBuildDigestHtml = vi.fn();
 vi.mock("@/lib/digest", () => ({
   getTrendingArticles: (...args) => mockGetTrendingArticles(...args),
-  getPersonalizedPicks: (...args) => mockGetPersonalizedPicks(...args),
   getFeedScopedArticles: (...args) => mockGetFeedScopedArticles(...args),
-  getFollowedArticles: (...args) => mockGetFollowedArticles(...args),
+  getDigestArticles: (...args) => mockGetDigestArticles(...args),
   buildDigestHtml: (...args) => mockBuildDigestHtml(...args),
 }));
 
@@ -33,11 +31,11 @@ describe("GET,POST /api/cron/send-digests", () => {
   beforeEach(() => {
     mockSendEmail.mockReset();
     mockGetTrendingArticles.mockReset().mockResolvedValue([]);
-    mockGetPersonalizedPicks.mockReset().mockResolvedValue([]);
     mockGetFeedScopedArticles.mockReset().mockResolvedValue([]);
-    mockGetFollowedArticles.mockReset().mockResolvedValue([]);
+    mockGetDigestArticles.mockReset().mockResolvedValue([]);
     mockBuildDigestHtml.mockReset().mockReturnValue("<html></html>");
     db.User.findAll.mockReset();
+    db.Feed.findOne.mockReset();
   });
 
   it("rejects requests missing the CRON_SECRET bearer header", async () => {
@@ -81,7 +79,7 @@ describe("GET,POST /api/cron/send-digests", () => {
       lastDigestSentAt: null,
     });
     db.User.findAll.mockResolvedValue([user]);
-    mockGetPersonalizedPicks.mockResolvedValue([{ title: "Pick" }]);
+    mockGetDigestArticles.mockResolvedValue([{ article: { id: 1, title: "Pick" }, reason: null }]);
 
     const res = await GET(makeRequest(`Bearer ${process.env.CRON_SECRET}`));
     const body = await res.json();
@@ -90,6 +88,56 @@ describe("GET,POST /api/cron/send-digests", () => {
     expect(body.sent).toBe(1);
     expect(mockSendEmail).toHaveBeenCalledWith(
       expect.objectContaining({ to: "a@b.com" })
+    );
+  });
+
+  it("caps a general (non-feed-scoped) digest at 5 articles via getDigestArticles", async () => {
+    const user = createInstanceMock({
+      id: "user-1",
+      email: "a@b.com",
+      tier: "Free",
+      digestFrequency: "weekly",
+      digestFeedId: null,
+      lastDigestSentAt: null,
+    });
+    db.User.findAll.mockResolvedValue([user]);
+    mockGetDigestArticles.mockResolvedValue([{ article: { id: 1 }, reason: null }]);
+
+    await GET(makeRequest(`Bearer ${process.env.CRON_SECRET}`));
+
+    expect(mockGetDigestArticles).toHaveBeenCalledWith(
+      db,
+      user,
+      expect.objectContaining({ isSubscribed: false, limit: 5 })
+    );
+  });
+
+  it("uses a subscriber's chosen custom Feed instead of getDigestArticles, capped at 5", async () => {
+    const user = createInstanceMock({
+      id: "user-1",
+      email: "a@b.com",
+      tier: "Subscribed",
+      digestFrequency: "weekly",
+      digestFeedId: "feed-1",
+      lastDigestSentAt: null,
+    });
+    db.User.findAll.mockResolvedValue([user]);
+    db.Feed.findOne.mockResolvedValue({ id: "feed-1", title: "My Feed" });
+    mockGetFeedScopedArticles.mockResolvedValue([{ id: 1, title: "Feed pick" }]);
+
+    const res = await GET(makeRequest(`Bearer ${process.env.CRON_SECRET}`));
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.sent).toBe(1);
+    expect(mockGetFeedScopedArticles).toHaveBeenCalledWith(
+      db.Article,
+      { id: "feed-1", title: "My Feed" },
+      expect.objectContaining({ limit: 5 })
+    );
+    expect(mockGetDigestArticles).not.toHaveBeenCalled();
+    expect(mockBuildDigestHtml).toHaveBeenCalledWith(
+      expect.objectContaining({ feedTitle: "My Feed" })
     );
   });
 
