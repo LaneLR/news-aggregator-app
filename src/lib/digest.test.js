@@ -205,4 +205,65 @@ describe("buildDigestHtml", () => {
     });
     expect(html).toContain('href="https://morningfeeds.example/settings"');
   });
+
+  // Article fields come from third-party RSS feeds (see rss-fetch-app),
+  // not from this app, so a malicious/compromised feed's title, url, or
+  // sourceName must not be able to break out of this hand-built HTML
+  // template into markup/attributes that land in a real subscriber's inbox.
+  it("escapes a malicious article title instead of injecting raw markup", () => {
+    const html = buildDigestHtml({
+      trending: [article({ title: '<img src=x onerror=alert(1)>' })],
+      picks: [],
+      frequency: "weekly",
+      baseUrl: "https://morningfeeds.example",
+    });
+    expect(html).not.toContain("<img src=x onerror=alert(1)>");
+    expect(html).toContain("&lt;img src=x onerror=alert(1)&gt;");
+  });
+
+  it("escapes a quote-breakout attempt in an article url instead of breaking out of the href attribute", () => {
+    const html = buildDigestHtml({
+      trending: [
+        article({ url: 'http://evil.example/x?a=1" onmouseover="alert(1)' }),
+      ],
+      picks: [],
+      frequency: "weekly",
+      baseUrl: "https://morningfeeds.example",
+    });
+    expect(html).not.toContain('onmouseover="alert(1)"');
+    expect(html).toContain("&quot;");
+  });
+
+  it("renders a non-http(s) article url as plain text instead of a clickable link", () => {
+    const html = buildDigestHtml({
+      trending: [article({ title: "Suspicious", url: "javascript:alert(1)" })],
+      picks: [],
+      frequency: "weekly",
+      baseUrl: "https://morningfeeds.example",
+    });
+    expect(html).not.toContain('href="javascript:alert(1)"');
+    expect(html).toContain("Suspicious");
+  });
+
+  it("drops a non-http(s) urlToImage instead of rendering it as an <img> src", () => {
+    const html = buildDigestHtml({
+      trending: [article({ urlToImage: "javascript:alert(1)" })],
+      picks: [],
+      frequency: "weekly",
+      baseUrl: "https://morningfeeds.example",
+    });
+    expect(html).not.toContain('src="javascript:alert(1)"');
+  });
+
+  it("escapes a malicious feed title in the feed-scoped section heading", () => {
+    const html = buildDigestHtml({
+      feedTitle: '"><script>alert(1)</script>',
+      feedArticles: [article()],
+      trending: [],
+      picks: [],
+      frequency: "daily",
+      baseUrl: "https://morningfeeds.example",
+    });
+    expect(html).not.toContain("<script>alert(1)</script>");
+  });
 });

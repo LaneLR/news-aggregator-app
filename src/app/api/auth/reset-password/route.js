@@ -1,11 +1,21 @@
 import jwt from "jsonwebtoken";
 import initializeDbAndModels from "@/lib/db";
+import { authRateLimitMiddleware } from "@/lib/rate-limiter";
 
 export async function POST(req) {
   const db = await initializeDbAndModels();
   const { User } = db;
   try {
+    await authRateLimitMiddleware(req);
+
     const { token, newPassword } = await req.json();
+
+    if (!newPassword || newPassword.length < 6) {
+      return Response.json(
+        { error: "Password must be at least 6 characters." },
+        { status: 400 }
+      );
+    }
 
     const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
 
@@ -36,6 +46,9 @@ export async function POST(req) {
     });
   } catch (err) {
     console.error(err);
+    if (err.status === 429) {
+      return Response.json({ error: err.message }, { status: 429 });
+    }
     if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {
       return Response.json(
         { error: "Invalid or expired token." },

@@ -7,6 +7,13 @@ vi.mock("node:dns/promises", () => ({
   lookup: (...args) => mockLookup(...args),
 }));
 
+const mockAgent = vi.fn(function Agent(options) {
+  this.options = options;
+});
+vi.mock("undici", () => ({
+  Agent: mockAgent,
+}));
+
 const { GET } = await import("./route");
 
 function makeRequest(qs) {
@@ -27,6 +34,7 @@ describe("GET /api/image-proxy", () => {
   beforeEach(() => {
     mockLookup.mockReset();
     mockLookup.mockResolvedValue([{ address: "93.184.216.34" }]); // public IP by default
+    mockAgent.mockClear();
   });
 
   it("rejects a missing url param", async () => {
@@ -120,5 +128,43 @@ describe("GET /api/image-proxy", () => {
     const res = await GET(makeRequest("url=https://cdn.example.com/pic.png"));
 
     expect(res.status).toBe(500);
+  });
+
+  it("pins the fetch to the DNS-validated IP instead of trusting a second, independent lookup", async () => {
+    // Guards against DNS-rebinding: fetch() must be told to connect using
+    // the exact IP assertSafeUrl already validated, not re-resolve the
+    // hostname itself. A dispatcher with a custom `connect.lookup` is how
+    // that pin is enforced (see pinnedDispatcher in route.js).
+    mockLookup.mockResolvedValue([{ address: "93.184.216.34", family: 4 }]);
+    global.fetch.mockResolvedValue(makeFetchResponse({ contentType: "image/png" }));
+
+    await GET(makeRequest("url=https://cdn.example.com/pic.png"));
+
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    const [, options] = global.fetch.mock.calls[0];
+    expect(options.dispatcher).toBeDefined();
+
+    expect(mockAgent).toHaveBeenCalledTimes(1);
+    const agentOptions = mockAgent.mock.calls.at(-1)[0];
+    const captured = [];
+    agentOptions.connect.lookup("cdn.example.com", { all: true }, (err, addresses) => {
+      captured.push(...addresses);
+    });
+    expect(captured).toEqual([{ address: "93.184.216.34", family: 4 }]);
+
+    const capturedSingle = [];
+    agentOptions.connect.lookup("cdn.example.com", { all: false }, (err, address, family) => {
+      capturedSingle.push(address, family);
+    });
+    expect(capturedSingle).toEqual(["93.184.216.34", 4]);
+  });
+
+  it("does not set a dispatcher when the URL host is already a literal IP", async () => {
+    global.fetch.mockResolvedValue(makeFetchResponse({ contentType: "image/png" }));
+
+    await GET(makeRequest(`url=${encodeURIComponent("http://93.184.216.34/pic.png")}`));
+
+    const [, options] = global.fetch.mock.calls[0];
+    expect(options.dispatcher).toBeUndefined();
   });
 });

@@ -20,6 +20,7 @@ const ERROR_MESSAGES = {
   "google-only": "This account uses Google sign-in — try the button below instead.",
   "invalid-password": "Incorrect password.",
   "email-not-verified": "Please verify your email address before logging in.",
+  "too-many-attempts": "Too many sign-in attempts. Please wait a minute and try again.",
 };
 const DEFAULT_ERROR_MESSAGE = "Something went wrong signing in. Please try again.";
 

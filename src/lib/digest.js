@@ -138,16 +138,49 @@ export async function getFollowedArticles(Article, { isSubscribed, mutedKeywords
   });
 }
 
+// Article fields (title, url, urlToImage, sourceName) originate from
+// third-party RSS feeds, not from this app — they must be escaped before
+// going into a raw HTML string the same way JSX would auto-escape them.
+// (JSX rendering elsewhere in the app is already safe by construction; this
+// hand-built email template is the one place that needed it done manually.)
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function isSafeHttpUrl(value) {
+  try {
+    const protocol = new URL(value).protocol;
+    return protocol === "http:" || protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 function articleRowHtml(article) {
-  const image = article.urlToImage
-    ? `<img src="${article.urlToImage}" alt="" width="72" height="72" style="border-radius:8px;object-fit:cover;display:block;" />`
+  const safeImageUrl =
+    article.urlToImage && isSafeHttpUrl(article.urlToImage)
+      ? escapeHtml(article.urlToImage)
+      : null;
+  const image = safeImageUrl
+    ? `<img src="${safeImageUrl}" alt="" width="72" height="72" style="border-radius:8px;object-fit:cover;display:block;" />`
     : "";
+
+  const title = escapeHtml(article.title);
+  const titleHtml = isSafeHttpUrl(article.url)
+    ? `<a href="${escapeHtml(article.url)}" style="color:#0a1430;font-weight:600;text-decoration:none;font-size:15px;">${title}</a>`
+    : `<span style="color:#0a1430;font-weight:600;font-size:15px;">${title}</span>`;
+
   return `
     <tr>
       <td style="padding:10px 0;vertical-align:top;width:80px;">${image}</td>
       <td style="padding:10px 0 10px 12px;vertical-align:top;">
-        <a href="${article.url}" style="color:#0a1430;font-weight:600;text-decoration:none;font-size:15px;">${article.title}</a>
-        <div style="color:#777;font-size:12px;margin-top:4px;">${article.sourceName || ""}</div>
+        ${titleHtml}
+        <div style="color:#777;font-size:12px;margin-top:4px;">${escapeHtml(article.sourceName || "")}</div>
       </td>
     </tr>`;
 }
@@ -164,7 +197,7 @@ function sectionHtml(title, articles) {
 export function buildDigestHtml({ trending, picks, frequency, baseUrl, feedTitle, feedArticles, followed }) {
   const cadence = frequency === "daily" ? "Today's" : "This week's";
   const body = feedTitle
-    ? sectionHtml(`New in "${feedTitle}"`, feedArticles || [])
+    ? sectionHtml(`New in "${escapeHtml(feedTitle)}"`, feedArticles || [])
     : `${sectionHtml("Picked for you", picks)}${sectionHtml("Trending now", trending)}`;
   const followedSection = sectionHtml("Topics you follow", followed || []);
   return `

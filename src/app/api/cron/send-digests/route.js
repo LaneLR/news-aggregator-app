@@ -22,6 +22,10 @@ function isDue(user, now) {
 // Authorization header when that env var is set on the project); POST is
 // kept too in case this is triggered manually or from a different scheduler.
 async function handler(req) {
+  if (!process.env.CRON_SECRET) {
+    console.error("CRON_SECRET is not set — refusing to run send-digests.");
+    return new Response("Unauthorized", { status: 401 });
+  }
   const authHeader = req.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response("Unauthorized", { status: 401 });

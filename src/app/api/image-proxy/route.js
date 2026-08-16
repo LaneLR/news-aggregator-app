@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dns from "node:dns/promises";
 import net from "node:net";
+import { Agent } from "undici";
 
 // Blocks SSRF: refuses to proxy requests to loopback/private/link-local
 // addresses, whether given directly as the hostname or reached via DNS.
@@ -47,6 +48,13 @@ function guessMimeFromUrl(urlString) {
   return EXTENSION_MIME_TYPES[ext] || null;
 }
 
+// Returns the exact IP address record(s) that were validated, so the caller
+// can pin the actual fetch's TCP connection to them (see pinnedDispatcher
+// below). Without this, assertSafeUrl's DNS lookup and fetch()'s own,
+// independent DNS lookup could resolve to different addresses — a
+// DNS-rebinding attacker (fast-TTL record, public IP on the first lookup,
+// private/internal IP on the second) could pass validation here and still
+// reach an internal address at fetch time.
 async function assertSafeUrl(urlString) {
   let parsed;
   try {
@@ -64,13 +72,34 @@ async function assertSafeUrl(urlString) {
 
   if (net.isIP(hostname)) {
     if (isBlockedIp(hostname)) throw new Error("Blocked host");
-    return;
+    // A literal IP host involves no DNS resolution, so there's nothing to
+    // pin — the connection can only ever go to this exact address.
+    return null;
   }
 
   const records = await dns.lookup(hostname, { all: true, verbatim: true });
   if (records.length === 0 || records.some((r) => isBlockedIp(r.address))) {
     throw new Error("Blocked host");
   }
+  return records;
+}
+
+// Forces the actual fetch's connection to use only the already-validated
+// IP(s), while the request itself still targets the original hostname (so
+// TLS SNI / certificate hostname checks and the Host header are unaffected).
+function pinnedDispatcher(records) {
+  if (!records) return undefined;
+  return new Agent({
+    connect: {
+      lookup: (_hostname, options, callback) => {
+        if (options.all) {
+          callback(null, records.map((r) => ({ address: r.address, family: r.family })));
+        } else {
+          callback(null, records[0].address, records[0].family);
+        }
+      },
+    },
+  });
 }
 
 export async function GET(req) {
@@ -82,8 +111,9 @@ export async function GET(req) {
     return NextResponse.json({ error: "No URL provided" }, { status: 400 });
   }
 
+  let resolvedRecords;
   try {
-    await assertSafeUrl(imageUrl);
+    resolvedRecords = await assertSafeUrl(imageUrl);
   } catch (err) {
     return NextResponse.json({ error: "Invalid image URL" }, { status: 400 });
   }
@@ -104,6 +134,7 @@ export async function GET(req) {
       headers: fetchHeaders,
       signal: controller.signal, // Connect the AbortController signal
       redirect: "error", // Don't follow redirects — prevents redirect-based SSRF bypass
+      dispatcher: pinnedDispatcher(resolvedRecords), // Pin to the validated IP(s) — see assertSafeUrl
     });
 
     clearTimeout(timeoutId); // Clear the timeout if the fetch succeeds
