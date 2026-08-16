@@ -4,7 +4,7 @@
   "description": "A fast, customizable RSS feed reader and news aggregator.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#fdfbf6",
   "theme_color": "#6f4225",
   "share_target": {
     "action": "/share",

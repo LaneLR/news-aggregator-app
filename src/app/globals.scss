@@ -1,27 +1,28 @@
 @use "../styles/themes";
 
 :root {
-  // Core brand palette — warm editorial neutrals (zinc, not slate-blue) with
-  // a coffee-brown accent (MochaReads rebrand), replacing the old navy/blue
-  // family and, before that, an amber accent. These feed the per-theme
-  // `--theme-*` variables in styles/themes.scss, so most components never
-  // reference these directly. `--dark-blue`/`--light-white` keep their
-  // names (still referenced by layout.js's inline body style) but now hold
-  // the "always-dark chrome" charcoal used by the header/footer bars
-  // regardless of site theme, not a navy blue.
+  // Core brand palette — warm "Sepia Mocha" neutrals with a coffee-brown
+  // accent (MochaReads rebrand), replacing the old navy/blue family and,
+  // before that, an amber accent. These feed the per-theme `--theme-*`
+  // variables in styles/themes.scss, so most components never reference
+  // these directly. `--dark-blue`/`--light-white` keep their names (still
+  // referenced by layout.js's inline body style) but now hold the
+  // "always-dark chrome" espresso-black used by the header/footer bars
+  // regardless of site theme, not a navy blue — see themes.scss's palette
+  // comment for why this is a warm brown-black rather than a neutral one.
   //
   // --primary-amber is used directly below (skip-link focus outline,
-  // scrollbar hover) against the always-dark #18181b chrome — set to the
+  // scrollbar hover) against the always-dark #1a140f chrome — set to the
   // same lighter caramel as --theme-title-contrast, not the darker
   // --theme-primary, for the same reason: it needs to read against a dark
   // surface in every theme, not pair with white text on a light one.
-  --dark-blue: #18181b;
+  --dark-blue: #1a140f;
   --light-white: #fafafa;
   --white: #ffffff;
-  --light-gray: #f4f4f5;
+  --light-gray: #f6f1e9;
   --primary-amber: #c9925c;
   --orange: #8a5a37;
-  --slate: #71717a;
+  --slate: #79706a;
 
   // Shared design tokens: consistent corner radii and elevation across
   // every card/surface in the app instead of ad-hoc per-component values.

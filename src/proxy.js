@@ -28,24 +28,24 @@ const PAGE_HTML = `<!DOCTYPE html>
 <style>
   :root {
     color-scheme: light;
-    --bg: #ffffff;
+    --bg: #fdfbf6;
     --text: #1c1917;
     --text-secondary: #57534e;
-    --border: #e5e3df;
-    --header-bg: #18181b;
+    --border: #e7ddd0;
+    --header-bg: #1a140f;
     --accent: #6f4225;
-    --card-bg: #ffffff;
+    --card-bg: #fdfbf6;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       color-scheme: dark;
-      --bg: #09090b;
+      --bg: #0e0a07;
       --text: #fafaf9;
       --text-secondary: #a8a29e;
-      --border: #292524;
-      --header-bg: #18181b;
+      --border: #2e2419;
+      --header-bg: #1a140f;
       --accent: #c9925c;
-      --card-bg: #18181b;
+      --card-bg: #201710;
     }
   }
   * { box-sizing: border-box; }
