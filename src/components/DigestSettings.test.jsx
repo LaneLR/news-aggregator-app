@@ -78,6 +78,85 @@ describe("DigestSettings", () => {
     expect(screen.getByRole("option", { name: "My Feed" })).toBeInTheDocument();
   });
 
+  it("logs an error when loading digest preferences fails", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    global.fetch.mockImplementation((url) => {
+      if (url.toString() === "/api/users/digest-preferences") return Promise.reject(new Error("network down"));
+      return Promise.reject(new Error(`Unmocked fetch: ${url}`));
+    });
+    const { container } = render(<DigestSettings />);
+
+    await waitFor(() =>
+      expect(consoleError).toHaveBeenCalledWith("Failed to load digest preferences:", expect.any(Error))
+    );
+    expect(container).toBeEmptyDOMElement();
+    consoleError.mockRestore();
+  });
+
+  it("logs an error when loading feeds fails for a subscribed user", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockSession.value = makeSession({ tier: "Plus" });
+    global.fetch.mockImplementation((url) => {
+      if (url.toString() === "/api/users/digest-preferences")
+        return Promise.resolve(makeFetchResponse({ digestEnabled: true, digestFrequency: "weekly" }));
+      if (url.toString() === "/api/feeds") return Promise.reject(new Error("network down"));
+      return Promise.reject(new Error(`Unmocked fetch: ${url}`));
+    });
+    render(<DigestSettings />);
+
+    await waitFor(() => expect(consoleError).toHaveBeenCalledWith("Failed to load feeds:", expect.any(Error)));
+    consoleError.mockRestore();
+  });
+
+  it("saves the frequency when Daily or Weekly is clicked", async () => {
+    const user = userEvent.setup();
+    mockFetchRoutes([
+      ["/api/users/digest-preferences", () => makeFetchResponse({ digestEnabled: true, digestFrequency: "weekly" })],
+    ]);
+    render(<DigestSettings />);
+    await screen.findByText("How often?");
+
+    mockFetchRoutes([
+      [/\/api\/users\/digest-preferences$/, () => makeFetchResponse({ digestEnabled: true, digestFrequency: "daily" })],
+    ]);
+    await user.click(screen.getByRole("button", { name: "Daily" }));
+
+    await waitFor(() => expect(screen.getByRole("button", { name: "Daily" })).toHaveClass(/active/));
+
+    mockFetchRoutes([
+      [/\/api\/users\/digest-preferences$/, () => makeFetchResponse({ digestEnabled: true, digestFrequency: "weekly" })],
+    ]);
+    await user.click(screen.getByRole("button", { name: "Weekly" }));
+
+    await waitFor(() => expect(screen.getByRole("button", { name: "Weekly" })).toHaveClass(/active/));
+  });
+
+  it("saves the chosen feed when the digest content select changes", async () => {
+    const user = userEvent.setup();
+    mockSession.value = makeSession({ tier: "Plus" });
+    mockFetchRoutes([
+      ["/api/users/digest-preferences", () => makeFetchResponse({ digestEnabled: true, digestFrequency: "weekly" })],
+      ["/api/feeds", () => makeFetchResponse([{ id: "feed-1", title: "My Feed" }])],
+    ]);
+    render(<DigestSettings />);
+    const select = await screen.findByRole("combobox");
+
+    mockFetchRoutes([
+      [
+        /\/api\/users\/digest-preferences$/,
+        () => makeFetchResponse({ digestEnabled: true, digestFrequency: "weekly", digestFeedId: "feed-1" }),
+      ],
+    ]);
+    await user.selectOptions(select, "feed-1");
+
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/users/digest-preferences",
+        expect.objectContaining({ body: JSON.stringify({ digestFeedId: "feed-1" }) })
+      )
+    );
+  });
+
   it("shows an error toast when saving preferences fails", async () => {
     const user = userEvent.setup();
     mockFetchRoutes([["/api/users/digest-preferences", () => makeFetchResponse({ digestEnabled: false, digestFrequency: "weekly" })]]);

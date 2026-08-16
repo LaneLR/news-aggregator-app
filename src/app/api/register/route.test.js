@@ -77,17 +77,44 @@ describe("POST /api/register", () => {
     });
     db.User.create.mockResolvedValue(newUser);
 
-    const res = await POST(makeRequest({ email: "a@example.com", password: "password1" }));
+    const res = await POST(
+      makeRequest({ email: "a@example.com", password: "password1", digestEnabled: true })
+    );
     const body = await res.json();
 
     expect(res.status).toBe(201);
     expect(body.user.password).toBeUndefined();
     expect(body.user.email).toBe("a@example.com");
+    expect(db.User.create).toHaveBeenCalledWith(
+      expect.objectContaining({ digestEnabled: true })
+    );
     expect(db.Archive.findOrCreate).toHaveBeenCalledWith({
       where: { userId: "user-1", name: "Saved for later" },
     });
     expect(mockSendEmail).toHaveBeenCalledWith(
       expect.objectContaining({ to: "a@example.com", subject: expect.stringContaining("Verify") })
+    );
+  });
+
+  it("respects an explicit digestEnabled: false from the registration form", async () => {
+    db.User.findOne.mockResolvedValue(null);
+    db.User.create.mockResolvedValue(createInstanceMock({ id: "user-1", email: "a@example.com" }));
+
+    await POST(makeRequest({ email: "a@example.com", password: "password1", digestEnabled: false }));
+
+    expect(db.User.create).toHaveBeenCalledWith(
+      expect.objectContaining({ digestEnabled: false })
+    );
+  });
+
+  it("defaults digestEnabled to true when the field is omitted entirely (e.g. a direct API call)", async () => {
+    db.User.findOne.mockResolvedValue(null);
+    db.User.create.mockResolvedValue(createInstanceMock({ id: "user-1", email: "a@example.com" }));
+
+    await POST(makeRequest({ email: "a@example.com", password: "password1" }));
+
+    expect(db.User.create).toHaveBeenCalledWith(
+      expect.objectContaining({ digestEnabled: true })
     );
   });
 

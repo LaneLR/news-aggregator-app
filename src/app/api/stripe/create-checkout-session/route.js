@@ -4,6 +4,9 @@ import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import getStripe from "@/lib/stripe";
+import { MONTHLY_PRICE_ID, ANNUAL_PRICE_ID } from "@/lib/stripePrices";
+
+const ALLOWED_PRICE_IDS = [MONTHLY_PRICE_ID, ANNUAL_PRICE_ID];
 
 export async function POST(req) {
   const stripe = getStripe();
@@ -18,6 +21,9 @@ export async function POST(req) {
       { error: "Price ID is required" },
       { status: 400 }
     );
+  }
+  if (!ALLOWED_PRICE_IDS.includes(priceId)) {
+    return NextResponse.json({ error: "Invalid price ID" }, { status: 400 });
   }
 
   const { User } = await initializeDbAndModels();

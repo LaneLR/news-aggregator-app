@@ -81,6 +81,18 @@ describe("POST /api/feeds/import/opml", () => {
     expect(res.status).toBe(400);
   });
 
+  it("rejects OPML whose outlines have no text/title attribute to import", async () => {
+    mockAuth.mockResolvedValue(makeSession({ tier: "Subscribed" }));
+
+    const res = await POST(
+      makeRequest({
+        opmlText: `<opml><head></head><body><outline xmlUrl="https://x.com/feed" /></body></opml>`,
+      })
+    );
+
+    expect(res.status).toBe(400);
+  });
+
   it("rejects when none of the imported sources are known", async () => {
     mockAuth.mockResolvedValue(makeSession({ tier: "Subscribed" }));
     db.Article.findAll.mockResolvedValue([{ sourceName: "BBC" }]);

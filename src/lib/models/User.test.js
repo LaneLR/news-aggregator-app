@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import bcrypt from "bcryptjs";
 import defineUser from "./User";
 import { createDisconnectedSequelize } from "@/test/modelTestUtils";
 
@@ -51,4 +52,83 @@ describe("User model", () => {
   // enforced by a Postgres CHECK constraint at actual query time, not by
   // Sequelize's in-memory `.validate()` — so it can't be exercised here
   // without a live connection (see modelTestUtils.js's own limits comment).
+
+  // beforeCreate/beforeUpdate only run bcrypt hashing and in-memory dirty
+  // tracking, neither of which needs a real DB connection, so they're
+  // invoked directly here (Sequelize registers them under
+  // Model.options.hooks[name] as an array) rather than left completely
+  // untested, which they were before — dbMock.js-based route tests stub out
+  // User.create()/update() entirely, so they never actually exercise this
+  // hook logic.
+  describe("beforeCreate hook", () => {
+    it("generates an 8-character uppercase referral code", async () => {
+      const user = User.build({ email: "test@example.com" });
+      await User.options.hooks.beforeCreate[0](user, {});
+      // nanoid's default alphabet includes "-"/"_" alongside alphanumerics,
+      // so a real generated code can occasionally contain one — only
+      // length and "no lowercase letters snuck in" are guaranteed.
+      expect(user.referralCode).toHaveLength(8);
+      expect(user.referralCode).toBe(user.referralCode.toUpperCase());
+    });
+
+    it("hashes a provided password", async () => {
+      const user = User.build({ email: "test@example.com", password: "plaintext-pw" });
+      await User.options.hooks.beforeCreate[0](user, {});
+
+      expect(user.password).not.toBe("plaintext-pw");
+      await expect(bcrypt.compare("plaintext-pw", user.password)).resolves.toBe(true);
+    });
+
+    it("leaves password as null for a Google-only signup with no password", async () => {
+      const user = User.build({ email: "test@example.com", password: null });
+      await User.options.hooks.beforeCreate[0](user, {});
+      expect(user.password).toBeNull();
+    });
+  });
+
+  describe("beforeUpdate hook", () => {
+    it("re-hashes the password when it was changed", async () => {
+      const user = User.build(
+        { email: "test@example.com", password: "old-hash" },
+        { isNewRecord: false, raw: true }
+      );
+      user.password = "new-plaintext-pw";
+      expect(user.changed("password")).toBe(true);
+
+      await User.options.hooks.beforeUpdate[0](user, {});
+
+      expect(user.password).not.toBe("new-plaintext-pw");
+      await expect(bcrypt.compare("new-plaintext-pw", user.password)).resolves.toBe(true);
+    });
+
+    it("leaves the password untouched when a different field changed", async () => {
+      const existingHash = await bcrypt.hash("unchanged", 10);
+      const user = User.build(
+        { email: "test@example.com", password: existingHash },
+        { isNewRecord: false, raw: true }
+      );
+      user.name = "New Name";
+      expect(user.changed("password")).toBe(false);
+
+      await User.options.hooks.beforeUpdate[0](user, {});
+
+      expect(user.password).toBe(existingHash);
+    });
+  });
+
+  describe("afterCreate hook", () => {
+    it("creates a default 'Saved for later' archive in the same transaction as the insert", async () => {
+      const user = User.build({ email: "test@example.com" });
+      const mockFindOrCreate = vi.fn().mockResolvedValue([{}, true]);
+      sequelize.models.Archive = { findOrCreate: mockFindOrCreate };
+      const transaction = { fake: "transaction" };
+
+      await User.options.hooks.afterCreate[0](user, { transaction });
+
+      expect(mockFindOrCreate).toHaveBeenCalledWith({
+        where: { name: "Saved for later", userId: user.id },
+        transaction,
+      });
+    });
+  });
 });

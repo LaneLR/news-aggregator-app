@@ -3,6 +3,10 @@ import { excludeGatedCategoriesCondition, excludePremiumArticlesCondition } from
 import { buildKeywordExclusion } from "./keywordFilter";
 import { buildKeywordInclusion } from "./followedKeywords";
 import { orderByDesc } from "./dbOrder";
+import { getRecommendedArticles } from "./recommendations";
+import { filterByMutedKeywords } from "./keywordFilter";
+
+const DIGEST_LIMIT = 5;
 
 function visibilityCondition(isSubscribed, mutedKeywords) {
   const conditions = isSubscribed
@@ -35,69 +39,9 @@ export async function getTrendingArticles(
   });
 }
 
-// Looks at what a user has liked/saved recently, finds their most common
-// article categories, and pulls recent top articles from those categories
-// that they haven't already seen.
-export async function getPersonalizedPicks(db, user, { isSubscribed, limit = 6 } = {}) {
-  const { ArticleLike, SavedArticle, Archive, Article } = db;
-
-  const [likes, saved] = await Promise.all([
-    ArticleLike.findAll({
-      where: { userId: user.id },
-      limit: 50,
-      order: [["createdAt", "DESC"]],
-      attributes: ["articleUrl"],
-    }),
-    SavedArticle.findAll({
-      include: [{ model: Archive, where: { userId: user.id }, required: true, attributes: [] }],
-      limit: 50,
-      order: [["createdAt", "DESC"]],
-      attributes: ["url"],
-    }),
-  ]);
-
-  const seenUrls = new Set([
-    ...likes.map((l) => l.articleUrl),
-    ...saved.map((s) => s.url),
-  ]);
-
-  if (seenUrls.size === 0) return [];
-
-  const historyArticles = await Article.findAll({
-    where: { url: { [Op.in]: [...seenUrls] } },
-    attributes: ["category"],
-  });
-
-  const categoryCounts = new Map();
-  for (const article of historyArticles) {
-    for (const category of article.category || []) {
-      categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
-    }
-  }
-
-  const topCategories = [...categoryCounts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3)
-    .map(([category]) => category);
-
-  if (topCategories.length === 0) return [];
-
-  return Article.findAll({
-    where: {
-      [Op.and]: [
-        { category: { [Op.overlap]: topCategories } },
-        { url: { [Op.notIn]: [...seenUrls] } },
-        ...visibilityCondition(isSubscribed, user.mutedKeywords),
-      ],
-    },
-    order: [orderByDesc(Article, "publishedAt")],
-    limit,
-  });
-}
-
-// Alternative to getTrendingArticles/getPersonalizedPicks for a user whose
-// digest is scoped to one of their own custom Feeds instead of general
-// trending/personalized content.
+// Alternative to getDigestArticles for a user whose digest is scoped to one
+// of their own custom Feeds instead of general trending/personalized
+// content.
 export async function getFeedScopedArticles(Article, feed, { mutedKeywords, limit = 10 } = {}) {
   const orConditions = [];
   if (feed.sourceNames?.length) orConditions.push({ sourceName: { [Op.in]: feed.sourceNames } });
@@ -115,9 +59,6 @@ export async function getFeedScopedArticles(Article, feed, { mutedKeywords, limi
   });
 }
 
-// Independent of the trending/personalized/feed-scoped branch below — a
-// followed topic is worth surfacing in the digest no matter which of those
-// modes the user is otherwise in.
 export async function getFollowedArticles(Article, { isSubscribed, mutedKeywords, followedKeywords, days = 7, limit = 8 } = {}) {
   const keywordInclusion = buildKeywordInclusion(followedKeywords);
   if (!keywordInclusion) return [];
@@ -138,42 +79,206 @@ export async function getFollowedArticles(Article, { isSubscribed, mutedKeywords
   });
 }
 
-function articleRowHtml(article) {
-  const image = article.urlToImage
-    ? `<img src="${article.urlToImage}" alt="" width="72" height="72" style="border-radius:8px;object-fit:cover;display:block;" />`
-    : "";
+// Free-tier equivalent of the Subscribed branch below — "For You" (see
+// src/lib/recommendations.js) is a subscriber-only feature on the site
+// itself, so the digest shouldn't hand it out for free by email either.
+// Leads with anything matching a followed topic (the strongest non-gated
+// signal available), then backfills with trending so there's always
+// something worth sending.
+//
+// `trendingPool`: trending is identical for every Free-tier user, so a
+// caller sending a batch of digests (see send-digests/route.js) can compute
+// it once and pass it in here instead of this function re-querying it once
+// per user. Falls back to querying it directly when called standalone.
+async function getFreeTierDigestPicks(db, user, { limit, days, trendingPool }) {
+  const { Article } = db;
+  const [followed, trending] = await Promise.all([
+    getFollowedArticles(Article, {
+      isSubscribed: false,
+      mutedKeywords: user.mutedKeywords,
+      followedKeywords: user.followedKeywords,
+      days,
+      limit,
+    }),
+    trendingPool
+      ? filterByMutedKeywords(trendingPool, user.mutedKeywords)
+      : getTrendingArticles(Article, { isSubscribed: false, mutedKeywords: user.mutedKeywords, limit }),
+  ]);
+
+  const seen = new Set();
+  const picks = [];
+  for (const article of followed) {
+    if (picks.length >= limit) break;
+    if (seen.has(article.url)) continue;
+    seen.add(article.url);
+    picks.push({ article, reason: "From a topic you follow" });
+  }
+  for (const article of trending) {
+    if (picks.length >= limit) break;
+    if (seen.has(article.url)) continue;
+    seen.add(article.url);
+    picks.push({ article, reason: null });
+  }
+  return picks;
+}
+
+// Picks up to `limit` articles (default 5 — enough to be worth opening the
+// email, not so many it turns into another feed to scroll) for a user's
+// general, non-feed-scoped digest. Returns `[{ article, reason }]`, where
+// `reason` is a short "Because you..." string or null for a trending pick.
+export async function getDigestArticles(
+  db,
+  user,
+  { isSubscribed, limit = DIGEST_LIMIT, days = 7, trendingPool } = {}
+) {
+  if (isSubscribed) {
+    const ranked = await getRecommendedArticles(db, user.id, { limit });
+    return ranked.slice(0, limit);
+  }
+  return getFreeTierDigestPicks(db, user, { limit, days, trendingPool });
+}
+
+// Article fields (title, url, urlToImage, sourceName) originate from
+// third-party RSS feeds, not from this app — they must be escaped before
+// going into a raw HTML string the same way JSX would auto-escape them.
+// (JSX rendering elsewhere in the app is already safe by construction; this
+// hand-built email template is the one place that needed it done manually.)
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function isSafeHttpUrl(value) {
+  try {
+    const protocol = new URL(value).protocol;
+    return protocol === "http:" || protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+const COLORS = {
+  pageBg: "#f6f1e9",
+  cardBg: "#fdfbf6",
+  headerBg: "#1a140f",
+  headerText: "#fdfbf6",
+  accent: "#6f4225",
+  accentTint: "#f0e3d3",
+  textPrimary: "#1a140f",
+  textSecondary: "#7a6a58",
+  border: "#e7ddd0",
+};
+
+const SERIF_STACK = "Georgia, 'Times New Roman', serif";
+const SANS_STACK = "Arial, Helvetica, sans-serif";
+
+// A link goes to the article's own page on the site (which itself links out
+// to the original source — see ArticleReader.jsx's "View original on..."),
+// not straight to the third-party source — the digest is meant to bring
+// readers back to MochaReads, not route around it.
+function articleUrl(baseUrl, article) {
+  return `${baseUrl}/article/${article.id}`;
+}
+
+function reasonPillHtml(reason) {
+  const label = reason || "Trending now";
+  return `<span style="display:inline-block;font-family:${SANS_STACK};font-size:11px;font-weight:700;letter-spacing:0.02em;color:${COLORS.accent};background-color:${COLORS.accentTint};border-radius:20px;padding:3px 10px;margin-bottom:6px;">${escapeHtml(label)}</span>`;
+}
+
+function articleRowHtml(baseUrl, { article, reason }, { isLast }) {
+  const safeImageUrl =
+    article.urlToImage && isSafeHttpUrl(article.urlToImage)
+      ? escapeHtml(article.urlToImage)
+      : null;
+  const image = safeImageUrl
+    ? `<img src="${safeImageUrl}" alt="" width="88" height="88" style="display:block;width:88px;height:88px;border-radius:10px;object-fit:cover;background-color:${COLORS.border};" />`
+    : `<div style="width:88px;height:88px;border-radius:10px;background-color:${COLORS.accentTint};"></div>`;
+
+  const title = escapeHtml(article.title);
+  const link = escapeHtml(articleUrl(baseUrl, article));
+  const titleHtml = `<a href="${link}" style="color:${COLORS.textPrimary};font-family:${SERIF_STACK};font-weight:700;font-size:17px;line-height:1.35;text-decoration:none;">${title}</a>`;
+
   return `
     <tr>
-      <td style="padding:10px 0;vertical-align:top;width:80px;">${image}</td>
-      <td style="padding:10px 0 10px 12px;vertical-align:top;">
-        <a href="${article.url}" style="color:#0a1430;font-weight:600;text-decoration:none;font-size:15px;">${article.title}</a>
-        <div style="color:#777;font-size:12px;margin-top:4px;">${article.sourceName || ""}</div>
+      <td style="padding:${isLast ? "18px" : "18px"} 0;border-bottom:${isLast ? "none" : `1px solid ${COLORS.border}`};" colspan="2">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="width:88px;vertical-align:top;">
+              <a href="${link}" style="text-decoration:none;">${image}</a>
+            </td>
+            <td style="padding-left:14px;vertical-align:top;">
+              ${reasonPillHtml(reason)}<br />
+              ${titleHtml}
+              <div style="margin-top:6px;font-family:${SANS_STACK};font-size:12px;color:${COLORS.textSecondary};">${escapeHtml(article.sourceName || "")}</div>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>`;
 }
 
-function sectionHtml(title, articles) {
-  if (!articles.length) return "";
+function picksTableHtml(baseUrl, picks) {
+  if (!picks.length) return "";
   return `
-    <h2 style="font-size:18px;color:#0a1430;border-bottom:2px solid #eee;padding-bottom:6px;margin:24px 0 4px;">${title}</h2>
-    <table role="presentation" width="100%" style="border-collapse:collapse;">
-      ${articles.map(articleRowHtml).join("")}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+      ${picks.map((pick, i) => articleRowHtml(baseUrl, pick, { isLast: i === picks.length - 1 })).join("")}
     </table>`;
 }
 
-export function buildDigestHtml({ trending, picks, frequency, baseUrl, feedTitle, feedArticles, followed }) {
-  const cadence = frequency === "daily" ? "Today's" : "This week's";
-  const body = feedTitle
-    ? sectionHtml(`New in "${feedTitle}"`, feedArticles || [])
-    : `${sectionHtml("Picked for you", picks)}${sectionHtml("Trending now", trending)}`;
-  const followedSection = sectionHtml("Topics you follow", followed || []);
+// `picks` is `[{ article, reason }]`, already capped at the desired count —
+// this function only renders, it doesn't decide what or how many to show
+// (see getDigestArticles/getFeedScopedArticles for that).
+export function buildDigestHtml({ picks, frequency, baseUrl, feedTitle }) {
+  const cadence = frequency === "daily" ? "daily" : "weekly";
+  const heading = feedTitle
+    ? `New in &ldquo;${escapeHtml(feedTitle)}&rdquo;`
+    : `Your ${cadence} picks`;
+  const subheading = feedTitle
+    ? "The latest from your custom feed."
+    : "A short list, chosen for you — not everything, just what's worth your time.";
+
+  const body = picksTableHtml(baseUrl, picks || []);
+
   return `
-    <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;">
-      <h1 style="font-size:22px;color:#0a1430;">${cadence} MochaReads digest</h1>
-      ${followedSection}${body}
-      <p style="margin-top:28px;font-size:12px;color:#999;">
-        You're getting this because you turned on email digests.
-        <a href="${baseUrl}/settings">Manage your digest settings</a>.
-      </p>
-    </div>`;
+<div style="background-color:${COLORS.pageBg};padding:32px 12px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background-color:${COLORS.cardBg};border:1px solid ${COLORS.border};border-radius:12px;overflow:hidden;">
+    <tr>
+      <td style="background-color:${COLORS.headerBg};padding:20px 28px;">
+        <table role="presentation" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="width:30px;height:30px;background-color:${COLORS.accent};border-radius:6px;text-align:center;vertical-align:middle;">
+              <span style="font-family:${SERIF_STACK};font-weight:700;font-size:16px;color:${COLORS.headerText};">M</span>
+            </td>
+            <td style="padding-left:10px;">
+              <span style="font-family:${SERIF_STACK};font-weight:700;font-size:18px;color:${COLORS.headerText};">Mocha<span style="color:#c9925c;">Reads</span></span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:28px 28px 8px;">
+        <h1 style="margin:0;font-family:${SERIF_STACK};font-size:24px;font-weight:700;color:${COLORS.textPrimary};">${heading}</h1>
+        <p style="margin:8px 0 0;font-family:${SANS_STACK};font-size:13px;color:${COLORS.textSecondary};line-height:1.5;">${subheading}</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:8px 28px 24px;">
+        ${body}
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:18px 28px;background-color:${COLORS.pageBg};border-top:1px solid ${COLORS.border};">
+        <p style="margin:0;font-family:${SANS_STACK};font-size:12px;color:${COLORS.textSecondary};line-height:1.6;text-align:center;">
+          You're getting this because you turned on email digests.<br />
+          <a href="${escapeHtml(baseUrl)}/settings" style="color:${COLORS.accent};font-weight:600;text-decoration:none;">Manage your digest settings</a>
+        </p>
+      </td>
+    </tr>
+  </table>
+</div>`;
 }

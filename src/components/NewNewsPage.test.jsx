@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { makeArticle, makeFetchResponse, makeSession } from "@/test/fixtures";
 
 let mockSession = null;
@@ -103,6 +103,35 @@ describe("NewNewsPage", () => {
 
     expect(await screen.findByText("Top story lead")).toBeInTheDocument();
     expect(screen.getByText("+2 more sources")).toBeInTheDocument();
+  });
+
+  it("falls back to empty categories and logs an error when news-by-category fails to fetch", async () => {
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockSession = null;
+    mockRoutes([["/api/news/top-stories", () => makeFetchResponse({ topStories: [] })]]);
+    render(<NewsPage />);
+
+    await waitFor(() =>
+      expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to fetch news:", expect.any(Error))
+    );
+    consoleErrorSpy.mockRestore();
+  });
+
+  it("falls back to no top stories and logs an error when top-stories fails to fetch", async () => {
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockSession = null;
+    mockRoutes([
+      [
+        "/api/news-by-category",
+        () => makeFetchResponse({ categories: { Business: [] }, showForYou: false, showTopStories: true }),
+      ],
+    ]);
+    render(<NewsPage />);
+
+    await screen.findByText(/no business articles right now/i);
+    expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to fetch top stories:", expect.any(Error));
+    expect(screen.queryByRole("heading", { name: /top stories/i })).not.toBeInTheDocument();
+    consoleErrorSpy.mockRestore();
   });
 
   it("shows the For You / Trending hero carousel when showForYou is true", async () => {

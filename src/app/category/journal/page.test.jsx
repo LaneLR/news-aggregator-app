@@ -61,6 +61,20 @@ describe("JournalNewsPage", () => {
     expect(props.category).toBe("Journal");
   });
 
+  it("renders CategoryPage with undefined articles/totalPages when the fetch throws", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockAuth.mockResolvedValue(makeSession({ id: "user-1", tier: "Subscribed" }));
+    mockGetCategoryArticles.mockRejectedValueOnce(new Error("db down"));
+
+    const element = await JournalNewsPage();
+    render(element);
+
+    const props = JSON.parse(screen.getByTestId("category-page").textContent);
+    expect(props.initialArticles).toBeUndefined();
+    expect(props.initialTotalPages).toBeUndefined();
+    expect(consoleError).toHaveBeenCalled();
+  });
+
   it("is indexable — the teaser is real, unique marketing content", () => {
     expect(metadata.robots).toBeUndefined();
   });

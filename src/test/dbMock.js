@@ -50,6 +50,7 @@ const MODEL_NAMES = [
   "MarketQuote",
   "MarketChartCache",
   "PushSubscription",
+  "IpAttempt",
 ];
 
 export function createDbMock() {

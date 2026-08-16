@@ -104,4 +104,66 @@ describe("NotificationSettings", () => {
 
     expect(await screen.findByText(/notifications were blocked/i)).toBeInTheDocument();
   });
+
+  it("shows an error when enabling throws (e.g. the subscribe or save request fails)", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const user = userEvent.setup();
+    vi.stubEnv("NEXT_PUBLIC_VAPID_PUBLIC_KEY", "AAAA");
+    global.fetch.mockImplementation((url, opts) => {
+      if (url === "/api/push/subscribe" && opts?.method === "POST") {
+        return Promise.resolve(makeFetchResponse(null, { ok: false, status: 500 }));
+      }
+      return Promise.reject(new Error(`Unmocked fetch: ${url}`));
+    });
+    render(<NotificationSettings />);
+
+    await user.click(await screen.findByRole("button", { name: /turn on notifications/i }));
+
+    expect(await screen.findByText(/something went wrong enabling notifications/i)).toBeInTheDocument();
+    expect(consoleError).toHaveBeenCalledWith("Failed to enable push notifications:", expect.any(Error));
+    consoleError.mockRestore();
+  });
+
+  it("disables push notifications when the button is clicked while subscribed", async () => {
+    const user = userEvent.setup();
+    const unsubscribe = vi.fn().mockResolvedValue(true);
+    setSupportEnvironment({ subscription: { endpoint: "https://push.example.com/1" } });
+    navigator.serviceWorker.ready.then((reg) => {
+      reg.pushManager.getSubscription = vi.fn().mockResolvedValue({
+        endpoint: "https://push.example.com/1",
+        unsubscribe,
+      });
+    });
+    global.fetch.mockImplementation((url, opts) => {
+      if (url === "/api/push/unsubscribe" && opts?.method === "POST") {
+        return Promise.resolve(makeFetchResponse({ success: true }));
+      }
+      return Promise.reject(new Error(`Unmocked fetch: ${url}`));
+    });
+    render(<NotificationSettings />);
+
+    await user.click(await screen.findByRole("button", { name: /turn off notifications/i }));
+
+    expect(await screen.findByRole("button", { name: /turn on notifications/i })).toBeInTheDocument();
+    await waitFor(() => expect(unsubscribe).toHaveBeenCalled());
+  });
+
+  it("shows an error when disabling push notifications throws", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const user = userEvent.setup();
+    setSupportEnvironment({ subscription: { endpoint: "https://push.example.com/1" } });
+    global.fetch.mockImplementation((url, opts) => {
+      if (url === "/api/push/unsubscribe" && opts?.method === "POST") {
+        return Promise.reject(new Error("network down"));
+      }
+      return Promise.reject(new Error(`Unmocked fetch: ${url}`));
+    });
+    render(<NotificationSettings />);
+
+    await user.click(await screen.findByRole("button", { name: /turn off notifications/i }));
+
+    expect(await screen.findByText(/something went wrong turning off notifications/i)).toBeInTheDocument();
+    expect(consoleError).toHaveBeenCalledWith("Failed to disable push notifications:", expect.any(Error));
+    consoleError.mockRestore();
+  });
 });

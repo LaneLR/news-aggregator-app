@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import initializeDbAndModels from "@/lib/db.js";
+import { authRateLimitMiddleware } from "@/lib/rate-limiter";
 
 // Auth.js v5 only passes a thrown error's *message* through to the client
 // when it's a CredentialsSignin instance — anything else (a plain `new
@@ -25,6 +26,9 @@ class InvalidPasswordError extends CredentialsSignin {
 }
 class EmailNotVerifiedError extends CredentialsSignin {
   code = "email-not-verified";
+}
+class TooManyAttemptsError extends CredentialsSignin {
+  code = "too-many-attempts";
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -51,7 +55,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize({ email, password }) {
+      async authorize({ email, password }, request) {
+        try {
+          await authRateLimitMiddleware(request);
+        } catch (err) {
+          if (err.status === 429) throw new TooManyAttemptsError();
+          throw err;
+        }
+
         const { User } = await initializeDbAndModels();
         const user = await User.findOne({ where: { email } });
 

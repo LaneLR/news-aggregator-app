@@ -32,7 +32,12 @@ async function getSequelizeInstance() {
         dialectOptions: {
           ssl: {
             require: true,
-            rejectUnauthorized: false
+            // Verified against the real Neon endpoint before flipping this —
+            // Neon's certificate chains to a public CA Node already trusts,
+            // so this doesn't need a custom CA bundle. Previously `false`,
+            // which accepted any certificate and left the connection open
+            // to on-path MITM despite being "encrypted".
+            rejectUnauthorized: true
           }
         }
       });

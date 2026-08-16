@@ -14,7 +14,7 @@ async function fillForm(user, { email = "test@example.com", password = "password
   await user.type(screen.getByPlaceholderText("you@example.com"), email);
   await user.type(screen.getByPlaceholderText("Create a password"), password);
   await user.type(screen.getByPlaceholderText("Re-enter your password"), confirmPassword);
-  await user.click(screen.getByRole("checkbox"));
+  await user.click(screen.getByRole("checkbox", { name: /I agree to the/ }));
 }
 
 describe("RegisterPage", () => {
@@ -39,6 +39,19 @@ describe("RegisterPage", () => {
     expect(passwordInput).toHaveAttribute("type", "text");
   });
 
+  it("toggles confirm password visibility", async () => {
+    const user = userEvent.setup();
+    render(<RegisterPage />);
+    const confirmPasswordInput = screen.getByPlaceholderText("Re-enter your password");
+    expect(confirmPasswordInput).toHaveAttribute("type", "password");
+
+    await user.click(screen.getAllByRole("button", { name: "Show password" })[1]);
+    expect(confirmPasswordInput).toHaveAttribute("type", "text");
+
+    await user.click(screen.getByRole("button", { name: "Hide password" }));
+    expect(confirmPasswordInput).toHaveAttribute("type", "password");
+  });
+
   it("shows an error and does not submit when passwords don't match", async () => {
     const user = userEvent.setup();
     render(<RegisterPage />);
@@ -50,10 +63,14 @@ describe("RegisterPage", () => {
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
-  it("submits and redirects to email verification on success", async () => {
+  it("submits and redirects to email verification on success, with the digest checkbox opted in by default", async () => {
     global.fetch.mockResolvedValueOnce(makeFetchResponse({ success: true }));
     const user = userEvent.setup();
     render(<RegisterPage />);
+
+    expect(
+      screen.getByRole("checkbox", { name: /occasional emails/ })
+    ).toBeChecked();
 
     await fillForm(user);
     await user.click(screen.getByRole("button", { name: "Create Account" }));
@@ -62,10 +79,35 @@ describe("RegisterPage", () => {
       "/api/register",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ email: "test@example.com", password: "password1" }),
+        body: JSON.stringify({
+          email: "test@example.com",
+          password: "password1",
+          digestEnabled: true,
+        }),
       })
     );
     await vi.waitFor(() => expect(push).toHaveBeenCalledWith("/verification/verify-email"));
+  });
+
+  it("submits digestEnabled: false when the user unchecks the digest opt-in", async () => {
+    global.fetch.mockResolvedValueOnce(makeFetchResponse({ success: true }));
+    const user = userEvent.setup();
+    render(<RegisterPage />);
+
+    await fillForm(user);
+    await user.click(screen.getByRole("checkbox", { name: /occasional emails/ }));
+    await user.click(screen.getByRole("button", { name: "Create Account" }));
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "/api/register",
+      expect.objectContaining({
+        body: JSON.stringify({
+          email: "test@example.com",
+          password: "password1",
+          digestEnabled: false,
+        }),
+      })
+    );
   });
 
   it("shows a server-provided error message when registration fails", async () => {

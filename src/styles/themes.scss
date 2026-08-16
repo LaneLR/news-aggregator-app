@@ -4,16 +4,24 @@
 // themes.js itself stays around only because ThemeSelector needs the raw
 // JS values to render its swatch previews of *both* themes at once.
 //
-// Palette: "Mocha Editorial" — true white surfaces with a coffee-brown
-// accent (sampled from the actual MochaReads logo assets, not guessed —
-// see the git history around the MochaReads rebrand for the pixel-sampling
-// script), replacing the earlier amber "Modern Editorial Paper" palette.
-// Aims for the restrained, mostly-monochrome-plus-one-accent look of
-// Stripe/Notion/Medium: color is used sparingly and deliberately, structure
-// comes from whitespace/borders/typography rather than tonal blocking —
-// which is why --theme-background and --theme-card-background are now the
-// same flat white rather than two different off-white tones. Keep in sync
-// with src/styles/themes.js by hand.
+// Palette: "Sepia Mocha" — the coffee-brown accent (sampled from the actual
+// MochaReads logo assets — see the git history around the MochaReads
+// rebrand for the pixel-sampling script) is unchanged from the earlier
+// "Mocha Editorial" pass, but every neutral around it is rebuilt to share
+// its warmth instead of sitting on stock cool grays. The previous palette's
+// neutrals were an unintentional mix of Tailwind's "zinc" (cool, blue-gray)
+// and "stone" (warm, brown-gray) scales — e.g. the always-dark header/
+// footer chrome was zinc-900 (#18181b) sitting right next to warm
+// stone-toned body text, which is exactly why the site read as "a neutral
+// SaaS UI with a brown accent" rather than one cohesive tone. Every
+// zinc-derived token below (chrome, card, slate, search/section
+// backgrounds, the *-gray borders) is now a custom warm-brown value in the
+// same family as the accent, so light mode reads as aged paper/sepia and
+// dark mode reads as espresso rather than generic near-black. Structure
+// still comes from whitespace/borders/typography, not tonal blocking —
+// --theme-background and --theme-card-background stay equal to each other
+// in both themes, just now a warm parchment/espresso tone instead of flat
+// white/near-black. Keep in sync with src/styles/themes.js by hand.
 //
 // Light is the baseline on bare :root (not gated behind a [data-theme]
 // selector) so it's always defined even before any attribute is set. Dark
@@ -47,38 +55,47 @@
   --theme-dark-blue: #1c1917;
   --theme-deep-blue: #1c1917;
   // Text/icon color specifically for the header bar, which stays
-  // near-black (#18181b) in BOTH light and dark theme — so unlike
+  // near-black (#1a140f) in BOTH light and dark theme — so unlike
   // --theme-primary above (deliberately too dark to read against another
   // dark surface), this needs its own lighter caramel tone, sampled from
-  // the "Reads" half of the logo wordmark. Clears 6.54:1 against the
+  // the "Reads" half of the logo wordmark. Clears 6.73:1 against the
   // header background; reused as-is for dark mode below since the header
   // color itself never changes between themes.
   --theme-title-contrast: #c9925c;
-  --theme-header-background: #18181b;
-  --theme-footer-background: #18181b;
-  --theme-secondary-dark: #18181b;
-  // True white, not the previous warm off-white paper (#f9f8f6) — matches
-  // --theme-card-background exactly on purpose (see the palette comment
-  // above): almost no tonal separation between page and card, borders and
-  // shadows carry the hierarchy instead.
-  --theme-background: #ffffff;
-  --theme-layout-background: #ffffff;
-  --theme-card-background: #ffffff;
-  --theme-button-background: #18181b;
+  // Warm espresso-black, not zinc-900 (#18181b) — this is the one surface
+  // present on every page regardless of theme, so it's the single highest-
+  // leverage place to establish "coffee" over "generic dark UI chrome."
+  --theme-header-background: #1a140f;
+  --theme-footer-background: #1a140f;
+  --theme-secondary-dark: #1a140f;
+  // Warm parchment, not flat white (#ffffff) — matches --theme-card-background
+  // exactly on purpose (see the palette comment above): almost no tonal
+  // separation between page and card, borders and shadows carry the
+  // hierarchy instead. Subtle on purpose (this is a "sepia tint," not a tan
+  // wash) — --theme-tip-background below shows what a fuller warm tone
+  // looks like when one is actually called for.
+  --theme-background: #fdfbf6;
+  --theme-layout-background: #fdfbf6;
+  --theme-card-background: #fdfbf6;
+  --theme-button-background: #1a140f;
   --theme-text: #1c1917;
   --theme-button-text: #fff;
   --theme-text-secondary: #57534e;
   --theme-text-tertiary: #78716c;
-  --theme-border: #e5e3df;
+  --theme-border: #e7ddd0;
   --theme-warning: #dc2626;
   --theme-tier-badge: #6f4225;
-  --theme-card: #a1a1aa;
-  --theme-archive-background: #fafaf9;
-  --theme-slate: #71717a;
+  // Warm taupe, not zinc-400 (#a1a1aa) — used for placeholder/skeleton fills.
+  --theme-card: #a69c8d;
+  --theme-archive-background: #faf5ec;
+  // Warm gray, not zinc-500 (#71717a).
+  --theme-slate: #79706a;
   --theme-success: #16a34a;
   --theme-dropdown-menu: #fff;
-  --theme-search-background: #f4f4f5;
-  --theme-primary-dark: #18181b;
+  // Warm cream, not zinc-100 (#f4f4f5) — shared with --theme-section-gray
+  // below so both read as the same "warm paper" surface.
+  --theme-search-background: #f6f1e9;
+  --theme-primary-dark: #1a140f;
   // Icon/badge accent — a distinct, lighter-than-primary brown so accents
   // (notification icons, header highlights) read as a deliberate second
   // tone rather than just reusing the button color everywhere.
@@ -86,8 +103,9 @@
   --theme-accent-hover: #653a1e;
   --theme-text-light: #fafafa;
   --theme-text-white: #ffffff;
-  --theme-section-gray: #f4f4f5;
-  --theme-border-gray: #e4e4e7;
+  --theme-section-gray: #f6f1e9;
+  // Warm tan, not zinc-200 (#e4e4e7).
+  --theme-border-gray: #e6dece;
 
   // Tip/callout banners (e.g. FeatureCallout) — a soft warm-tan treatment
   // in the same coffee family, not a tinted derivation of --theme-primary.
@@ -101,10 +119,10 @@
 
   // A lighter caramel than the light-mode primary — the same tone used for
   // --theme-title-contrast above, since both need to read against a
-  // near-black surface. Clears 7.34:1 against the page background and
-  // 6.54:1 against card/header surfaces.
+  // near-black surface. Clears 6.73:1 against the page background and
+  // 6.50:1 against card/header surfaces.
   --theme-primary: #c9925c;
-  --theme-primary-contrast: #09090b;
+  --theme-primary-contrast: #0e0a07;
   // Already light enough to double as standalone text against dark
   // surfaces — no separate darker/lighter variant needed.
   --theme-primary-text: #c9925c;
@@ -114,33 +132,44 @@
   --theme-dark-blue: #fafaf9;
   --theme-deep-blue: #fafaf9;
   --theme-title-contrast: #c9925c;
-  --theme-header-background: #18181b;
-  --theme-footer-background: #18181b;
-  --theme-secondary-dark: #18181b;
-  --theme-background: #09090b;
-  --theme-layout-background: #09090b;
-  --theme-card-background: #18181b;
-  --theme-button-background: #18181b;
+  // Same warm espresso-black as light mode's chrome — this bar never
+  // changes between themes, so both palettes point at one literal value.
+  --theme-header-background: #1a140f;
+  --theme-footer-background: #1a140f;
+  --theme-secondary-dark: #1a140f;
+  // Dark-roast espresso, not zinc-950 (#09090b) — a genuine warm near-black
+  // instead of a cool neutral one.
+  --theme-background: #0e0a07;
+  --theme-layout-background: #0e0a07;
+  // Lighter than the page background for card/page layering (matches the
+  // original palette's ~1.1:1 separation), warm instead of zinc-900.
+  --theme-card-background: #201710;
+  --theme-button-background: #1a140f;
   --theme-text: #fafaf9;
   --theme-button-text: #fff;
   --theme-text-secondary: #a8a29e;
   --theme-text-tertiary: #a8a29e;
-  --theme-border: #27272a;
+  --theme-border: #2e2419;
   --theme-warning: #ef4444;
   --theme-tier-badge: #c9925c;
-  --theme-card: #3f3f46;
-  --theme-archive-background: #18181b;
-  --theme-slate: #a1a1aa;
+  // Warm taupe-brown, not zinc-700 (#3f3f46).
+  --theme-card: #453b2f;
+  --theme-archive-background: #201710;
+  // Warm gray, not zinc-400 (#a1a1aa).
+  --theme-slate: #a89d8d;
   --theme-success: #22c55e;
   --theme-dropdown-menu: #fff;
-  --theme-search-background: #27272a;
-  --theme-primary-dark: #18181b;
+  // Warm dark, not zinc-800 (#27272a) — shared with --theme-section-gray
+  // below.
+  --theme-search-background: #241c14;
+  --theme-primary-dark: #1a140f;
   --theme-accent-orange: #d4a373;
   --theme-accent-hover: #b5804f;
   --theme-text-light: #fafafa;
   --theme-text-white: #ffffff;
-  --theme-section-gray: #27272a;
-  --theme-border-gray: #3f3f46;
+  --theme-section-gray: #241c14;
+  // Warm taupe-brown, not zinc-700 (#3f3f46) — matches --theme-card.
+  --theme-border-gray: #453b2f;
 
   --theme-tip-background: #2a1c12;
   --theme-tip-border: #5c3319;

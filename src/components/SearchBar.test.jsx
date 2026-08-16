@@ -109,4 +109,105 @@ describe("SearchBar", () => {
 
     expect(push).toHaveBeenCalledWith("/search?query=tesla");
   });
+
+  it("falls back to an empty recent-searches list when localStorage holds invalid JSON", async () => {
+    localStorage.setItem(RECENT_KEY, "not valid json{{{");
+    const user = userEvent.setup();
+    render(<SearchBar />);
+
+    await user.click(screen.getByRole("combobox"));
+
+    expect(screen.queryByText("Recent searches")).not.toBeInTheDocument();
+  });
+
+  it("closes the dropdown when clicking outside the search bar", async () => {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(["apple"]));
+    const user = userEvent.setup();
+    render(
+      <div>
+        <SearchBar />
+        <button type="button">Outside</button>
+      </div>
+    );
+
+    await user.click(screen.getByRole("combobox"));
+    expect(screen.getByText("apple")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Outside" }));
+    expect(screen.queryByText("apple")).not.toBeInTheDocument();
+  });
+
+  it("closes the dropdown on Escape", async () => {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(["apple"]));
+    const user = userEvent.setup();
+    render(<SearchBar />);
+
+    const input = screen.getByRole("combobox");
+    await user.click(input);
+    expect(screen.getByText("apple")).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    expect(screen.queryByText("apple")).not.toBeInTheDocument();
+  });
+
+  it("clears suggestions when the suggestions fetch rejects", async () => {
+    const user = userEvent.setup();
+    global.fetch.mockRejectedValueOnce(new Error("network down"));
+
+    render(<SearchBar />);
+    await user.type(screen.getByRole("combobox"), "ai");
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    // No suggestion rows or trailing "see all" row show up once it settles.
+    await waitFor(() => expect(screen.queryByRole("option")).not.toBeInTheDocument());
+  });
+
+  it("navigates a fetched suggestion via ArrowUp wraparound and Enter", async () => {
+    const user = userEvent.setup();
+    global.fetch.mockResolvedValueOnce(
+      makeFetchResponse({
+        suggestions: [{ id: "a1", title: "AI Breakthrough", sourceName: "Example", category: ["Tech"] }],
+      })
+    );
+
+    render(<SearchBar />);
+    const input = screen.getByRole("combobox");
+    await user.type(input, "ai");
+    await screen.findByText("AI Breakthrough");
+
+    // With one suggestion + a trailing "see all" row (itemCount 2),
+    // ArrowUp from the default (-1) wraps to index 0 (the suggestion);
+    // a second ArrowUp moves to index 1 (the trailing "see all" row).
+    await user.keyboard("{ArrowUp}{ArrowUp}{Enter}");
+
+    expect(push).toHaveBeenCalledWith("/search?query=ai");
+  });
+
+  it("clicks a recent-search row directly to run that search", async () => {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(["apple"]));
+    const user = userEvent.setup();
+    render(<SearchBar />);
+
+    await user.click(screen.getByRole("combobox"));
+    await user.click(screen.getByText("apple"));
+
+    expect(push).toHaveBeenCalledWith("/search?query=apple");
+  });
+
+  it("clicks the trailing 'See all results' row to run the current search", async () => {
+    const user = userEvent.setup();
+    global.fetch.mockResolvedValueOnce(
+      makeFetchResponse({
+        suggestions: [{ id: "a1", title: "AI Breakthrough", sourceName: "Example", category: ["Tech"] }],
+      })
+    );
+
+    render(<SearchBar />);
+    await user.type(screen.getByRole("combobox"), "ai");
+    await screen.findByText("AI Breakthrough");
+
+    await user.click(screen.getByText(/See all results for "ai"/));
+
+    expect(push).toHaveBeenCalledWith("/search?query=ai");
+  });
 });

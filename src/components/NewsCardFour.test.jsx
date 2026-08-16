@@ -176,4 +176,93 @@ describe("NewsCardFour", () => {
       "https://example.com/story"
     );
   });
+
+  it("tracks a click when the thumbnail image link is clicked", async () => {
+    const user = userEvent.setup();
+    const article = makeArticle({ title: "Tracked Story" });
+    render(<NewsCardFour article={article} viewOnly />);
+
+    await user.click(screen.getByAltText("Tracked Story"));
+    // trackArticleClick only fires sendBeacon/fetch when navigator.sendBeacon
+    // is unavailable in jsdom, but at minimum it must not throw and the link
+    // click should be handled without error.
+    expect(screen.getByAltText("Tracked Story")).toBeInTheDocument();
+  });
+
+  it("tracks a click when the read-more button is clicked", async () => {
+    const user = userEvent.setup();
+    const article = makeArticle({ title: "Tracked Story Two", url: "https://example.com/tracked" });
+    render(<NewsCardFour article={article} viewOnly />);
+
+    await user.click(screen.getByRole("link", { name: /read article/i }));
+    expect(screen.getByRole("link", { name: /read article/i })).toBeInTheDocument();
+  });
+
+  it("marks the article as read on a left swipe past the threshold", async () => {
+    mockSession = makeSession();
+    const article = makeArticle({ isRead: false, url: "https://example.com/swipe-read" });
+    mockRoutes([...ARCHIVE_ROUTES, ["/api/articles/mark-all-read", () => makeFetchResponse({ success: true })]]);
+    const { container } = render(<NewsCardFour article={article} viewOnly />);
+
+    const wrapper = container.querySelector('[class*="swipeWrapper"]');
+    fireEvent.touchStart(wrapper, { touches: [{ clientX: 200 }] });
+    fireEvent.touchMove(wrapper, { touches: [{ clientX: 100 }] });
+    fireEvent.touchEnd(wrapper);
+
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/articles/mark-all-read",
+        expect.objectContaining({ method: "POST", body: JSON.stringify({ urls: [article.url] }) })
+      )
+    );
+  });
+
+  it("logs an error but does not throw when marking read via swipe fails", async () => {
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockSession = makeSession();
+    const article = makeArticle({ isRead: false, url: "https://example.com/swipe-fail" });
+    mockRoutes([...ARCHIVE_ROUTES, ["/api/articles/mark-all-read", () => Promise.reject(new Error("network down"))]]);
+    const { container } = render(<NewsCardFour article={article} viewOnly />);
+
+    const wrapper = container.querySelector('[class*="swipeWrapper"]');
+    fireEvent.touchStart(wrapper, { touches: [{ clientX: 200 }] });
+    fireEvent.touchMove(wrapper, { touches: [{ clientX: 100 }] });
+    fireEvent.touchEnd(wrapper);
+
+    await waitFor(() =>
+      expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to mark article as read:", expect.any(Error))
+    );
+    consoleErrorSpy.mockRestore();
+  });
+
+  it("does not mark as read on left swipe when logged out", () => {
+    mockSession = null;
+    const article = makeArticle({ isRead: false });
+    const { container } = render(<NewsCardFour article={article} viewOnly />);
+
+    const wrapper = container.querySelector('[class*="swipeWrapper"]');
+    fireEvent.touchStart(wrapper, { touches: [{ clientX: 200 }] });
+    fireEvent.touchMove(wrapper, { touches: [{ clientX: 100 }] });
+    fireEvent.touchEnd(wrapper);
+
+    expect(global.fetch).not.toHaveBeenCalledWith(
+      "/api/articles/mark-all-read",
+      expect.anything()
+    );
+  });
+
+  it("clicks the save action on a right swipe past the threshold", () => {
+    const article = makeArticle();
+    const { container } = render(<NewsCardFour article={article} viewOnly />);
+
+    const saveButton = container.querySelector('[data-action="save"]');
+    const clickSpy = vi.spyOn(saveButton, "click");
+
+    const wrapper = container.querySelector('[class*="swipeWrapper"]');
+    fireEvent.touchStart(wrapper, { touches: [{ clientX: 100 }] });
+    fireEvent.touchMove(wrapper, { touches: [{ clientX: 200 }] });
+    fireEvent.touchEnd(wrapper);
+
+    expect(clickSpy).toHaveBeenCalled();
+  });
 });

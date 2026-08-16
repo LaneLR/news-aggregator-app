@@ -11,6 +11,7 @@ import defineReadArticle from "./models/ReadArticle.js";
 import defineMarketQuote from "./models/MarketQuote.js";
 import defineMarketChartCache from "./models/MarketChartCache.js";
 import definePushSubscription from "./models/PushSubscription.js";
+import defineIpAttempt from "./models/IpAttempt.js";
 
 if (!global.db) {
   global.db = {};
@@ -37,6 +38,7 @@ async function initializeDbAndModels() {
       const MarketQuote = defineMarketQuote(sequelize);
       const MarketChartCache = defineMarketChartCache(sequelize);
       const PushSubscription = definePushSubscription(sequelize);
+      const IpAttempt = defineIpAttempt(sequelize);
 
       global.db.sequelize = sequelize;
       global.db.User = User;
@@ -51,6 +53,7 @@ async function initializeDbAndModels() {
       global.db.MarketQuote = MarketQuote;
       global.db.MarketChartCache = MarketChartCache;
       global.db.PushSubscription = PushSubscription;
+      global.db.IpAttempt = IpAttempt;
 
       User.hasMany(Archive, { foreignKey: "userId", onDelete: "CASCADE" });
       Archive.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });

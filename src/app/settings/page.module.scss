@@ -9,7 +9,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.4rem;
-  padding: 2rem 0 1.5rem;
+  padding: 1.5rem 0 1.25rem;
   text-align: center;
 }
 
@@ -17,7 +17,7 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  font-size: 2.2rem;
+  font-size: 1.9rem;
   font-weight: 700;
   color: var(--theme-dark-blue);
 
@@ -26,7 +26,7 @@
   }
 
   @media (max-width: 440px) {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
   }
 }
 
@@ -37,7 +37,7 @@
 .layoutRow {
   display: flex;
   align-items: flex-start;
-  gap: 1.5rem;
+  gap: 1.25rem;
 
   @media (max-width: 800px) {
     flex-direction: column;
@@ -48,7 +48,7 @@
   flex: 1 1 60%;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
   min-width: 0;
 }
 
@@ -67,7 +67,7 @@
 
 .card {
   background-color: var(--theme-card-background);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--theme-border);
   overflow: hidden;
@@ -76,9 +76,9 @@
 .cardHeader {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 1.1rem;
-  padding: 1.1rem 1.5rem;
+  gap: 0.65rem;
+  font-size: 1rem;
+  padding: 0.85rem 1.25rem;
   margin: 0;
   border-bottom: 1px solid var(--theme-border);
   color: var(--theme-dark-blue);
@@ -88,16 +88,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-sm);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
   background-color: color-mix(in srgb, var(--theme-primary) 12%, transparent);
   color: var(--theme-primary);
   flex-shrink: 0;
 }
 
 .cardContent {
-  padding: 1.5rem;
+  padding: 1.25rem;
 }
 
 .cardSubheading {
@@ -109,8 +109,8 @@
   color: var(--theme-text-secondary);
 
   &:not(:first-child) {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
     border-top: 1px solid var(--theme-border);
   }
 }
@@ -118,8 +118,8 @@
 .tipCard {
   display: flex;
   gap: 10px;
-  padding: 1.1rem 1.25rem;
-  border-radius: var(--radius-md);
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-sm);
   background-color: color-mix(in srgb, var(--theme-primary) 8%, var(--theme-card-background));
   border: 1px solid color-mix(in srgb, var(--theme-primary) 25%, transparent);
   color: var(--theme-primary);
@@ -145,8 +145,8 @@
 }
 
 .linksCard {
-  padding: 1.1rem 1.25rem;
-  border-radius: var(--radius-md);
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-sm);
   background-color: var(--theme-card-background);
   border: 1px solid var(--theme-border);
   box-shadow: var(--shadow-sm);

@@ -19,6 +19,18 @@ function Consumer() {
   return <div data-testid="help-key">{shortcuts.help}</div>;
 }
 
+function UnwrappedConsumer() {
+  const { shortcuts, setShortcuts } = useKeyboardShortcuts();
+  return (
+    <div>
+      <div data-testid="help-key">{shortcuts.help}</div>
+      <button type="button" onClick={() => setShortcuts({ ...shortcuts, help: "x" })}>
+        set
+      </button>
+    </div>
+  );
+}
+
 describe("isTypingTarget", () => {
   it("returns true for inputs, textareas, and contentEditable elements", () => {
     const input = document.createElement("input");
@@ -35,6 +47,18 @@ describe("isTypingTarget", () => {
     expect(isTypingTarget(textarea)).toBe(true);
     expect(isTypingTarget(editable)).toBe(true);
     expect(isTypingTarget(div)).toBe(false);
+  });
+});
+
+describe("useKeyboardShortcuts", () => {
+  it("falls back to the default context (default shortcuts, no-op setShortcuts) outside a provider", async () => {
+    const user = userEvent.setup();
+    render(<UnwrappedConsumer />);
+
+    expect(screen.getByTestId("help-key")).toHaveTextContent("?");
+    await user.click(screen.getByRole("button", { name: "set" }));
+    // The default context's setShortcuts is a no-op, so nothing should change.
+    expect(screen.getByTestId("help-key")).toHaveTextContent("?");
   });
 });
 
@@ -69,6 +93,20 @@ describe("KeyboardShortcutsProvider", () => {
     expect(await screen.findByText("h")).toBeInTheDocument();
   });
 
+  it("silently keeps the default shortcuts if the fetch rejects", async () => {
+    mockSession = makeSession();
+    global.fetch.mockImplementation(() => Promise.reject(new Error("network error")));
+
+    render(
+      <KeyboardShortcutsProvider>
+        <Consumer />
+      </KeyboardShortcutsProvider>
+    );
+
+    await vi.waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    expect(screen.getByTestId("help-key")).toHaveTextContent("?");
+  });
+
   it("opens the help dialog when the configured help key is pressed", async () => {
     mockSession = null;
     const user = userEvent.setup();
@@ -83,6 +121,23 @@ describe("KeyboardShortcutsProvider", () => {
     await user.keyboard("?");
 
     expect(screen.getByRole("dialog", { name: /keyboard shortcuts/i })).toBeInTheDocument();
+  });
+
+  it("closes the help dialog via its close button", async () => {
+    mockSession = null;
+    const user = userEvent.setup();
+    render(
+      <KeyboardShortcutsProvider>
+        <p>App content</p>
+      </KeyboardShortcutsProvider>
+    );
+
+    await user.keyboard("?");
+    expect(screen.getByRole("dialog", { name: /keyboard shortcuts/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Close" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("ignores the help key while typing in an input", async () => {

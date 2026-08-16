@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeArticle, makeFetchResponse } from "@/test/fixtures";
 
@@ -159,5 +159,36 @@ describe("ArticleReader", () => {
     const paywalled = makeArticle({ sourceName: "Bloomberg" });
     render(<ArticleReader article={paywalled} sanitizedContent="" relatedCoverage={[]} readingTime={1} />);
     expect(screen.getByTitle("This source could be behind a paywall.")).toBeInTheDocument();
+  });
+
+  it("tracks a click on the top 'View original' link", async () => {
+    const user = userEvent.setup();
+    render(<ArticleReader article={article} sanitizedContent="<p>x</p>" relatedCoverage={[]} readingTime={1} />);
+    await user.click(screen.getByRole("link", { name: /View original on BBC/ }));
+    expect(screen.getByRole("link", { name: /View original on BBC/ })).toHaveAttribute("href", article.url);
+  });
+
+  it("tracks a click on the bottom 'Read the full article' link", async () => {
+    const user = userEvent.setup();
+    render(<ArticleReader article={article} sanitizedContent="<p>x</p>" relatedCoverage={[]} readingTime={1} />);
+    await user.click(screen.getByRole("link", { name: /Read the full article on BBC/ }));
+    expect(screen.getByRole("link", { name: /Read the full article on BBC/ })).toHaveAttribute("href", article.url);
+  });
+
+  it("updates the read-progress bar width as the article is scrolled", () => {
+    const { container } = render(
+      <ArticleReader article={article} sanitizedContent="<p>x</p>" relatedCoverage={[]} readingTime={1} />
+    );
+    const articleEl = container.querySelector('[class*="article"]');
+    // Simulate a tall article scrolled partway down: rect.height 2000px
+    // against jsdom's innerHeight leaves a positive scrollable range, and a
+    // negative rect.top simulates having scrolled into it.
+    const total = 2000 - window.innerHeight;
+    vi.spyOn(articleEl, "getBoundingClientRect").mockReturnValue({ height: 2000, top: -(total / 2) });
+
+    fireEvent.scroll(window);
+
+    const progressFill = container.querySelector('[class*="progressFill"]');
+    expect(progressFill.style.width).toBe("50%");
   });
 });

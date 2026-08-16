@@ -6,6 +6,11 @@ import { createDbMock, createInstanceMock } from "@/test/dbMock";
 const db = createDbMock();
 vi.mock("@/lib/db", () => ({ default: vi.fn(async () => db) }));
 
+const mockRateLimit = vi.fn(async () => {});
+vi.mock("@/lib/rate-limiter", () => ({
+  authRateLimitMiddleware: (...args) => mockRateLimit(...args),
+}));
+
 const { POST } = await import("./route");
 
 function makeRequest(body) {
@@ -22,6 +27,26 @@ function signToken(payload, opts) {
 describe("POST /api/auth/reset-password", () => {
   beforeEach(() => {
     db.User.findByPk.mockReset();
+    mockRateLimit.mockReset();
+    mockRateLimit.mockResolvedValue(undefined);
+  });
+
+  it("rejects a password shorter than 6 characters", async () => {
+    const token = signToken({ id: "user-1", purpose: "reset-password", v: 0 });
+
+    const res = await POST(makeRequest({ token, newPassword: "abc" }));
+
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 429 when the rate limiter rejects", async () => {
+    const rateLimitError = new Error("Too many requests. Please try again after some time.");
+    rateLimitError.status = 429;
+    mockRateLimit.mockRejectedValueOnce(rateLimitError);
+
+    const res = await POST(makeRequest({ token: "irrelevant", newPassword: "newpass123" }));
+
+    expect(res.status).toBe(429);
   });
 
   it("rejects a garbage token", async () => {

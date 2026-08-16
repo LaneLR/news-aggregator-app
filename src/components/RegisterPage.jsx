@@ -18,6 +18,7 @@ export default function RegisterPage() {
     const email = formData.get("email");
     const password = formData.get("password");
     const confirmPassword = formData.get("confirmPassword");
+    const digestEnabled = formData.get("digestEnabled") === "on";
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -28,7 +29,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, digestEnabled }),
       });
 
       const data = await res.json();
@@ -128,6 +129,20 @@ export default function RegisterPage() {
               Privacy Policy
             </Link>
             .
+          </label>
+        </div>
+
+        <div className={styles.checkboxWrapper}>
+          <input
+            className={styles.styledInput}
+            type="checkbox"
+            id="digestEnabled"
+            name="digestEnabled"
+            defaultChecked
+          />
+          <label htmlFor="digestEnabled">
+            Send me occasional emails with popular and relevant articles. You
+            can turn this off anytime in Settings.
           </label>
         </div>
 

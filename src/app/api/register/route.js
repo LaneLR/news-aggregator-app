@@ -11,7 +11,7 @@ export async function POST(req) {
   try {
     await authRateLimitMiddleware(req);
 
-    const { email, password } = await req.json();
+    const { email, password, digestEnabled } = await req.json();
 
     // Basic manual validation (kept as-is)
     if (!email || !password)
@@ -47,6 +47,11 @@ export async function POST(req) {
       password: password,
       emailIsVerified: false,
       referralCode: nanoid(8).toUpperCase(), // Generate the code here
+      // The registration form's digest checkbox defaults to checked, so
+      // omitting it entirely (e.g. a direct API call) defaults to opted-in
+      // too, matching that same default rather than the model's own
+      // conservative false default.
+      digestEnabled: digestEnabled !== false,
     });
 
     await db.Archive.findOrCreate({

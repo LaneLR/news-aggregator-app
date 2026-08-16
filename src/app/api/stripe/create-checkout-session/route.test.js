@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { createDbMock, createInstanceMock } from "@/test/dbMock";
 import { makeSession } from "@/test/fixtures";
+import { MONTHLY_PRICE_ID } from "@/lib/stripePrices";
 
 const db = createDbMock();
 vi.mock("@/lib/db", () => ({ default: vi.fn(async () => db) }));
@@ -43,7 +44,7 @@ describe("POST /api/stripe/create-checkout-session", () => {
   it("rejects unauthenticated requests", async () => {
     mockAuth.mockResolvedValue(null);
 
-    const res = await POST(makeRequest({ priceId: "price_123" }));
+    const res = await POST(makeRequest({ priceId: MONTHLY_PRICE_ID }));
 
     expect(res.status).toBe(401);
   });
@@ -56,11 +57,20 @@ describe("POST /api/stripe/create-checkout-session", () => {
     expect(res.status).toBe(400);
   });
 
+  it("rejects a priceId that isn't one of the two known plans", async () => {
+    mockAuth.mockResolvedValue(makeSession({ id: "user-1" }));
+
+    const res = await POST(makeRequest({ priceId: "price_not_a_real_plan" }));
+
+    expect(res.status).toBe(400);
+    expect(mockStripe.checkout.sessions.create).not.toHaveBeenCalled();
+  });
+
   it("returns 404 when the session user no longer exists", async () => {
     mockAuth.mockResolvedValue(makeSession({ id: "user-1" }));
     db.User.findByPk.mockResolvedValue(null);
 
-    const res = await POST(makeRequest({ priceId: "price_123" }));
+    const res = await POST(makeRequest({ priceId: MONTHLY_PRICE_ID }));
 
     expect(res.status).toBe(404);
   });
@@ -69,7 +79,7 @@ describe("POST /api/stripe/create-checkout-session", () => {
     mockAuth.mockResolvedValue(makeSession({ id: "user-1" }));
     db.User.findByPk.mockResolvedValue(createInstanceMock({ tier: "Subscribed" }));
 
-    const res = await POST(makeRequest({ priceId: "price_123" }));
+    const res = await POST(makeRequest({ priceId: MONTHLY_PRICE_ID }));
 
     expect(res.status).toBe(400);
   });
@@ -81,7 +91,7 @@ describe("POST /api/stripe/create-checkout-session", () => {
     );
 
     const res = await POST(
-      makeRequest({ priceId: "price_123", referralCode: "REF1", promotionCodeId: "promo_1" })
+      makeRequest({ priceId: MONTHLY_PRICE_ID, referralCode: "REF1", promotionCodeId: "promo_1" })
     );
 
     expect(res.status).toBe(400);
@@ -93,7 +103,7 @@ describe("POST /api/stripe/create-checkout-session", () => {
     db.User.findOne.mockResolvedValue(null);
 
     const res = await POST(
-      makeRequest({ priceId: "price_123", referralCode: "BADCODE", promotionCodeId: "promo_1" })
+      makeRequest({ priceId: MONTHLY_PRICE_ID, referralCode: "BADCODE", promotionCodeId: "promo_1" })
     );
 
     expect(res.status).toBe(400);
@@ -104,7 +114,7 @@ describe("POST /api/stripe/create-checkout-session", () => {
     db.User.findByPk.mockResolvedValue(createInstanceMock({ id: "user-1", tier: "Free", usedReferralCode: null }));
     db.User.findOne.mockResolvedValue(createInstanceMock({ id: "referrer-1" }));
 
-    const res = await POST(makeRequest({ priceId: "price_123", referralCode: "REF1" }));
+    const res = await POST(makeRequest({ priceId: MONTHLY_PRICE_ID, referralCode: "REF1" }));
 
     expect(res.status).toBe(400);
   });
@@ -119,7 +129,7 @@ describe("POST /api/stripe/create-checkout-session", () => {
       url: "https://checkout.stripe.com/pay/cs_test_123",
     });
 
-    const res = await POST(makeRequest({ priceId: "price_123" }));
+    const res = await POST(makeRequest({ priceId: MONTHLY_PRICE_ID }));
     const body = await res.json();
 
     expect(res.status).toBe(200);
@@ -130,7 +140,7 @@ describe("POST /api/stripe/create-checkout-session", () => {
     expect(body.url).toBe("https://checkout.stripe.com/pay/cs_test_123");
     expect(mockStripe.checkout.sessions.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        line_items: [{ price: "price_123", quantity: 1 }],
+        line_items: [{ price: MONTHLY_PRICE_ID, quantity: 1 }],
         mode: "subscription",
         customer_email: "a@example.com",
         success_url: "https://app.example.com/account?subscription_success=true",
@@ -146,7 +156,7 @@ describe("POST /api/stripe/create-checkout-session", () => {
     );
     mockStripe.checkout.sessions.create.mockResolvedValue({ id: "cs_test_123" });
 
-    await POST(makeRequest({ priceId: "price_123" }));
+    await POST(makeRequest({ priceId: MONTHLY_PRICE_ID }));
 
     const callArg = mockStripe.checkout.sessions.create.mock.calls[0][0];
     expect(callArg.customer).toBe("cus_existing");
@@ -161,7 +171,7 @@ describe("POST /api/stripe/create-checkout-session", () => {
     db.User.findOne.mockResolvedValue(createInstanceMock({ id: "user-1" })); // referrer === self
 
     const res = await POST(
-      makeRequest({ priceId: "price_123", referralCode: "REF1", promotionCodeId: "promo_1" })
+      makeRequest({ priceId: MONTHLY_PRICE_ID, referralCode: "REF1", promotionCodeId: "promo_1" })
     );
 
     expect(res.status).toBe(400);
@@ -174,7 +184,7 @@ describe("POST /api/stripe/create-checkout-session", () => {
     );
     mockStripe.checkout.sessions.create.mockRejectedValue(new Error("stripe down"));
 
-    const res = await POST(makeRequest({ priceId: "price_123" }));
+    const res = await POST(makeRequest({ priceId: MONTHLY_PRICE_ID }));
 
     expect(res.status).toBe(500);
   });

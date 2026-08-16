@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeFetchResponse, makeSession } from "@/test/fixtures";
 
@@ -88,5 +88,83 @@ describe("Header", () => {
       )
     );
     expect(update).toHaveBeenCalledWith({ selectedTheme: "dark" });
+  });
+
+  it("toggles from dark back to the default theme, showing the Sun icon while dark", async () => {
+    const user = userEvent.setup();
+    mockSession = makeSession({ selectedTheme: "dark" });
+    mockStatus = "authenticated";
+    global.fetch.mockImplementation((url, opts) => {
+      if (url === "/api/users/theme" && opts?.method === "PATCH") {
+        return Promise.resolve(makeFetchResponse({ success: true }));
+      }
+      return Promise.reject(new Error(`Unmocked fetch: ${url}`));
+    });
+    render(<Header />);
+
+    // Dark is the active theme, so the toggle shows the Sun icon (switch to
+    // light) rather than the Moon.
+    const toggle = screen.getByTitle("Toggle light/dark theme");
+    expect(toggle.querySelector("svg")).toBeInTheDocument();
+
+    await user.click(toggle);
+
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/users/theme",
+        expect.objectContaining({
+          method: "PATCH",
+          body: JSON.stringify({ themeName: "default" }),
+        })
+      )
+    );
+    expect(update).toHaveBeenCalledWith({ selectedTheme: "default" });
+  });
+
+  it("logs an error when persisting the toggled theme fails", async () => {
+    const user = userEvent.setup();
+    mockSession = makeSession({ selectedTheme: "default" });
+    mockStatus = "authenticated";
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    global.fetch.mockImplementation((url) => Promise.reject(new Error(`network down: ${url}`)));
+    render(<Header />);
+
+    await user.click(screen.getByTitle("Toggle light/dark theme"));
+
+    await waitFor(() =>
+      expect(consoleError).toHaveBeenCalledWith("Failed to update theme", expect.any(Error))
+    );
+    expect(update).not.toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+
+  it("follows the OS color scheme when there is no explicit theme choice, and updates live on change", async () => {
+    let changeHandler;
+    const removeEventListener = vi.fn();
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = vi.fn().mockImplementation((query) => ({
+      matches: true, // OS prefers dark
+      media: query,
+      addEventListener: (event, handler) => {
+        if (event === "change") changeHandler = handler;
+      },
+      removeEventListener,
+    }));
+
+    mockSession = makeSession({ selectedTheme: null });
+    mockStatus = "authenticated";
+    const { unmount } = render(<Header />);
+
+    // No explicit theme, OS prefers dark -> Sun icon shown (dark is current).
+    expect(screen.getByTitle("Toggle light/dark theme").querySelector("svg")).toBeInTheDocument();
+
+    // Simulate the OS switching to light mode while mounted.
+    act(() => {
+      changeHandler({ matches: false });
+    });
+
+    unmount();
+    expect(removeEventListener).toHaveBeenCalledWith("change", changeHandler);
+    window.matchMedia = originalMatchMedia;
   });
 });

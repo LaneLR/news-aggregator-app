@@ -67,6 +67,23 @@ describe("ShareButton", () => {
 
       expect(writeText).toHaveBeenCalledWith("http://localhost:3000/article/article-1");
       expect(await screen.findByText("Copied!")).toBeInTheDocument();
+
+      await vi.waitFor(() => expect(screen.queryByText("Share via Email")).not.toBeInTheDocument(), {
+        timeout: 2000,
+      });
+    });
+
+    it("logs (without throwing) if navigator.clipboard.writeText rejects", async () => {
+      const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+      const user = userEvent.setup();
+      const writeText = vi.fn().mockRejectedValue(new Error("denied"));
+      Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+
+      render(<ShareButton article={article} />);
+      await user.click(screen.getByRole("button", { name: "Share article" }));
+      await user.click(screen.getByRole("button", { name: "Copy Link" }));
+
+      await vi.waitFor(() => expect(consoleError).toHaveBeenCalled());
     });
 
     it("closes the fallback menu when clicking outside", async () => {

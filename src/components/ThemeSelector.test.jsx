@@ -48,6 +48,42 @@ describe("ThemeSelector", () => {
     expect(update).toHaveBeenCalledWith({ selectedTheme: "dark" });
   });
 
+  it("PATCHes null when the 'Auto' swatch is clicked", async () => {
+    mockSession = { user: { selectedTheme: "dark" } };
+    global.fetch.mockResolvedValueOnce(makeFetchResponse({ success: true }));
+    const user = userEvent.setup();
+
+    render(<ThemeSelector />);
+    await user.click(screen.getByRole("button", { name: /Auto/ }));
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "/api/users/theme",
+      expect.objectContaining({
+        method: "PATCH",
+        body: JSON.stringify({ themeName: null }),
+      })
+    );
+    expect(update).toHaveBeenCalledWith({ selectedTheme: null });
+  });
+
+  it("PATCHes 'default' when the 'Light' swatch is clicked", async () => {
+    mockSession = { user: { selectedTheme: "dark" } };
+    global.fetch.mockResolvedValueOnce(makeFetchResponse({ success: true }));
+    const user = userEvent.setup();
+
+    render(<ThemeSelector />);
+    await user.click(screen.getByRole("button", { name: /^Light/ }));
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "/api/users/theme",
+      expect.objectContaining({
+        method: "PATCH",
+        body: JSON.stringify({ themeName: "default" }),
+      })
+    );
+    expect(update).toHaveBeenCalledWith({ selectedTheme: "default" });
+  });
+
   it("logs an error and does not throw when the PATCH fails", async () => {
     mockSession = { user: { selectedTheme: null } };
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});

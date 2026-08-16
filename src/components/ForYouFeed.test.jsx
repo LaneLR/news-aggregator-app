@@ -3,9 +3,23 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeArticle, makeFetchResponse } from "@/test/fixtures";
 
-vi.mock("./NewsCardThree", () => ({ default: ({ article }) => <div>Card:{article.title}</div> }));
+vi.mock("./NewsCardThree", () => ({
+  default: ({ article, innerRef }) => (
+    <div ref={innerRef}>Card:{article.title}</div>
+  ),
+}));
 vi.mock("./ThreePaneLayout", () => ({
-  default: ({ articles }) => <div>ThreePane:{articles.length}</div>,
+  default: ({ articles, onSelectArticle }) => (
+    <div>
+      ThreePane:{articles.length}
+      <button type="button" onClick={() => onSelectArticle(articles[0])}>
+        Select first
+      </button>
+      <button type="button" onClick={() => onSelectArticle(null)}>
+        Clear selection
+      </button>
+    </div>
+  ),
 }));
 vi.mock("./MarkAllReadButton", () => ({
   default: ({ onClick, disabled }) => (
@@ -35,8 +49,12 @@ vi.mock("@/lib/useLayoutPrefs", () => ({
 const markAllRead = { value: { hasUnread: false, markingAllRead: false, handleMarkAllRead: vi.fn() } };
 vi.mock("@/lib/useMarkAllRead", () => ({ useMarkAllRead: () => markAllRead.value }));
 
+const articleShortcuts = { onSelect: null };
 vi.mock("@/lib/useArticleShortcuts", () => ({
-  useArticleShortcuts: () => ({ selectedIndex: -1, cardRefs: { current: [] } }),
+  useArticleShortcuts: (articles, onSelect) => {
+    articleShortcuts.onSelect = onSelect;
+    return { selectedIndex: -1, cardRefs: { current: [] } };
+  },
 }));
 
 const { default: ForYouFeed } = await import("./ForYouFeed");
@@ -78,6 +96,38 @@ describe("ForYouFeed", () => {
     global.fetch.mockResolvedValueOnce(makeFetchResponse({ articles: [article] }));
     render(<ForYouFeed />);
     expect(await screen.findByText("Card:Recommended Story")).toBeInTheDocument();
+  });
+
+  it("selects an article via the keyboard-shortcut callback in reader density", async () => {
+    const article = makeArticle({ id: "shortcut-article" });
+    global.fetch.mockResolvedValueOnce(makeFetchResponse({ articles: [article] }));
+    render(<ForYouFeed />);
+    await screen.findByText("ThreePane:1");
+
+    expect(() => articleShortcuts.onSelect(article)).not.toThrow();
+  });
+
+  it("clears and sets the selected article via ThreePaneLayout's onSelectArticle", async () => {
+    const user = userEvent.setup();
+    const article = makeArticle();
+    global.fetch.mockResolvedValueOnce(makeFetchResponse({ articles: [article] }));
+    render(<ForYouFeed />);
+
+    const selectButton = await screen.findByRole("button", { name: "Select first" });
+    await user.click(selectButton);
+    await user.click(screen.getByRole("button", { name: "Clear selection" }));
+  });
+
+  it("sets the default archive id when the archive-default fetch succeeds", async () => {
+    global.fetch.mockImplementation((url) => {
+      const urlStr = url.toString();
+      if (urlStr === "/api/recommendations") return Promise.resolve(makeFetchResponse({ articles: [] }));
+      if (urlStr === "/api/archives/default") return Promise.resolve(makeFetchResponse({ archiveId: "arch-1" }));
+      return Promise.reject(new Error(`Unmocked fetch: ${urlStr}`));
+    });
+    render(<ForYouFeed />);
+    expect(await screen.findByText("Nothing tailored just yet.")).toBeInTheDocument();
+    expect(global.fetch).toHaveBeenCalledWith("/api/archives/default");
   });
 
   it("shows the mark-all-read button when there is unread content and calls it", async () => {

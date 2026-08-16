@@ -48,4 +48,17 @@ describe("CopyButton", () => {
 
     expect(toast.error).toHaveBeenCalledWith("Clipboard access isn't available in this browser.");
   });
+
+  it("shows 'Failed!' feedback when the clipboard write rejects", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const writeText = vi.fn().mockRejectedValue(new Error("denied"));
+    stubClipboard({ writeText });
+
+    render(<CopyButton textToCopy="https://example.com/shared" />);
+    fireEvent.click(screen.getByRole("button"));
+
+    expect(await screen.findByText("Failed!")).toBeInTheDocument();
+    expect(consoleError).toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
 });

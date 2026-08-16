@@ -15,6 +15,10 @@ function isDue(user, now) {
 }
 
 async function handler(req) {
+  if (!process.env.CRON_SECRET) {
+    console.error("CRON_SECRET is not set — refusing to run send-push-notifications.");
+    return new Response("Unauthorized", { status: 401 });
+  }
   const authHeader = req.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response("Unauthorized", { status: 401 });

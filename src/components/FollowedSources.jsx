@@ -26,6 +26,9 @@ export default function FollowedSources({ initialSources }) {
       setSources(data.followedSources);
     } catch (err) {
       console.error("Failed to unfollow source:", err);
+      setSources((prev) =>
+        prev.includes(sourceName) ? prev : [...prev, sourceName]
+      );
     } finally {
       setSaving(false);
     }

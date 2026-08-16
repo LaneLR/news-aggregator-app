@@ -56,6 +56,42 @@ describe("KeyboardShortcutsSettings", () => {
     expect(screen.getByText(/press a key/i)).toBeInTheDocument();
   });
 
+  it("ignores modifier keys like Tab while listening, staying in listening mode", async () => {
+    const user = userEvent.setup();
+    render(<KeyboardShortcutsSettings initialShortcuts={DEFAULT_KEYBOARD_SHORTCUTS} />);
+
+    await user.click(screen.getByRole("button", { name: "j" }));
+    expect(screen.getByText(/press a key/i)).toBeInTheDocument();
+
+    await user.keyboard("{Tab}");
+
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it("stops listening on blur without changing the shortcut", async () => {
+    const user = userEvent.setup();
+    render(<KeyboardShortcutsSettings initialShortcuts={DEFAULT_KEYBOARD_SHORTCUTS} />);
+
+    await user.click(screen.getByRole("button", { name: "j" }));
+    expect(screen.getByText(/press a key/i)).toBeInTheDocument();
+
+    await user.click(document.body);
+
+    expect(screen.queryByText(/press a key/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "j" })).toBeInTheDocument();
+  });
+
+  it("shows an error message when saving fails", async () => {
+    const user = userEvent.setup();
+    mockPatch(() => makeFetchResponse({ error: "Server exploded" }, { ok: false, status: 500 }));
+    render(<KeyboardShortcutsSettings initialShortcuts={DEFAULT_KEYBOARD_SHORTCUTS} />);
+
+    await user.click(screen.getByRole("button", { name: "j" }));
+    await user.keyboard("n");
+
+    expect(await screen.findByText("Server exploded")).toBeInTheDocument();
+  });
+
   it("resets to defaults when Reset is clicked", async () => {
     const user = userEvent.setup();
     mockPatch(() => makeFetchResponse({ keyboardShortcuts: DEFAULT_KEYBOARD_SHORTCUTS }));

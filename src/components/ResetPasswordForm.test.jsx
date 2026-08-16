@@ -34,6 +34,21 @@ describe("ResetPasswordForm", () => {
     mockSearchParams = new URLSearchParams({ token: "reset-token-1" });
   });
 
+  it("toggles visibility of both password fields", async () => {
+    const user = userEvent.setup();
+    render(<ResetPasswordForm />);
+    const passwordInput = screen.getByLabelText("New Password");
+    const confirmPasswordInput = screen.getByLabelText("Confirm New Password");
+    expect(passwordInput).toHaveAttribute("type", "password");
+    expect(confirmPasswordInput).toHaveAttribute("type", "password");
+
+    await user.click(screen.getAllByRole("button", { name: "Show password" })[0]);
+    expect(passwordInput).toHaveAttribute("type", "text");
+
+    await user.click(screen.getAllByRole("button", { name: "Show password" })[0]);
+    expect(confirmPasswordInput).toHaveAttribute("type", "text");
+  });
+
   it("shows an error when passwords don't match", async () => {
     const user = userEvent.setup();
     render(<ResetPasswordForm />);

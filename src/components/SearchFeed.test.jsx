@@ -18,16 +18,26 @@ vi.mock("./NewsGridWrapper", () => ({
   default: ({ children }) => <div data-testid="grid">{children}</div>,
 }));
 vi.mock("./NewsCardThree", () => ({
-  default: ({ article }) => <div data-testid="card">{article.title}</div>,
+  default: ({ article, innerRef }) => (
+    <div ref={innerRef} data-testid="card">
+      {article.title}
+    </div>
+  ),
 }));
 vi.mock("./ThreePaneLayout", () => ({
-  default: ({ articles }) => (
+  default: ({ articles, onSelectArticle }) => (
     <div data-testid="three-pane">
       {articles.map((a) => (
         <div key={a.url} data-testid="card">
           {a.title}
         </div>
       ))}
+      <button type="button" onClick={() => onSelectArticle(articles[0])}>
+        Select first
+      </button>
+      <button type="button" onClick={() => onSelectArticle(null)}>
+        Clear selection
+      </button>
     </div>
   ),
 }));
@@ -49,8 +59,12 @@ vi.mock("@/lib/useLayoutPrefs", () => ({
 }));
 
 const mockCardRefs = { current: [] };
+const articleShortcuts = { onSelect: null };
 vi.mock("@/lib/useArticleShortcuts", () => ({
-  useArticleShortcuts: () => ({ selectedIndex: -1, cardRefs: mockCardRefs }),
+  useArticleShortcuts: (articles, onSelect) => {
+    articleShortcuts.onSelect = onSelect;
+    return { selectedIndex: -1, cardRefs: mockCardRefs };
+  },
 }));
 
 const mockHandleMarkAllRead = vi.fn();
@@ -250,6 +264,29 @@ describe("SearchFeed", () => {
     await triggerIntersection();
 
     expect(await screen.findByText("No more results", {}, { timeout: 3000 })).toBeInTheDocument();
+  });
+
+  it("selects an article via the keyboard-shortcut callback in reader density", async () => {
+    mockViewDensity = "reader";
+    const article = { url: "https://example.com/1", title: "Reader Density Test", id: "1" };
+    global.fetch.mockResolvedValueOnce(resultsPage([article]));
+    render(<SearchFeed initialQuery="nvidia" />);
+    await screen.findByTestId("three-pane");
+
+    expect(() => articleShortcuts.onSelect(article)).not.toThrow();
+  });
+
+  it("clears and sets the selected article via ThreePaneLayout's onSelectArticle", async () => {
+    mockViewDensity = "reader";
+    const user = userEvent.setup();
+    global.fetch.mockResolvedValueOnce(
+      resultsPage([{ url: "https://example.com/1", title: "Reader Density Test", id: "1" }])
+    );
+    render(<SearchFeed initialQuery="nvidia" />);
+    await screen.findByTestId("three-pane");
+
+    await user.click(screen.getByRole("button", { name: "Select first" }));
+    await user.click(screen.getByRole("button", { name: "Clear selection" }));
   });
 
   it("logs and stops pagination if the search request throws", async () => {

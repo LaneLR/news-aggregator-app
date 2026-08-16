@@ -32,6 +32,17 @@ describe("nativeApp", () => {
       setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) MochaReads-Mobile-App");
       expect(isRunningInNativeApp()).toBe(true);
     });
+
+    it("returns false when navigator is undefined (e.g. during SSR)", () => {
+      const originalNavigator = globalThis.navigator;
+      // @ts-expect-error - simulating a non-browser environment
+      delete globalThis.navigator;
+      try {
+        expect(isRunningInNativeApp()).toBe(false);
+      } finally {
+        globalThis.navigator = originalNavigator;
+      }
+    });
   });
 
   describe("openPaymentUrl", () => {

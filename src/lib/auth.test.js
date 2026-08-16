@@ -32,6 +32,15 @@ vi.mock("bcryptjs", () => ({
   default: { compare: vi.fn() },
 }));
 
+// Real authRateLimitMiddleware tracks state per-IP at module scope, so
+// several authorize() calls in this file (all with no real request/IP)
+// would trip its 5-per-minute limit against each other — mock it the same
+// way every other auth-adjacent route test does.
+const mockRateLimit = vi.fn(async () => {});
+vi.mock("@/lib/rate-limiter", () => ({
+  authRateLimitMiddleware: (...args) => mockRateLimit(...args),
+}));
+
 await import("./auth.js");
 const config = mockNextAuth.mock.calls[0][0];
 // The real CredentialsProvider() (unmocked here — see the docblock note in
@@ -53,6 +62,21 @@ function dbUser(overrides = {}) {
 describe("auth.js NextAuth config", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockRateLimit.mockReset();
+    mockRateLimit.mockResolvedValue(undefined);
+  });
+
+  describe("credentials authorize() rate limiting", () => {
+    it("throws TooManyAttemptsError when the rate limiter rejects", async () => {
+      const rateLimitError = new Error("Too many requests");
+      rateLimitError.status = 429;
+      mockRateLimit.mockRejectedValueOnce(rateLimitError);
+
+      await expect(
+        authorize({ email: "a@example.com", password: "x" }, {})
+      ).rejects.toMatchObject({ code: "too-many-attempts" });
+      expect(db.User.findOne).not.toHaveBeenCalled();
+    });
   });
 
   describe("credentials authorize()", () => {

@@ -41,6 +41,52 @@ describe("GET,POST /api/cron/send-push-notifications", () => {
     expect(res.status).toBe(401);
   });
 
+  it("fails closed when CRON_SECRET itself isn't configured", async () => {
+    const original = process.env.CRON_SECRET;
+    delete process.env.CRON_SECRET;
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const res = await GET(makeRequest("Bearer undefined"));
+      expect(res.status).toBe(401);
+      expect(consoleError).toHaveBeenCalledWith(expect.stringContaining("CRON_SECRET is not set"));
+    } finally {
+      process.env.CRON_SECRET = original;
+    }
+  });
+
+  it("does not re-notify a user whose last push was under 20 hours ago", async () => {
+    db.PushSubscription.findAll.mockResolvedValue([{ userId: "user-1" }]);
+    const user = createInstanceMock({
+      id: "user-1",
+      followedKeywords: ["nvidia"],
+      lastPushSentAt: new Date(Date.now() - 10 * 60 * 60 * 1000),
+    });
+    db.User.findAll.mockResolvedValue([user]);
+
+    const res = await GET(makeRequest(`Bearer ${process.env.CRON_SECRET}`));
+    const body = await res.json();
+
+    expect(body.eligible).toBe(0);
+    expect(mockSendPushToUser).not.toHaveBeenCalled();
+  });
+
+  it("re-notifies a user once 20+ hours have passed since their last push", async () => {
+    db.PushSubscription.findAll.mockResolvedValue([{ userId: "user-1" }]);
+    const user = createInstanceMock({
+      id: "user-1",
+      followedKeywords: ["nvidia"],
+      lastPushSentAt: new Date(Date.now() - 21 * 60 * 60 * 1000),
+    });
+    db.User.findAll.mockResolvedValue([user]);
+    mockGetFollowedArticles.mockResolvedValue([{ title: "Match" }]);
+
+    const res = await GET(makeRequest(`Bearer ${process.env.CRON_SECRET}`));
+    const body = await res.json();
+
+    expect(body.eligible).toBe(1);
+    expect(mockSendPushToUser).toHaveBeenCalled();
+  });
+
   it("short-circuits with eligible:0 when nobody has a push subscription", async () => {
     db.PushSubscription.findAll.mockResolvedValue([]);
 
@@ -91,6 +137,40 @@ describe("GET,POST /api/cron/send-push-notifications", () => {
 
     expect(body.eligible).toBe(0);
     expect(mockSendPushToUser).not.toHaveBeenCalled();
+  });
+
+  it("counts a per-user failure without aborting the rest of the batch", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    db.PushSubscription.findAll.mockResolvedValue([{ userId: "user-1" }, { userId: "user-2" }]);
+    const failingUser = createInstanceMock({
+      id: "user-1",
+      email: "fails@b.com",
+      followedKeywords: ["nvidia"],
+      lastPushSentAt: null,
+    });
+    const okUser = createInstanceMock({
+      id: "user-2",
+      email: "ok@b.com",
+      followedKeywords: ["tesla"],
+      lastPushSentAt: null,
+    });
+    db.User.findAll.mockResolvedValue([failingUser, okUser]);
+    mockGetFollowedArticles
+      .mockRejectedValueOnce(new Error("db down"))
+      .mockResolvedValueOnce([]);
+
+    const res = await GET(makeRequest(`Bearer ${process.env.CRON_SECRET}`));
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.sent).toBe(1);
+    expect(body.failed).toBe(1);
+    expect(consoleError).toHaveBeenCalledWith(
+      expect.stringContaining("Failed to send push notification to fails@b.com"),
+      expect.any(Error)
+    );
+    expect(failingUser.update).not.toHaveBeenCalled();
+    expect(okUser.update).toHaveBeenCalledWith({ lastPushSentAt: expect.any(Date) });
   });
 
   it("returns 500 when the job throws unexpectedly", async () => {

@@ -9,8 +9,8 @@ vi.mock("next-auth/react", () => ({
 }));
 
 vi.mock("./NewsCardThree", () => ({
-  default: ({ article, isSelected, onToggleSelect, selectionMode }) => (
-    <div>
+  default: ({ article, isSelected, onToggleSelect, selectionMode, innerRef }) => (
+    <div ref={innerRef}>
       Card:{article.title}
       {selectionMode && (
         <button type="button" onClick={onToggleSelect}>
@@ -215,6 +215,51 @@ describe("CategoryPage", () => {
     expect(await screen.findByText("Card:Page Two Story")).toBeInTheDocument();
     expect(screen.getByText("Card:Page One Story")).toBeInTheDocument();
     expect(await screen.findByText("You're all caught up.")).toBeInTheDocument();
+  });
+
+  it("switches from Trending back to Latest and reloads for a signed-in user", async () => {
+    const user = userEvent.setup();
+    mockSession.value = { user: { id: "user-1" } };
+    mockFetchRoutes([
+      [/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })],
+      [/\/api\/articles\/business\?sort=trending/, () => makeFetchResponse({ articles: [makeArticle({ title: "Trending Story" })], totalPages: 1 })],
+      [/\/api\/articles\/business\?sort=latest/, () => makeFetchResponse({ articles: [makeArticle({ title: "Latest Story" })], totalPages: 1 })],
+    ]);
+
+    render(<CategoryPage category="business" initialArticles={[makeArticle({ title: "SSR Story" })]} initialTotalPages={1} />);
+    await user.click(screen.getByRole("button", { name: "Trending" }));
+    expect(await screen.findByText("Card:Trending Story")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Latest" }));
+    expect(await screen.findByText("Card:Latest Story")).toBeInTheDocument();
+  });
+
+  it("switches to Most Liked for a signed-in user", async () => {
+    const user = userEvent.setup();
+    mockSession.value = { user: { id: "user-1" } };
+    mockFetchRoutes([
+      [/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })],
+      [/\/api\/articles\/business\?sort=liked/, () => makeFetchResponse({ articles: [makeArticle({ title: "Liked Story" })], totalPages: 1 })],
+    ]);
+
+    render(<CategoryPage category="business" initialArticles={[makeArticle({ title: "Latest Story" })]} initialTotalPages={1} />);
+    await user.click(screen.getByRole("button", { name: "Most Liked" }));
+
+    expect(await screen.findByText("Card:Liked Story")).toBeInTheDocument();
+  });
+
+  it("deselects a previously-selected article in bulk-select mode", async () => {
+    const user = userEvent.setup();
+    mockSession.value = { user: { id: "user-1" } };
+    mockFetchRoutes([[/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })]]);
+
+    render(<CategoryPage category="business" initialArticles={[makeArticle({ title: "Toggle Story" })]} initialTotalPages={1} />);
+    await user.click(screen.getByRole("button", { name: "Select" }));
+    await user.click(screen.getByRole("button", { name: /Select:Toggle Story/ }));
+    expect(screen.getByText("1 selected")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /Selected:Toggle Story/ }));
+    expect(screen.queryByText("1 selected")).not.toBeInTheDocument();
   });
 
   it("shows a sign-in prompt instead of fetching when a signed-out user selects Trending", async () => {
