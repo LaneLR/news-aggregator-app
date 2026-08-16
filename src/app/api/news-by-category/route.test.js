@@ -81,13 +81,41 @@ describe("GET /api/news-by-category", () => {
     const article = articleInstance({ url: "https://example.com/a" });
     db.Article.findAll.mockResolvedValue([article]);
     db.ArticleLike.findAll.mockResolvedValue([{ articleUrl: "https://example.com/a" }]);
-    db.ReadArticle.findAll.mockResolvedValue([]);
+    db.ReadArticle.findAll.mockResolvedValue([{ articleUrl: "https://example.com/a" }]);
 
     const res = await GET(makeRequest());
     const body = await res.json();
 
     expect(body.categories.Business[0].isLikedByUser).toBe(true);
-    expect(body.categories.Business[0].isRead).toBe(false);
+    expect(body.categories.Business[0].isRead).toBe(true);
+  });
+
+  it("excludes muted-keyword titles from every category's query", async () => {
+    mockAuth.mockResolvedValue(makeSession({ tier: "Subscribed", id: "user-1" }));
+    db.User.findByPk.mockResolvedValue({
+      mutedKeywords: ["crypto"],
+      homeSections: ["Business"],
+    });
+    db.Article.findAll.mockResolvedValue([]);
+
+    await GET(makeRequest());
+
+    const whereArg = db.Article.findAll.mock.calls[0][0].where;
+    const andKey = Object.getOwnPropertySymbols(whereArg)[0];
+    // category-contains condition + the muted-keyword exclusion fragment.
+    expect(whereArg[andKey].length).toBe(2);
+  });
+
+  it("falls back to default home sections when the session's user no longer exists", async () => {
+    mockAuth.mockResolvedValue(makeSession({ tier: "Subscribed", id: "user-1" }));
+    db.User.findByPk.mockResolvedValue(null);
+    db.Article.findAll.mockResolvedValue([]);
+
+    const res = await GET(makeRequest());
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.showForYou).toBe(true);
   });
 
   it("returns 500 on an unexpected error", async () => {

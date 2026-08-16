@@ -303,6 +303,35 @@ describe("NewsCardThree", () => {
     expect(screen.getByRole("link", { name: "Read article" })).toHaveAttribute("href", article.url);
   });
 
+  it("calls onSelect instead of navigating when the thumbnail image link is clicked", async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    const article = makeArticle({ title: "Selectable Story" });
+    render(<NewsCardThree article={article} viewOnly onSelect={onSelect} />);
+
+    await user.click(screen.getByAltText("Selectable Story"));
+
+    expect(onSelect).toHaveBeenCalledTimes(1);
+  });
+
+  it("logs an error but does not throw when marking read via swipe fails", async () => {
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockSession = makeSession();
+    const article = makeArticle({ isRead: false });
+    mockRoutes([...ARCHIVE_ROUTES, ["/api/articles/mark-all-read", () => Promise.reject(new Error("network down"))]]);
+    const { container } = render(<NewsCardThree article={article} viewOnly />);
+    const wrapper = container.firstChild;
+
+    fireEvent.touchStart(wrapper, { touches: [{ clientX: 200 }] });
+    fireEvent.touchMove(wrapper, { touches: [{ clientX: 100 }] });
+    fireEvent.touchEnd(wrapper);
+
+    await waitFor(() =>
+      expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to mark article as read:", expect.any(Error))
+    );
+    consoleErrorSpy.mockRestore();
+  });
+
   it("renders without a category-color top border when the article has no category", () => {
     const article = makeArticle({ category: [] });
     const { container } = render(<NewsCardThree article={article} viewOnly />);

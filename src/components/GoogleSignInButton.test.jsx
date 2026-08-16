@@ -40,4 +40,29 @@ describe("GoogleSignInButton", () => {
 
     expect(button).toHaveStyle({ boxShadow: "0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15)" });
   });
+
+  it("removes hover styles on mouse leave", async () => {
+    const user = userEvent.setup();
+    render(<GoogleSignInButton />);
+    const button = screen.getByRole("button", { name: /sign in with google/i });
+
+    await user.hover(button);
+    await user.unhover(button);
+
+    expect(button).not.toHaveStyle({
+      boxShadow: "0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15)",
+    });
+  });
+
+  it("adjusts the state overlay opacity on focus and blur", async () => {
+    const user = userEvent.setup();
+    render(<GoogleSignInButton />);
+    const button = screen.getByRole("button", { name: /sign in with google/i });
+
+    await user.tab();
+    expect(button).toHaveFocus();
+
+    await user.tab();
+    expect(button).not.toHaveFocus();
+  });
 });

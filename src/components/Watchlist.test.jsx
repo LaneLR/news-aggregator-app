@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeFetchResponse } from "@/test/fixtures";
 import Watchlist from "./Watchlist";
@@ -106,5 +106,77 @@ describe("Watchlist", () => {
     await user.click(screen.getByRole("button", { name: "Add" }));
 
     expect(await screen.findByText("Already on your watchlist.")).toBeInTheDocument();
+  });
+
+  it("blocks adding a symbol once the max of 8 is reached", async () => {
+    const symbols = ["AAA", "BBB", "CCC", "DDD", "EEE", "FFF", "GGG", "HHH"];
+    mockLoadResponse({
+      configured: true,
+      symbols,
+      quotes: symbols.map((symbol) => ({ symbol, price: 10, change: 1, changePercent: 1 })),
+    });
+    const { container } = render(<Watchlist />);
+    await screen.findByText("AAA");
+
+    const input = screen.getByPlaceholderText("Limit of 8 reached");
+    expect(input).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Add" })).toBeDisabled();
+
+    // The input/button are disabled at the limit, so force a draft value in
+    // directly and submit the form itself to exercise the limit-check branch
+    // that guards persistSymbols (e.g. reached via a stale ref or fast typing
+    // right as the 8th symbol lands).
+    fireEvent.change(input, { target: { value: "ZZZ" } });
+    fireEvent.submit(container.querySelector("form"));
+    expect(await screen.findByText("You can track up to 8 symbols.")).toBeInTheDocument();
+  });
+
+  it("sets an error state when the initial load response isn't ok", async () => {
+    global.fetch.mockResolvedValueOnce(makeFetchResponse({}, { ok: false }));
+    const { container } = render(<Watchlist />);
+
+    await vi.waitFor(() => expect(container.querySelector("form")).toBeInTheDocument());
+    expect(container.querySelector('[class*="card"]')).not.toBeInTheDocument();
+    expect(screen.queryByText("Add a ticker above to track it alongside the major indices.")).not.toBeInTheDocument();
+  });
+
+  it("silently records failure to load the watchlist", async () => {
+    global.fetch.mockRejectedValueOnce(new Error("network down"));
+    const { container } = render(<Watchlist />);
+
+    await vi.waitFor(() => expect(container.querySelector("form")).toBeInTheDocument());
+    expect(screen.queryByText("Add a ticker above to track it alongside the major indices.")).not.toBeInTheDocument();
+  });
+
+  it("does nothing when the add form is submitted with an empty draft", async () => {
+    mockLoadResponse({ configured: true, symbols: [], quotes: [] });
+    const user = userEvent.setup();
+    render(<Watchlist />);
+    await screen.findByPlaceholderText("Add a ticker (e.g. AAPL)…");
+
+    await user.click(screen.getByRole("button", { name: "Add" }));
+
+    expect(global.fetch).toHaveBeenCalledTimes(1); // only the initial load
+    expect(screen.queryByText(/Not a valid ticker/)).not.toBeInTheDocument();
+  });
+
+  it("logs and recovers when persisting the watchlist fails", async () => {
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockLoadResponse({ configured: true, symbols: [], quotes: [] });
+    const user = userEvent.setup();
+    render(<Watchlist />);
+    await screen.findByPlaceholderText("Add a ticker (e.g. AAPL)…");
+
+    global.fetch.mockResolvedValueOnce(makeFetchResponse({}, { ok: false })); // PATCH fails
+
+    await user.type(screen.getByPlaceholderText("Add a ticker (e.g. AAPL)…"), "aapl");
+    await user.click(screen.getByRole("button", { name: "Add" }));
+
+    await vi.waitFor(() =>
+      expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to update watchlist:", expect.any(Error))
+    );
+    await vi.waitFor(() => expect(screen.getByRole("button", { name: "Add" })).not.toBeDisabled());
+
+    consoleErrorSpy.mockRestore();
   });
 });

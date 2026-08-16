@@ -39,6 +39,19 @@ describe("RegisterPage", () => {
     expect(passwordInput).toHaveAttribute("type", "text");
   });
 
+  it("toggles confirm password visibility", async () => {
+    const user = userEvent.setup();
+    render(<RegisterPage />);
+    const confirmPasswordInput = screen.getByPlaceholderText("Re-enter your password");
+    expect(confirmPasswordInput).toHaveAttribute("type", "password");
+
+    await user.click(screen.getAllByRole("button", { name: "Show password" })[1]);
+    expect(confirmPasswordInput).toHaveAttribute("type", "text");
+
+    await user.click(screen.getByRole("button", { name: "Hide password" }));
+    expect(confirmPasswordInput).toHaveAttribute("type", "password");
+  });
+
   it("shows an error and does not submit when passwords don't match", async () => {
     const user = userEvent.setup();
     render(<RegisterPage />);

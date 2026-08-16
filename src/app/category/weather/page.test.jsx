@@ -27,6 +27,19 @@ describe("WeatherNewsPage", () => {
     expect(props.category).toBe("Weather");
   });
 
+  it("renders CategoryPage with undefined articles/totalPages when the fetch throws", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockGetCategoryArticles.mockRejectedValueOnce(new Error("db down"));
+
+    const element = await WeatherNewsPage();
+    render(element);
+
+    const props = JSON.parse(screen.getByTestId("category-page").textContent);
+    expect(props.initialArticles).toBeUndefined();
+    expect(props.initialTotalPages).toBeUndefined();
+    expect(consoleError).toHaveBeenCalled();
+  });
+
   it("exports page metadata", () => {
     expect(metadata.title).toBe("Weather News");
   });

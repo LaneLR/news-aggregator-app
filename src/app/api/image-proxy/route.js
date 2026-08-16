@@ -67,8 +67,16 @@ async function assertSafeUrl(urlString) {
     throw new Error("Unsupported protocol");
   }
 
-  const hostname = parsed.hostname;
-  if (hostname === "localhost") throw new Error("Blocked host");
+  if (parsed.hostname === "localhost") throw new Error("Blocked host");
+
+  // WHATWG URL wraps an IPv6 literal host in brackets ("[::1]"), but
+  // net.isIP only recognizes the bracket-less form — without stripping
+  // them, every IPv6-literal URL fails this check and silently falls
+  // through to the DNS-lookup branch below instead of being blocked here.
+  const hostname =
+    parsed.hostname.startsWith("[") && parsed.hostname.endsWith("]")
+      ? parsed.hostname.slice(1, -1)
+      : parsed.hostname;
 
   if (net.isIP(hostname)) {
     if (isBlockedIp(hostname)) throw new Error("Blocked host");

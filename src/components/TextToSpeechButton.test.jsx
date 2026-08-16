@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 const push = vi.fn();
@@ -79,6 +79,40 @@ describe("TextToSpeechButton", () => {
     await user.click(screen.getByRole("button", { name: "Resume" }));
     expect(window.speechSynthesis.resume).toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
+  });
+
+  it("cancels any in-progress speech when unmounted", () => {
+    const { unmount } = render(<TextToSpeechButton text="Some article text" isSubscribed />);
+    unmount();
+    expect(window.speechSynthesis.cancel).toHaveBeenCalled();
+  });
+
+  it("returns to idle when the utterance finishes naturally", async () => {
+    const user = userEvent.setup();
+    render(<TextToSpeechButton text="Some article text" isSubscribed />);
+
+    await user.click(screen.getByRole("button", { name: "Listen" }));
+    const utterance = window.SpeechSynthesisUtterance.mock.instances[0];
+    act(() => {
+      utterance.onend();
+    });
+
+    expect(screen.getByRole("button", { name: "Listen" })).toBeInTheDocument();
+    expect(screen.queryByTitle("Stop")).not.toBeInTheDocument();
+  });
+
+  it("returns to idle when the utterance errors out", async () => {
+    const user = userEvent.setup();
+    render(<TextToSpeechButton text="Some article text" isSubscribed />);
+
+    await user.click(screen.getByRole("button", { name: "Listen" }));
+    const utterance = window.SpeechSynthesisUtterance.mock.instances[0];
+    act(() => {
+      utterance.onerror();
+    });
+
+    expect(screen.getByRole("button", { name: "Listen" })).toBeInTheDocument();
+    expect(screen.queryByTitle("Stop")).not.toBeInTheDocument();
   });
 
   it("stops playback and returns to idle, hiding the stop button", async () => {

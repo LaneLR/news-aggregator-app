@@ -27,6 +27,19 @@ describe("WorldNewsPage", () => {
     expect(props.category).toBe("World");
   });
 
+  it("renders CategoryPage with undefined articles/totalPages when the fetch throws", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockGetCategoryArticles.mockRejectedValueOnce(new Error("db down"));
+
+    const element = await WorldNewsPage();
+    render(element);
+
+    const props = JSON.parse(screen.getByTestId("category-page").textContent);
+    expect(props.initialArticles).toBeUndefined();
+    expect(props.initialTotalPages).toBeUndefined();
+    expect(consoleError).toHaveBeenCalled();
+  });
+
   it("exports page metadata", () => {
     expect(metadata.title).toBe("World News");
   });

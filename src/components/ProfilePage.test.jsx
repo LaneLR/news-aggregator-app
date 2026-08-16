@@ -61,6 +61,21 @@ describe("ProfilePage", () => {
     expect(screen.getByRole("button", { name: "Upgrade to Pro" })).toBeInTheDocument();
   });
 
+  it("navigates to /pricing when a Free user clicks Upgrade to Pro", () => {
+    const originalLocation = window.location;
+    delete window.location;
+    window.location = { href: "" };
+
+    mockSession = makeSession({ tier: "Free" });
+    mockStatus = "authenticated";
+    render(<ProfilePage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Upgrade to Pro" }));
+
+    expect(window.location.href).toBe("/pricing");
+    window.location = originalLocation;
+  });
+
   it("shows subscription details and Manage/Cancel buttons for a subscribed user", () => {
     mockSession = makeSession({
       tier: "Subscribed",

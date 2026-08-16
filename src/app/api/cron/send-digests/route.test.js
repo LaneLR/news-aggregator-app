@@ -50,6 +50,46 @@ describe("GET,POST /api/cron/send-digests", () => {
     expect(res.status).toBe(401);
   });
 
+  it("fails closed when CRON_SECRET itself isn't configured", async () => {
+    const original = process.env.CRON_SECRET;
+    delete process.env.CRON_SECRET;
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const res = await GET(makeRequest("Bearer undefined"));
+      expect(res.status).toBe(401);
+      expect(consoleError).toHaveBeenCalledWith(expect.stringContaining("CRON_SECRET is not set"));
+    } finally {
+      process.env.CRON_SECRET = original;
+    }
+  });
+
+  it.each([
+    { frequency: "daily", hoursAgo: 10, expectDue: false },
+    { frequency: "daily", hoursAgo: 21, expectDue: true },
+    { frequency: "weekly", hoursAgo: 24, expectDue: false },
+    { frequency: "weekly", hoursAgo: 7 * 24 + 1, expectDue: true },
+  ])(
+    "only treats a $frequency user as due after enough time has passed (expectDue=$expectDue)",
+    async ({ frequency, hoursAgo, expectDue }) => {
+      const user = createInstanceMock({
+        id: "user-1",
+        email: "a@b.com",
+        tier: "Free",
+        digestFrequency: frequency,
+        digestFeedId: null,
+        lastDigestSentAt: new Date(Date.now() - hoursAgo * 60 * 60 * 1000),
+      });
+      db.User.findAll.mockResolvedValue([user]);
+      mockGetDigestArticles.mockResolvedValue([{ article: { id: 1 }, reason: null }]);
+
+      const res = await GET(makeRequest(`Bearer ${process.env.CRON_SECRET}`));
+      const body = await res.json();
+
+      expect(body.eligible).toBe(expectDue ? 1 : 0);
+      expect(mockSendEmail).toHaveBeenCalledTimes(expectDue ? 1 : 0);
+    }
+  );
+
   it("skips users with nothing to send but still marks them processed", async () => {
     const user = createInstanceMock({
       id: "user-1",
@@ -139,6 +179,46 @@ describe("GET,POST /api/cron/send-digests", () => {
     expect(mockBuildDigestHtml).toHaveBeenCalledWith(
       expect.objectContaining({ feedTitle: "My Feed" })
     );
+  });
+
+  it("counts a per-user failure without aborting the rest of the batch", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const failingUser = createInstanceMock({
+      id: "user-1",
+      email: "fails@b.com",
+      tier: "Free",
+      digestFrequency: "weekly",
+      digestFeedId: null,
+      lastDigestSentAt: null,
+    });
+    const okUser = createInstanceMock({
+      id: "user-2",
+      email: "ok@b.com",
+      tier: "Free",
+      digestFrequency: "weekly",
+      digestFeedId: null,
+      lastDigestSentAt: null,
+    });
+    db.User.findAll.mockResolvedValue([failingUser, okUser]);
+    mockGetDigestArticles.mockResolvedValue([{ article: { id: 1 }, reason: null }]);
+    mockSendEmail
+      .mockRejectedValueOnce(new Error("resend down"))
+      .mockResolvedValueOnce(undefined);
+
+    const res = await GET(makeRequest(`Bearer ${process.env.CRON_SECRET}`));
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.sent).toBe(1);
+    expect(body.failed).toBe(1);
+    expect(consoleError).toHaveBeenCalledWith(
+      expect.stringContaining("Failed to send digest to fails@b.com"),
+      expect.any(Error)
+    );
+    // The failing user's lastDigestSentAt is NOT bumped (still eligible to
+    // retry next run), the successful one's is.
+    expect(failingUser.update).not.toHaveBeenCalled();
+    expect(okUser.update).toHaveBeenCalledWith({ lastDigestSentAt: expect.any(Date) });
   });
 
   it("returns 500 when the job throws unexpectedly", async () => {

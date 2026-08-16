@@ -27,6 +27,19 @@ describe("PoliticsNewsPage", () => {
     expect(props.category).toBe("Politics");
   });
 
+  it("renders CategoryPage with undefined articles/totalPages when the fetch throws", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockGetCategoryArticles.mockRejectedValueOnce(new Error("db down"));
+
+    const element = await PoliticsNewsPage();
+    render(element);
+
+    const props = JSON.parse(screen.getByTestId("category-page").textContent);
+    expect(props.initialArticles).toBeUndefined();
+    expect(props.initialTotalPages).toBeUndefined();
+    expect(consoleError).toHaveBeenCalled();
+  });
+
   it("exports page metadata", () => {
     expect(metadata.title).toBe("Politics News");
   });

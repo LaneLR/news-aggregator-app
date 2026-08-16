@@ -40,6 +40,17 @@ describe("GET /api/feeds/opml", () => {
     expect(text).toContain('text="CNN"');
   });
 
+  it("handles a feed with no sourceNames/categories at all", async () => {
+    mockAuth.mockResolvedValue(makeSession());
+    db.Feed.findAll.mockResolvedValue([{ title: "Empty Feed", sourceNames: null, categories: null }]);
+
+    const res = await GET();
+    const text = await res.text();
+
+    expect(res.status).toBe(200);
+    expect(text).toContain('text="Empty Feed"');
+  });
+
   it("returns 500 on an unexpected error", async () => {
     mockAuth.mockResolvedValue(makeSession());
     db.Feed.findAll.mockRejectedValue(new Error("db down"));

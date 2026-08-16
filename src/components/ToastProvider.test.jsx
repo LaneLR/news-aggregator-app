@@ -9,6 +9,7 @@ function TriggerButtons() {
       <button onClick={() => toast.success("Saved!")}>fire-success</button>
       <button onClick={() => toast.error("Something broke")}>fire-error</button>
       <button onClick={() => toast.info("FYI", { title: "Heads up" })}>fire-info-title</button>
+      <button onClick={() => toast.warning("Careful now")}>fire-warning</button>
       <button onClick={() => toast.show("No auto-dismiss", { duration: 0 })}>fire-no-duration</button>
     </div>
   );
@@ -29,6 +30,28 @@ describe("ToastProvider", () => {
       return <button onClick={() => toast.success("x")}>fire</button>;
     }
     expect(() => render(<Standalone />)).not.toThrow();
+  });
+
+  it("every default no-op on the context (outside a provider) is safe to call", () => {
+    function Standalone() {
+      const toast = useToast();
+      return (
+        <button
+          onClick={() => {
+            toast.show("x");
+            toast.success("x");
+            toast.error("x");
+            toast.warning("x");
+            toast.info("x");
+            toast.dismiss(1);
+          }}
+        >
+          fire-all
+        </button>
+      );
+    }
+    render(<Standalone />);
+    expect(() => fireEvent.click(screen.getByText("fire-all"))).not.toThrow();
   });
 
   it("shows a toast with the correct role when success/error/info is called", () => {
@@ -109,6 +132,17 @@ describe("ToastProvider", () => {
     });
 
     expect(screen.queryByText("Saved!")).not.toBeInTheDocument();
+  });
+
+  it("shows a warning toast with a status role", () => {
+    render(
+      <ToastProvider>
+        <TriggerButtons />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText("fire-warning"));
+    expect(screen.getByText("Careful now")).toBeInTheDocument();
   });
 
   it("can show multiple toasts stacked at once", () => {

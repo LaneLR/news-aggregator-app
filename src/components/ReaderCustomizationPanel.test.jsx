@@ -34,6 +34,23 @@ describe("ReaderCustomizationPanel", () => {
     expect(onChange).toHaveBeenCalledWith({ fontSize: "large" });
   });
 
+  it("calls onChange for font family, line height, and content width controls", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(<ReaderCustomizationPanel prefs={defaultPrefs} onChange={onChange} onReset={vi.fn()} />);
+
+    await user.click(screen.getByRole("button", { name: "Reading display settings" }));
+
+    await user.click(screen.getByRole("button", { name: "Serif" }));
+    expect(onChange).toHaveBeenCalledWith({ fontFamily: "serif" });
+
+    await user.click(screen.getByRole("button", { name: "Relaxed" }));
+    expect(onChange).toHaveBeenCalledWith({ lineHeight: "relaxed" });
+
+    await user.click(screen.getByRole("button", { name: "Wide" }));
+    expect(onChange).toHaveBeenCalledWith({ contentWidth: "wide" });
+  });
+
   it("calls onReset when 'Reset to default' is clicked", async () => {
     const onReset = vi.fn();
     const user = userEvent.setup();

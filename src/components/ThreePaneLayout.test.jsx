@@ -15,8 +15,8 @@ vi.mock("next/navigation", () => ({
 // files — stubbed here so ThreePaneLayout's own wiring (selection, fetch,
 // full-screen, focus trap) can be tested in isolation.
 vi.mock("./NewsCardThree", () => ({
-  default: ({ article, onSelect }) => (
-    <div>
+  default: ({ article, onSelect, innerRef }) => (
+    <div ref={typeof innerRef === "function" ? innerRef : undefined}>
       <button type="button" onClick={onSelect}>
         {article.title}
       </button>
@@ -110,6 +110,61 @@ describe("ThreePaneLayout", () => {
 
     expect(await screen.findByRole("heading", { name: "Article One" })).toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it("falls back to an empty error body when the failed response isn't valid JSON", async () => {
+    global.fetch.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      json: () => Promise.reject(new Error("not json")),
+    });
+
+    renderLayout({ selectedArticleId: "a1" });
+
+    expect(await screen.findByText("Couldn't load this article.")).toBeInTheDocument();
+  });
+
+  it("selects the article when clicking blank list-item space, not just the title link", async () => {
+    const user = userEvent.setup();
+    const { onSelectArticle } = renderLayout();
+
+    // The mocked NewsCardThree renders its own wrapping div around the
+    // button — ThreePaneLayout's .listItem div (the "blank space" this
+    // handler exists for) is one level further up.
+    const listItem = screen.getByRole("button", { name: "Article One" }).closest("div").parentElement;
+    await user.click(listItem);
+
+    expect(onSelectArticle).toHaveBeenCalledWith(articles[0]);
+  });
+
+  it("closes the reader when ArticleReader's onClose fires", async () => {
+    global.fetch.mockResolvedValueOnce(
+      makeFetchResponse({ article: { title: "Article One" }, sanitizedContent: "<p>body</p>", relatedCoverage: [], readingTime: 1 })
+    );
+    const user = userEvent.setup();
+
+    const { onSelectArticle } = renderLayout({ selectedArticleId: "a1" });
+    await screen.findByRole("heading", { name: "Article One" });
+
+    await user.click(screen.getByRole("button", { name: "Close" }));
+
+    expect(onSelectArticle).toHaveBeenCalledWith(null);
+  });
+
+  it("wires each list item's DOM node into cardRefs by index", () => {
+    const cardRefs = { current: [] };
+    render(
+      <ThreePaneLayout
+        articles={articles}
+        selectedIndex={-1}
+        cardRefs={cardRefs}
+        selectedArticleId={null}
+        onSelectArticle={vi.fn()}
+      />
+    );
+
+    expect(cardRefs.current[0]).toBeInstanceOf(HTMLElement);
+    expect(cardRefs.current[1]).toBeInstanceOf(HTMLElement);
   });
 
   it("calls onSelectArticle when clicking a card's title", async () => {

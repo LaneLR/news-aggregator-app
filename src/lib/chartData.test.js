@@ -128,6 +128,32 @@ describe("getChartRange", () => {
     expect(result.points[0].price).toBe(100);
   });
 
+  it("aborts the Yahoo request if it takes longer than the timeout", async () => {
+    vi.useFakeTimers();
+    try {
+      const MarketChartCache = makeCacheModel({ cached: null });
+      global.fetch = vi.fn(
+        (url, opts) =>
+          new Promise((resolve, reject) => {
+            opts.signal.addEventListener("abort", () => {
+              const err = new Error("The operation was aborted");
+              err.name = "AbortError";
+              reject(err);
+            });
+          })
+      );
+      vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const resultPromise = getChartRange(MarketChartCache, "SPY", "1d");
+      await vi.advanceTimersByTimeAsync(8000);
+      const result = await resultPromise;
+
+      expect(result).toEqual({ points: [], updatedAt: null });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("exposes a config entry for every documented range", () => {
     for (const range of ["1d", "5d", "1mo", "3mo", "6mo", "1y", "5y", "10y", "max"]) {
       expect(CHART_RANGES[range]).toBeDefined();

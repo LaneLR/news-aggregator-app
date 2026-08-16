@@ -165,6 +165,83 @@ describe("ArchiveToggleButton", () => {
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith("Nope"));
   });
 
+  it("logs a warning and leaves the article unsaved when the check endpoint returns non-OK", async () => {
+    const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    mockFetchRoutes([
+      ["/api/archives", () => makeFetchResponse({ archives: [] })],
+      [
+        /\/api\/articles\/check/,
+        () => ({ ok: false, status: 500, text: () => Promise.resolve("server error") }),
+      ],
+    ]);
+
+    render(<ArchiveToggleButton article={article} viewOnly />);
+
+    await waitFor(() => expect(consoleWarn).toHaveBeenCalledWith("Check failed:", "server error"));
+    expect(screen.getByRole("button", { name: "Save to archive" })).toBeInTheDocument();
+    consoleWarn.mockRestore();
+  });
+
+  it("logs an error when the check request itself throws", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    global.fetch.mockImplementation((url) => {
+      if (url.toString() === "/api/archives") return Promise.resolve(makeFetchResponse({ archives: [] }));
+      if (url.toString().includes("/api/articles/check")) return Promise.reject(new Error("network down"));
+      return Promise.reject(new Error(`Unmocked fetch: ${url}`));
+    });
+
+    render(<ArchiveToggleButton article={article} viewOnly />);
+
+    await waitFor(() =>
+      expect(consoleError).toHaveBeenCalledWith("Error checking saved status:", expect.any(Error))
+    );
+    consoleError.mockRestore();
+  });
+
+  it("shows an error toast and logs when saving throws a network error", async () => {
+    const user = userEvent.setup();
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    global.fetch.mockImplementation((url) => {
+      if (url.toString() === "/api/archives")
+        return Promise.resolve(makeFetchResponse({ archives: [{ id: "archive-1", name: "Reading list" }] }));
+      if (url.toString().includes("/api/articles/check")) return Promise.resolve(makeFetchResponse({ saved: false }));
+      if (url.toString().includes("/api/archives/archive-1/articles")) return Promise.reject(new Error("network down"));
+      return Promise.reject(new Error(`Unmocked fetch: ${url}`));
+    });
+
+    render(<ArchiveToggleButton article={article} viewOnly />);
+
+    await user.click(await screen.findByRole("button", { name: "Save to archive" }));
+    await user.click(await screen.findByRole("button", { name: "Reading list" }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Failed to save article. Check your connection and try again.")
+    );
+    expect(consoleError).toHaveBeenCalledWith("Error saving article:", expect.any(Error));
+    consoleError.mockRestore();
+  });
+
+  it("shows an error toast and logs when removal throws a network error", async () => {
+    const user = userEvent.setup();
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    global.fetch.mockImplementation((url) => {
+      if (url.toString() === "/api/archives") return Promise.resolve(makeFetchResponse({ archives: [] }));
+      if (url.toString().includes("/api/archives/archive-1/articles/article-1"))
+        return Promise.reject(new Error("network down"));
+      return Promise.reject(new Error(`Unmocked fetch: ${url}`));
+    });
+
+    render(<ArchiveToggleButton article={article} archiveId="archive-1" />);
+
+    await user.click(screen.getByRole("button", { name: "Remove from archive" }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Failed to remove article. Check your connection and try again.")
+    );
+    expect(consoleError).toHaveBeenCalledWith("Error removing article:", expect.any(Error));
+    consoleError.mockRestore();
+  });
+
   it("shows an error toast when removal fails", async () => {
     const user = userEvent.setup();
     mockFetchRoutes([

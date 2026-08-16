@@ -93,7 +93,43 @@ describe("HeroCarousel", () => {
     await screen.findByRole("heading", { name: /for you/i });
 
     await user.click(screen.getByRole("button", { name: "Trending" }));
-
     expect(await screen.findByRole("heading", { name: /trending/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "For You" }));
+    expect(await screen.findByRole("heading", { name: /for you/i })).toBeInTheDocument();
+  });
+
+  it("switches back to Most Read sort after Most Liked was selected", async () => {
+    const user = userEvent.setup();
+    mockSession = null;
+    mockRoutes([[/\/api\/articles\/trending/, () => makeFetchResponse({ articles: [] })]]);
+    render(<HeroCarousel />);
+    await screen.findByText(/nothing trending right now/i);
+
+    await user.click(screen.getByRole("button", { name: "Most Liked" }));
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenLastCalledWith(expect.stringContaining("sort=liked"))
+    );
+
+    await user.click(screen.getByRole("button", { name: "Most Read" }));
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenLastCalledWith(expect.stringContaining("sort=trending"))
+    );
+  });
+
+  it("logs an error and stops loading when the fetch fails", async () => {
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockSession = null;
+    mockRoutes([]);
+    render(<HeroCarousel />);
+
+    await waitFor(() =>
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Failed to load hero carousel articles:",
+        expect.any(Error)
+      )
+    );
+    expect(await screen.findByText(/nothing trending right now/i)).toBeInTheDocument();
+    consoleErrorSpy.mockRestore();
   });
 });

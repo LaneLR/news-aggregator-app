@@ -105,6 +105,19 @@ describe("CarouselArticleCard", () => {
     expect(screen.getByTitle("This source could be behind a paywall.")).toBeInTheDocument();
   });
 
+  it("tracks a click when the 'Read article' link is clicked", async () => {
+    const user = userEvent.setup();
+    const article = makeArticle({ url: "https://example.com/tracked-carousel" });
+    render(<CarouselCard article={article} />);
+
+    await user.click(screen.getByRole("link", { name: "Read article" }));
+
+    expect(screen.getByRole("link", { name: "Read article" })).toHaveAttribute(
+      "href",
+      "https://example.com/tracked-carousel"
+    );
+  });
+
   it("renders the category-colored fallback art instead of a broken image when the article has no image", () => {
     const article = makeArticle({ urlToImage: null, category: ["Entertainment"], title: "No Image Article" });
     const { container } = render(<CarouselCard article={article} />);

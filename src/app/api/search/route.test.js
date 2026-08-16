@@ -60,6 +60,31 @@ describe("GET /api/search", () => {
     expect(sql).not.toContain(`"tier" = 'free'`);
   });
 
+  it("filters by category when the category param is given", async () => {
+    mockAuth.mockResolvedValue(null);
+    db.sequelize.query.mockResolvedValue([]);
+
+    await GET(makeRequest("query=fed&category=Business"));
+
+    const [sql, options] = db.sequelize.query.mock.calls[0];
+    expect(sql).toContain(`"category"::text ILIKE :category`);
+    expect(options.replacements.category).toBe("%Business%");
+  });
+
+  it("excludes titles matching a signed-in user's muted keywords", async () => {
+    mockAuth.mockResolvedValue(makeSession({ tier: "Subscribed", id: "user-1" }));
+    db.User.findByPk.mockResolvedValue({ mutedKeywords: ["crypto", "nft"] });
+    db.sequelize.query.mockResolvedValue([]);
+
+    await GET(makeRequest("query=fed"));
+
+    const [sql, options] = db.sequelize.query.mock.calls[0];
+    expect(sql).toContain(`"title" NOT ILIKE :muted0`);
+    expect(sql).toContain(`"title" NOT ILIKE :muted1`);
+    expect(options.replacements.muted0).toBe("%crypto%");
+    expect(options.replacements.muted1).toBe("%nft%");
+  });
+
   it("attaches isLikedByUser/isRead for a signed-in user", async () => {
     mockAuth.mockResolvedValue(makeSession({ tier: "Subscribed", id: "user-1" }));
     db.User.findByPk.mockResolvedValue({ mutedKeywords: [] });
