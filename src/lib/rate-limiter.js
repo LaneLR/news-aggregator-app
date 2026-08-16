@@ -1,21 +1,33 @@
 // src/lib/rate-limiter.js
-// --- NO EXTERNAL RATE LIMITING PACKAGE NEEDED ---
-// This implements a simple in-memory IP-based rate limiter for Next.js App Router.
+// DB-backed IP rate limiter with an escalating lockout for repeat
+// offenders. This replaces an earlier in-memory version — that version's
+// state lived in a single process's memory, which doesn't hold up on
+// Vercel's serverless model (each request can land on a different
+// instance, and a cold start wipes it entirely), so the "5 requests per
+// minute" limit it enforced was really closer to "5 per minute per warm
+// instance." Storing state in the Postgres DB this app already runs makes
+// the limit actually shared across every instance, at no extra cost.
+import initializeDbAndModels from "@/lib/db";
 
-// Stores request counts for each IP address.
-// Key: IP address (string)
-// Value: Map<timestamp, count> - A map of timestamps to request counts within that timestamp.
-const requestCounts = new Map();
+const RATE_LIMIT_INTERVAL_MS = 60 * 1000; // base limit: 1-minute rolling window
+const MAX_REQUESTS_PER_INTERVAL = 5;
 
-// Configuration for your authentication rate limiter
-const RATE_LIMIT_INTERVAL_MS = 60 * 1000; // 1 minute
-const MAX_REQUESTS_PER_INTERVAL = 5; // Allow 5 requests per minute from a single IP
-const CLEANUP_INTERVAL_MS = 5 * 60 * 1000; // Run cleanup every 5 minutes
+// An IP that keeps exceeding the base limit gets locked out for
+// increasingly long periods — 5 minutes, then 1 hour, then a 24-hour
+// ceiling — rather than one flat lockout. A few mistyped passwords barely
+// slow a real person down; sustained brute-forcing gets exponentially more
+// expensive within minutes. 24 hours is deliberately a ceiling, not a
+// permanent ban — IP addresses get reassigned between customers over time
+// (residential/mobile ISPs, CGNAT), so a "permanent" block increasingly
+// punishes whoever inherits the address rather than the original attacker.
+const LOCKOUT_TIERS_MS = [5 * 60 * 1000, 60 * 60 * 1000, 24 * 60 * 60 * 1000];
+// A full day with no further violations resets the escalation ladder back
+// to the first tier, so one past incident doesn't compound forever.
+const VIOLATION_DECAY_MS = 24 * 60 * 60 * 1000;
 
-// Function to get the client's IP address from the request.
 // Next.js App Router route handlers receive a Web API `Request`, whose
-// `headers` is a `Headers` instance — it must be read with `.get()`,
-// not bracket/property access (which silently returns undefined).
+// `headers` is a `Headers` instance — it must be read with `.get()`, not
+// bracket/property access (which silently returns undefined).
 const getClientIp = (req) => {
   const forwardedFor = req.headers?.get?.("x-forwarded-for");
   return (
@@ -25,66 +37,67 @@ const getClientIp = (req) => {
   );
 };
 
-// --- Cleanup function for expired entries ---
-// This prevents the 'requestCounts' Map from growing indefinitely.
-// Exported only so tests can invoke it directly rather than waiting on the
-// real 5-minute setInterval below — not used by any other module.
-export function cleanupExpiredRequests() {
-  const now = Date.now();
-  for (const [ip, ipTimestamps] of requestCounts.entries()) {
-    for (const timestamp of ipTimestamps.keys()) {
-      if (now - timestamp > RATE_LIMIT_INTERVAL_MS) {
-        ipTimestamps.delete(timestamp); // Remove old timestamps
-      }
-    }
-    if (ipTimestamps.size === 0) {
-      requestCounts.delete(ip); // Remove IP if no active requests
-    }
-  }
-  // console.log("Rate limiter cleanup performed. Current IPs tracked:", requestCounts.size); // Optional diagnostic
+function lockoutDurationMs(violationCount) {
+  const tier = Math.min(violationCount, LOCKOUT_TIERS_MS.length) - 1;
+  return LOCKOUT_TIERS_MS[tier];
 }
 
-// Start the cleanup process (run periodically in the background)
-// This will run once when the module loads on the server.
-setInterval(cleanupExpiredRequests, CLEANUP_INTERVAL_MS);
-
+function throwLockedError(lockedUntil, now) {
+  const minutesLeft = Math.max(1, Math.ceil((lockedUntil - now) / 60000));
+  const error = new Error(
+    `Too many requests. Please try again in ${minutesLeft} minute${minutesLeft === 1 ? "" : "s"}.`
+  );
+  error.status = 429;
+  throw error;
+}
 
 /**
- * Middleware function for rate limiting Next.js App Router API routes.
+ * Rate-limits a request's source IP, escalating to a temporary lockout for
+ * repeat offenders. Throws an Error with `status: 429` when the caller
+ * should be rejected.
  *
  * @param {Request} req The Next.js Request object.
- * @throws {Error} Throws an error with status 429 if the rate limit is exceeded.
  */
 export const authRateLimitMiddleware = async (req) => {
   const ip = getClientIp(req);
-  const now = Date.now();
+  const now = new Date();
+  const { IpAttempt } = await initializeDbAndModels();
 
-  // Get or initialize the map for this IP
-  if (!requestCounts.has(ip)) {
-    requestCounts.set(ip, new Map());
+  const attempt = await IpAttempt.findByPk(ip);
+
+  if (attempt?.lockedUntil && attempt.lockedUntil > now) {
+    throwLockedError(attempt.lockedUntil, now);
   }
-  const ipTimestamps = requestCounts.get(ip);
 
-  // Add the current request timestamp
-  if (!ipTimestamps.has(now)) {
-    ipTimestamps.set(now, 0);
-  }
-  ipTimestamps.set(now, ipTimestamps.get(now) + 1);
-
-  // Calculate total requests in the current interval
-  let totalRequests = 0;
-  for (const [timestamp, count] of ipTimestamps.entries()) {
-    if (now - timestamp < RATE_LIMIT_INTERVAL_MS) {
-      totalRequests += count;
+  if (!attempt) {
+    try {
+      await IpAttempt.create({ ip, windowCount: 1, windowStart: now });
+    } catch (err) {
+      // A concurrent first-ever request from this same IP can race to
+      // create the same row — harmless either way, so just let it through.
+      if (err.name !== "SequelizeUniqueConstraintError") throw err;
     }
+    return;
   }
 
-  // console.log(`IP: ${ip}, Requests in interval: ${totalRequests}`); // Optional diagnostic
-
-  if (totalRequests > MAX_REQUESTS_PER_INTERVAL) {
-    // Manually set a 'status' property on the error to be caught by the route handler
-    const error = new Error('Too many requests. Please try again after some time.');
-    error.status = 429;
-    throw error;
+  const windowExpired =
+    !attempt.windowStart || now - attempt.windowStart > RATE_LIMIT_INTERVAL_MS;
+  if (windowExpired) {
+    await attempt.update({ windowCount: 1, windowStart: now });
+    return;
   }
+
+  const windowCount = attempt.windowCount + 1;
+  if (windowCount <= MAX_REQUESTS_PER_INTERVAL) {
+    await attempt.update({ windowCount });
+    return;
+  }
+
+  const violationDecayed =
+    !attempt.lastViolationAt || now - attempt.lastViolationAt > VIOLATION_DECAY_MS;
+  const violationCount = violationDecayed ? 1 : attempt.violationCount + 1;
+  const lockedUntil = new Date(now.getTime() + lockoutDurationMs(violationCount));
+
+  await attempt.update({ windowCount, violationCount, lockedUntil, lastViolationAt: now });
+  throwLockedError(lockedUntil, now);
 };
