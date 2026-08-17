@@ -21,15 +21,24 @@ export const CATEGORY_SECTION_TAGS = [
   "Podcast",
 ];
 
-export const HERO_SECTION_KEYS = ["forYou", "topStories"];
+// "today" sits between the two — a chronological, cross-category "what's
+// published since local midnight" row, not a personalized feed or a
+// clustered-by-coverage one — but it's driven by the same show/hide toggle
+// mechanism as forYou/topStories, so it lives in this same list rather than
+// alongside CATEGORY_SECTION_TAGS (it isn't a category: no articles are
+// tagged "today", it's a time filter over every category at once).
+export const HERO_SECTION_KEYS = ["forYou", "today", "topStories"];
 
 export const ALL_SECTION_KEYS = [...HERO_SECTION_KEYS, ...CATEGORY_SECTION_TAGS];
 
 // Matches the 5 categories /api/news-by-category always fetched before this
-// became configurable, plus both hero rows — existing users' homepages
-// don't change at all until they actually open the new setting.
+// became configurable, plus every hero row — existing users with their own
+// already-saved homeSections won't see a newly-added default here (or any
+// future one) until they open Settings themselves and opt in; only accounts
+// that have never customized this pick up new defaults automatically.
 export const DEFAULT_HOME_SECTIONS = [
   "forYou",
+  "today",
   "topStories",
   "Business",
   "Tech",

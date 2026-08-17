@@ -1,0 +1,113 @@
+.pageHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 2rem 0 1.5rem;
+  text-align: center;
+}
+
+.pageHeading {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--theme-dark-blue);
+  width: 100%;
+  justify-content: center;
+
+  svg {
+    color: var(--theme-primary);
+  }
+
+  @media (max-width: 440px) {
+    font-size: 1.7rem;
+  }
+}
+
+.pageSubtitle {
+  color: var(--theme-text-secondary);
+}
+
+.filterBar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  background-color: var(--theme-layout-background);
+
+  .sortToggle {
+    margin: 0;
+  }
+}
+
+.sortToggle {
+  display: flex;
+  justify-content: center;
+  gap: 0.3rem;
+  margin: 1rem 0 0.5rem;
+  background-color: var(--theme-card-background);
+  padding: 4px;
+  border: 1px solid var(--theme-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+}
+
+.sortOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--theme-text-secondary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+
+  &.active {
+    background: var(--theme-primary);
+    color: var(--theme-primary-contrast);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.loadMoreRow {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.caughtUpText {
+  color: var(--theme-text-secondary);
+  font-size: 0.9rem;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3rem 1rem;
+  color: var(--theme-text-secondary);
+  text-align: center;
+
+  svg {
+    color: var(--theme-border);
+    margin-bottom: 0.5rem;
+  }
+}
+
+.emptyStateHint {
+  font-size: 0.85rem;
+  color: var(--theme-text-secondary);
+  max-width: 420px;
+}

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, Flame, Lock } from "lucide-react";
+import { Sparkles, CalendarDays, Flame, Lock } from "lucide-react";
 import { CATEGORY_LINKS } from "@/lib/navLinks";
 import { useToast } from "./ToastProvider";
 import styles from "./HomeSectionsSettings.module.scss";
@@ -20,6 +20,12 @@ const HERO_OPTIONS = [
     label: "For You / Trending",
     description: "The personalized carousel at the top of the page.",
     Icon: Sparkles,
+  },
+  {
+    key: "today",
+    label: "Today's News",
+    description: "Everything published since midnight, across every category.",
+    Icon: CalendarDays,
   },
   {
     key: "topStories",
