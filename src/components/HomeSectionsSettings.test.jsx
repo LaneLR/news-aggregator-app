@@ -29,11 +29,33 @@ describe("HomeSectionsSettings", () => {
   });
 
   it("renders the hero and category options, checking initial sections", () => {
-    render(<HomeSectionsSettings initialSections={["forYou", "Business"]} isSubscribed={false} />);
+    render(<HomeSectionsSettings initialSections={["forYou", "today", "local", "Business"]} isSubscribed={false} />);
 
     expect(screen.getByRole("checkbox", { name: /for you \/ trending/i })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: /today's news/i })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: /local news/i })).toBeChecked();
     expect(screen.getByRole("checkbox", { name: /top stories/i })).not.toBeChecked();
     expect(screen.getByRole("checkbox", { name: /business/i })).toBeChecked();
+  });
+
+  it("toggles Today's News on and persists it", async () => {
+    const user = userEvent.setup();
+    mockPatch(makeFetchResponse({ homeSections: ["forYou", "today"] }));
+    render(<HomeSectionsSettings initialSections={["forYou"]} isSubscribed={false} />);
+
+    await user.click(screen.getByRole("checkbox", { name: /today's news/i }));
+
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: /today's news/i })).toBeChecked());
+  });
+
+  it("toggles Local News on and persists it", async () => {
+    const user = userEvent.setup();
+    mockPatch(makeFetchResponse({ homeSections: ["forYou", "local"] }));
+    render(<HomeSectionsSettings initialSections={["forYou"]} isSubscribed={false} />);
+
+    await user.click(screen.getByRole("checkbox", { name: /local news/i }));
+
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: /local news/i })).toBeChecked());
   });
 
   it("shows a lock affordance on subscriber-only categories for a free user", () => {

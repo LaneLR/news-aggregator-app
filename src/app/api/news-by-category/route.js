@@ -31,6 +31,8 @@ export async function GET(req) {
     }
 
     const showForYou = homeSections.includes("forYou");
+    const showToday = homeSections.includes("today");
+    const showLocal = homeSections.includes("local");
     const showTopStories = homeSections.includes("topStories");
     // Defense in depth against a stale/tampered preference — a free user's
     // saved list should never contain a gated tag (the PATCH route already
@@ -110,6 +112,8 @@ export async function GET(req) {
     return NextResponse.json({
       categories: categorizedArticles,
       showForYou,
+      showToday,
+      showLocal,
       showTopStories,
     });
   } catch (err) {

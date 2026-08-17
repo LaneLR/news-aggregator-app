@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { MapPin, X, Pencil } from "lucide-react";
-import { useWeatherLocation } from "@/lib/useWeatherLocation";
+import { useUserLocation } from "@/lib/useUserLocation";
 import { getWeatherDisplay } from "@/lib/weatherCodes";
+import LocationPicker from "./LocationPicker";
 import styles from "./WeatherWidget.module.scss";
 
 // Lives in the header, between the search bar and the icon button group — a
@@ -13,18 +14,19 @@ import styles from "./WeatherWidget.module.scss";
 //
 // Current conditions only — no radar, alerts, or forecast beyond right now,
 // and no push notifications. Opt-in by construction: nothing is fetched or
-// shown until the user explicitly picks a location (see
-// useWeatherLocation.js), never inferred from IP/geolocation. Renders
-// nothing at all if the site owner hasn't set OPENWEATHER_API_KEY yet.
+// shown until the user explicitly grants a location, either by tapping "Use
+// my current location" (a real browser permission prompt — nothing is read
+// silently or inferred from IP) or by searching a city/zip manually. The
+// acquisition UI itself lives in LocationPicker.jsx, shared with Settings'
+// Location card and the Local News opt-in prompt — all three read/write the
+// same useUserLocation-backed location. Renders nothing at all if the site
+// owner hasn't set OPENWEATHER_API_KEY yet.
 export default function WeatherWidget() {
-  const { location, setLocation, hydrated } = useWeatherLocation();
+  const { location, setLocation, hydrated } = useUserLocation();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
   const [notConfigured, setNotConfigured] = useState(false);
   const [conditions, setConditions] = useState(null);
-  const debounceRef = useRef(null);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -49,30 +51,6 @@ export default function WeatherWidget() {
     };
   }, [location, editing]);
 
-  useEffect(() => {
-    clearTimeout(debounceRef.current);
-    const trimmed = query.trim();
-    if (trimmed.length < 2) {
-      setResults([]);
-      return;
-    }
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/weather/search?q=${encodeURIComponent(trimmed)}`);
-        const data = await res.json();
-        if (!data.configured) {
-          setNotConfigured(true);
-          setResults([]);
-          return;
-        }
-        setResults(data.results || []);
-      } catch {
-        setResults([]);
-      }
-    }, 250);
-    return () => clearTimeout(debounceRef.current);
-  }, [query]);
-
   // Matches Header.jsx's own account-menu dropdown: close on an outside
   // click or Escape, only listening while actually open.
   useEffect(() => {
@@ -95,16 +73,9 @@ export default function WeatherWidget() {
 
   if (!hydrated || notConfigured) return null;
 
-  const pickLocation = (loc) => {
-    setLocation({ name: loc.name, state: loc.state, country: loc.country, lat: loc.lat, lon: loc.lon });
-    setConditions(null);
-    setEditing(false);
-    setQuery("");
-    setResults([]);
-    setOpen(false);
-  };
-
   const removeLocation = () => {
+    // Handled by LocationPicker's own setLocation for picks; Remove has no
+    // picker involved, so it goes straight through the shared hook.
     setLocation(null);
     setConditions(null);
     setEditing(false);
@@ -139,41 +110,18 @@ export default function WeatherWidget() {
       {open && (
         <div className={styles.popover} role="dialog" aria-label="Weather">
           {showSearch ? (
-            <div className={styles.searchArea}>
-              <input
-                type="text"
-                className={styles.searchInput}
-                placeholder="Add your location — city, state, or zip code…"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                aria-label="Search for a city or zip code for local weather"
-                autoFocus
-              />
-              {results.length > 0 && (
-                <ul className={styles.resultsList} role="listbox">
-                  {results.map((r, i) => (
-                    <li key={`${r.lat}-${r.lon}-${i}`}>
-                      <button type="button" className={styles.resultButton} onClick={() => pickLocation(r)}>
-                        {[r.name, r.state, r.country].filter(Boolean).join(", ")}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {location && (
-                <button
-                  type="button"
-                  className={styles.cancelLink}
-                  onClick={() => {
-                    setEditing(false);
-                    setQuery("");
-                    setResults([]);
-                  }}
-                >
-                  Cancel
-                </button>
-              )}
-            </div>
+            <LocationPicker
+              autoFocus
+              onPicked={() => {
+                setConditions(null);
+                setEditing(false);
+                setOpen(false);
+              }}
+              onCancel={location ? () => setEditing(false) : undefined}
+              onSearchResponse={(data) => {
+                if (!data.configured) setNotConfigured(true);
+              }}
+            />
           ) : conditions ? (
             <div className={styles.conditionsArea}>
               <div className={styles.conditionsRow}>

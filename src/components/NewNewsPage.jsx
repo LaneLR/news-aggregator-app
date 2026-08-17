@@ -10,6 +10,8 @@ import {
   Newspaper,
   ChevronRight,
   Flame,
+  CalendarDays,
+  MapPinned,
   Leaf,
   Landmark,
   Globe,
@@ -26,7 +28,9 @@ import CarouselSkeleton from "@/components/CarouselSkeleton";
 import HeroCarousel from "@/components/HeroCarousel";
 import FeatureCallout from "@/components/FeatureCallout";
 import PullToRefreshIndicator from "@/components/PullToRefreshIndicator";
+import LocationPicker from "@/components/LocationPicker";
 import { usePullToRefresh } from "@/lib/usePullToRefresh";
+import { useUserLocation } from "@/lib/useUserLocation";
 import { DEFAULT_HOME_SECTIONS } from "@/lib/homeSections";
 import styles from "./NewNewsPage.module.scss";
 
@@ -71,8 +75,20 @@ const CATEGORY_SUBTITLES = {
 // (a user who's never opened Settings → Home Page Sections) — real values
 // arrive with the /api/news-by-category response and override these.
 const DEFAULT_SHOW_FOR_YOU = DEFAULT_HOME_SECTIONS.includes("forYou");
+const DEFAULT_SHOW_TODAY = DEFAULT_HOME_SECTIONS.includes("today");
+const DEFAULT_SHOW_LOCAL = DEFAULT_HOME_SECTIONS.includes("local");
 const DEFAULT_SHOW_TOP_STORIES = DEFAULT_HOME_SECTIONS.includes("topStories");
 const DEFAULT_CATEGORY_SECTIONS = DEFAULT_HOME_SECTIONS.filter((key) => CATEGORY_ICONS[key]);
+
+// Local midnight, computed in the visitor's own browser — the server has no
+// reliable way to know a visitor's timezone on its own, and every
+// publishedAt is stored in UTC, so a client-computed boundary is simpler
+// and more correct than guessing server-side (see src/lib/todayArticles.js).
+function startOfTodayISO() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d.toISOString();
+}
 
 export default function NewsPage() {
   // null = still loading; [] / {} = loaded (possibly empty). Sections render
@@ -81,8 +97,13 @@ export default function NewsPage() {
   // the card content pops in once each fetch resolves.
   const [categorizedArticles, setCategorizedArticles] = useState(null);
   const [topStories, setTopStories] = useState(null);
+  const [todayArticles, setTodayArticles] = useState(null);
+  const [localArticles, setLocalArticles] = useState(null);
   const [showForYou, setShowForYou] = useState(DEFAULT_SHOW_FOR_YOU);
+  const [showToday, setShowToday] = useState(DEFAULT_SHOW_TODAY);
+  const [showLocal, setShowLocal] = useState(DEFAULT_SHOW_LOCAL);
   const [showTopStories, setShowTopStories] = useState(DEFAULT_SHOW_TOP_STORIES);
+  const { location, hydrated: locationHydrated } = useUserLocation();
 
   const loadNews = () => {
     const categoriesPromise = fetch("/api/news-by-category")
@@ -90,6 +111,8 @@ export default function NewsPage() {
       .then((data) => {
         setCategorizedArticles(data.categories || {});
         setShowForYou(data.showForYou ?? true);
+        setShowToday(data.showToday ?? true);
+        setShowLocal(data.showLocal ?? true);
         setShowTopStories(data.showTopStories ?? true);
       })
       .catch((err) => {
@@ -105,12 +128,37 @@ export default function NewsPage() {
         setTopStories([]);
       });
 
-    return Promise.all([categoriesPromise, topStoriesPromise]);
+    const todayPromise = fetch(`/api/news/today?startOfDay=${encodeURIComponent(startOfTodayISO())}`)
+      .then((res) => res.json())
+      .then((data) => setTodayArticles(data.articles || []))
+      .catch((err) => {
+        console.error("Failed to fetch today's news:", err);
+        setTodayArticles([]);
+      });
+
+    return Promise.all([categoriesPromise, topStoriesPromise, todayPromise]);
   };
 
   useEffect(() => {
     loadNews();
   }, []);
+
+  // Separate from loadNews' Promise.all above — useUserLocation only knows
+  // whether a location is saved after its own mount effect reads
+  // localStorage (locationHydrated), so this can't resolve synchronously
+  // alongside the other home-page fetches. Only fires once a location
+  // actually exists; the "no location yet" case renders an opt-in prompt
+  // instead of fetching (see the JSX below), matching LocalPage.jsx.
+  useEffect(() => {
+    if (!locationHydrated || !location) return;
+    fetch(`/api/news/local?lat=${location.lat}&lon=${location.lon}`)
+      .then((res) => res.json())
+      .then((data) => setLocalArticles(data.articles || []))
+      .catch((err) => {
+        console.error("Failed to fetch local news:", err);
+        setLocalArticles([]);
+      });
+  }, [location, locationHydrated]);
 
   const { pullDistance, isRefreshing, pullHandlers } = usePullToRefresh(loadNews);
 
@@ -125,6 +173,98 @@ export default function NewsPage() {
       <h1 className={styles.srOnly}>Your News Feed</h1>
       <FeatureCallout />
       {showForYou && <HeroCarousel />}
+
+      {showToday && (todayArticles === null || todayArticles.length > 0) && (
+        <section className={styles.section}>
+          <div className={styles.headerRow}>
+            <div className={styles.headerLeft}>
+              <span className={styles.accentBar} />
+              <div>
+                <h2 className={`${styles.sectionTitle} headline`}>
+                  <CalendarDays size={20} />
+                  Today&apos;s News
+                </h2>
+                <p className={styles.sectionSubtitle}>
+                  Everything published since midnight, across every category
+                </p>
+              </div>
+            </div>
+            <Link className={styles.viewAllLink} href="/today">
+              View all
+              <ChevronRight size={16} />
+            </Link>
+          </div>
+          {todayArticles === null ? (
+            <CarouselSkeleton />
+          ) : (
+            <CarouselRow>
+              {todayArticles.map((article) => (
+                <CarouselArticleCard key={article.url} article={article} />
+              ))}
+            </CarouselRow>
+          )}
+        </section>
+      )}
+
+      {showLocal && locationHydrated && !location && (
+        <section className={styles.section}>
+          <div className={styles.headerRow}>
+            <div className={styles.headerLeft}>
+              <span className={styles.accentBar} />
+              <div>
+                <h2 className={`${styles.sectionTitle} headline`}>
+                  <MapPinned size={20} />
+                  Local News
+                </h2>
+                <p className={styles.sectionSubtitle}>
+                  Coverage from your nearest local newsroom, across every category
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className={styles.localPrompt}>
+            <p className={styles.localPromptText}>
+              Grant your location, or search for a city or zip code, to see it here.
+            </p>
+            <LocationPicker />
+          </div>
+        </section>
+      )}
+
+      {showLocal &&
+        locationHydrated &&
+        location &&
+        (localArticles === null || localArticles.length > 0) && (
+          <section className={styles.section}>
+            <div className={styles.headerRow}>
+              <div className={styles.headerLeft}>
+                <span className={styles.accentBar} />
+                <div>
+                  <h2 className={`${styles.sectionTitle} headline`}>
+                    <MapPinned size={20} />
+                    Local News
+                  </h2>
+                  <p className={styles.sectionSubtitle}>
+                    Coverage from your nearest local newsroom, across every category
+                  </p>
+                </div>
+              </div>
+              <Link className={styles.viewAllLink} href="/local">
+                View all
+                <ChevronRight size={16} />
+              </Link>
+            </div>
+            {localArticles === null ? (
+              <CarouselSkeleton />
+            ) : (
+              <CarouselRow>
+                {localArticles.map((article) => (
+                  <CarouselArticleCard key={article.url} article={article} />
+                ))}
+              </CarouselRow>
+            )}
+          </section>
+        )}
 
       {showTopStories && (topStories === null || topStories.length > 0) && (
         <section className={styles.section}>
