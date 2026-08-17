@@ -4,6 +4,7 @@ import FollowedSources from "@/components/FollowedSources";
 import NotificationSettings from "@/components/NotificationSettings";
 import KeyboardShortcutsSettings from "@/components/KeyboardShortcutsSettings";
 import HomeSectionsSettings from "@/components/HomeSectionsSettings";
+import LocationSettings from "@/components/LocationSettings";
 import AccountTabs from "@/components/AccountTabs";
 import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
@@ -18,6 +19,7 @@ import {
   LayoutGrid,
   Rss,
   Bell,
+  MapPin,
 } from "lucide-react";
 import styles from "./page.module.scss";
 
@@ -127,6 +129,18 @@ export default async function SettingsPage() {
             </h2>
             <div className={styles.cardContent}>
               <KeyboardShortcutsSettings initialShortcuts={currentUser?.keyboardShortcuts} />
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <h2 className={styles.cardHeader}>
+              <span className={styles.cardHeaderIcon}>
+                <MapPin size={15} />
+              </span>
+              Location
+            </h2>
+            <div className={styles.cardContent}>
+              <LocationSettings />
             </div>
           </div>
         </div>

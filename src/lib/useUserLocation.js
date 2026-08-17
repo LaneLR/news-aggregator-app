@@ -1,7 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const STORAGE_KEY = "morningfeeds:weatherLocation";
+// Fired on every setLocation call so sibling components mounted in the same
+// tab (weather widget, Settings' Location card, the Local News prompt) stay
+// in sync with each other — the browser's own "storage" event only fires in
+// *other* tabs/windows, never the one that made the change, which isn't
+// enough once more than one component reads this same saved location.
+const CHANGE_EVENT = "morningfeeds:user-location-changed";
 
 // Local-only, same reasoning as readerPrefs.js: this is opt-in by
 // construction (nothing is read/shown until the user explicitly grants a
@@ -11,7 +17,12 @@ const STORAGE_KEY = "morningfeeds:weatherLocation";
 // the account. See the memory note this feature came from: location data
 // here must be something the user deliberately hands over, not silently
 // detected.
-export function useWeatherLocation() {
+//
+// Originally weather-only (hence the storage key, kept as-is so existing
+// saved locations aren't silently dropped) — now shared with Local News,
+// which reads/writes the same location rather than prompting separately.
+// See LocationPicker.jsx for the shared acquisition UI both features use.
+export function useUserLocation() {
   const [location, setLocationState] = useState(null);
   const [hydrated, setHydrated] = useState(false);
 
@@ -23,9 +34,13 @@ export function useWeatherLocation() {
       // Ignore malformed/unavailable storage — falls back to "no location".
     }
     setHydrated(true);
+
+    const handleChange = (event) => setLocationState(event.detail);
+    window.addEventListener(CHANGE_EVENT, handleChange);
+    return () => window.removeEventListener(CHANGE_EVENT, handleChange);
   }, []);
 
-  const setLocation = (next) => {
+  const setLocation = useCallback((next) => {
     setLocationState(next);
     try {
       if (next) localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -33,7 +48,8 @@ export function useWeatherLocation() {
     } catch {
       // Best-effort persistence only.
     }
-  };
+    window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: next }));
+  }, []);
 
   return { location, setLocation, hydrated };
 }

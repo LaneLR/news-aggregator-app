@@ -74,6 +74,16 @@ export default function defineArticle(sequelize) {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      // Which hubCities.js metro this article's source covers, e.g.
+      // "dallas-fort-worth" — null for every non-local source. Set at
+      // ingestion time from a local feed config entry's own "hubCity"
+      // field (see rss-fetch-app's feeds/localSources.json), independent
+      // of `category`: a local article keeps its normal category tags too,
+      // so it still shows up on category pages in addition to Local News.
+      hubCity: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {
       sequelize,
@@ -86,6 +96,7 @@ export default function defineArticle(sequelize) {
         { fields: ["tier"] },
         { fields: ["likeCount"] },
         { fields: ["clickCount"] },
+        { fields: ["hubCity"] },
       ],
     }
   );

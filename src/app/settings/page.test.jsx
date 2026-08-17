@@ -33,6 +33,9 @@ vi.mock("@/components/KeyboardShortcutsSettings", () => ({
 vi.mock("@/components/HomeSectionsSettings", () => ({
   default: (props) => <div data-testid="home-sections-settings">{JSON.stringify(props)}</div>,
 }));
+vi.mock("@/components/LocationSettings", () => ({
+  default: () => <div data-testid="location-settings" />,
+}));
 
 const { default: SettingsPage, metadata } = await import("./page");
 
@@ -96,6 +99,7 @@ describe("SettingsPage", () => {
 
     expect(screen.getByTestId("notification-settings")).toBeInTheDocument();
     expect(screen.getByTestId("account-tabs")).toBeInTheDocument();
+    expect(screen.getByTestId("location-settings")).toBeInTheDocument();
   });
 
   it("passes isSubscribed=false for Free-tier users", async () => {

@@ -39,6 +39,7 @@ describe("GET /api/news-by-category", () => {
     expect(res.status).toBe(200);
     expect(body.showForYou).toBe(true);
     expect(body.showToday).toBe(true);
+    expect(body.showLocal).toBe(true);
     expect(body.showTopStories).toBe(true);
     // DEFAULT_HOME_SECTIONS category tags: Business, Tech, Entertainment, Sports, Science
     expect(Object.keys(body.categories).sort()).toEqual(
@@ -59,6 +60,7 @@ describe("GET /api/news-by-category", () => {
 
     expect(body.showForYou).toBe(true);
     expect(body.showToday).toBe(false);
+    expect(body.showLocal).toBe(false);
     expect(body.showTopStories).toBe(false);
     expect(Object.keys(body.categories)).toEqual(["Market"]);
   });

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, CalendarDays, Flame, Lock } from "lucide-react";
+import { Sparkles, CalendarDays, MapPinned, Flame, Lock } from "lucide-react";
 import { CATEGORY_LINKS } from "@/lib/navLinks";
 import { useToast } from "./ToastProvider";
 import styles from "./HomeSectionsSettings.module.scss";
@@ -26,6 +26,12 @@ const HERO_OPTIONS = [
     label: "Today's News",
     description: "Everything published since midnight, across every category.",
     Icon: CalendarDays,
+  },
+  {
+    key: "local",
+    label: "Local News",
+    description: "Coverage from your nearest local newsroom, across every category.",
+    Icon: MapPinned,
   },
   {
     key: "topStories",

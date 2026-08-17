@@ -108,6 +108,31 @@
   }
 }
 
+.localPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--theme-border);
+
+  // Constrains LocationPicker's search UI to a sane width in this
+  // centered, full-width card context — the same component renders
+  // unconstrained (fills its popover/settings-card container) elsewhere.
+  > * {
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+.localPromptText {
+  margin: 0;
+  color: var(--theme-text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 .emptySectionText {
   display: flex;
   align-items: center;

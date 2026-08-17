@@ -27,7 +27,12 @@ export const CATEGORY_SECTION_TAGS = [
 // mechanism as forYou/topStories, so it lives in this same list rather than
 // alongside CATEGORY_SECTION_TAGS (it isn't a category: no articles are
 // tagged "today", it's a time filter over every category at once).
-export const HERO_SECTION_KEYS = ["forYou", "today", "topStories"];
+//
+// "local" is the same idea, filtered by hub-city (src/lib/hubCities.js)
+// instead of time — also not a category (no article is tagged "local"),
+// also cross-category by nature (a local article keeps its normal category
+// tags too), so it lives here rather than in CATEGORY_SECTION_TAGS.
+export const HERO_SECTION_KEYS = ["forYou", "today", "local", "topStories"];
 
 export const ALL_SECTION_KEYS = [...HERO_SECTION_KEYS, ...CATEGORY_SECTION_TAGS];
 
@@ -39,6 +44,7 @@ export const ALL_SECTION_KEYS = [...HERO_SECTION_KEYS, ...CATEGORY_SECTION_TAGS]
 export const DEFAULT_HOME_SECTIONS = [
   "forYou",
   "today",
+  "local",
   "topStories",
   "Business",
   "Tech",
