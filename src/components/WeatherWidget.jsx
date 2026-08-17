@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { MapPin, X, Pencil } from "lucide-react";
+import { MapPin, X, Pencil, LocateFixed } from "lucide-react";
 import { useWeatherLocation } from "@/lib/useWeatherLocation";
 import { getWeatherDisplay } from "@/lib/weatherCodes";
 import styles from "./WeatherWidget.module.scss";
@@ -13,9 +13,11 @@ import styles from "./WeatherWidget.module.scss";
 //
 // Current conditions only — no radar, alerts, or forecast beyond right now,
 // and no push notifications. Opt-in by construction: nothing is fetched or
-// shown until the user explicitly picks a location (see
-// useWeatherLocation.js), never inferred from IP/geolocation. Renders
-// nothing at all if the site owner hasn't set OPENWEATHER_API_KEY yet.
+// shown until the user explicitly grants a location, either by tapping "Use
+// my current location" (a real browser permission prompt — nothing is read
+// silently or inferred from IP) or by searching a city/zip manually. See
+// useWeatherLocation.js. Renders nothing at all if the site owner hasn't set
+// OPENWEATHER_API_KEY yet.
 export default function WeatherWidget() {
   const { location, setLocation, hydrated } = useWeatherLocation();
   const [open, setOpen] = useState(false);
@@ -24,6 +26,8 @@ export default function WeatherWidget() {
   const [results, setResults] = useState([]);
   const [notConfigured, setNotConfigured] = useState(false);
   const [conditions, setConditions] = useState(null);
+  const [geoStatus, setGeoStatus] = useState("idle"); // idle | loading | error
+  const [geoError, setGeoError] = useState("");
   const debounceRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -96,11 +100,19 @@ export default function WeatherWidget() {
   if (!hydrated || notConfigured) return null;
 
   const pickLocation = (loc) => {
-    setLocation({ name: loc.name, state: loc.state, country: loc.country, lat: loc.lat, lon: loc.lon });
+    setLocation({
+      name: loc.name ?? null,
+      state: loc.state ?? null,
+      country: loc.country ?? null,
+      lat: loc.lat,
+      lon: loc.lon,
+    });
     setConditions(null);
     setEditing(false);
     setQuery("");
     setResults([]);
+    setGeoStatus("idle");
+    setGeoError("");
     setOpen(false);
   };
 
@@ -108,6 +120,33 @@ export default function WeatherWidget() {
     setLocation(null);
     setConditions(null);
     setEditing(false);
+  };
+
+  const useMyLocation = () => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      setGeoStatus("error");
+      setGeoError("Geolocation isn't supported in this browser — search for your city or zip instead.");
+      return;
+    }
+    setGeoStatus("loading");
+    setGeoError("");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        // No reverse-geocode call here — the weather API response already
+        // returns a locationName (see route.js), which the UI falls back to
+        // whenever name/state are unset.
+        pickLocation({ lat: position.coords.latitude, lon: position.coords.longitude });
+      },
+      (error) => {
+        setGeoStatus("error");
+        setGeoError(
+          error.code === error.PERMISSION_DENIED
+            ? "Location access denied — search for your city or zip instead."
+            : "Couldn't get your location — search for your city or zip instead."
+        );
+      },
+      { timeout: 10000, maximumAge: 10 * 60 * 1000 }
+    );
   };
 
   const showSearch = !location || editing;
@@ -140,14 +179,26 @@ export default function WeatherWidget() {
         <div className={styles.popover} role="dialog" aria-label="Weather">
           {showSearch ? (
             <div className={styles.searchArea}>
+              <button
+                type="button"
+                className={styles.geoButton}
+                onClick={useMyLocation}
+                disabled={geoStatus === "loading"}
+              >
+                <LocateFixed size={14} strokeWidth={2} />
+                {geoStatus === "loading" ? "Locating…" : "Use my current location"}
+              </button>
+              {geoStatus === "error" && <p className={styles.geoError}>{geoError}</p>}
+              <div className={styles.divider}>
+                <span>or enter manually</span>
+              </div>
               <input
                 type="text"
                 className={styles.searchInput}
-                placeholder="Add your location — city, state, or zip code…"
+                placeholder="City, state, or zip code…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 aria-label="Search for a city or zip code for local weather"
-                autoFocus
               />
               {results.length > 0 && (
                 <ul className={styles.resultsList} role="listbox">

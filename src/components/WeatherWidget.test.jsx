@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeFetchResponse } from "@/test/fixtures";
 
@@ -11,6 +11,10 @@ const CINCINNATI = { name: "Cincinnati", state: "Ohio", country: "US", lat: 39.1
 describe("WeatherWidget", () => {
   beforeEach(() => {
     localStorage.clear();
+  });
+
+  afterEach(() => {
+    delete global.navigator.geolocation;
   });
 
   it("shows a plain location trigger when no location is saved, with the popover closed", async () => {
@@ -27,7 +31,7 @@ describe("WeatherWidget", () => {
     await user.click(await screen.findByRole("button", { name: /add your location/i }));
 
     expect(screen.getByRole("dialog", { name: "Weather" })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/add your location/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/search for a city or zip code/i)).toBeInTheDocument();
   });
 
   it("searches for a location (debounced) and lists results", async () => {
@@ -38,7 +42,7 @@ describe("WeatherWidget", () => {
     render(<WeatherWidget />);
 
     await user.click(await screen.findByRole("button", { name: /add your location/i }));
-    await user.type(screen.getByPlaceholderText(/add your location/i), "Cincinnati");
+    await user.type(screen.getByLabelText(/search for a city or zip code/i), "Cincinnati");
 
     await waitFor(() =>
       expect(global.fetch).toHaveBeenCalledWith("/api/weather/search?q=Cincinnati")
@@ -51,7 +55,7 @@ describe("WeatherWidget", () => {
     render(<WeatherWidget />);
 
     await user.click(await screen.findByRole("button", { name: /add your location/i }));
-    await user.type(screen.getByPlaceholderText(/add your location/i), "c");
+    await user.type(screen.getByLabelText(/search for a city or zip code/i), "c");
     await new Promise((resolve) => setTimeout(resolve, 350));
 
     expect(global.fetch).not.toHaveBeenCalled();
@@ -75,7 +79,7 @@ describe("WeatherWidget", () => {
     render(<WeatherWidget />);
 
     await user.click(await screen.findByRole("button", { name: /add your location/i }));
-    await user.type(screen.getByPlaceholderText(/add your location/i), "Cincinnati");
+    await user.type(screen.getByLabelText(/search for a city or zip code/i), "Cincinnati");
     await user.click(await screen.findByText("Cincinnati, Ohio, US"));
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -132,7 +136,7 @@ describe("WeatherWidget", () => {
     await user.click(screen.getByRole("button", { name: /weather:/i }));
     await user.click(screen.getByRole("button", { name: "Change location" }));
 
-    expect(screen.getByPlaceholderText(/add your location/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/search for a city or zip code/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
   });
 
@@ -184,7 +188,7 @@ describe("WeatherWidget", () => {
     const { container } = render(<WeatherWidget />);
 
     await user.click(await screen.findByRole("button", { name: /add your location/i }));
-    await user.type(screen.getByPlaceholderText(/add your location/i), "Cincinnati");
+    await user.type(screen.getByLabelText(/search for a city or zip code/i), "Cincinnati");
 
     await waitFor(() => expect(container).toBeEmptyDOMElement());
   });
@@ -196,5 +200,96 @@ describe("WeatherWidget", () => {
     const { container } = render(<WeatherWidget />);
 
     await waitFor(() => expect(container).toBeEmptyDOMElement());
+  });
+
+  it("uses the browser's geolocation to save a location and fetch conditions", async () => {
+    const getCurrentPosition = vi.fn((onSuccess) =>
+      onSuccess({ coords: { latitude: 39.1, longitude: -84.5 } })
+    );
+    vi.stubGlobal("navigator", { ...navigator, geolocation: { getCurrentPosition } });
+    global.fetch.mockResolvedValueOnce(
+      makeFetchResponse({ configured: true, tempF: 72, conditionId: 800, isDay: true, locationName: "Cincinnati" })
+    );
+    const user = userEvent.setup();
+    render(<WeatherWidget />);
+
+    await user.click(await screen.findByRole("button", { name: /add your location/i }));
+    await user.click(screen.getByRole("button", { name: /use my current location/i }));
+
+    expect(getCurrentPosition).toHaveBeenCalled();
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY))).toEqual({
+      name: null,
+      state: null,
+      country: null,
+      lat: 39.1,
+      lon: -84.5,
+    });
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenCalledWith("/api/weather?lat=39.1&lon=-84.5")
+    );
+    expect(await screen.findByText("72°F")).toBeInTheDocument();
+  });
+
+  it("shows an error and leaves manual search available when geolocation permission is denied", async () => {
+    const getCurrentPosition = vi.fn((_onSuccess, onError) => onError({ code: 1, PERMISSION_DENIED: 1 }));
+    vi.stubGlobal("navigator", { ...navigator, geolocation: { getCurrentPosition } });
+    const user = userEvent.setup();
+    render(<WeatherWidget />);
+
+    await user.click(await screen.findByRole("button", { name: /add your location/i }));
+    await user.click(screen.getByRole("button", { name: /use my current location/i }));
+
+    expect(await screen.findByText(/location access denied/i)).toBeInTheDocument();
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+    expect(screen.getByLabelText(/search for a city or zip code/i)).toBeInTheDocument();
+  });
+
+  it("shows a generic error when geolocation fails for a non-permission reason", async () => {
+    const getCurrentPosition = vi.fn((_onSuccess, onError) => onError({ code: 2, PERMISSION_DENIED: 1 }));
+    vi.stubGlobal("navigator", { ...navigator, geolocation: { getCurrentPosition } });
+    const user = userEvent.setup();
+    render(<WeatherWidget />);
+
+    await user.click(await screen.findByRole("button", { name: /add your location/i }));
+    await user.click(screen.getByRole("button", { name: /use my current location/i }));
+
+    expect(await screen.findByText(/couldn't get your location/i)).toBeInTheDocument();
+  });
+
+  it("shows an error immediately when the browser has no geolocation support", async () => {
+    vi.stubGlobal("navigator", { ...navigator, geolocation: undefined });
+    const user = userEvent.setup();
+    render(<WeatherWidget />);
+
+    await user.click(await screen.findByRole("button", { name: /add your location/i }));
+    await user.click(screen.getByRole("button", { name: /use my current location/i }));
+
+    expect(await screen.findByText(/geolocation isn't supported/i)).toBeInTheDocument();
+  });
+
+  it("disables the geolocation button while a location request is in flight", async () => {
+    let resolvePosition;
+    const getCurrentPosition = vi.fn(
+      (onSuccess) =>
+        new Promise((resolve) => {
+          resolvePosition = () => {
+            onSuccess({ coords: { latitude: 39.1, longitude: -84.5 } });
+            resolve();
+          };
+        })
+    );
+    vi.stubGlobal("navigator", { ...navigator, geolocation: { getCurrentPosition } });
+    global.fetch.mockResolvedValueOnce(
+      makeFetchResponse({ configured: true, tempF: 72, conditionId: 800, isDay: true, locationName: "Cincinnati" })
+    );
+    const user = userEvent.setup();
+    render(<WeatherWidget />);
+
+    await user.click(await screen.findByRole("button", { name: /add your location/i }));
+    await user.click(screen.getByRole("button", { name: /use my current location/i }));
+
+    expect(await screen.findByRole("button", { name: /locating…/i })).toBeDisabled();
+    await act(async () => resolvePosition());
+    await waitFor(() => expect(screen.getByText("72°F")).toBeInTheDocument());
   });
 });
