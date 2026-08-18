@@ -1,6 +1,7 @@
 @use "../styles/marketCard" as market;
 
 .section {
+  @include market.section-gutter;
   margin-bottom: 1.5rem;
   padding: 1rem;
   background-color: var(--theme-card-background);
@@ -61,6 +62,26 @@
   flex-wrap: wrap;
   gap: 4px;
   margin-bottom: 1rem;
+
+  // Eight range options (1D through Max) wrapping to a second line reads as
+  // a ragged, unintentional layout on a narrow phone (a lone button
+  // stranded on its own row) — a single horizontally-scrollable strip is
+  // the same pattern already used for card carousels elsewhere in the app,
+  // and reads as deliberate instead.
+  @media (max-width: 480px) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--theme-primary);
+    }
+  }
 }
 
 .rangeTab {
@@ -76,6 +97,10 @@
 
   &:hover {
     border-color: var(--theme-primary);
+  }
+
+  @media (max-width: 480px) {
+    flex-shrink: 0;
   }
 }
 

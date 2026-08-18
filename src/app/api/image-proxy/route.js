@@ -110,6 +110,16 @@ function pinnedDispatcher(records) {
   });
 }
 
+// A same-host http->https upgrade or a CDN handing off to its origin are
+// both completely ordinary for article images (imgci.com, skyandtelescope.org
+// and others in production hit this) — outright refusing every redirect (the
+// previous behavior) meant those images just never loaded. Each hop is
+// re-validated with the same assertSafeUrl/pinnedDispatcher SSRF protection
+// as the initial URL, so this still can't be used to reach a private address
+// via a redirect; it just no longer treats "resolves through a redirect" the
+// same as "resolves to somewhere unsafe".
+const MAX_REDIRECTS = 5;
+
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const imageUrl = searchParams.get("url");
@@ -117,13 +127,6 @@ export async function GET(req) {
 
   if (!imageUrl) {
     return NextResponse.json({ error: "No URL provided" }, { status: 400 });
-  }
-
-  let resolvedRecords;
-  try {
-    resolvedRecords = await assertSafeUrl(imageUrl);
-  } catch (err) {
-    return NextResponse.json({ error: "Invalid image URL" }, { status: 400 });
   }
 
   const controller = new AbortController();
@@ -138,12 +141,34 @@ export async function GET(req) {
       fetchHeaders.Referer = referrer;
     }
 
-    const response = await fetch(imageUrl, {
-      headers: fetchHeaders,
-      signal: controller.signal, // Connect the AbortController signal
-      redirect: "error", // Don't follow redirects — prevents redirect-based SSRF bypass
-      dispatcher: pinnedDispatcher(resolvedRecords), // Pin to the validated IP(s) — see assertSafeUrl
-    });
+    let currentUrl = imageUrl;
+    let response;
+    for (let hop = 0; ; hop++) {
+      let resolvedRecords;
+      try {
+        resolvedRecords = await assertSafeUrl(currentUrl);
+      } catch (err) {
+        clearTimeout(timeoutId);
+        return NextResponse.json({ error: "Invalid image URL" }, { status: 400 });
+      }
+
+      response = await fetch(currentUrl, {
+        headers: fetchHeaders,
+        signal: controller.signal, // Connect the AbortController signal
+        redirect: "manual", // Handled below, one validated hop at a time
+        dispatcher: pinnedDispatcher(resolvedRecords), // Pin to the validated IP(s) — see assertSafeUrl
+      });
+
+      const location = response.headers.get("location");
+      const isRedirect = response.status >= 300 && response.status < 400 && location;
+      if (!isRedirect) break;
+
+      if (hop >= MAX_REDIRECTS) {
+        clearTimeout(timeoutId);
+        return NextResponse.json({ error: "Too many redirects" }, { status: 400 });
+      }
+      currentUrl = new URL(location, currentUrl).toString();
+    }
 
     clearTimeout(timeoutId); // Clear the timeout if the fetch succeeds
 

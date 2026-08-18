@@ -173,4 +173,40 @@ export const HUB_CITIES = [
   { id: "st-louis", name: "St. Louis", state: "MO", lat: 38.627, lon: -90.1994 },
   { id: "little-rock", name: "Little Rock", state: "AR", lat: 34.7465, lon: -92.2896 },
   { id: "fort-smith-fayetteville", name: "Fort Smith-Fayetteville", state: "AR", lat: 35.3859, lon: -94.3985 },
+
+  // --- Round 2: previously-uncovered 100k+ metros ---
+  // Riverside-San Bernardino, CA and Stockton-Modesto, CA: no genuinely
+  // separate working feed found — both sit inside larger DMAs (LA and
+  // Sacramento respectively) without their own dedicated affiliate, so
+  // adding a hub would just mislabel that larger market's news as local.
+  { id: "anchorage", name: "Anchorage", state: "AK", lat: 61.22, lon: -149.9 },
+  { id: "honolulu", name: "Honolulu", state: "HI", lat: 21.31, lon: -157.86 },
+  { id: "san-diego", name: "San Diego", state: "CA", lat: 32.72, lon: -117.16 },
+  { id: "buffalo", name: "Buffalo", state: "NY", lat: 42.89, lon: -78.88 },
+  { id: "rochester-ny", name: "Rochester", state: "NY", lat: 43.16, lon: -77.61 },
+  { id: "scranton-wilkes-barre", name: "Scranton-Wilkes-Barre", state: "PA", lat: 41.41, lon: -75.66 },
+  { id: "allentown", name: "Allentown-Bethlehem", state: "PA", lat: 40.6, lon: -75.47 },
+  { id: "erie", name: "Erie", state: "PA", lat: 42.13, lon: -80.09 },
+  { id: "green-bay", name: "Green Bay", state: "WI", lat: 44.51, lon: -88.02 },
+  { id: "duluth", name: "Duluth", state: "MN", lat: 46.79, lon: -92.1 },
+
+  // --- Round 3: more previously-uncovered 100k+ metros ---
+  // Flint, MI and Trenton, NJ: no genuinely populated working feed found —
+  // left uncovered rather than guessed at (see rss-fetch-app research notes).
+  // Akron, OH: labeled "Akron" rather than "Akron-Canton" — Canton (Stark
+  // County) has no separately-verified feed of its own, and Nielsen treats
+  // Cleveland-Akron-Canton as one DMA, so there's no separate commercial-TV
+  // feed to add; Signal Akron is a nonprofit newsroom specific to Akron/
+  // Summit County, confirmed distinct from the existing Cleveland feed.
+  { id: "toledo", name: "Toledo", state: "OH", lat: 41.6528, lon: -83.5379 },
+  { id: "youngstown", name: "Youngstown", state: "OH", lat: 41.0998, lon: -80.6495 },
+  { id: "akron", name: "Akron", state: "OH", lat: 41.0814, lon: -81.519 },
+  { id: "lansing", name: "Lansing", state: "MI", lat: 42.7325, lon: -84.5555 },
+  { id: "huntsville", name: "Huntsville", state: "AL", lat: 34.7304, lon: -86.5861 },
+  { id: "columbia-sc", name: "Columbia", state: "SC", lat: 34.0007, lon: -81.0348 },
+  { id: "atlantic-city", name: "Atlantic City", state: "NJ", lat: 39.3643, lon: -74.4229 },
+  { id: "wichita-falls", name: "Wichita Falls", state: "TX", lat: 33.9137, lon: -98.4934 },
+  { id: "san-angelo", name: "San Angelo", state: "TX", lat: 31.4638, lon: -100.437 },
+  { id: "palm-springs", name: "Palm Springs", state: "CA", lat: 33.8303, lon: -116.5453 },
+  { id: "santa-barbara", name: "Santa Barbara", state: "CA", lat: 34.4208, lon: -119.6982 },
 ];

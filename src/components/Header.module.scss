@@ -121,6 +121,20 @@
   gap: 8px;
 }
 
+// Opens ReaderNavSidebar as a mobile drawer (see MobileNavProvider) — only
+// needed once the sidebar itself has left its sticky-column layout and
+// stacked out of immediate view, so this matches that same breakpoint
+// (ReaderNavSidebar.module.scss / MainContentWrapper.module.scss) rather
+// than an arbitrary one of its own.
+.menuButton {
+  display: none;
+  margin-right: 14px;
+
+  @media (max-width: 900px) {
+    display: flex;
+  }
+}
+
 .logoContainer {
   background-color: transparent;
   width: 100%;

@@ -1,4 +1,5 @@
 "use client";
+import { useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
@@ -16,6 +17,8 @@ import {
 } from "lucide-react";
 import { CATEGORY_LINKS, PERSONAL_LINKS, slugFromHref } from "@/lib/navLinks";
 import { useUnreadCounts } from "@/lib/useUnreadCounts";
+import { useMobileNav } from "./MobileNavProvider";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 import styles from "./ReaderNavSidebar.module.scss";
 
 const TOP_LINKS = [
@@ -57,13 +60,29 @@ export default function ReaderNavSidebar() {
   const isSubscribed = session?.user?.tier && session.user.tier !== "Free";
   const isLoggedIn = !!session?.user?.id;
   const unreadCounts = useUnreadCounts();
+  const { isOpen, close } = useMobileNav();
+  const navRef = useRef(null);
+  // Only traps focus (and is only reachable at all) once the drawer is open
+  // on a narrow viewport — on desktop this sidebar is always visible inline,
+  // never a modal, so there's nothing to trap focus inside of there.
+  useFocusTrap(navRef, isOpen);
 
   const visibleTop = TOP_LINKS.filter((l) => isSubscribed || !l.subscriberOnly);
   // Every category is shown now — Market/Journal get a lock badge instead
   // of being hidden, matching CATEGORY_LINKS' own `gated` treatment.
 
   return (
-    <nav className={styles.sidebar} aria-label="Categories">
+    <>
+      {/* Only visually present below the drawer breakpoint (see .backdrop's
+          own media query) — always rendered so open/close can animate
+          rather than popping in only once the viewport is already narrow. */}
+      {isOpen && <div className={styles.backdrop} onClick={close} aria-hidden="true" />}
+      <nav
+        ref={navRef}
+        className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ""}`}
+        aria-label="Categories"
+        {...(isOpen ? { role: "dialog", "aria-modal": "true", tabIndex: -1 } : {})}
+      >
       <ul className={styles.linkList}>
         {visibleTop.map(({ label, href, Icon, countKey }) => {
           const count =
@@ -73,6 +92,7 @@ export default function ReaderNavSidebar() {
               <Link
                 href={href}
                 className={`${styles.link} ${pathname === href ? styles.active : ""}`}
+                onClick={close}
               >
                 <Icon size={16} strokeWidth={2} />
                 {label}
@@ -97,6 +117,7 @@ export default function ReaderNavSidebar() {
               <Link
                 href={href}
                 className={`${styles.link} ${pathname === href ? styles.active : ""}`}
+                onClick={close}
               >
                 <Icon size={16} strokeWidth={2} />
                 {label}
@@ -127,6 +148,7 @@ export default function ReaderNavSidebar() {
                 <Link
                   href={href}
                   className={`${styles.link} ${pathname === href ? styles.active : ""}`}
+                  onClick={close}
                 >
                   <Icon size={16} strokeWidth={2} />
                   {label}
@@ -144,6 +166,7 @@ export default function ReaderNavSidebar() {
           </ul>
         </>
       )}
-    </nav>
+      </nav>
+    </>
   );
 }

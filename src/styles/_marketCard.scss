@@ -62,6 +62,19 @@
   color: var(--theme-text);
 }
 
+// Every Market-category section (MarketChart, SectorPerformance,
+// MostCovered, Watchlist) is a sibling of MarketTicker, whose own grid has
+// a 0.75rem padding insetting its cards from the page edge — but each of
+// these four sections previously had no horizontal inset of its own, so
+// their card border (MarketChart) or heading text (the other three) sat
+// flush against the viewport edge instead of lining up with the ticker
+// cards above them. Matching that same 0.75rem here keeps every Market
+// block visually aligned to one consistent gutter.
+@mixin section-gutter {
+  margin-left: 0.75rem;
+  margin-right: 0.75rem;
+}
+
 @mixin ticker-change {
   display: flex;
   align-items: center;
