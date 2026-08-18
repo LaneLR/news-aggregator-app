@@ -4,14 +4,35 @@ import Link from "next/link";
 import Button from "./Button";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { Sun, Moon } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Sun, Moon, Menu, X } from "lucide-react";
 import SearchBar from "./SearchBar";
 import WeatherWidget from "./WeatherWidget";
 import HeaderSubscribeBanner from "./SubscribeHeaderBanner";
+import { useMobileNav } from "./MobileNavProvider";
+import { shouldShowSidebar } from "@/lib/navLinks";
 import styles from "./Header.module.scss";
 
 export default function Header() {
   const { data: session, status, update } = useSession();
+  const pathname = usePathname();
+  const { isOpen: isNavOpen, toggle: toggleNav } = useMobileNav();
+  // Only worth opening on pages that actually render the sidebar this
+  // drawer contains (see MainContentWrapper) — showing a hamburger that
+  // opens nothing on marketing/auth pages would be a dead-end control.
+  const showMenuButton = shouldShowSidebar(pathname);
+
+  const menuButton = showMenuButton && (
+    <button
+      type="button"
+      className={`${styles.iconButton} ${styles.menuButton}`}
+      onClick={toggleNav}
+      aria-label={isNavOpen ? "Close menu" : "Open menu"}
+      aria-expanded={isNavOpen}
+    >
+      {isNavOpen ? <X size={20} strokeWidth={2} /> : <Menu size={20} strokeWidth={2} />}
+    </button>
+  );
 
   // When selectedTheme is null (no explicit choice — see themes.scss), the
   // page is actually following the OS's prefers-color-scheme. Reading that
@@ -51,6 +72,7 @@ export default function Header() {
     return (
       <div className={styles.wrapper}>
         <div className={styles.leftContainer}>
+          {menuButton}
           <div className={styles.logoLink}>
             <div className={styles.logoContainer}>
               <Image
@@ -88,6 +110,7 @@ export default function Header() {
         <div style={{ width: "100%" }}>
           <div className={styles.wrapper}>
             <div className={styles.leftContainer}>
+              {menuButton}
               <Link className={styles.logoLink} href={"/news"}>
                 <div className={styles.logoContainer}>
                   <Image
@@ -134,6 +157,7 @@ export default function Header() {
       ) : (
         <div className={styles.wrapper}>
           <div className={styles.leftContainer}>
+            {menuButton}
             <Link className={styles.logoLink} href={"/"}>
               <div className={styles.logoContainer}>
                 <Image

@@ -15,6 +15,7 @@ import CommandPalette from "@/components/CommandPalette";
 import ToastProvider from "@/components/ToastProvider";
 import ConfirmDialogProvider from "@/components/ConfirmDialogProvider";
 import FollowedSourcesProvider from "@/components/FollowedSourcesProvider";
+import MobileNavProvider from "@/components/MobileNavProvider";
 import { auth } from "@/lib/auth";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -147,13 +148,15 @@ export default async function RootLayout({ children }) {
                 <FollowedSourcesProvider>
                   <ConfirmDialogProvider>
                     <KeyboardShortcutsProvider>
-                      <AppWrapper>
-                        <Header />
-                        <MainContentWrapper>{children}</MainContentWrapper>
-                        <Footer />
-                        <MobileTabBar />
-                      </AppWrapper>
-                      <CommandPalette />
+                      <MobileNavProvider>
+                        <AppWrapper>
+                          <Header />
+                          <MainContentWrapper>{children}</MainContentWrapper>
+                          <Footer />
+                          <MobileTabBar />
+                        </AppWrapper>
+                        <CommandPalette />
+                      </MobileNavProvider>
                     </KeyboardShortcutsProvider>
                   </ConfirmDialogProvider>
                 </FollowedSourcesProvider>

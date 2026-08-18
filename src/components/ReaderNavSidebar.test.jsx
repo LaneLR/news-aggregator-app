@@ -14,6 +14,12 @@ vi.mock("next/navigation", () => ({
   usePathname: () => mockPathname,
 }));
 
+let mockIsOpen = false;
+const mockClose = vi.fn();
+vi.mock("./MobileNavProvider", () => ({
+  useMobileNav: () => ({ isOpen: mockIsOpen, close: mockClose }),
+}));
+
 const unreadCounts = { value: { categories: {}, feeds: 0, following: 0 } };
 vi.mock("@/lib/useUnreadCounts", () => ({ useUnreadCounts: () => unreadCounts.value }));
 
@@ -23,6 +29,8 @@ describe("ReaderNavSidebar", () => {
   beforeEach(() => {
     unreadCounts.value = { categories: {}, feeds: 0, following: 0 };
     signOut.mockClear();
+    mockIsOpen = false;
+    mockClose.mockClear();
   });
 
   it("hides subscriber-only top links but always shows categories (with a lock badge) for a Free user", () => {
@@ -130,5 +138,49 @@ describe("ReaderNavSidebar", () => {
     await user.click(screen.getByRole("button", { name: /Log Out/ }));
 
     expect(signOut).toHaveBeenCalledWith({ callbackUrl: "/login" });
+  });
+
+  it("renders no backdrop and no dialog role when the drawer is closed", () => {
+    mockSession = makeSession({ tier: "Free" });
+    mockPathname = "/news";
+    mockIsOpen = false;
+    const { container } = render(<ReaderNavSidebar />);
+
+    expect(container.querySelector('[class*="backdrop"]')).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("renders a backdrop and dialog role when the drawer is open", () => {
+    mockSession = makeSession({ tier: "Free" });
+    mockPathname = "/news";
+    mockIsOpen = true;
+    const { container } = render(<ReaderNavSidebar />);
+
+    expect(container.querySelector('[class*="backdrop"]')).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Categories" })).toBeInTheDocument();
+  });
+
+  it("closes the drawer when the backdrop is clicked", async () => {
+    const user = userEvent.setup();
+    mockSession = makeSession({ tier: "Free" });
+    mockPathname = "/news";
+    mockIsOpen = true;
+    const { container } = render(<ReaderNavSidebar />);
+
+    await user.click(container.querySelector('[class*="backdrop"]'));
+
+    expect(mockClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("closes the drawer when a nav link is clicked", async () => {
+    const user = userEvent.setup();
+    mockSession = makeSession({ tier: "Free" });
+    mockPathname = "/news";
+    mockIsOpen = true;
+    render(<ReaderNavSidebar />);
+
+    await user.click(screen.getByRole("link", { name: /Business/ }));
+
+    expect(mockClose).toHaveBeenCalledTimes(1);
   });
 });

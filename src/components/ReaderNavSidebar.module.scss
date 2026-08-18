@@ -36,15 +36,52 @@
     background-color: var(--theme-primary);
   }
 
+  // Below the breakpoint this becomes an off-canvas drawer (see .backdrop
+  // and .sidebarOpen) instead of a stacked full-width block above the page
+  // content — the previous stacked layout meant every mobile visitor had to
+  // scroll past the entire category list before reaching any articles.
   @media (max-width: 900px) {
-    position: static;
-    max-height: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 210;
+    width: min(300px, 82vw);
+    max-height: 100vh;
     flex-basis: auto;
-    width: 100%;
-    overflow-y: visible;
-    border-right: none;
-    border-bottom: 1px solid var(--theme-border);
+    overflow-y: auto;
+    border-right: 1px solid var(--theme-border);
+    border-bottom: none;
     padding-bottom: 1.25rem;
+    box-shadow: var(--shadow-lg);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+
+    &:not(.sidebarOpen) {
+      // Fully removed from the layout/tab order while closed, not just
+      // pushed off-screen — a translated-but-still-rendered drawer would
+      // otherwise still be Tab-reachable and still occupy assistive-tech
+      // navigation even though it's invisible.
+      visibility: hidden;
+    }
+  }
+}
+
+.sidebarOpen {
+  @media (max-width: 900px) {
+    transform: translateX(0);
+    visibility: visible;
+  }
+}
+
+.backdrop {
+  display: none;
+
+  @media (max-width: 900px) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 205;
+    background-color: rgba(0, 0, 0, 0.45);
   }
 }
 

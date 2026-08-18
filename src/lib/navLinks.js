@@ -61,3 +61,34 @@ export const CATEGORY_LINKS = [
 // aren't — so counts are looked up case-insensitively via this helper
 // rather than assuming a consistent capitalization scheme.
 export const slugFromHref = (href) => href.split("/").pop();
+
+// Standalone/single-purpose pages where the persistent category sidebar
+// (ReaderNavSidebar, via MainContentWrapper) doesn't belong —
+// marketing/landing, auth, legal/static, and the onboarding flow.
+// Everything else (category pages, /news, /search, /archives, the article
+// reader, account/settings, etc.) gets the sidebar, for every visitor —
+// logged in or not. A blocklist rather than an allowlist so a new content
+// page gets the sidebar automatically without needing to remember to add it
+// here. Shared with Header (which needs to know whether to show a
+// hamburger button that opens the same sidebar as a mobile drawer) so the
+// two never drift out of sync on which pages have a sidebar to open.
+const HIDDEN_SIDEBAR_PATHS = new Set([
+  "/",
+  "/login",
+  "/register",
+  "/pricing",
+  "/privacy",
+  "/terms-of-service",
+  "/contact-us",
+  "/about",
+  "/forgot-password",
+  "/password-reset",
+  "/onboarding",
+  "/subscribe",
+]);
+
+export function shouldShowSidebar(pathname) {
+  if (HIDDEN_SIDEBAR_PATHS.has(pathname)) return false;
+  if (pathname.startsWith("/verification/")) return false;
+  return true;
+}

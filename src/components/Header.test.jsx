@@ -5,15 +5,21 @@ import { makeFetchResponse, makeSession } from "@/test/fixtures";
 
 let mockSession = null;
 let mockStatus = "unauthenticated";
+let mockPathname = "/news";
 const update = vi.fn();
+const mockToggle = vi.fn();
+let mockIsNavOpen = false;
 vi.mock("next-auth/react", () => ({
   useSession: () => ({ data: mockSession, status: mockStatus, update }),
 }));
 vi.mock("next/navigation", () => ({
   // Header renders SearchBar under the hood, which calls usePathname() and
   // useRouter() directly.
-  usePathname: () => "/news",
+  usePathname: () => mockPathname,
   useRouter: () => ({ push: vi.fn() }),
+}));
+vi.mock("./MobileNavProvider", () => ({
+  useMobileNav: () => ({ isOpen: mockIsNavOpen, toggle: mockToggle }),
 }));
 
 const { default: Header } = await import("./Header");
@@ -22,7 +28,10 @@ describe("Header", () => {
   beforeEach(() => {
     mockSession = null;
     mockStatus = "unauthenticated";
+    mockPathname = "/news";
+    mockIsNavOpen = false;
     update.mockClear();
+    mockToggle.mockClear();
     global.fetch.mockImplementation((url) =>
       Promise.reject(new Error(`Unmocked fetch: ${url}`))
     );
@@ -166,5 +175,62 @@ describe("Header", () => {
     unmount();
     expect(removeEventListener).toHaveBeenCalledWith("change", changeHandler);
     window.matchMedia = originalMatchMedia;
+  });
+
+  // The hamburger is only visually shown below a 900px CSS media query
+  // (see Header.module.scss's .menuButton) — jsdom's default viewport is
+  // wider than that, so @testing-library/dom's getByRole excludes it as
+  // "hidden" the same way it does for MobileTabBar's links (see that
+  // file's own comment on this). Querying by aria-label directly sidesteps
+  // the accessible-role/visibility computation instead of fighting it.
+  it("shows a mobile menu button on a page that has a category sidebar to open", () => {
+    mockSession = makeSession();
+    mockStatus = "authenticated";
+    mockPathname = "/news";
+    const { container } = render(<Header />);
+    expect(container.querySelector('[aria-label="Open menu"]')).toBeInTheDocument();
+  });
+
+  it("hides the mobile menu button on a page with no sidebar (e.g. pricing)", () => {
+    mockSession = makeSession();
+    mockStatus = "authenticated";
+    mockPathname = "/pricing";
+    const { container } = render(<Header />);
+    expect(container.querySelector('[aria-label="Open menu"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[aria-label="Close menu"]')).not.toBeInTheDocument();
+  });
+
+  it("hides the mobile menu button while logged out on a marketing page", () => {
+    mockStatus = "unauthenticated";
+    mockPathname = "/login";
+    const { container } = render(<Header />);
+    expect(container.querySelector('[aria-label="Open menu"]')).not.toBeInTheDocument();
+  });
+
+  it("still shows the mobile menu button while logged out on a content page", () => {
+    mockStatus = "unauthenticated";
+    mockPathname = "/news";
+    const { container } = render(<Header />);
+    expect(container.querySelector('[aria-label="Open menu"]')).toBeInTheDocument();
+  });
+
+  it("toggles the mobile nav drawer when the menu button is clicked", async () => {
+    const user = userEvent.setup();
+    mockSession = makeSession();
+    mockStatus = "authenticated";
+    mockPathname = "/news";
+    const { container } = render(<Header />);
+
+    await user.click(container.querySelector('[aria-label="Open menu"]'));
+    expect(mockToggle).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows a close icon and label once the drawer is open", () => {
+    mockSession = makeSession();
+    mockStatus = "authenticated";
+    mockPathname = "/news";
+    mockIsNavOpen = true;
+    const { container } = render(<Header />);
+    expect(container.querySelector('[aria-label="Close menu"]')).toBeInTheDocument();
   });
 });
