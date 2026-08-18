@@ -14,6 +14,7 @@ import { getCategoryColor } from "@/lib/categoryColors";
 import { timeAgo } from "@/lib/timeAgo";
 import ArticleFallbackArt from "./ArticleFallbackArt";
 import { useToast } from "./ToastProvider";
+import { useLowResImage } from "@/lib/useLowResImage";
 import styles from "./CarouselArticleCard.module.scss";
 
 export default function CarouselCard({ article, archiveId }) {
@@ -29,6 +30,7 @@ export default function CarouselCard({ article, archiveId }) {
   const proxiedImageUrl = hasRealImage
     ? `/api/image-proxy?url=${encodeURIComponent(article.urlToImage)}`
     : null;
+  const { isLowRes, handleImageLoad } = useLowResImage();
 
   const handleLike = async () => {
     if (!session) {
@@ -68,8 +70,10 @@ export default function CarouselCard({ article, archiveId }) {
           <Image
             src={proxiedImageUrl}
             alt={article.title}
+            onLoad={handleImageLoad}
             fill
             sizes="320px"
+            className={isLowRes ? styles.lowResImage : undefined}
             style={{ objectFit: "cover" }}
           />
         ) : (
