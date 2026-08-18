@@ -16,20 +16,21 @@ export default function CarouselRow({ children }) {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
-  // Only ever called once the effect below has already confirmed
-  // scrollRef.current exists (directly, or via a listener attached to that
-  // same element), so no separate null guard is needed here.
+  // A ResizeObserver/scroll callback can still be in flight when the
+  // component unmounts (e.g. a client-side route change navigating away
+  // mid-carousel) — React nulls the ref before the effect cleanup below
+  // finishes detaching these listeners, so a queued callback can fire
+  // against a null ref. Guard here rather than assuming cleanup always wins
+  // the race.
   const updateScrollability = useCallback(() => {
     const el = scrollRef.current;
+    if (!el) return;
     // 1px tolerance for subpixel rounding right at the scroll boundaries.
     setCanScrollLeft(el.scrollLeft > 1);
     setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
   }, []);
 
   useEffect(() => {
-    // The scrolling div below always renders (never behind a conditional),
-    // so scrollRef.current is already attached by the time any effect body
-    // runs — no null guard needed.
     const el = scrollRef.current;
     updateScrollability();
     // Covers both causes of "how much overflow exists" changing after

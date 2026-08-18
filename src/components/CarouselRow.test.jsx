@@ -122,4 +122,33 @@ describe("CarouselRow", () => {
 
     expect(screen.getByRole("button", { name: "Scroll right" })).toBeInTheDocument();
   });
+
+  it("ignores a ResizeObserver callback that fires after unmount", () => {
+    // A resize/scroll notification can already be queued when the
+    // component unmounts (e.g. a client-side route change navigating away
+    // mid-carousel) — React nulls the ref before cleanup fully detaches
+    // these listeners, so the callback can still fire once against a null
+    // ref. The real ResizeObserver.observe() is a no-op in jsdom (see
+    // vitest.setup.js), so capture the callback directly to simulate that.
+    let capturedCallback;
+    const OriginalResizeObserver = globalThis.ResizeObserver;
+    globalThis.ResizeObserver = class {
+      constructor(callback) {
+        capturedCallback = callback;
+      }
+      observe() {}
+      disconnect() {}
+    };
+
+    const { unmount } = render(
+      <CarouselRow>
+        <div>Card A</div>
+      </CarouselRow>
+    );
+    unmount();
+
+    expect(() => capturedCallback()).not.toThrow();
+
+    globalThis.ResizeObserver = OriginalResizeObserver;
+  });
 });

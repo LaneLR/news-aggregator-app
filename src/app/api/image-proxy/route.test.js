@@ -30,6 +30,16 @@ function makeFetchResponse({ ok = true, status = 200, contentType = "image/jpeg"
   };
 }
 
+function makeRedirectResponse(location, status = 301) {
+  return {
+    ok: false,
+    status,
+    statusText: "",
+    headers: { get: (h) => (h === "location" ? location : null) },
+    arrayBuffer: async () => new ArrayBuffer(0),
+  };
+}
+
 describe("GET /api/image-proxy", () => {
   beforeEach(() => {
     mockLookup.mockReset();
@@ -230,6 +240,53 @@ describe("GET /api/image-proxy", () => {
       capturedSingle.push(address, family);
     });
     expect(capturedSingle).toEqual(["93.184.216.34", 4]);
+  });
+
+  it("follows a same-host http->https redirect and proxies the final image", async () => {
+    // A same-host protocol upgrade (or a CDN handing off to its origin) is
+    // routine for article images — refusing to follow it entirely (the
+    // previous behavior) meant those images just never loaded.
+    global.fetch
+      .mockResolvedValueOnce(makeRedirectResponse("https://cdn.example.com/pic.jpg"))
+      .mockResolvedValueOnce(makeFetchResponse({ contentType: "image/jpeg" }));
+
+    const res = await GET(makeRequest(`url=${encodeURIComponent("http://cdn.example.com/pic.jpg")}`));
+
+    expect(res.status).toBe(200);
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(global.fetch.mock.calls[1][0]).toBe("https://cdn.example.com/pic.jpg");
+  });
+
+  it("resolves a relative Location header against the redirecting URL", async () => {
+    global.fetch
+      .mockResolvedValueOnce(makeRedirectResponse("/pic-final.jpg"))
+      .mockResolvedValueOnce(makeFetchResponse({ contentType: "image/jpeg" }));
+
+    const res = await GET(makeRequest(`url=${encodeURIComponent("https://cdn.example.com/pic.jpg")}`));
+
+    expect(res.status).toBe(200);
+    expect(global.fetch.mock.calls[1][0]).toBe("https://cdn.example.com/pic-final.jpg");
+  });
+
+  it("re-validates each redirect hop, rejecting a redirect to a private address (SSRF protection)", async () => {
+    global.fetch.mockResolvedValueOnce(makeRedirectResponse("http://169.254.169.254/latest/meta-data"));
+
+    const res = await GET(makeRequest(`url=${encodeURIComponent("https://cdn.example.com/pic.jpg")}`));
+
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toBe("Invalid image URL");
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("gives up after too many redirect hops instead of looping forever", async () => {
+    global.fetch.mockResolvedValue(makeRedirectResponse("https://cdn.example.com/pic.jpg"));
+
+    const res = await GET(makeRequest(`url=${encodeURIComponent("https://cdn.example.com/pic.jpg")}`));
+
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toBe("Too many redirects");
   });
 
   it("does not set a dispatcher when the URL host is already a literal IP", async () => {
