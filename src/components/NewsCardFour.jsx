@@ -14,6 +14,7 @@ import { getCategoryColor } from "@/lib/categoryColors";
 import { useSwipeGesture } from "@/lib/useSwipeGesture";
 import ArticleFallbackArt from "./ArticleFallbackArt";
 import { useToast } from "./ToastProvider";
+import { useLowResImage } from "@/lib/useLowResImage";
 import styles from "./NewsCardFour.module.scss";
 
 // See the identical comment in NewsCardThree.jsx — unconditional preload
@@ -64,6 +65,7 @@ export default function NewsCardFour({
   const showFallbackArt = !proxiedImageUrl || imageFailed;
 
   const handleImageError = () => setImageFailed(true);
+  const { isLowRes, handleImageLoad } = useLowResImage();
 
   const handleLike = async () => {
     if (!session) {
@@ -149,9 +151,11 @@ export default function NewsCardFour({
             src={proxiedImageUrl}
             alt={article?.title || "News article image"}
             onError={handleImageError}
+            onLoad={handleImageLoad}
             preload={index != null && index < PRELOAD_THRESHOLD_INDEX}
             fill
             sizes="(max-width: 768px) 100vw, 33vw"
+            className={isLowRes ? styles.lowResImage : undefined}
             style={{
               objectFit: "cover",
               objectPosition: "top",

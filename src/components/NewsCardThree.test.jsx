@@ -196,6 +196,40 @@ describe("NewsCardThree", () => {
     expect(container.querySelector('[style*="linear-gradient"]')).toBeInTheDocument();
   });
 
+  it("applies the blurred-backdrop treatment once a too-small source image finishes loading", async () => {
+    const article = makeArticle({ urlToImage: "https://example.com/tiny.jpg" });
+    render(<NewsCardThree article={article} viewOnly />);
+    await screen.findByRole("button", { name: "Save to archive" });
+
+    const img = screen.getByAltText(article.title);
+    expect(img.className).not.toMatch(/lowResImage/);
+
+    Object.defineProperty(img, "naturalWidth", { value: 60, configurable: true });
+    Object.defineProperty(img, "naturalHeight", { value: 60, configurable: true });
+    // next/image doesn't wire the caller's onLoad directly onto the <img>'s
+    // own onLoad attribute — it wraps it (see handleLoading in
+    // next/image-component.js), calling it asynchronously after its own
+    // internal img.decode() promise resolves. fireEvent.load still triggers
+    // that wrapper, but the resulting state update lands a tick later.
+    fireEvent.load(img);
+
+    await waitFor(() => expect(img.className).toMatch(/lowResImage/));
+  });
+
+  it("does not apply the blurred-backdrop treatment for a normal-sized image", async () => {
+    const article = makeArticle({ urlToImage: "https://example.com/normal.jpg" });
+    render(<NewsCardThree article={article} viewOnly />);
+    await screen.findByRole("button", { name: "Save to archive" });
+
+    const img = screen.getByAltText(article.title);
+    Object.defineProperty(img, "naturalWidth", { value: 800, configurable: true });
+    Object.defineProperty(img, "naturalHeight", { value: 450, configurable: true });
+    fireEvent.load(img);
+
+    await waitFor(() => expect(img["data-loaded-src"]).toBeTruthy());
+    expect(img.className).not.toMatch(/lowResImage/);
+  });
+
   it("renders the category-colored fallback art with the headline overlaid when there's no urlToImage at all", () => {
     const article = makeArticle({ urlToImage: null, category: ["Entertainment"], title: "No Image Article" });
     const { container } = render(<NewsCardThree article={article} viewOnly />);

@@ -100,6 +100,33 @@ describe("NewsCardFour", () => {
     expect(container.querySelector('[style*="linear-gradient"]')).toBeInTheDocument();
   });
 
+  it("applies the blurred-backdrop treatment once a too-small source image finishes loading", async () => {
+    const article = makeArticle({ urlToImage: "https://example.com/tiny.jpg", title: "Tiny Thumbnail" });
+    render(<NewsCardFour article={article} viewOnly />);
+
+    const img = screen.getByAltText("Tiny Thumbnail");
+    expect(img.className).not.toMatch(/lowResImage/);
+
+    Object.defineProperty(img, "naturalWidth", { value: 60, configurable: true });
+    Object.defineProperty(img, "naturalHeight", { value: 60, configurable: true });
+    fireEvent.load(img);
+
+    await waitFor(() => expect(img.className).toMatch(/lowResImage/));
+  });
+
+  it("does not apply the blurred-backdrop treatment for a normal-sized image", async () => {
+    const article = makeArticle({ urlToImage: "https://example.com/normal.jpg", title: "Normal Thumbnail" });
+    render(<NewsCardFour article={article} viewOnly />);
+
+    const img = screen.getByAltText("Normal Thumbnail");
+    Object.defineProperty(img, "naturalWidth", { value: 800, configurable: true });
+    Object.defineProperty(img, "naturalHeight", { value: 450, configurable: true });
+    fireEvent.load(img);
+
+    await waitFor(() => expect(img["data-loaded-src"]).toBeTruthy());
+    expect(img.className).not.toMatch(/lowResImage/);
+  });
+
   it("shows a lock icon for paywalled sources", () => {
     const article = makeArticle({ sourceName: "New York Times" });
     render(<NewsCardFour article={article} viewOnly />);

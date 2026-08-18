@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeArticle, makeFetchResponse } from "@/test/fixtures";
 
@@ -124,5 +124,32 @@ describe("CarouselArticleCard", () => {
 
     expect(screen.queryByAltText("No Image Article")).not.toBeInTheDocument();
     expect(container.querySelector('[class*="imageLink"] [style*="linear-gradient"]')).toBeInTheDocument();
+  });
+
+  it("applies the blurred-backdrop treatment once a too-small source image finishes loading", async () => {
+    const article = makeArticle({ urlToImage: "https://example.com/tiny.jpg", title: "Tiny Thumbnail" });
+    render(<CarouselCard article={article} />);
+
+    const img = screen.getByAltText("Tiny Thumbnail");
+    expect(img.className).not.toMatch(/lowResImage/);
+
+    Object.defineProperty(img, "naturalWidth", { value: 60, configurable: true });
+    Object.defineProperty(img, "naturalHeight", { value: 60, configurable: true });
+    fireEvent.load(img);
+
+    await waitFor(() => expect(img.className).toMatch(/lowResImage/));
+  });
+
+  it("does not apply the blurred-backdrop treatment for a normal-sized image", async () => {
+    const article = makeArticle({ urlToImage: "https://example.com/normal.jpg", title: "Normal Thumbnail" });
+    render(<CarouselCard article={article} />);
+
+    const img = screen.getByAltText("Normal Thumbnail");
+    Object.defineProperty(img, "naturalWidth", { value: 800, configurable: true });
+    Object.defineProperty(img, "naturalHeight", { value: 450, configurable: true });
+    fireEvent.load(img);
+
+    await waitFor(() => expect(img["data-loaded-src"]).toBeTruthy());
+    expect(img.className).not.toMatch(/lowResImage/);
   });
 });

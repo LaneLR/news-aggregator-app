@@ -87,6 +87,20 @@
   width: 100%;
   height: 220px;
   background-color: var(--theme-layout-background);
+  // Needed for .lowResImage's scale() below — without it, the deliberately
+  // oversized blurred image bleeds past the card's rounded corners instead
+  // of being cropped by them.
+  overflow: hidden;
+}
+
+// See the identical comment in NewsCardThree.module.scss — some sources
+// only ever provide a tiny source image, so this leans into the softness
+// (the same blurred-backdrop treatment Spotify/Apple Music use for
+// undersized artwork) instead of blowing it up into obviously blocky
+// pixelation.
+.lowResImage {
+  filter: blur(14px) saturate(1.15);
+  transform: scale(1.15);
 }
 
 .contentArea {
