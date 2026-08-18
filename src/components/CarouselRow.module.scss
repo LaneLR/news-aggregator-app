@@ -46,8 +46,16 @@
     transform: translateY(-50%) scale(0.94);
   }
 
-  @media (max-width: 700px) {
-    display: none;
+  // Previously hidden below 700px, forcing swipe-only navigation on mobile
+  // — but touch users benefit from a tap target just as much as a mouse
+  // pointer does, and the button's overflow-aware visibility (see
+  // CarouselRow.jsx) already keeps it from showing when there's nowhere to
+  // scroll, so there's no reason to additionally suppress it by viewport
+  // width. Shrunk slightly at the same breakpoint the row's own gap
+  // shrinks, so it doesn't crowd narrow screens.
+  @media (max-width: 440px) {
+    width: 32px;
+    height: 32px;
   }
 }
 

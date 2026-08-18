@@ -1,6 +1,7 @@
 @use "../styles/marketCard" as market;
 
 .section {
+  @include market.section-gutter;
   margin-bottom: 1.5rem;
 }
 
