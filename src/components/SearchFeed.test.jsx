@@ -174,9 +174,15 @@ describe("SearchFeed", () => {
 
     // Same extended timeout as the "deduplicates" test right below, which
     // has this identical render-page-1 / trigger-intersection / assert
-    // shape — CI runners are slow enough for the default 1000ms to be too
-    // tight here even though the underlying fetch/render cycle is correct.
-    expect(await screen.findByText("Page Two Article", {}, { timeout: 3000 })).toBeInTheDocument();
+    // shape — under heavy full-suite parallel load, the fetch/render cycle
+    // (correct, but genuinely async: mocked fetch resolves, then setResults,
+    // then a React re-render/commit) can take longer wall-clock time than a
+    // CPU-starved test runner's default polling window, even though nothing
+    // is actually broken. 1000ms wasn't enough; 3000ms still intermittently
+    // wasn't enough under real full-suite CI load (confirmed reproducing
+    // 2026-08-18) — bumped further rather than re-bumping by small
+    // increments each time this resurfaces.
+    expect(await screen.findByText("Page Two Article", {}, { timeout: 8000 })).toBeInTheDocument();
     expect(global.fetch).toHaveBeenLastCalledWith("/api/search?query=nvidia&page=2");
   });
 
@@ -197,7 +203,7 @@ describe("SearchFeed", () => {
     );
     await triggerIntersection();
 
-    expect(await screen.findByText("New Article", {}, { timeout: 3000 })).toBeInTheDocument();
+    expect(await screen.findByText("New Article", {}, { timeout: 8000 })).toBeInTheDocument();
     expect(screen.getAllByText("Same Article")).toHaveLength(1);
   });
 
@@ -263,7 +269,7 @@ describe("SearchFeed", () => {
     global.fetch.mockResolvedValueOnce(resultsPage([]));
     await triggerIntersection();
 
-    expect(await screen.findByText("No more results", {}, { timeout: 3000 })).toBeInTheDocument();
+    expect(await screen.findByText("No more results", {}, { timeout: 8000 })).toBeInTheDocument();
   });
 
   it("selects an article via the keyboard-shortcut callback in reader density", async () => {
