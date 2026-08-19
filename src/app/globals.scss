@@ -1,6 +1,19 @@
 @use "../styles/themes";
 
 :root {
+  // Single source of truth for the wrapped iOS app's safe-area insets
+  // (status bar/notch/Dynamic Island, home indicator) — every fixed or
+  // screen-edge-attached surface (Header, MobileTabBar, ReaderNavSidebar's
+  // mobile drawer, ...) reads from these instead of repeating its own
+  // env(safe-area-inset-*) call, so there's exactly one place to check when
+  // adding a new one rather than a per-component habit that's easy to
+  // forget (as ReaderNavSidebar's drawer did). Resolves to 0px in a normal
+  // browser tab and on non-notch devices either way.
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+
   // Core brand palette — warm "Sepia Mocha" neutrals with a coffee-brown
   // accent (MochaReads rebrand), replacing the old navy/blue family and,
   // before that, an amber accent. These feed the per-theme `--theme-*`

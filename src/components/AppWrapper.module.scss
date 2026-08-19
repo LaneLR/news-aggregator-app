@@ -7,6 +7,6 @@
   // breakpoint, see that component) never sits on top of the page's own
   // last bit of content.
   @media (max-width: 768px) {
-    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(56px + var(--safe-area-bottom));
   }
 }
