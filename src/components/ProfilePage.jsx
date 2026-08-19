@@ -101,7 +101,7 @@ export default function ProfilePage() {
                     </div>
                   )}
                 </div>
-                <div>
+                <div className={styles.accountInfoText}>
                   <h1 className={`${styles.userName} headline`}>
                     {user.name}
                     <span

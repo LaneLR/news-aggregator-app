@@ -22,6 +22,12 @@
   // LegalInfoPage).
   @media (max-width: 700px) {
     flex-direction: column;
+    // 2rem (32px) of gutter on each side was fine when list+reader shared
+    // a wide row, but on a phone-width column layout it eats into the
+    // narrow list-density cards' own already-tight budget for no reason —
+    // matches the 0.75rem gutter used elsewhere on mobile (Market page's
+    // section-gutter mixin).
+    padding: 0.5rem 0.75rem 3rem;
   }
 }
 

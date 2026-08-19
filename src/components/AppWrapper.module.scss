@@ -3,10 +3,21 @@
   flex-direction: column;
   min-height: 100vh;
 
-  // Reserves room below the Footer so the fixed MobileTabBar (same 768px
-  // breakpoint, see that component) never sits on top of the page's own
-  // last bit of content.
   @media (max-width: 768px) {
-    padding-bottom: calc(56px + var(--safe-area-bottom));
+    // The 100vh floor above exists to pin the Footer near the bottom of a
+    // short page (a normal desktop "sticky footer" pattern) — on mobile
+    // that's not worth it: a floating footer right after short content
+    // reads as completely normal there, and inside the wrapped native app
+    // there's no Footer at all to pin (see layout.jsx's isNativeApp
+    // check), so the 100vh floor was serving no purpose while leaving a
+    // dead empty gap below short pages like Profile/Settings. `auto` lets
+    // MainContentWrapper's own flex-grow (which would otherwise stretch to
+    // fill that same floor) settle back to its natural content height too.
+    min-height: auto;
+    // Reserves room below the Footer so the fixed MobileTabBar (same 768px
+    // breakpoint, see that component) never sits on top of the page's own
+    // last bit of content. 64px, not 56px, to match MobileTabBar's own
+    // min-height (56px) plus its padding-top (8px) breathing room.
+    padding-bottom: calc(64px + var(--safe-area-bottom));
   }
 }
