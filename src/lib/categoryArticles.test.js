@@ -139,4 +139,105 @@ describe("getCategoryArticles", () => {
     const andKey = Object.getOwnPropertySymbols(whereArg)[0];
     expect(whereArg[andKey]).toHaveLength(1); // category condition only
   });
+
+  describe("premium teaser injection", () => {
+    it("sprinkles premium-tier articles into a non-subscriber's feed, flagged as teasers", async () => {
+      db.Article.findAndCountAll.mockResolvedValue({
+        rows: Array.from({ length: 24 }, (_, i) => articleInstance({ url: `free-${i}` })),
+        count: 24,
+      });
+      db.Article.findAll.mockResolvedValue([
+        articleInstance({ url: "premium-1", title: "Premium Headline", tier: "premium" }),
+        articleInstance({ url: "premium-2", tier: "premium" }),
+      ]);
+
+      const result = await getCategoryArticles({ category: "business", userId: "user-1" });
+
+      const teasers = result.articles.filter((a) => a.isPremiumTeaser);
+      expect(teasers).toHaveLength(2);
+      expect(teasers.map((t) => t.url)).toEqual(["premium-1", "premium-2"]);
+      // Real free articles are untouched — same 24, still present.
+      expect(result.articles.filter((a) => !a.isPremiumTeaser)).toHaveLength(24);
+    });
+
+    it("never includes the article body or interaction state on a teaser row", async () => {
+      db.Article.findAndCountAll.mockResolvedValue({
+        rows: [articleInstance({ url: "free-1" })],
+        count: 1,
+      });
+      db.Article.findAll.mockResolvedValue([
+        articleInstance({ url: "premium-1", content: "the full paywalled article text" }),
+      ]);
+
+      const result = await getCategoryArticles({ category: "business", userId: "user-1" });
+      const teaser = result.articles.find((a) => a.isPremiumTeaser);
+
+      expect(teaser.content).toBeUndefined();
+      expect(teaser.isLikedByUser).toBeUndefined();
+      expect(teaser.isRead).toBeUndefined();
+      // What a locked card actually needs to render.
+      expect(teaser).toMatchObject({ url: "premium-1", isPremiumTeaser: true });
+      expect(teaser.title).toBeDefined();
+      expect(teaser.sourceName).toBeDefined();
+    });
+
+    it("queries premium articles with tier=premium, excluding podcasts, in random order", async () => {
+      db.Article.findAndCountAll.mockResolvedValue({ rows: [articleInstance()], count: 1 });
+      await getCategoryArticles({ category: "business", userId: "user-1" });
+
+      const findAllArgs = db.Article.findAll.mock.calls[0][0];
+      expect(findAllArgs.order[0].val).toBe("RANDOM()");
+      const whereArg = findAllArgs.where;
+      const andKey = Object.getOwnPropertySymbols(whereArg)[0];
+      const conditions = whereArg[andKey];
+      expect(conditions).toHaveLength(2); // category condition + tier/sourceType literal
+      expect(conditions[1].val).toBe(`"tier" = 'premium' AND "sourceType" != 'podcast'`);
+    });
+
+    it("requests only 1 teaser for an anonymous (no userId) request", async () => {
+      db.Article.findAndCountAll.mockResolvedValue({
+        rows: Array.from({ length: 10 }, (_, i) => articleInstance({ url: `free-${i}` })),
+        count: 10,
+      });
+      await getCategoryArticles({ category: "business" });
+
+      expect(db.Article.findAll).toHaveBeenCalledWith(expect.objectContaining({ limit: 1 }));
+    });
+
+    it("does not inject teasers for a subscribed user", async () => {
+      db.Article.findAndCountAll.mockResolvedValue({ rows: [articleInstance()], count: 1 });
+      await getCategoryArticles({ category: "business", userId: "user-1", isSubscribed: true });
+
+      expect(db.Article.findAll).not.toHaveBeenCalled();
+    });
+
+    it("leaves the feed unchanged when there are no premium articles to tease", async () => {
+      db.Article.findAndCountAll.mockResolvedValue({ rows: [articleInstance({ url: "free-1" })], count: 1 });
+      db.Article.findAll.mockResolvedValue([]);
+
+      const result = await getCategoryArticles({ category: "business", userId: "user-1" });
+
+      expect(result.articles).toHaveLength(1);
+      expect(result.articles[0].isPremiumTeaser).toBeUndefined();
+    });
+
+    it("also applies the user's muted-keyword exclusion to the premium teaser query", async () => {
+      db.Article.findAndCountAll.mockResolvedValue({ rows: [articleInstance()], count: 1 });
+      db.User.findByPk.mockResolvedValue({ mutedKeywords: ["crypto"] });
+
+      await getCategoryArticles({ category: "business", userId: "user-1" });
+
+      const whereArg = db.Article.findAll.mock.calls[0][0].where;
+      const andKey = Object.getOwnPropertySymbols(whereArg)[0];
+      // category condition + tier/sourceType literal + keyword exclusion
+      expect(whereArg[andKey]).toHaveLength(3);
+    });
+
+    it("does not query for teasers at all when the free feed itself is empty", async () => {
+      db.Article.findAndCountAll.mockResolvedValue({ rows: [], count: 0 });
+      await getCategoryArticles({ category: "business", userId: "user-1" });
+
+      expect(db.Article.findAll).not.toHaveBeenCalled();
+    });
+  });
 });

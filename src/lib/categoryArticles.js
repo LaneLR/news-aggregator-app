@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, literal } from "sequelize";
 import initializeDbAndModels from "@/lib/db";
 import { buildKeywordExclusion } from "@/lib/keywordFilter";
 import { excludePremiumArticlesCondition } from "@/lib/subscriberOnlyCategories";
@@ -50,11 +50,12 @@ export async function getCategoryArticles({
 
   let likedUrls = new Set();
   let readUrls = new Set();
+  let keywordExclusion;
   if (userId) {
     const currentUser = await User.findByPk(userId, {
       attributes: ["mutedKeywords"],
     });
-    const keywordExclusion = buildKeywordExclusion(currentUser?.mutedKeywords);
+    keywordExclusion = buildKeywordExclusion(currentUser?.mutedKeywords);
     if (keywordExclusion) whereConditions.push(keywordExclusion);
 
     const [userLikes, userReads] = await Promise.all([
@@ -78,14 +79,87 @@ export async function getCategoryArticles({
     offset,
   });
 
+  const articles = rows.map((item) => ({
+    ...item.toJSON(),
+    isLikedByUser: likedUrls.has(item.url),
+    isRead: readUrls.has(item.url),
+  }));
+
+  const withTeasers = isSubscribed
+    ? articles
+    : await injectPremiumTeasers(Article, articles, {
+        categoryName,
+        keywordExclusion,
+        // The anonymous 10-item preview is already a small, incomplete
+        // feed meant to nudge signup, not upgrade — one locked teaser is
+        // enough there; a logged-in Free viewer's full 24-item page can
+        // carry the 2-3 the product actually wants without reading as
+        // paywall spam (see feedback on teaser "dosage").
+        count: userId ? (Math.random() < 0.5 ? 2 : 3) : 1,
+      });
+
   return {
-    articles: rows.map((item) => ({
-      ...item.toJSON(),
-      isLikedByUser: likedUrls.has(item.url),
-      isRead: readUrls.has(item.url),
-    })),
+    articles: withTeasers,
     total: count,
     page,
     totalPages: Math.ceil(count / effectiveLimit),
   };
+}
+
+// Sprinkles a handful of premium-tier articles from the same category into
+// an otherwise-free feed, rendered by the client as a locked/blurred
+// "MochaReads Pro" teaser (see PremiumTeaserCard.jsx) rather than a normal
+// card — title/source/image are real (that's the whole point: a specific,
+// enticing headline converts better than an abstract upsell), but nothing
+// else about the row is meant to be readable, so this strips every field
+// that isn't needed to render the locked card.
+async function injectPremiumTeasers(Article, freeArticles, { categoryName, keywordExclusion, count }) {
+  if (freeArticles.length === 0 || count <= 0) return freeArticles;
+
+  // Independent conditions, not a reuse of the free query's — that query's
+  // own condition (excludePremiumArticlesCondition) exists specifically to
+  // EXCLUDE the rows this one needs to find, so building from scratch is
+  // clearer than trying to subtract one condition back out of the other
+  // list. Podcasts are always free regardless of `tier` (see Article.js's
+  // comment), so excluded here the same way the free query excludes them
+  // implicitly via excludePremiumArticlesCondition.
+  const premiumConditions = [
+    { category: { [Op.contains]: [categoryName] } },
+    literal(`"tier" = 'premium' AND "sourceType" != 'podcast'`),
+  ];
+  if (keywordExclusion) premiumConditions.push(keywordExclusion);
+
+  const teaserRows = await Article.findAll({
+    where: { [Op.and]: premiumConditions },
+    // Random, not "latest" — a fixed top-N would show the exact same 2-3
+    // locked articles on every page/refresh, which reads as a bug rather
+    // than a rotating preview of what Pro unlocks.
+    order: [literal("RANDOM()")],
+    limit: count,
+  });
+
+  if (teaserRows.length === 0) return freeArticles;
+
+  const teasers = teaserRows.map((item) => ({
+    id: item.id,
+    url: item.url,
+    title: item.title,
+    urlToImage: item.urlToImage,
+    sourceName: item.sourceName,
+    category: item.category,
+    publishedAt: item.publishedAt,
+    isPremiumTeaser: true,
+  }));
+
+  // Spreads teasers evenly through the page instead of clustering them at
+  // one end — divides the free articles into `teasers.length` roughly-even
+  // segments and inserts one teaser near the end of each.
+  const result = [...freeArticles];
+  const segmentSize = Math.max(1, Math.floor(result.length / teasers.length));
+  teasers.forEach((teaser, i) => {
+    const insertAt = Math.min(result.length, (i + 1) * segmentSize + i);
+    result.splice(insertAt, 0, teaser);
+  });
+
+  return result;
 }
