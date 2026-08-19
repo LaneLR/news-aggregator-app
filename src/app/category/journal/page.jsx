@@ -9,7 +9,7 @@ import { getCategoryArticles } from "@/lib/categoryArticles";
 // rather than bouncing people to /pricing with no context.
 export const metadata = {
   title: "Journals",
-  description: "Peer-reviewed research and long-form analysis — for Subscribers.",
+  description: "Peer-reviewed research and long-form analysis — for MochaReads Pro.",
 };
 
 export default async function JournalNewsPage() {

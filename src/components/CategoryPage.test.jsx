@@ -34,6 +34,9 @@ vi.mock("./ThreePaneLayout", () => ({
     </div>
   ),
 }));
+vi.mock("./PremiumTeaserCard", () => ({
+  default: ({ article }) => <div>Teaser:{article.title}</div>,
+}));
 vi.mock("./MarkAllReadButton", () => ({
   default: ({ onClick, disabled }) => (
     <button type="button" onClick={onClick} disabled={disabled}>
@@ -118,6 +121,36 @@ describe("CategoryPage", () => {
 
     expect(screen.getByText("Card:SSR Story")).toBeInTheDocument();
     expect(screen.queryAllByText("Skeleton")).toHaveLength(0);
+  });
+
+  it("renders a locked teaser card for an article flagged isPremiumTeaser", () => {
+    mockFetchRoutes([[/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })]]);
+    const initialArticles = [
+      makeArticle({ title: "Free Story" }),
+      { ...makeArticle({ title: "Locked Story" }), isPremiumTeaser: true },
+    ];
+
+    render(<CategoryPage category="business" initialArticles={initialArticles} initialTotalPages={1} />);
+
+    expect(screen.getByText("Card:Free Story")).toBeInTheDocument();
+    expect(screen.getByText("Teaser:Locked Story")).toBeInTheDocument();
+    // The mocked NewsCardThree renders "Card:" for every article — a teaser
+    // must never fall through to it, since that'd be the real card (with a
+    // working read-more link) rendering a Pro-only article for a Free viewer.
+    expect(screen.queryByText("Card:Locked Story")).not.toBeInTheDocument();
+  });
+
+  it("excludes teaser articles from the three-pane reader — nothing to open there", () => {
+    layoutPrefs.value = { loaded: true, viewDensity: "reader", setViewDensity: vi.fn() };
+    mockFetchRoutes([[/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })]]);
+    const initialArticles = [
+      makeArticle({ title: "Free Story" }),
+      { ...makeArticle({ title: "Locked Story" }), isPremiumTeaser: true },
+    ];
+
+    render(<CategoryPage category="business" initialArticles={initialArticles} initialTotalPages={1} />);
+
+    expect(screen.getByText("ThreePane:1")).toBeInTheDocument();
   });
 
   it("shows loading skeletons and then articles when there's no SSR data", async () => {

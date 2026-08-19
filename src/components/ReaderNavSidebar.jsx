@@ -126,7 +126,7 @@ export default function ReaderNavSidebar() {
                     size={14}
                     strokeWidth={2.5}
                     className={styles.lockIcon}
-                    aria-label="Subscribers only"
+                    aria-label="Pro only"
                   />
                 )}
                 {count > 0 && (

@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Heart, Lock, ExternalLink, Newspaper, X, Maximize2, Minimize2 } from "lucide-react";
+import { Heart, Lock, ExternalLink, Newspaper, X, Maximize2, Minimize2, ArrowLeft } from "lucide-react";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 import ShareButton from "./ShareButton";
 import ReaderCustomizationPanel from "./ReaderCustomizationPanel";
@@ -97,14 +97,36 @@ export default function ArticleReader({
     }
   };
 
+  // The 3-pane reader already has its own exit affordance (onClose, closing
+  // it back into the list pane it opened from) — this is only for the
+  // standalone /article/[id] page, which has neither onClose nor
+  // onToggleFullScreen and previously had no way back except the browser's
+  // own chrome. router.back() (rather than a fixed href like /news) both
+  // returns to whatever page actually linked here and, being a real
+  // history-stack pop rather than a fresh navigation, gets the browser's
+  // native scroll-position restoration for free — the feed picks up
+  // exactly where the reader left it instead of resetting to the top.
+  const showBackButton = !onClose;
+
   return (
     <div className={styles.wrapper} style={readerPrefsToCssVars(prefs)}>
       <div className={styles.progressTrack}>
         <div className={styles.progressFill} style={{ width: `${readProgress}%` }} />
       </div>
       <article className={styles.article} ref={articleRef}>
-        {(badgeCategory || onToggleFullScreen || onClose) && (
+        {(showBackButton || badgeCategory || onToggleFullScreen || onClose) && (
           <div className={styles.headerRow}>
+            {showBackButton && (
+              <button
+                type="button"
+                className={styles.backButton}
+                onClick={() => router.back()}
+                aria-label="Back"
+              >
+                <ArrowLeft size={17} strokeWidth={2.25} />
+                Back
+              </button>
+            )}
             {badgeCategory && (
               <span
                 className={styles.categoryBadge}

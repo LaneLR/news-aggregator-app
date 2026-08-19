@@ -32,7 +32,7 @@ describe("JournalNewsPage", () => {
     render(element);
 
     expect(mockGetCategoryArticles).not.toHaveBeenCalled();
-    expect(screen.getByText("Journals are for Subscribers")).toBeInTheDocument();
+    expect(screen.getByText("Journals are for MochaReads Pro")).toBeInTheDocument();
     expect(screen.queryByTestId("category-page")).not.toBeInTheDocument();
   });
 
@@ -43,7 +43,7 @@ describe("JournalNewsPage", () => {
     render(element);
 
     expect(mockGetCategoryArticles).not.toHaveBeenCalled();
-    expect(screen.getByText("Journals are for Subscribers")).toBeInTheDocument();
+    expect(screen.getByText("Journals are for MochaReads Pro")).toBeInTheDocument();
   });
 
   it("renders CategoryPage with the Journal category for subscribed users", async () => {

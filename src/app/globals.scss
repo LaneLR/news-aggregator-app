@@ -69,6 +69,16 @@ body {
   // overflows; this disables that bounce the same way overscroll-behavior-y
   // above already contains the vertical one.
   overscroll-behavior-x: none;
+  // Native apps don't let an accidental long-press on a nav label or a card
+  // headline pop the OS text-selection handles/magnifier — that's what was
+  // happening here, and it read as unpolished/webpage-y specifically in the
+  // wrapped iOS app. The exceptions that actually need real selection
+  // (article body text, inputs/textareas) opt back in explicitly below and
+  // in ArticleReader.module.scss, rather than this applying selectively in
+  // the first place — a global default is one rule to maintain instead of
+  // hunting down every future headline/label that'd otherwise need it
+  // one-by-one.
+  user-select: none;
   color: var(--light-white);
   // Lora (not Roboto) is the site-wide default — see layout.jsx's comment
   // on the `lora` font const for why.
@@ -132,6 +142,15 @@ select,
 textarea,
 optgroup {
   font-family: inherit;
+}
+
+// Form controls already handle text selection/editing independently of an
+// ancestor's user-select in every browser that matters here — this is
+// belt-and-suspenders, not a fix for an observed bug, since the global
+// user-select: none above is only ever meant to affect static UI text.
+input,
+textarea {
+  user-select: text;
 }
 
 .skipLink {

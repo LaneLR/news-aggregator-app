@@ -58,6 +58,12 @@ vi.mock("@/components/MobileNavProvider", () => ({
 vi.mock("@/components/NativeSplashHandler", () => ({
   default: () => <div data-testid="native-splash-handler" />,
 }));
+vi.mock("@/components/AppSplashScreen", () => ({
+  default: () => <div data-testid="app-splash-screen" />,
+}));
+vi.mock("@/components/BackToTopButton", () => ({
+  default: () => <div data-testid="back-to-top-button" />,
+}));
 
 const mockAuth = vi.fn();
 vi.mock("@/lib/auth", () => ({ auth: () => mockAuth() }));
@@ -98,6 +104,7 @@ describe("RootLayout", () => {
     expect(screen.getByTestId("header")).toBeInTheDocument();
     expect(screen.getByTestId("footer")).toBeInTheDocument();
     expect(screen.getByTestId("mobile-tab-bar")).toBeInTheDocument();
+    expect(screen.getByTestId("back-to-top-button")).toBeInTheDocument();
     expect(screen.getByTestId("command-palette")).toBeInTheDocument();
     expect(screen.getByTestId("sw-register")).toBeInTheDocument();
     expect(
@@ -158,6 +165,7 @@ describe("RootLayout", () => {
       expect(screen.getByTestId("header")).toHaveAttribute("data-hide-logo", "true");
       expect(screen.queryByTestId("footer")).not.toBeInTheDocument();
       expect(screen.getByTestId("native-splash-handler")).toBeInTheDocument();
+      expect(screen.getByTestId("app-splash-screen")).toBeInTheDocument();
     });
 
     it("shows the logo, footer, and no splash handler on a normal web visit", async () => {
@@ -170,6 +178,7 @@ describe("RootLayout", () => {
       expect(screen.getByTestId("header")).toHaveAttribute("data-hide-logo", "false");
       expect(screen.getByTestId("footer")).toBeInTheDocument();
       expect(screen.queryByTestId("native-splash-handler")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("app-splash-screen")).not.toBeInTheDocument();
     });
   });
 });

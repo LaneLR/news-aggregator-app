@@ -1,0 +1,137 @@
+.cardContainer {
+  background-color: var(--theme-card-background);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--theme-border);
+  border-top-width: 1px;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  min-width: 0;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+
+  &.densityList {
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 168px;
+
+    &:hover {
+      transform: none;
+    }
+
+    .imageArea {
+      width: 200px;
+      height: auto;
+      flex-shrink: 0;
+    }
+
+    .contentArea {
+      justify-content: center;
+    }
+  }
+
+  &.densityMagazine {
+    .imageArea {
+      height: 280px;
+    }
+
+    .blurredTitle {
+      font-size: 1.4rem;
+    }
+  }
+}
+
+.imageArea {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  background-color: var(--theme-layout-background);
+}
+
+// Real image, deliberately obscured — scaled up so the blur radius doesn't
+// reveal soft-focus edges/letterboxing at the image's true boundary (same
+// technique as the low-res-image blur treatment elsewhere in the app).
+.blurredImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  filter: blur(11px) saturate(1.1) brightness(0.85);
+  transform: scale(1.15);
+}
+
+.lockOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.28);
+  color: #fff;
+
+  svg {
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+  }
+}
+
+.contentArea {
+  padding: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.proBadge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  margin: 0 0 0.6rem 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--theme-primary) 15%, transparent);
+  color: var(--theme-primary);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+// The headline text is real (see PremiumTeaserCard.jsx's comment on why),
+// just visually illegible — a specific, enticing-but-unreadable headline
+// sells the upgrade better than a generic placeholder bar would.
+.blurredTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--theme-dark-blue);
+  line-height: 1.4;
+  margin: 0 0 0.5rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  filter: blur(5px);
+  user-select: none;
+}
+
+.sourceName {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--theme-text-secondary);
+  margin: auto 0 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

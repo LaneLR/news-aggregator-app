@@ -9,7 +9,7 @@ import { getCategoryArticles } from "@/lib/categoryArticles";
 // `gated` flag) rather than bouncing people to /pricing with no context.
 export const metadata = {
   title: "Market News",
-  description: "A live market dashboard and full market-news coverage — for Subscribers.",
+  description: "A live market dashboard and full market-news coverage — for MochaReads Pro.",
 };
 
 export default async function MarketNewsPage() {

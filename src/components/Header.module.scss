@@ -2,6 +2,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: transform 0.25s ease;
+  // Sticky + hide-on-scroll-down is mobile-only. Desktop deliberately keeps
+  // the old plain in-flow behavior: ReaderNavSidebar's own desktop column
+  // is `position: sticky; top: 0`, on the assumption that once the (non-
+  // sticky) header scrolls out of view, the true viewport top is free for
+  // it to stick to. Making Header sticky at top: 0 on desktop too would
+  // have the two competing for the same spot, with the sidebar stuck
+  // underneath the header instead of below it.
+  @media (max-width: 900px) {
+    position: sticky;
+    top: 0;
+    // Above ordinary page content, below the mobile nav drawer/backdrop
+    // (915/910) and MobileTabBar (900) — this bar has no reason to outrank
+    // either of those, it just needs to stay above the article grid/cards
+    // scrolling underneath it.
+    z-index: 100;
+  }
   // min-height, not height: this project sets box-sizing: border-box
   // globally (globals.scss), which makes padding eat into a *fixed* height
   // instead of adding to it — height: 76px + the padding-top below would
@@ -30,6 +47,25 @@
   padding-top: var(--safe-area-top);
   padding-left: var(--safe-area-left);
   padding-right: var(--safe-area-right);
+  // A little breathing room below the bar's own content, on top of the
+  // safe-area inset above — without it the search bar/icons sit flush
+  // against whatever the page's own content starts with right below,
+  // reading as one cramped block instead of two distinct surfaces.
+  padding-bottom: 8px;
+}
+
+// Slides the whole bar up out of view while scrolling down (its own
+// content, not the page's — position: sticky above keeps it pinned to the
+// viewport first), reclaiming screen space for reading; Header.jsx re-adds
+// this class the moment scroll direction flips to "up" so it's never more
+// than one upward nudge away, without needing to scroll all the way back to
+// the top of a long results list. Desktop keeps the header always visible —
+// this only ever applies below the same breakpoint the mobile menu button
+// itself uses.
+.headerHidden {
+  @media (max-width: 900px) {
+    transform: translateY(-100%);
+  }
 }
 
 .leftContainer {

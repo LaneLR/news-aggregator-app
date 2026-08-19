@@ -1,0 +1,39 @@
+.button {
+  position: fixed;
+  left: 1.25rem;
+  bottom: 1.5rem;
+  z-index: 850;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--theme-border);
+  background-color: var(--theme-card-background);
+  color: var(--theme-primary);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(12px) scale(0.9);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: var(--theme-layout-background);
+  }
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  // Clears MobileTabBar (56px + its own 8px top padding, plus the safe-area
+  // inset) — the same reservation AppWrapper itself uses to keep normal
+  // page content from sitting under the tab bar, applied here since this
+  // button is its own separately fixed-position element outside that flow.
+  @media (max-width: 768px) {
+    bottom: calc(72px + var(--safe-area-bottom));
+  }
+}

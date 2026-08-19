@@ -43,7 +43,7 @@ describe("ReaderNavSidebar", () => {
     expect(screen.queryByRole("link", { name: /My Feeds/ })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Journals/ })).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /Journals/ }).querySelector('[aria-label="Subscribers only"]')
+      screen.getByRole("link", { name: /Journals/ }).querySelector('[aria-label="Pro only"]')
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Business/ })).toBeInTheDocument();
   });
@@ -57,7 +57,7 @@ describe("ReaderNavSidebar", () => {
     expect(screen.getByRole("link", { name: /My Feeds/ })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Journals/ })).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /Journals/ }).querySelector('[aria-label="Subscribers only"]')
+      screen.getByRole("link", { name: /Journals/ }).querySelector('[aria-label="Pro only"]')
     ).not.toBeInTheDocument();
   });
 

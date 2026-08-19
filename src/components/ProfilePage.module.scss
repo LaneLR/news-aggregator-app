@@ -19,11 +19,20 @@
   display: flex;
   align-items: center;
   gap: 1.25rem;
+  // Without this, .accountInfoText's flex min-width defaults to "auto" —
+  // its own content's natural size — so a long, unbroken email address
+  // (no spaces to wrap on) could force this row, the card, and the whole
+  // page wider than the viewport instead of wrapping/truncating in place.
+  min-width: 0;
 
   @media (max-width: 480px) {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+.accountInfoText {
+  min-width: 0;
 }
 
 .avatar {
@@ -67,6 +76,10 @@
   font-size: 0.95rem;
   color: var(--theme-text-secondary);
   margin: 0.3rem 0 0 0;
+  // A long email has no spaces to naturally wrap on — without this it
+  // renders as one unbroken line that pushes the row (and the whole page,
+  // on a narrow viewport with no horizontal scroll) wider than the screen.
+  overflow-wrap: anywhere;
 }
 
 .memberSince {
@@ -134,6 +147,10 @@
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--theme-border);
   overflow: hidden;
+  // Belt-and-suspenders alongside .accountInfoRow/.accountInfoText's own
+  // min-width: 0 — caps the card itself at its column's width regardless of
+  // what any current or future row inside tries to force it to.
+  max-width: 100%;
   scroll-margin-top: 1.5rem;
 }
 

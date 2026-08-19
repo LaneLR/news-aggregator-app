@@ -9,8 +9,9 @@ vi.mock("next-auth/react", () => ({
 }));
 
 const pushMock = vi.fn();
+const backMock = vi.fn();
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: pushMock, replace: vi.fn(), refresh: vi.fn(), back: vi.fn() }),
+  useRouter: () => ({ push: pushMock, replace: vi.fn(), refresh: vi.fn(), back: backMock }),
 }));
 
 const toast = { success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn(), show: vi.fn(), dismiss: vi.fn() };
@@ -30,6 +31,7 @@ describe("ArticleReader", () => {
   beforeEach(() => {
     mockSession.value = null;
     pushMock.mockClear();
+    backMock.mockClear();
     toast.info.mockClear();
   });
 
@@ -122,6 +124,32 @@ describe("ArticleReader", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
     await user.click(screen.getByRole("button", { name: "Full screen" }));
     expect(onToggleFullScreen).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows a Back button on the standalone page (no onClose) and pops browser history when clicked", async () => {
+    const user = userEvent.setup();
+    render(
+      <ArticleReader article={article} sanitizedContent="<p>x</p>" relatedCoverage={[]} readingTime={1} />
+    );
+
+    const backButton = screen.getByRole("button", { name: "Back" });
+    expect(backButton).toBeInTheDocument();
+
+    await user.click(backButton);
+    expect(backMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not show a Back button when embedded in the 3-pane reader (onClose provided)", () => {
+    render(
+      <ArticleReader
+        article={article}
+        sanitizedContent="<p>x</p>"
+        relatedCoverage={[]}
+        readingTime={1}
+        onClose={vi.fn()}
+      />
+    );
+    expect(screen.queryByRole("button", { name: "Back" })).not.toBeInTheDocument();
   });
 
   it("redirects to login when liking while signed out", async () => {

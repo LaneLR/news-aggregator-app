@@ -49,7 +49,7 @@ describe("PricingPage", () => {
     render(<PricingPage />);
 
     expect(screen.getByRole("heading", { name: "Free" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Subscribed" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Pro" })).toBeInTheDocument();
   });
 
   it("toggles between monthly and annual pricing", async () => {

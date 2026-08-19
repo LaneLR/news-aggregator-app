@@ -261,7 +261,7 @@ export default function PricingPage() {
 
         <div className={`${styles.pricingCard} ${styles.highlighted}`}>
           <span className={styles.popularBadge}>Most Popular</span>
-          <h2 className={styles.planName}>Subscribed</h2>
+          <h2 className={styles.planName}>Pro</h2>
           <p className={styles.price}>
             {billingInterval === "annual" ? (
               <>

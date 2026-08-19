@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Newspaper, RefreshCw, ListChecks, X, Sparkles, Lock } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
+import PremiumTeaserCard from "./PremiumTeaserCard";
 import ThreePaneLayout from "./ThreePaneLayout";
 import Button from "./Button";
 import MarkAllReadButton from "./MarkAllReadButton";
@@ -301,8 +302,16 @@ export default function CategoryPage({
     fetchDefaultArchive();
   }, []);
 
+  // Locked teaser cards have no save/like buttons and nothing to open, so
+  // they're excluded from keyboard nav (j/k/o/s/l) entirely — otherwise
+  // "o"/Enter on a focused teaser would push straight to
+  // /article/[id] for a Pro-only article a Free viewer can't actually read.
+  const navigableArticles = useMemo(
+    () => articles.filter((article) => !article.isPremiumTeaser),
+    [articles]
+  );
   const { selectedIndex, cardRefs } = useArticleShortcuts(
-    articles,
+    navigableArticles,
     effectiveDensity === "reader" ? (article) => setSelectedArticleId(article.id) : undefined
   );
 
@@ -407,8 +416,12 @@ export default function CategoryPage({
       ) : articles.length > 0 ? (
         <>
           {effectiveDensity === "reader" ? (
+            // The 3-pane reader opens a selected article in an adjacent pane —
+            // a locked teaser has nothing to open there, so it's left out of
+            // this density rather than needing its own dead-end selection
+            // state. It still appears in every other density.
             <ThreePaneLayout
-              articles={articles}
+              articles={articles.filter((article) => !article.isPremiumTeaser)}
               archiveId={defaultArchiveId}
               viewOnly={true}
               selectedIndex={selectedIndex}
@@ -418,21 +431,38 @@ export default function CategoryPage({
             />
           ) : (
             <NewsGridWrapper density={effectiveDensity}>
-              {articles.map((article, i) => (
-                <NewsCardThree
-                  key={article.url}
-                  density={effectiveDensity}
-                  article={article}
-                  archiveId={defaultArchiveId}
-                  viewOnly={true}
-                  isKeyboardFocused={i === selectedIndex}
-                  innerRef={(el) => (cardRefs.current[i] = el)}
-                  index={i}
-                  selectionMode={selectMode}
-                  isSelected={selectedUrls.has(article.url)}
-                  onToggleSelect={() => toggleSelectUrl(article.url)}
-                />
-              ))}
+              {(() => {
+                // Tracks each real (non-teaser) card's own index into
+                // navigableArticles separately from its position in the
+                // rendered array — keyboard nav (cardRefs/selectedIndex) is
+                // keyed against navigableArticles, so a card after a teaser
+                // needs the *navigable* index here, not its raw array index.
+                let navIndex = -1;
+                return articles.map((article) => {
+                  if (article.isPremiumTeaser) {
+                    return (
+                      <PremiumTeaserCard key={article.url} article={article} density={effectiveDensity} />
+                    );
+                  }
+                  navIndex += 1;
+                  const i = navIndex;
+                  return (
+                    <NewsCardThree
+                      key={article.url}
+                      density={effectiveDensity}
+                      article={article}
+                      archiveId={defaultArchiveId}
+                      viewOnly={true}
+                      isKeyboardFocused={i === selectedIndex}
+                      innerRef={(el) => (cardRefs.current[i] = el)}
+                      index={i}
+                      selectionMode={selectMode}
+                      isSelected={selectedUrls.has(article.url)}
+                      onToggleSelect={() => toggleSelectUrl(article.url)}
+                    />
+                  );
+                });
+              })()}
             </NewsGridWrapper>
           )}
 

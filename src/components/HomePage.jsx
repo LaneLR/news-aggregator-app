@@ -181,7 +181,7 @@ export default function HomePage() {
             </ul>
           </div>
           <div className={`${styles.pricingCard} ${styles.highlighted}`}>
-            <h3 className={styles.pricingCardTitle}>Subscribed</h3>
+            <h3 className={styles.pricingCardTitle}>Pro</h3>
             <ul className={styles.pricingFeatureList}>
               {SUBSCRIBED_FEATURES.map((feature) => (
                 <li key={feature}>

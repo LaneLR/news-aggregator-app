@@ -12,12 +12,8 @@ vi.mock("@/lib/auth", () => ({ auth: () => mockAuth() }));
 const mockRedirect = vi.fn((url) => {
   throw new Error(`REDIRECT:${url}`);
 });
-const mockNotFound = vi.fn(() => {
-  throw new Error("NOT_FOUND");
-});
 vi.mock("next/navigation", () => ({
   redirect: (url) => mockRedirect(url),
-  notFound: () => mockNotFound(),
 }));
 
 const { default: SearchResultsPage, metadata } = await import("./page");
@@ -39,18 +35,25 @@ describe("SearchResultsPage", () => {
     );
   });
 
-  it("calls notFound when the query is empty", async () => {
+  it("shows a prompt to use the header search bar when the query is empty, instead of 404ing", async () => {
     mockAuth.mockResolvedValue(makeSession());
 
-    await expect(SearchResultsPage(makeSearchParams({ query: "   " }))).rejects.toThrow(
-      "NOT_FOUND"
-    );
+    const element = await SearchResultsPage(makeSearchParams({ query: "   " }));
+    render(element);
+
+    expect(screen.getByText("Search MochaReads")).toBeInTheDocument();
+    expect(screen.queryByTestId("search-feed")).not.toBeInTheDocument();
   });
 
-  it("calls notFound when there is no query param at all", async () => {
+  it("shows the same prompt when there is no query param at all", async () => {
+    // The mobile tab bar's Search icon links to bare /search with no query
+    // param — this used to 404 outright.
     mockAuth.mockResolvedValue(makeSession());
 
-    await expect(SearchResultsPage(makeSearchParams({}))).rejects.toThrow("NOT_FOUND");
+    const element = await SearchResultsPage(makeSearchParams({}));
+    render(element);
+
+    expect(screen.getByText("Search MochaReads")).toBeInTheDocument();
   });
 
   it("renders SearchFeed with the lowercased query", async () => {
