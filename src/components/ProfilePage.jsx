@@ -107,7 +107,7 @@ export default function ProfilePage() {
                     <span
                       className={`${styles.tierBadge} ${user.tier === "Free" ? styles.free : ""}`}
                     >
-                      {user.tier === "Free" ? "Free Tier" : "Subscribed"}
+                      {user.tier === "Free" ? "Free Tier" : "Pro"}
                     </span>
                   </h1>
                   <p className={styles.userEmail}>{user.email}</p>

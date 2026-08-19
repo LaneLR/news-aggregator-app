@@ -28,7 +28,7 @@ describe("HomePage", () => {
   it("renders both the Free and Subscribed pricing cards", () => {
     render(<HomePage />);
     expect(screen.getByRole("heading", { name: "Free" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Subscribed" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Pro" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /see full pricing details/i })).toHaveAttribute("href", "/pricing");
   });
 });

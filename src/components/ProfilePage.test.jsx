@@ -88,7 +88,7 @@ describe("ProfilePage", () => {
     mockStatus = "authenticated";
     render(<ProfilePage />);
 
-    expect(screen.getAllByText("Subscribed").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Pro").length).toBeGreaterThan(0);
     expect(screen.getByText("active")).toBeInTheDocument();
     expect(screen.getByText("Renews on")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Manage Subscription" })).toBeInTheDocument();

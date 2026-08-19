@@ -91,7 +91,7 @@ function JournalIllustration({ className }) {
 
 const CONTENT = {
   Market: {
-    title: "Market coverage is for Subscribers",
+    title: "Market coverage is for MochaReads Pro",
     subtitle: "A live dashboard plus every major market feed, all in one place.",
     features: [
       "Live indices, sector performance & historical charts",
@@ -101,7 +101,7 @@ const CONTENT = {
     Illustration: MarketIllustration,
   },
   Journal: {
-    title: "Journals are for Subscribers",
+    title: "Journals are for MochaReads Pro",
     subtitle: "Peer-reviewed research and long-form analysis, without the noise.",
     features: [
       "Nature, Science, PNAS & other peer-reviewed journals",

@@ -32,7 +32,7 @@ describe("MarketNewsPage", () => {
     render(element);
 
     expect(mockGetCategoryArticles).not.toHaveBeenCalled();
-    expect(screen.getByText("Market coverage is for Subscribers")).toBeInTheDocument();
+    expect(screen.getByText("Market coverage is for MochaReads Pro")).toBeInTheDocument();
     expect(screen.queryByTestId("category-page")).not.toBeInTheDocument();
   });
 
@@ -43,7 +43,7 @@ describe("MarketNewsPage", () => {
     render(element);
 
     expect(mockGetCategoryArticles).not.toHaveBeenCalled();
-    expect(screen.getByText("Market coverage is for Subscribers")).toBeInTheDocument();
+    expect(screen.getByText("Market coverage is for MochaReads Pro")).toBeInTheDocument();
   });
 
   it("renders CategoryPage with the Market category for subscribed users", async () => {
