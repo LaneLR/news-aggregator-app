@@ -134,6 +134,21 @@
     background-color: color-mix(in srgb, var(--theme-primary) 10%, transparent);
   }
 
+  // useFocusTrap (see ReaderNavSidebar.jsx) correctly moves focus to the
+  // first link the instant this drawer opens — real, intentional
+  // accessibility behavior (a keyboard/screen-reader user needs to land
+  // somewhere inside a newly-opened dialog), not a bug to remove. Without
+  // this rule, though, that focus had no styling of its own to fall back
+  // on beyond the browser's raw default outline — an unstyled, jarring
+  // bright-blue ring that looked like a stray "half selected" glitch
+  // rather than deliberate UI. This gives it a real, theme-consistent
+  // treatment instead, matching the same outline convention used
+  // elsewhere in the app (e.g. NewsCardThree's keyboard-focus ring).
+  &:focus-visible {
+    outline: 2px solid var(--theme-primary);
+    outline-offset: -2px;
+  }
+
   &.active {
     background-color: var(--theme-primary);
     color: var(--theme-primary-contrast);
