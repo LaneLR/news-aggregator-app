@@ -85,7 +85,11 @@ body {
   font-family: var(--font-lora), Georgia, "Times New Roman", serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--dark-blue);
+  // Theme-following — see layout.jsx's inline body style comment (which
+  // takes precedence via specificity but is kept in sync here since this
+  // rule is what actually applies before hydration/for any element that
+  // isn't <body> itself, e.g. <html>).
+  background-color: var(--theme-layout-background);
   ::-webkit-file-upload-button {
     width: auto;
   }

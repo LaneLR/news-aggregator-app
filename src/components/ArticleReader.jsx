@@ -14,6 +14,7 @@ import { trackArticleClick } from "@/lib/trackClick";
 import { getCategoryColor } from "@/lib/categoryColors";
 import { timeAgo } from "@/lib/timeAgo";
 import { useReaderPrefs, readerPrefsToCssVars } from "@/lib/readerPrefs";
+import { decodeHtmlEntities } from "@/lib/decodeHtmlEntities";
 import { useToast } from "./ToastProvider";
 import styles from "./ArticleReader.module.scss";
 
@@ -65,12 +66,14 @@ export default function ArticleReader({
     return () => window.removeEventListener("scroll", handleScroll, { capture: true });
   }, [sanitizedContent]);
 
+  const cleanTitle = decodeHtmlEntities(article.title);
+
   const speechText = useMemo(() => {
     const bodyText = extractPlainText(sanitizedContent);
-    return [article.title, bodyText].filter(Boolean).join(". ");
-  }, [article.title, sanitizedContent]);
+    return [cleanTitle, bodyText].filter(Boolean).join(". ");
+  }, [cleanTitle, sanitizedContent]);
 
-  const cleanSourceName = article.sourceName || "Unknown source";
+  const cleanSourceName = decodeHtmlEntities(article.sourceName || "Unknown source");
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
   const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
 
@@ -168,7 +171,7 @@ export default function ArticleReader({
           </div>
         )}
 
-        <h1 className={`${styles.title} headline`}>{article.title}</h1>
+        <h1 className={`${styles.title} headline`}>{cleanTitle}</h1>
 
         <div className={styles.metaRow}>
           <span className={styles.source}>{cleanSourceName}</span>
@@ -194,7 +197,7 @@ export default function ArticleReader({
           <div className={styles.heroImage}>
             <Image
               src={`/api/image-proxy?url=${encodeURIComponent(article.urlToImage)}`}
-              alt={article.title}
+              alt={cleanTitle}
               fill
               sizes="(max-width: 768px) 100vw, 720px"
               style={{ objectFit: "cover" }}
@@ -256,9 +259,9 @@ export default function ArticleReader({
               <li key={related.id}>
                 <Link href={`/article/${related.id}`} className={styles.relatedLink}>
                   <span className={styles.relatedSource}>
-                    {related.sourceName || "Unknown source"}
+                    {decodeHtmlEntities(related.sourceName) || "Unknown source"}
                   </span>
-                  <span className={styles.relatedTitle}>{related.title}</span>
+                  <span className={styles.relatedTitle}>{decodeHtmlEntities(related.title)}</span>
                 </Link>
               </li>
             ))}

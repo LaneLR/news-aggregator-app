@@ -46,6 +46,14 @@ describe("MobileTabBar", () => {
     expect(screen.queryByText("Liked")).not.toBeInTheDocument();
   });
 
+  it("has no Search tab — the header's own search bar is the entry point", () => {
+    mockSession = makeSession({ tier: "Free" });
+    mockPathname = "/news";
+    render(<MobileTabBar />);
+
+    expect(screen.queryByText("Search")).not.toBeInTheDocument();
+  });
+
   it("marks the tab matching the current path as active", () => {
     mockSession = makeSession({ tier: "Free" });
     mockPathname = "/news";

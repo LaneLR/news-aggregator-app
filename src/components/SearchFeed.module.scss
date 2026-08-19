@@ -52,6 +52,15 @@
   }
 }
 
+// The bare-/search landing prompt (see app/search/page.jsx) — same look as
+// .emptyState above, but vertically centered within a deliberate share of
+// the viewport instead of sitting top-anchored with all the leftover space
+// stranded below it.
+.landingPrompt {
+  min-height: 60vh;
+  justify-content: center;
+}
+
 .emptyStateHint {
   font-size: 0.85rem;
   color: var(--theme-text-secondary);

@@ -62,6 +62,26 @@ describe("ArticleReader", () => {
     expect(screen.getByText("3 min read")).toBeInTheDocument();
   });
 
+  it("decodes an HTML entity left in the raw title/source text by the feed", () => {
+    const entityArticle = makeArticle({
+      id: "article-2",
+      title: "PlayStation&#8217;s wireless speakers",
+      sourceName: "AT&amp;T News",
+    });
+    render(
+      <ArticleReader
+        article={entityArticle}
+        sanitizedContent="<p>x</p>"
+        relatedCoverage={[]}
+        readingTime={1}
+      />
+    );
+    expect(
+      screen.getByRole("heading", { name: "PlayStation’s wireless speakers" })
+    ).toBeInTheDocument();
+    expect(screen.getByText("AT&T News")).toBeInTheDocument();
+  });
+
   it("renders sanitized content when provided", () => {
     render(
       <ArticleReader article={article} sanitizedContent="<p>Body text</p>" relatedCoverage={[]} readingTime={3} />

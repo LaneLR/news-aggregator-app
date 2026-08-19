@@ -15,6 +15,7 @@ import { timeAgo } from "@/lib/timeAgo";
 import ArticleFallbackArt from "./ArticleFallbackArt";
 import { useToast } from "./ToastProvider";
 import { useLowResImage } from "@/lib/useLowResImage";
+import { decodeHtmlEntities } from "@/lib/decodeHtmlEntities";
 import styles from "./CarouselArticleCard.module.scss";
 
 export default function CarouselCard({ article, archiveId }) {
@@ -59,8 +60,10 @@ export default function CarouselCard({ article, archiveId }) {
     }
   };
 
-  const cleanSourceName =
-    article.sourceName || article.source?.name || "Unknown";
+  const cleanTitle = decodeHtmlEntities(article.title);
+  const cleanSourceName = decodeHtmlEntities(
+    article.sourceName || article.source?.name || "Unknown"
+  );
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
 
   return (
@@ -69,7 +72,7 @@ export default function CarouselCard({ article, archiveId }) {
         {proxiedImageUrl ? (
           <Image
             src={proxiedImageUrl}
-            alt={article.title}
+            alt={cleanTitle}
             onLoad={handleImageLoad}
             fill
             sizes="320px"
@@ -88,7 +91,7 @@ export default function CarouselCard({ article, archiveId }) {
           </span>
         )}
         <div className={styles.titleOverlay}>
-          <h3 className={`${styles.title} headline`}>{article.title}</h3>
+          <h3 className={`${styles.title} headline`}>{cleanTitle}</h3>
         </div>
       </Link>
       <div className={styles.metaRow}>
