@@ -1,0 +1,38 @@
+@keyframes modalSlideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes modalSlideOut {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  // Above every other overlay in the app (drawer 915, tab bar 900, header
+  // 100) except CommandPalette/ToastProvider/ConfirmDialogProvider
+  // (2000-3000) — a saved-source toast or a confirm dialog triggered from
+  // inside the reader should still be able to appear on top of it.
+  z-index: 1900;
+  overflow-y: auto;
+  background-color: var(--theme-background);
+  animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  &.closing {
+    animation: modalSlideOut 0.25s cubic-bezier(0.4, 0, 1, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}

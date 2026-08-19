@@ -1,9 +1,7 @@
 import { cache } from "react";
-import { notFound, redirect } from "next/navigation";
 import sanitizeHtml from "sanitize-html";
-import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
-import { getArticleReaderData } from "@/lib/articleReaderData";
+import { resolveArticleForPage } from "@/lib/resolveArticleForPage";
 import ArticleReader from "@/components/ArticleReader";
 import JsonLd from "@/components/JsonLd";
 import { decodeHtmlEntities } from "@/lib/decodeHtmlEntities";
@@ -62,13 +60,7 @@ export async function generateMetadata({ params }) {
 
 export default async function ArticlePage({ params }) {
   const { id } = await params;
-  const session = await auth();
-
-  const data = await getArticleReaderData(id, session);
-  if (!data) notFound();
-  if (data.gated) redirect("/pricing");
-
-  const { article, sanitizedContent, relatedCoverage, readingTime } = data;
+  const { article, sanitizedContent, relatedCoverage, readingTime } = await resolveArticleForPage(id);
 
   const articleSchema = {
     "@context": "https://schema.org",

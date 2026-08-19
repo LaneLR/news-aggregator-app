@@ -123,7 +123,7 @@ export const viewport = {
   viewportFit: "cover",
 };
 
-export default async function RootLayout({ children }) {
+export default async function RootLayout({ children, modal }) {
   // Seeding SessionProvider with the server-checked session means every
   // client component's useSession() (Header included) is correct on the
   // very first render — no client-only fetch-and-settle race that can
@@ -183,6 +183,15 @@ export default async function RootLayout({ children }) {
                           <MobileTabBar />
                           <BackToTopButton />
                         </AppWrapper>
+                        {/* @modal parallel route slot (see
+                            app/@modal/(.)article/[id]/page.jsx) — only ever
+                            non-null while an intercepted article navigation
+                            is open; otherwise app/@modal/default.jsx renders
+                            null here. Needs ToastProvider/
+                            ConfirmDialogProvider context same as the rest of
+                            the app, so it renders inside those, not outside
+                            AppWrapper's own provider tree. */}
+                        {modal}
                         <CommandPalette />
                         {isNativeApp && (
                           <>
