@@ -1,11 +1,10 @@
 import { cache } from "react";
-import { notFound, redirect } from "next/navigation";
 import sanitizeHtml from "sanitize-html";
-import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
-import { getArticleReaderData } from "@/lib/articleReaderData";
+import { resolveArticleForPage } from "@/lib/resolveArticleForPage";
 import ArticleReader from "@/components/ArticleReader";
 import JsonLd from "@/components/JsonLd";
+import { decodeHtmlEntities } from "@/lib/decodeHtmlEntities";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -26,7 +25,7 @@ function excerptFrom(article) {
       return plainText.length > 160 ? `${plainText.slice(0, 157)}...` : plainText;
     }
   }
-  return `Read the full story from ${article.sourceName || "the source"} on MochaReads.`;
+  return `Read the full story from ${decodeHtmlEntities(article.sourceName) || "the source"} on MochaReads.`;
 }
 
 export async function generateMetadata({ params }) {
@@ -36,14 +35,15 @@ export async function generateMetadata({ params }) {
 
   const description = excerptFrom(article);
   const url = `${BASE_URL}/article/${article.id}`;
+  const title = decodeHtmlEntities(article.title);
 
   return {
-    title: article.title,
+    title,
     description,
     alternates: { canonical: url },
     openGraph: {
       type: "article",
-      title: article.title,
+      title,
       description,
       url,
       publishedTime: article.publishedAt,
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }) {
     },
     twitter: {
       card: "summary_large_image",
-      title: article.title,
+      title,
       description,
       images: article.urlToImage ? [article.urlToImage] : undefined,
     },
@@ -60,22 +60,16 @@ export async function generateMetadata({ params }) {
 
 export default async function ArticlePage({ params }) {
   const { id } = await params;
-  const session = await auth();
-
-  const data = await getArticleReaderData(id, session);
-  if (!data) notFound();
-  if (data.gated) redirect("/pricing");
-
-  const { article, sanitizedContent, relatedCoverage, readingTime } = data;
+  const { article, sanitizedContent, relatedCoverage, readingTime } = await resolveArticleForPage(id);
 
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
-    headline: article.title,
+    headline: decodeHtmlEntities(article.title),
     image: article.urlToImage ? [article.urlToImage] : undefined,
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
-    author: { "@type": "Organization", name: article.sourceName || "Unknown" },
+    author: { "@type": "Organization", name: decodeHtmlEntities(article.sourceName) || "Unknown" },
     publisher: {
       "@type": "Organization",
       name: "MochaReads",

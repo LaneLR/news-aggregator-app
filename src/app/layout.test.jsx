@@ -84,7 +84,10 @@ describe("RootLayout", () => {
     const session = makeSession({ selectedTheme: null });
     mockAuth.mockResolvedValue(session);
 
-    const element = await RootLayout({ children: <div data-testid="page-content">hi</div> });
+    const element = await RootLayout({
+      children: <div data-testid="page-content">hi</div>,
+      modal: <div data-testid="modal-slot">modal content</div>,
+    });
     // React (this DOM version) silently drops <html>/<body> wrapper tags
     // when rendered under a plain <div> (RTL's default container) instead
     // of throwing, since they're invalid nesting there — their children
@@ -105,6 +108,7 @@ describe("RootLayout", () => {
     expect(screen.getByTestId("footer")).toBeInTheDocument();
     expect(screen.getByTestId("mobile-tab-bar")).toBeInTheDocument();
     expect(screen.getByTestId("back-to-top-button")).toBeInTheDocument();
+    expect(screen.getByTestId("modal-slot")).toBeInTheDocument();
     expect(screen.getByTestId("command-palette")).toBeInTheDocument();
     expect(screen.getByTestId("sw-register")).toBeInTheDocument();
     expect(

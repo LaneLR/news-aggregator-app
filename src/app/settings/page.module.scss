@@ -2,6 +2,11 @@
   max-width: 1000px;
   margin: 0 auto;
   padding: 0 1rem 3rem;
+  // Same backstop as ProfilePage.module.scss's .profileWrapper — this page
+  // shares AccountTabs and the same card/cardHeader/cardContent tokens, so
+  // it's worth the same guarantee against a card or row overflowing the
+  // column instead of clipping in place.
+  overflow-x: hidden;
 }
 
 .pageHeader {

@@ -1,28 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { createDbMock, createInstanceMock } from "@/test/dbMock";
-import { makeSession } from "@/test/fixtures";
 
 const db = createDbMock();
 vi.mock("@/lib/db", () => ({ default: vi.fn(async () => db) }));
 
-const mockAuth = vi.fn();
-vi.mock("@/lib/auth", () => ({ auth: () => mockAuth() }));
-
-const mockGetArticleReaderData = vi.fn();
-vi.mock("@/lib/articleReaderData", () => ({
-  getArticleReaderData: (...args) => mockGetArticleReaderData(...args),
-}));
-
-const mockNotFound = vi.fn(() => {
-  throw new Error("NOT_FOUND");
-});
-const mockRedirect = vi.fn((url) => {
-  throw new Error(`REDIRECT:${url}`);
-});
-vi.mock("next/navigation", () => ({
-  notFound: () => mockNotFound(),
-  redirect: (url) => mockRedirect(url),
+const mockResolveArticleForPage = vi.fn();
+vi.mock("@/lib/resolveArticleForPage", () => ({
+  resolveArticleForPage: (...args) => mockResolveArticleForPage(...args),
 }));
 
 vi.mock("@/components/ArticleReader", () => ({
@@ -40,28 +25,28 @@ function makeParams(id) {
 
 describe("ArticlePage", () => {
   beforeEach(() => {
-    mockAuth.mockReset();
-    mockGetArticleReaderData.mockReset();
+    mockResolveArticleForPage.mockReset();
     db.Article.findByPk.mockReset();
   });
 
-  it("calls notFound when the article doesn't exist", async () => {
-    mockAuth.mockResolvedValue(null);
-    mockGetArticleReaderData.mockResolvedValue(null);
+  it("propagates a notFound() thrown by resolveArticleForPage", async () => {
+    mockResolveArticleForPage.mockImplementation(() => {
+      throw new Error("NOT_FOUND");
+    });
 
     await expect(ArticlePage(makeParams("999"))).rejects.toThrow("NOT_FOUND");
   });
 
-  it("redirects to /pricing when the article is gated and the user can't read it", async () => {
-    mockAuth.mockResolvedValue(makeSession({ tier: "Free" }));
-    mockGetArticleReaderData.mockResolvedValue({ gated: true });
+  it("propagates a /pricing redirect thrown by resolveArticleForPage", async () => {
+    mockResolveArticleForPage.mockImplementation(() => {
+      throw new Error("REDIRECT:/pricing");
+    });
 
     await expect(ArticlePage(makeParams("1"))).rejects.toThrow("REDIRECT:/pricing");
   });
 
   it("renders ArticleReader with the resolved reader data", async () => {
-    mockAuth.mockResolvedValue(makeSession({ tier: "Subscribed" }));
-    mockGetArticleReaderData.mockResolvedValue({
+    mockResolveArticleForPage.mockResolvedValue({
       article: {
         id: "1",
         title: "Big story",

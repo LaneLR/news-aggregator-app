@@ -70,10 +70,6 @@ export default function ForYouFeed() {
           <Sparkles size={26} strokeWidth={2} />
           For You
         </h1>
-        <p className={styles.pageSubtitle}>
-          Picked based on the sources you follow, plus categories and
-          articles you&apos;ve liked, saved, and clicked on.
-        </p>
       </div>
 
       {(hasUnread || articles.length > 0) && (

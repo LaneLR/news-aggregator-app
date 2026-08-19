@@ -15,6 +15,7 @@ import { useSwipeGesture } from "@/lib/useSwipeGesture";
 import ArticleFallbackArt from "./ArticleFallbackArt";
 import { useToast } from "./ToastProvider";
 import { useLowResImage } from "@/lib/useLowResImage";
+import { decodeHtmlEntities } from "@/lib/decodeHtmlEntities";
 import styles from "./NewsCardThree.module.scss";
 
 // Every card used to set `preload` (formerly `priority`) unconditionally,
@@ -116,11 +117,13 @@ export default function NewsCardThree({
       toast.error("Couldn't update like status. Please try again.");
     }
   };
-  const cleanTitle =
+  const cleanTitle = decodeHtmlEntities(
     article.title?.substring(0, article.title.lastIndexOf(" - ")) ||
-    article.title;
-  const cleanSourceName =
-    article.sourceName || article.source?.name || "Unknown source";
+      article.title
+  );
+  const cleanSourceName = decodeHtmlEntities(
+    article.sourceName || article.source?.name || "Unknown source"
+  );
 
   const isPaywalled = PAYWALLED_SOURCES.has(cleanSourceName);
 

@@ -25,7 +25,7 @@ export default async function SearchResultsPage({ searchParams }) {
     // header's search bar. That search bar is already visible on this page
     // (see Header.jsx), so this is just a prompt to use it, not a 404.
     return (
-      <div className={styles.emptyState}>
+      <div className={`${styles.emptyState} ${styles.landingPrompt}`}>
         <Search size={32} strokeWidth={1.5} />
         <p>Search MochaReads</p>
         <p className={styles.emptyStateHint}>

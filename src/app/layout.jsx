@@ -123,7 +123,7 @@ export const viewport = {
   viewportFit: "cover",
 };
 
-export default async function RootLayout({ children }) {
+export default async function RootLayout({ children, modal }) {
   // Seeding SessionProvider with the server-checked session means every
   // client component's useSession() (Header included) is correct on the
   // very first render — no client-only fetch-and-settle race that can
@@ -148,7 +148,15 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en" data-theme={dataTheme}>
       <body
-        style={{ backgroundColor: "var(--dark-blue)", color: "var(--light-white)" }}
+        // Theme-following, not the constant --dark-blue "always-dark chrome"
+        // color Header/MobileTabBar deliberately use — this only ever shows
+        // through in the gap below unusually short page content (or a brief
+        // overscroll bounce), and a constant dark fill there reads as a
+        // broken light-theme page rather than intentional "letterboxing".
+        // The very top notch/status-bar inset is unaffected: Header is the
+        // first thing rendered in the body and covers that area with its
+        // own always-dark box regardless of what's behind it.
+        style={{ backgroundColor: "var(--theme-layout-background)", color: "var(--light-white)" }}
         className={`${roboto.variable} ${lora.variable}`}
       >
         <a href="#main-content" className="skipLink">
@@ -175,6 +183,15 @@ export default async function RootLayout({ children }) {
                           <MobileTabBar />
                           <BackToTopButton />
                         </AppWrapper>
+                        {/* @modal parallel route slot (see
+                            app/@modal/(.)article/[id]/page.jsx) — only ever
+                            non-null while an intercepted article navigation
+                            is open; otherwise app/@modal/default.jsx renders
+                            null here. Needs ToastProvider/
+                            ConfirmDialogProvider context same as the rest of
+                            the app, so it renders inside those, not outside
+                            AppWrapper's own provider tree. */}
+                        {modal}
                         <CommandPalette />
                         {isNativeApp && (
                           <>

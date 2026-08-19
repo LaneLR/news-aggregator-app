@@ -1,25 +1,34 @@
+// A text label reads unambiguously where the old bare RSS/signal-style icon
+// didn't — "Follow" vs "Following" says exactly what clicking it does and
+// what state it's currently in, no icon-literacy required. White/colored
+// swap (rather than the theme's own surface tokens) is a deliberate,
+// consistent look regardless of light/dark theme or which card it's
+// sitting on — the same fixed scheme most apps use for this exact control.
 .followButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--theme-text-secondary);
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--theme-primary);
+  background-color: #fff;
+  color: var(--theme-primary);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
   cursor: pointer;
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 
   &:hover {
-    background-color: var(--theme-layout-background);
-    color: var(--theme-text);
+    background-color: color-mix(in srgb, var(--theme-primary) 12%, #fff);
   }
 
   &.following {
     background-color: var(--theme-primary);
-    color: var(--theme-primary-contrast);
+    color: #fff;
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--theme-primary) 85%, black);
+    }
   }
 }

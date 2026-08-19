@@ -56,18 +56,29 @@ body {
   overflow-x: hidden;
   margin: 0;
   padding: 0;
-  // Suppresses the browser's own native pull-to-refresh at the page-scroll
-  // boundary so it doesn't double-fire alongside the custom one
-  // (usePullToRefresh.js) on category/news pages — without this, pulling
-  // down could trigger a full page reload AND the in-app refresh at once.
-  overscroll-behavior-y: contain;
+  // `none`, not just `contain` — this needs to do two separate jobs:
+  // (1) the original one, suppressing the browser's own native
+  // pull-to-refresh at the page-scroll boundary so it doesn't double-fire
+  // alongside the custom one (usePullToRefresh.js, a pure JS touch-event
+  // implementation that reads touch coordinates directly and doesn't rely
+  // on any native overscroll behavior — disabling the native effect here
+  // doesn't affect it); and (2), same as overscroll-behavior-x below,
+  // stopping WKWebView's own vertical rubber-band bounce at the very top/
+  // bottom of the page. That bounce briefly reveals whatever's *behind*
+  // the page — governed by the wrapped app's native WebView background
+  // color (capacitor.config.ts), a single fixed value that can't track the
+  // current light/dark theme — so on a light-theme page it showed as a
+  // dark sliver past the true end of the content. `contain` alone only
+  // stops the bounce from chaining to a parent; it doesn't stop the local
+  // bounce effect itself the way `none` does.
+  overscroll-behavior-y: none;
   // The app has no horizontally-scrollable page — only individual carousel
   // rows scroll sideways, and those already contain their own overflow.
   // Without this, the wrapped iOS app's WKWebView still allows a horizontal
   // rubber-band bounce at the screen edges purely as a native gesture (its
   // own UIScrollView), independent of whether any element actually
   // overflows; this disables that bounce the same way overscroll-behavior-y
-  // above already contains the vertical one.
+  // above now disables the vertical one.
   overscroll-behavior-x: none;
   // Native apps don't let an accidental long-press on a nav label or a card
   // headline pop the OS text-selection handles/magnifier — that's what was
@@ -85,7 +96,11 @@ body {
   font-family: var(--font-lora), Georgia, "Times New Roman", serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--dark-blue);
+  // Theme-following — see layout.jsx's inline body style comment (which
+  // takes precedence via specificity but is kept in sync here since this
+  // rule is what actually applies before hydration/for any element that
+  // isn't <body> itself, e.g. <html>).
+  background-color: var(--theme-layout-background);
   ::-webkit-file-upload-button {
     width: auto;
   }

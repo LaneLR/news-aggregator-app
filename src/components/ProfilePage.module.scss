@@ -5,6 +5,13 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  // Hard backstop: nothing inside this page should ever need to visually
+  // extend past its own column now that the actual overflow sources
+  // (.accountInfoRow/.accountInfoText's missing min-width: 0, .cardFooter's
+  // non-wrapping buttons) are fixed directly — this just guarantees a
+  // regression clips instead of pushing the whole page wider than the
+  // screen, same reasoning as .card's own max-width: 100% below.
+  overflow-x: hidden;
 }
 
 // Matches Settings' pageHeader/layoutRow pattern (src/app/settings/page.module.scss)
@@ -225,6 +232,21 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.6rem;
+  flex-wrap: wrap;
+
+  // "Manage Subscription" + "Cancel Subscription" side by side need more
+  // width than a phone screen has to give — neither wrapped nor shrank on
+  // its own (Button has no built-in min-width:0), so the second one was
+  // getting clipped at the screen edge. Stacking full-width below this
+  // fixes it without needing to shorten either button's label.
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: stretch;
+
+    > * {
+      width: 100%;
+    }
+  }
 }
 
 .tipCard {

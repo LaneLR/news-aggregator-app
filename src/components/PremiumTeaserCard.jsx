@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Lock, Sparkles } from "lucide-react";
 import ArticleFallbackArt from "./ArticleFallbackArt";
 import { getCategoryColor } from "@/lib/categoryColors";
+import { decodeHtmlEntities } from "@/lib/decodeHtmlEntities";
 import styles from "./PremiumTeaserCard.module.scss";
 
 // Renders a locked preview of a MochaReads Pro-only article inside an
@@ -14,7 +15,8 @@ export default function PremiumTeaserCard({ article, density = "card" }) {
   const badgeCategory = Array.isArray(article.category) ? article.category[0] : null;
   const rawUrl = typeof article?.urlToImage === "string" ? article.urlToImage.trim() : "";
   const proxiedImageUrl = rawUrl ? `/api/image-proxy?url=${encodeURIComponent(rawUrl)}` : null;
-  const sourceName = article.sourceName || "MochaReads Pro";
+  const sourceName = decodeHtmlEntities(article.sourceName) || "MochaReads Pro";
+  const cleanTitle = decodeHtmlEntities(article.title);
 
   return (
     <Link
@@ -23,7 +25,7 @@ export default function PremiumTeaserCard({ article, density = "card" }) {
         density === "magazine" ? styles.densityMagazine : ""
       }`}
       style={badgeCategory ? { borderTopColor: getCategoryColor(badgeCategory), borderTopWidth: "4px" } : undefined}
-      aria-label={`${article.title} — MochaReads Pro article, subscribe to read`}
+      aria-label={`${cleanTitle} — MochaReads Pro article, subscribe to read`}
     >
       <div className={styles.imageArea}>
         {proxiedImageUrl ? (
@@ -46,7 +48,7 @@ export default function PremiumTeaserCard({ article, density = "card" }) {
           <Sparkles size={12} strokeWidth={2.5} />
           MochaReads Pro
         </p>
-        <h3 className={styles.blurredTitle}>{article.title}</h3>
+        <h3 className={styles.blurredTitle}>{cleanTitle}</h3>
         <p className={styles.sourceName}>{sourceName}</p>
       </div>
     </Link>

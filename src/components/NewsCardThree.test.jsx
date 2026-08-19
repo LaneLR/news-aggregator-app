@@ -63,6 +63,16 @@ describe("NewsCardThree", () => {
     expect(screen.getByText("Example News")).toBeInTheDocument();
   });
 
+  it("decodes an HTML entity a source left in the raw title/source text", () => {
+    const article = makeArticle({
+      title: "PlayStation&#8217;s wireless speakers",
+      sourceName: "AT&amp;T News",
+    });
+    render(<NewsCardThree article={article} viewOnly />);
+    expect(screen.getByText("PlayStation’s wireless speakers")).toBeInTheDocument();
+    expect(screen.getByText("AT&T News")).toBeInTheDocument();
+  });
+
   it("renders a follow-source button for the article's source", () => {
     const article = makeArticle({ sourceName: "Example News" });
     render(<NewsCardThree article={article} viewOnly />);
