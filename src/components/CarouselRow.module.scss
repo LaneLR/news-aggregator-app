@@ -59,10 +59,17 @@
   }
 }
 
+// Floats just inside the row's own edge rather than bleeding outside the
+// wrapper's box. The old -14px offset put half of each button past the
+// wrapper's bounds — harmless on desktop where the surrounding page has
+// margin to spare, but on a narrow/edge-to-edge mobile layout (or the
+// wrapped iOS app, which has no browser chrome to absorb it) that bleed
+// pushed the page's own scrollable width past the viewport, adding a sliver
+// of horizontal scroll with the arrow itself clipped at the true edge.
 .arrowLeft {
-  left: -14px;
+  left: 8px;
 }
 
 .arrowRight {
-  right: -14px;
+  right: 8px;
 }

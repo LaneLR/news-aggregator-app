@@ -2,7 +2,7 @@
 // wrapper project's capacitor.config.ts (ios/android) — lets this website
 // tell it's being rendered inside the wrapped mobile app vs. a normal
 // browser tab, with no other coupling between the two repos.
-const NATIVE_APP_UA_MARKER = "MochaReads-Mobile-App";
+export const NATIVE_APP_UA_MARKER = "MochaReads-Mobile-App";
 
 export function isRunningInNativeApp() {
   if (typeof navigator === "undefined") return false;

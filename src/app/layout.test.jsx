@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { makeSession } from "@/test/fixtures";
 
@@ -14,7 +14,9 @@ vi.mock("@/Provider", () => ({
     </div>
   ),
 }));
-vi.mock("@/components/Header", () => ({ default: () => <div data-testid="header" /> }));
+vi.mock("@/components/Header", () => ({
+  default: ({ hideLogo }) => <div data-testid="header" data-hide-logo={hideLogo ? "true" : "false"} />,
+}));
 vi.mock("@/components/AppWrapper", () => ({
   default: ({ children }) => <div data-testid="app-wrapper">{children}</div>,
 }));
@@ -53,13 +55,25 @@ vi.mock("@/components/FollowedSourcesProvider", () => ({
 vi.mock("@/components/MobileNavProvider", () => ({
   default: ({ children }) => <div data-testid="mobile-nav-provider">{children}</div>,
 }));
+vi.mock("@/components/NativeSplashHandler", () => ({
+  default: () => <div data-testid="native-splash-handler" />,
+}));
 
 const mockAuth = vi.fn();
 vi.mock("@/lib/auth", () => ({ auth: () => mockAuth() }));
 
+const mockIsNativeAppRequest = vi.fn();
+vi.mock("@/lib/isNativeAppRequest", () => ({
+  isNativeAppRequest: () => mockIsNativeAppRequest(),
+}));
+
 const { default: RootLayout, metadata, viewport } = await import("./layout");
 
 describe("RootLayout", () => {
+  beforeEach(() => {
+    mockIsNativeAppRequest.mockReset().mockResolvedValue(false);
+  });
+
   it("renders children inside the full provider/chrome stack and passes the session through", async () => {
     const session = makeSession({ selectedTheme: null });
     mockAuth.mockResolvedValue(session);
@@ -128,7 +142,34 @@ describe("RootLayout", () => {
     expect(metadata.manifest).toBe("/manifest.json");
   });
 
-  it("exports a theme-color viewport", () => {
+  it("exports a theme-color viewport that also covers under device notches/insets", () => {
     expect(viewport.themeColor).toBe("#6f4225");
+    expect(viewport.viewportFit).toBe("cover");
+  });
+
+  describe("inside the wrapped iOS app", () => {
+    it("hides the header logo, omits the footer, and mounts the splash handler", async () => {
+      mockAuth.mockResolvedValue(null);
+      mockIsNativeAppRequest.mockResolvedValue(true);
+
+      const element = await RootLayout({ children: <div /> });
+      render(element);
+
+      expect(screen.getByTestId("header")).toHaveAttribute("data-hide-logo", "true");
+      expect(screen.queryByTestId("footer")).not.toBeInTheDocument();
+      expect(screen.getByTestId("native-splash-handler")).toBeInTheDocument();
+    });
+
+    it("shows the logo, footer, and no splash handler on a normal web visit", async () => {
+      mockAuth.mockResolvedValue(null);
+      mockIsNativeAppRequest.mockResolvedValue(false);
+
+      const element = await RootLayout({ children: <div /> });
+      render(element);
+
+      expect(screen.getByTestId("header")).toHaveAttribute("data-hide-logo", "false");
+      expect(screen.getByTestId("footer")).toBeInTheDocument();
+      expect(screen.queryByTestId("native-splash-handler")).not.toBeInTheDocument();
+    });
   });
 });

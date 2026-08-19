@@ -11,6 +11,17 @@
   background-color: var(--theme-secondary-dark);
   color: var(--theme-button-text);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  // Pushes the bar's content below the iOS status bar/notch/Dynamic Island
+  // (and out from under a side notch in landscape) when running inside the
+  // wrapped native app — env() resolves to 0px in a normal browser tab
+  // (where the OS chrome isn't part of the page), so this is a no-op there.
+  // Adds to `height` rather than replacing any of it, and since this bar's
+  // own background is already the theme-independent "always dark" chrome
+  // color, the inset region never mismatches the light/dark page beneath
+  // it the way padding the transparent body background directly would.
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 .leftContainer {
