@@ -186,10 +186,18 @@
 
 .cardContent {
   padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
   color: var(--theme-dark-blue);
+
+  // Settings' equivalent (app/settings/page.module.scss) is just
+  // `padding: 1.25rem` — no flex-column/gap. Its own multi-part cards
+  // (e.g. "Following", with Topics + Sources subsections) space themselves
+  // via .cardSubheading's own margin instead of a flex-gap parent. This
+  // matches that: same visual gap between this card's stacked children
+  // (Subscription's info rows, etc.), via margin instead of a flex
+  // container's gap.
+  > * + * {
+    margin-top: 0.6rem;
+  }
 
   // Inline text links (e.g. the Privacy card's "Privacy Policy") otherwise
   // inherit the global reset (color: inherit; text-decoration: none) and
