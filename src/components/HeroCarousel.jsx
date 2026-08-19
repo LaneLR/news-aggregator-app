@@ -9,11 +9,6 @@ import styles from "./HeroCarousel.module.scss";
 
 const CAROUSEL_LIMIT = 12;
 
-const SUBTITLES = {
-  forYou: "Picked based on the sources you follow, plus categories and articles you've liked, saved, and clicked on.",
-  trending: "The most-read stories across MochaReads right now.",
-};
-
 // Sits where the single-article hero used to be. Subscribers get a "For
 // You" vs "Trending" toggle; free users only ever see Trending (the "For
 // You" tab requires a subscription server-side, same as /for-you).
@@ -62,7 +57,6 @@ export default function HeroCarousel() {
               {view === "forYou" ? <Sparkles size={20} /> : <TrendingUp size={20} />}
               {view === "forYou" ? "For You" : "Trending"}
             </h2>
-            <p className={styles.sectionSubtitle}>{SUBTITLES[view]}</p>
           </div>
         </div>
         <div className={styles.toggleGroup}>

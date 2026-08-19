@@ -1,11 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, render, screen } from "@testing-library/react";
-
-const ORIGINAL_USER_AGENT = navigator.userAgent;
-
-function setUserAgent(value) {
-  Object.defineProperty(navigator, "userAgent", { configurable: true, value });
-}
+import { act, render } from "@testing-library/react";
 
 const { default: AppSplashScreen } = await import("./AppSplashScreen");
 
@@ -15,30 +9,24 @@ describe("AppSplashScreen", () => {
   });
 
   afterEach(() => {
-    setUserAgent(ORIGINAL_USER_AGENT);
     vi.useRealTimers();
   });
 
-  it("renders nothing on a normal web visit", () => {
-    setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15");
+  it("is visible on its very first render, with no client-side detection delay", () => {
+    // The gap this used to leave (visible only after a useEffect flipped a
+    // "hidden" -> "visible" state post-mount) was a real, reported bug: a
+    // white flash and the raw loading.jsx dots showing before the splash
+    // ever appeared. This component is only ever rendered at all when the
+    // server has already confirmed the request is from the wrapped app
+    // (see layout.jsx's isNativeApp gate), so there's no client detection
+    // left to wait on — it must render visible synchronously, the same on
+    // its first (server) render as everywhere else.
     const { container } = render(<AppSplashScreen />);
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it("shows the splash immediately when running inside the wrapped app", () => {
-    setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) MochaReads-Mobile-App");
-    render(<AppSplashScreen />);
-    expect(document.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
-  });
-
-  it("is hidden from assistive tech (purely decorative, real content is already rendered underneath)", () => {
-    setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) MochaReads-Mobile-App");
-    const { container } = render(<AppSplashScreen />);
+    expect(container.firstChild).toBeInTheDocument();
     expect(container.firstChild).toHaveAttribute("aria-hidden", "true");
   });
 
   it("starts fading after the minimum display duration, then unmounts after the fade completes", () => {
-    setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) MochaReads-Mobile-App");
     const { container } = render(<AppSplashScreen />);
 
     act(() => vi.advanceTimersByTime(1100));
@@ -50,7 +38,6 @@ describe("AppSplashScreen", () => {
   });
 
   it("clears its timers on unmount instead of leaking a late setState", () => {
-    setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) MochaReads-Mobile-App");
     const clearSpy = vi.spyOn(window, "clearTimeout");
     const { unmount } = render(<AppSplashScreen />);
 

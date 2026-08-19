@@ -50,6 +50,15 @@ describe("FollowSourceButton", () => {
     expect(button).toHaveAttribute("aria-pressed", "true");
   });
 
+  it("shows a readable 'Follow'/'Following' text label instead of an icon-only button", () => {
+    const { rerender } = render(<FollowSourceButton sourceName="Reuters" />);
+    expect(screen.getByRole("button", { name: "Follow Reuters" })).toHaveTextContent("Follow");
+
+    mockFollowing = true;
+    rerender(<FollowSourceButton sourceName="Reuters" />);
+    expect(screen.getByRole("button", { name: "Unfollow Reuters" })).toHaveTextContent("Following");
+  });
+
   it("redirects to login and shows a toast when clicked while signed out", async () => {
     const user = userEvent.setup();
     render(<FollowSourceButton sourceName="Reuters" />);

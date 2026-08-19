@@ -139,9 +139,6 @@ export default function TodayPage() {
           <CalendarDays size={30} />
           Today&apos;s News
         </h1>
-        <p className={styles.pageSubtitle}>
-          Everything published since midnight, across every category.
-        </p>
       </div>
 
       <div className={styles.filterBar}>

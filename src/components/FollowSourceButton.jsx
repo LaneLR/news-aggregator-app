@@ -1,5 +1,4 @@
 "use client";
-import { Rss } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useFollowedSources } from "./FollowedSourcesProvider";
@@ -34,7 +33,7 @@ export default function FollowSourceButton({ sourceName }) {
       aria-label={following ? `Unfollow ${sourceName}` : `Follow ${sourceName}`}
       aria-pressed={following}
     >
-      <Rss size={12} strokeWidth={2.5} />
+      {following ? "Following" : "Follow"}
     </button>
   );
 }

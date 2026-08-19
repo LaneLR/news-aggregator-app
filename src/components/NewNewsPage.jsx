@@ -54,23 +54,6 @@ const CATEGORY_ICONS = {
   Podcast: Mic,
 };
 
-const CATEGORY_SUBTITLES = {
-  Business: "Markets, companies, and the economy",
-  Tech: "The latest in tech and innovation",
-  Entertainment: "Movies, TV, music, and culture",
-  Sports: "Scores, highlights, and analysis",
-  Science: "Discoveries and breakthroughs",
-  Lifestyle: "Wellness, culture, and everyday living",
-  Politics: "Policy, elections, and government",
-  World: "News from around the globe",
-  US: "National headlines",
-  Weather: "Forecasts and severe weather coverage",
-  Journal: "In-depth reporting and analysis",
-  Market: "Stocks, indices, and market movements",
-  Finance: "Personal finance and the economy",
-  Podcast: "Episodes from finance, tech, and news podcasts",
-};
-
 // Matches the pre-fetch default so nothing flashes for the common case
 // (a user who's never opened Settings → Home Page Sections) — real values
 // arrive with the /api/news-by-category response and override these.
@@ -184,9 +167,6 @@ export default function NewsPage() {
                   <CalendarDays size={20} />
                   Today&apos;s News
                 </h2>
-                <p className={styles.sectionSubtitle}>
-                  Everything published since midnight, across every category
-                </p>
               </div>
             </div>
             <Link className={styles.viewAllLink} href="/today">
@@ -216,9 +196,6 @@ export default function NewsPage() {
                   <MapPinned size={20} />
                   Local News
                 </h2>
-                <p className={styles.sectionSubtitle}>
-                  Coverage from your nearest local newsroom, across every category
-                </p>
               </div>
             </div>
           </div>
@@ -244,9 +221,6 @@ export default function NewsPage() {
                     <MapPinned size={20} />
                     Local News
                   </h2>
-                  <p className={styles.sectionSubtitle}>
-                    Coverage from your nearest local newsroom, across every category
-                  </p>
                 </div>
               </div>
               <Link className={styles.viewAllLink} href="/local">
@@ -276,9 +250,6 @@ export default function NewsPage() {
                   <Flame size={20} />
                   Top Stories
                 </h2>
-                <p className={styles.sectionSubtitle}>
-                  Stories multiple sources are covering right now
-                </p>
               </div>
             </div>
           </div>
@@ -317,9 +288,6 @@ export default function NewsPage() {
                     <CategoryIcon size={20} />
                     {category}
                   </h2>
-                  {CATEGORY_SUBTITLES[category] && (
-                    <p className={styles.sectionSubtitle}>{CATEGORY_SUBTITLES[category]}</p>
-                  )}
                 </div>
               </div>
               <Link className={styles.viewAllLink} href={`/category/${category.toLowerCase()}`}>
