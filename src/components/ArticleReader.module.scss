@@ -45,6 +45,30 @@
   margin-bottom: 0.75rem;
 }
 
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  margin-right: 0.75rem;
+  padding: 6px 12px 6px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--theme-border);
+  background-color: transparent;
+  color: var(--theme-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out;
+
+  &:hover {
+    color: var(--theme-text);
+    border-color: var(--theme-primary);
+    background-color: var(--theme-layout-background);
+  }
+}
+
 .categoryBadge {
   padding: 4px 12px;
   border-radius: 999px;
