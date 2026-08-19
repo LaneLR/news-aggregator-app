@@ -13,7 +13,7 @@ import { useMobileNav } from "./MobileNavProvider";
 import { shouldShowSidebar } from "@/lib/navLinks";
 import styles from "./Header.module.scss";
 
-export default function Header() {
+export default function Header({ hideLogo = false }) {
   const { data: session, status, update } = useSession();
   const pathname = usePathname();
   const { isOpen: isNavOpen, toggle: toggleNav } = useMobileNav();
@@ -73,24 +73,26 @@ export default function Header() {
       <div className={styles.wrapper}>
         <div className={styles.leftContainer}>
           {menuButton}
-          <div className={styles.logoLink}>
-            <div className={styles.logoContainer}>
-              <Image
-                preload
-                src={"/images/MochaReads-M.png"}
-                alt={"MochaReads logo"}
-                width={52}
-                height={48}
-              />
-            </div>
-            <div className={styles.logoTextWrapper}>
-              <div className={`${styles.logoText}`}>
-                <span>Mocha</span>
-                <span>Reads</span>
+          {!hideLogo && (
+            <div className={styles.logoLink}>
+              <div className={styles.logoContainer}>
+                <Image
+                  preload
+                  src={"/images/MochaReads-M.png"}
+                  alt={"MochaReads logo"}
+                  width={52}
+                  height={48}
+                />
               </div>
-              <span className={styles.tagline}>All the news. One place.</span>
+              <div className={styles.logoTextWrapper}>
+                <div className={`${styles.logoText}`}>
+                  <span>Mocha</span>
+                  <span>Reads</span>
+                </div>
+                <span className={styles.tagline}>All the news. One place.</span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <div className={styles.centerContainer}>
           <div className={styles.headerShimmer} style={{ width: "min(520px, 100%)", height: 38 }} />
@@ -111,24 +113,26 @@ export default function Header() {
           <div className={styles.wrapper}>
             <div className={styles.leftContainer}>
               {menuButton}
-              <Link className={styles.logoLink} href={"/news"}>
-                <div className={styles.logoContainer}>
-                  <Image
-                    preload
-                    src={"/images/MochaReads-M.png"}
-                    alt={"MochaReads logo"}
-                    width={52}
-                    height={48}
-                  />
-                </div>
-                <div className={styles.logoTextWrapper}>
-                  <div className={`${styles.logoText} headline`}>
-                    <span>Mocha</span>
-                    <span>Reads</span>
+              {!hideLogo && (
+                <Link className={styles.logoLink} href={"/news"}>
+                  <div className={styles.logoContainer}>
+                    <Image
+                      preload
+                      src={"/images/MochaReads-M.png"}
+                      alt={"MochaReads logo"}
+                      width={52}
+                      height={48}
+                    />
                   </div>
-                  <span className={styles.tagline}>All the news. One place.</span>
-                </div>
-              </Link>
+                  <div className={styles.logoTextWrapper}>
+                    <div className={`${styles.logoText} headline`}>
+                      <span>Mocha</span>
+                      <span>Reads</span>
+                    </div>
+                    <span className={styles.tagline}>All the news. One place.</span>
+                  </div>
+                </Link>
+              )}
             </div>
             <div className={styles.centerContainer}>
               <SearchBar />
@@ -158,24 +162,26 @@ export default function Header() {
         <div className={styles.wrapper}>
           <div className={styles.leftContainer}>
             {menuButton}
-            <Link className={styles.logoLink} href={"/"}>
-              <div className={styles.logoContainer}>
-                <Image
-                  preload
-                  src={"/images/MochaReads-M.png"}
-                  alt={"MochaReads logo"}
-                  width={52}
-                  height={48}
-                />
-              </div>
-              <div className={styles.logoTextWrapper}>
-                <div className={`${styles.logoText} headline`}>
-                  <span>Mocha</span>
-                  <span>Reads</span>
+            {!hideLogo && (
+              <Link className={styles.logoLink} href={"/"}>
+                <div className={styles.logoContainer}>
+                  <Image
+                    preload
+                    src={"/images/MochaReads-M.png"}
+                    alt={"MochaReads logo"}
+                    width={52}
+                    height={48}
+                  />
                 </div>
-                <span className={styles.tagline}>All the news. One place.</span>
-              </div>
-            </Link>
+                <div className={styles.logoTextWrapper}>
+                  <div className={`${styles.logoText} headline`}>
+                    <span>Mocha</span>
+                    <span>Reads</span>
+                  </div>
+                  <span className={styles.tagline}>All the news. One place.</span>
+                </div>
+              </Link>
+            )}
           </div>
           <div className={styles.rightContainer}>
             <nav style={{ display: "flex", columnGap: "10px" }}>

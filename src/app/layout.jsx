@@ -16,7 +16,9 @@ import ToastProvider from "@/components/ToastProvider";
 import ConfirmDialogProvider from "@/components/ConfirmDialogProvider";
 import FollowedSourcesProvider from "@/components/FollowedSourcesProvider";
 import MobileNavProvider from "@/components/MobileNavProvider";
+import NativeSplashHandler from "@/components/NativeSplashHandler";
 import { auth } from "@/lib/auth";
+import { isNativeAppRequest } from "@/lib/isNativeAppRequest";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -111,6 +113,12 @@ export const metadata = {
 
 export const viewport = {
   themeColor: "#6f4225",
+  // Lets the wrapped iOS app's WebView draw under the status bar/notch/home
+  // indicator instead of leaving the OS chrome's own opaque bar there —
+  // required for env(safe-area-inset-*) (Header/MobileTabBar's own padding)
+  // to resolve to anything but 0px. A no-op on a normal browser tab, which
+  // isn't drawing under any OS chrome in the first place.
+  viewportFit: "cover",
 };
 
 export default async function RootLayout({ children }) {
@@ -119,6 +127,11 @@ export default async function RootLayout({ children }) {
   // very first render — no client-only fetch-and-settle race that can
   // land on a stale "unauthenticated" state until a manual refresh.
   const session = await auth();
+  // Checked once, server-side, from the request's own User-Agent (see
+  // isNativeAppRequest.js) — threaded down to Header/Footer below so the
+  // wrapped app's chrome renders correctly on the very first paint, with no
+  // client-only flash of the web-visitor layout before it corrects itself.
+  const isNativeApp = await isNativeAppRequest();
 
   // Logged-out visitors always get light, full stop — dark mode is an
   // opt-in a signed-in user makes for themselves (ThemeSelector), never
@@ -150,12 +163,17 @@ export default async function RootLayout({ children }) {
                     <KeyboardShortcutsProvider>
                       <MobileNavProvider>
                         <AppWrapper>
-                          <Header />
+                          <Header hideLogo={isNativeApp} />
                           <MainContentWrapper>{children}</MainContentWrapper>
-                          <Footer />
+                          {/* The wrapped app already has its own native chrome
+                              (tab bar, system back gesture) — a web-style footer
+                              of Privacy/About/Contact links is dead weight there,
+                              never scrolled to on a phone-sized single screen. */}
+                          {!isNativeApp && <Footer />}
                           <MobileTabBar />
                         </AppWrapper>
                         <CommandPalette />
+                        {isNativeApp && <NativeSplashHandler />}
                       </MobileNavProvider>
                     </KeyboardShortcutsProvider>
                   </ConfirmDialogProvider>

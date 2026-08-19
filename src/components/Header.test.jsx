@@ -233,4 +233,39 @@ describe("Header", () => {
     const { container } = render(<Header />);
     expect(container.querySelector('[aria-label="Close menu"]')).toBeInTheDocument();
   });
+
+  // hideLogo is threaded in from the root layout, server-side, based on
+  // whether the request came from the wrapped iOS app (see
+  // isNativeAppRequest.js) — inside that app the logo is redundant chrome,
+  // since the visitor already knows what app they opened.
+  describe("hideLogo", () => {
+    it("hides the logo while the session is loading", () => {
+      mockStatus = "loading";
+      render(<Header hideLogo />);
+      expect(screen.queryByAltText("MochaReads logo")).not.toBeInTheDocument();
+    });
+
+    it("hides the logo when logged in", () => {
+      mockSession = makeSession();
+      mockStatus = "authenticated";
+      render(<Header hideLogo />);
+      expect(screen.queryByAltText("MochaReads logo")).not.toBeInTheDocument();
+      // The rest of the header is unaffected.
+      expect(screen.getByRole("combobox", { name: /search articles/i })).toBeInTheDocument();
+    });
+
+    it("hides the logo when logged out", () => {
+      mockStatus = "unauthenticated";
+      render(<Header hideLogo />);
+      expect(screen.queryByAltText("MochaReads logo")).not.toBeInTheDocument();
+      // The log-in button is unaffected.
+      expect(screen.getByRole("link", { name: /log in/i })).toBeInTheDocument();
+    });
+
+    it("still shows the logo by default", () => {
+      mockStatus = "unauthenticated";
+      render(<Header />);
+      expect(screen.getByAltText("MochaReads logo")).toBeInTheDocument();
+    });
+  });
 });
