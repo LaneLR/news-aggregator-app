@@ -11,12 +11,26 @@ import WeatherWidget from "./WeatherWidget";
 import HeaderSubscribeBanner from "./SubscribeHeaderBanner";
 import { useMobileNav } from "./MobileNavProvider";
 import { shouldShowSidebar } from "@/lib/navLinks";
+import { useScrollDirection } from "@/lib/useScrollDirection";
 import styles from "./Header.module.scss";
+
+// Below this scroll depth the header always stays put — hiding it the
+// instant someone nudges the page down by a few pixels near the top would
+// read as twitchy, and there's no real content real-estate to gain back
+// that close to the top anyway. Only applies on mobile (see .headerHidden's
+// own media query) — desktop keeps the header always visible.
+const HIDE_THRESHOLD_PX = 96;
 
 export default function Header({ hideLogo = false }) {
   const { data: session, status, update } = useSession();
   const pathname = usePathname();
   const { isOpen: isNavOpen, toggle: toggleNav } = useMobileNav();
+  const { scrollY, direction } = useScrollDirection();
+  // Never hide while the drawer is open — the hamburger/close button
+  // disappearing out from under an open drawer would look broken, and
+  // there's no legitimate "scroll the page" gesture happening at that point
+  // anyway (the drawer's own list scrolls independently).
+  const isHidden = !isNavOpen && direction === "down" && scrollY > HIDE_THRESHOLD_PX;
   // Only worth opening on pages that actually render the sidebar this
   // drawer contains (see MainContentWrapper) — showing a hamburger that
   // opens nothing on marketing/auth pages would be a dead-end control.
@@ -70,7 +84,7 @@ export default function Header({ hideLogo = false }) {
   // wrong state a moment later. This renders a state-neutral shell instead.
   if (status === "loading") {
     return (
-      <div className={styles.wrapper}>
+      <div className={`${styles.wrapper} ${isHidden ? styles.headerHidden : ""}`}>
         <div className={styles.leftContainer}>
           {menuButton}
           {!hideLogo && (
@@ -110,7 +124,7 @@ export default function Header({ hideLogo = false }) {
     <>
       {!!session ? (
         <div style={{ width: "100%" }}>
-          <div className={styles.wrapper}>
+          <div className={`${styles.wrapper} ${isHidden ? styles.headerHidden : ""}`}>
             <div className={styles.leftContainer}>
               {menuButton}
               {!hideLogo && (
@@ -159,7 +173,7 @@ export default function Header({ hideLogo = false }) {
           <HeaderSubscribeBanner />
         </div>
       ) : (
-        <div className={styles.wrapper}>
+        <div className={`${styles.wrapper} ${isHidden ? styles.headerHidden : ""}`}>
           <div className={styles.leftContainer}>
             {menuButton}
             {!hideLogo && (

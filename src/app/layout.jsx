@@ -16,6 +16,7 @@ import ToastProvider from "@/components/ToastProvider";
 import ConfirmDialogProvider from "@/components/ConfirmDialogProvider";
 import FollowedSourcesProvider from "@/components/FollowedSourcesProvider";
 import MobileNavProvider from "@/components/MobileNavProvider";
+import BackToTopButton from "@/components/BackToTopButton";
 import NativeSplashHandler from "@/components/NativeSplashHandler";
 import { auth } from "@/lib/auth";
 import { isNativeAppRequest } from "@/lib/isNativeAppRequest";
@@ -171,6 +172,7 @@ export default async function RootLayout({ children }) {
                               never scrolled to on a phone-sized single screen. */}
                           {!isNativeApp && <Footer />}
                           <MobileTabBar />
+                          <BackToTopButton />
                         </AppWrapper>
                         <CommandPalette />
                         {isNativeApp && <NativeSplashHandler />}

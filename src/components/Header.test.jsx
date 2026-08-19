@@ -21,6 +21,10 @@ vi.mock("next/navigation", () => ({
 vi.mock("./MobileNavProvider", () => ({
   useMobileNav: () => ({ isOpen: mockIsNavOpen, toggle: mockToggle }),
 }));
+let mockScrollState = { scrollY: 0, direction: null };
+vi.mock("@/lib/useScrollDirection", () => ({
+  useScrollDirection: () => mockScrollState,
+}));
 
 const { default: Header } = await import("./Header");
 
@@ -30,6 +34,7 @@ describe("Header", () => {
     mockStatus = "unauthenticated";
     mockPathname = "/news";
     mockIsNavOpen = false;
+    mockScrollState = { scrollY: 0, direction: null };
     update.mockClear();
     mockToggle.mockClear();
     global.fetch.mockImplementation((url) =>
@@ -232,6 +237,38 @@ describe("Header", () => {
     mockIsNavOpen = true;
     const { container } = render(<Header />);
     expect(container.querySelector('[aria-label="Close menu"]')).toBeInTheDocument();
+  });
+
+  describe("hide on scroll", () => {
+    it("stays visible near the top of the page even while scrolling down", () => {
+      mockStatus = "unauthenticated";
+      mockScrollState = { scrollY: 50, direction: "down" };
+      const { container } = render(<Header />);
+      expect(container.querySelector('[class*="wrapper"]').className).not.toMatch(/headerHidden/);
+    });
+
+    it("hides once scrolled down past the threshold while still scrolling down", () => {
+      mockStatus = "unauthenticated";
+      mockScrollState = { scrollY: 300, direction: "down" };
+      const { container } = render(<Header />);
+      expect(container.querySelector('[class*="wrapper"]').className).toMatch(/headerHidden/);
+    });
+
+    it("reappears while scrolling back up, even far down the page", () => {
+      mockStatus = "unauthenticated";
+      mockScrollState = { scrollY: 300, direction: "up" };
+      const { container } = render(<Header />);
+      expect(container.querySelector('[class*="wrapper"]').className).not.toMatch(/headerHidden/);
+    });
+
+    it("never hides while the mobile nav drawer is open", () => {
+      mockSession = makeSession();
+      mockStatus = "authenticated";
+      mockIsNavOpen = true;
+      mockScrollState = { scrollY: 300, direction: "down" };
+      const { container } = render(<Header />);
+      expect(container.querySelector('[class*="wrapper"]').className).not.toMatch(/headerHidden/);
+    });
   });
 
   // hideLogo is threaded in from the root layout, server-side, based on

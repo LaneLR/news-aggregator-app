@@ -58,6 +58,9 @@ vi.mock("@/components/MobileNavProvider", () => ({
 vi.mock("@/components/NativeSplashHandler", () => ({
   default: () => <div data-testid="native-splash-handler" />,
 }));
+vi.mock("@/components/BackToTopButton", () => ({
+  default: () => <div data-testid="back-to-top-button" />,
+}));
 
 const mockAuth = vi.fn();
 vi.mock("@/lib/auth", () => ({ auth: () => mockAuth() }));
@@ -98,6 +101,7 @@ describe("RootLayout", () => {
     expect(screen.getByTestId("header")).toBeInTheDocument();
     expect(screen.getByTestId("footer")).toBeInTheDocument();
     expect(screen.getByTestId("mobile-tab-bar")).toBeInTheDocument();
+    expect(screen.getByTestId("back-to-top-button")).toBeInTheDocument();
     expect(screen.getByTestId("command-palette")).toBeInTheDocument();
     expect(screen.getByTestId("sw-register")).toBeInTheDocument();
     expect(
