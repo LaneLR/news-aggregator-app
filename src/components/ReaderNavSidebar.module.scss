@@ -44,13 +44,24 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 210;
+    // Above MobileTabBar (z-index: 900) and its own .backdrop below — a
+    // fixed-position drawer doesn't automatically layer above other fixed
+    // siblings just because it opens later; without this the tab bar was
+    // rendering on top of the backdrop, looking like two unrelated
+    // overlapping bars instead of one dimmed screen with a drawer over it.
+    z-index: 915;
     width: min(300px, 82vw);
     max-height: 100vh;
     flex-basis: auto;
     overflow-y: auto;
     border-right: 1px solid var(--theme-border);
     border-bottom: none;
+    // Keeps the category list (and the drawer's own top edge) clear of the
+    // status bar/notch/Dynamic Island — this is a fixed-position element,
+    // so it doesn't inherit any padding/inset added to an in-flow ancestor
+    // like Header; each screen-edge-attached surface needs its own
+    // reference to the shared --safe-area-* tokens (see globals.scss).
+    padding-top: var(--safe-area-top);
     padding-bottom: 1.25rem;
     box-shadow: var(--shadow-lg);
     transform: translateX(-100%);
@@ -80,7 +91,10 @@
     display: block;
     position: fixed;
     inset: 0;
-    z-index: 205;
+    // Below the drawer (915) but above MobileTabBar (900), so opening the
+    // drawer visibly dims the tab bar along with the rest of the page
+    // instead of leaving it poking through on top of the dimmed backdrop.
+    z-index: 910;
     background-color: rgba(0, 0, 0, 0.45);
   }
 }

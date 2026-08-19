@@ -14,7 +14,7 @@
   box-shadow: var(--shadow-lg);
 
   @media (max-width: 500px) {
-    bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+    bottom: calc(4.5rem + var(--safe-area-bottom));
     width: calc(100% - 2rem);
     justify-content: space-between;
   }
