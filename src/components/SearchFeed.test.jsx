@@ -233,7 +233,7 @@ describe("SearchFeed", () => {
     expect(screen.queryByRole("button", { name: "Mark all as read" })).not.toBeInTheDocument();
   });
 
-  it("falls back a gated density (list/magazine) to 'card' for a non-subscribed user", async () => {
+  it("falls back a gated density (list) to 'card' for a non-subscribed user", async () => {
     mockSession = makeSession({ tier: "Free" });
     mockViewDensity = "list";
     global.fetch.mockResolvedValueOnce(
@@ -242,7 +242,7 @@ describe("SearchFeed", () => {
     render(<SearchFeed initialQuery="nvidia" />);
 
     await screen.findByText("Gated Density Test");
-    // Reader density would render ThreePaneLayout; card/list/magazine render
+    // Reader density would render ThreePaneLayout; card/list render
     // NewsGridWrapper + NewsCardThree — confirms it fell back off "list".
     expect(screen.getByTestId("grid")).toBeInTheDocument();
     expect(screen.queryByTestId("three-pane")).not.toBeInTheDocument();

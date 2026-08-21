@@ -90,12 +90,25 @@ describe("SearchBar", () => {
     const user = userEvent.setup();
     render(<SearchBar />);
 
-    await user.click(screen.getByRole("combobox"));
+    const input = screen.getByRole("combobox");
+    await user.click(input);
     await user.click(screen.getByLabelText('Remove "apple" from recent searches'));
 
     expect(screen.queryByText("apple")).not.toBeInTheDocument();
     expect(push).not.toHaveBeenCalled();
     await waitFor(() => expect(JSON.parse(localStorage.getItem(RECENT_KEY))).toEqual(["tesla"]));
+  });
+
+  it("keeps the search input focused after removing a recent search, instead of blurring it", async () => {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(["apple"]));
+    const user = userEvent.setup();
+    render(<SearchBar />);
+
+    const input = screen.getByRole("combobox");
+    await user.click(input);
+    await user.click(screen.getByLabelText('Remove "apple" from recent searches'));
+
+    expect(input).toHaveFocus();
   });
 
   it("supports arrow-key navigation through recent searches and Enter to select", async () => {

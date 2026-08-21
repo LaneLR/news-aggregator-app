@@ -26,7 +26,7 @@ import { useMarkAllRead } from "@/lib/useMarkAllRead";
 import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
 import styles from "./CategoryPage.module.scss";
 
-const GATED_DENSITIES = new Set(["list", "magazine"]);
+const GATED_DENSITIES = new Set(["list"]);
 // Trending/Most Liked reflect this app's own click/like activity rather
 // than a plain chronological feed — signed-out visitors get Latest only
 // (see ANONYMOUS_ARTICLE_LIMIT server-side); picking either of these while
@@ -121,7 +121,11 @@ export default function CategoryPage({
   };
 
   const loadMoreArticles = async () => {
-    if (isLoadingMore || page >= totalPages) return;
+    // The old Button that called this only ever rendered for a signed-in
+    // user (SignInGate took its place otherwise) — the sentinel below is
+    // unconditionally observed regardless of auth state, so this guard has
+    // to live here now instead of being implicit in what got rendered.
+    if (!isLoggedIn || isLoadingMore || page >= totalPages) return;
     setIsLoadingMore(true);
     try {
       const nextPage = page + 1;
@@ -135,6 +139,41 @@ export default function CategoryPage({
       setIsLoadingMore(false);
     }
   };
+
+  // Always the current render's closure (fresh page/totalPages/isLoadingMore
+  // every time, no dependency array) — the IntersectionObserver effect below
+  // is deliberately only set up once (empty deps, so the same observer
+  // instance keeps watching the same sentinel node across re-renders instead
+  // of being torn down/recreated every fetch). Calling loadMoreArticles
+  // straight from that effect would freeze its closure at whatever
+  // page/totalPages were on mount; going through this ref means the
+  // intersection callback always invokes the latest version instead.
+  const loadMoreArticlesRef = useRef(loadMoreArticles);
+  useEffect(() => {
+    loadMoreArticlesRef.current = loadMoreArticles;
+  });
+
+  const loadMoreSentinelRef = useRef(null);
+  useEffect(() => {
+    if (!loadMoreSentinelRef.current) return;
+    // Deliberately not awaited — a real IntersectionObserver never looks at
+    // the callback's return value, and awaiting loadMoreArticlesRef here
+    // would tie this callback's own completion to the fetch it kicks off,
+    // which is exactly wrong for the case a second intersection fires while
+    // the first fetch is still in flight (isLoadingMore's guard, inside
+    // loadMoreArticles, is what's supposed to catch that — this callback
+    // firing-and-forgetting is what lets a second one even get the chance
+    // to hit that guard instead of queuing up behind the first).
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) loadMoreArticlesRef.current();
+      },
+      { rootMargin: "150px" }
+    );
+    const current = loadMoreSentinelRef.current;
+    observer.observe(current);
+    return () => observer.unobserve(current);
+  }, []);
 
   useEffect(() => {
     if (!category) return;
@@ -469,14 +508,7 @@ export default function CategoryPage({
           <div className={styles.loadMoreRow}>
             {page < totalPages ? (
               isLoggedIn ? (
-                <Button
-                  bgColor={"var(--theme-layout-background)"}
-                  clr={"var(--theme-dark-blue)"}
-                  onClick={loadMoreArticles}
-                  disabled={isLoadingMore}
-                >
-                  {isLoadingMore ? "Loading…" : "Load More"}
-                </Button>
+                isLoadingMore && <p className={styles.caughtUpText}>Loading more…</p>
               ) : (
                 <SignInGate message="Sign in to load more articles." compact />
               )
@@ -492,6 +524,16 @@ export default function CategoryPage({
           <p className={styles.emptyStateHint}>Check back soon — new stories come in throughout the day.</p>
         </div>
       )}
+
+      {/* Scrolling this into view auto-fetches the next page — see the
+          loadMoreArticlesRef/IntersectionObserver effect above. Rendered
+          unconditionally (not nested inside the articles.length > 0 branch
+          above) so the observer effect's one-time mount setup always finds
+          a real node to attach to — TodayPage/LocalPage start with zero
+          articles before their first fetch resolves, so nesting this inside
+          that branch left it absent on first mount, and since that effect
+          never re-runs, the observer never got created at all. */}
+      <div ref={loadMoreSentinelRef} className={styles.loadMoreSentinel} />
 
       {selectMode && (
         <BulkActionBar

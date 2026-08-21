@@ -3,9 +3,17 @@
   gap: 1rem;
 }
 
+// flex: 1 (an equal percentage share of .swatchGrid's own width) instead of
+// a fixed 100px each — three fixed-width swatches plus their gaps (332px+)
+// don't shrink to fit a narrow card, which was forcing this card (and its
+// column siblings, since they share the same flex column width) wider than
+// the viewport on a narrow/webview screen. min-width: 0 lets a flex item
+// actually shrink below its content's own size, which flex: 1 alone doesn't
+// guarantee (a flex item's default min-width is "auto").
 .swatch {
   position: relative;
-  width: 100px;
+  flex: 1;
+  min-width: 0;
   height: 60px;
   border-radius: var(--radius-sm);
   border: 3px solid transparent;

@@ -5,7 +5,6 @@ import { MapPinned } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 import ThreePaneLayout from "./ThreePaneLayout";
-import Button from "./Button";
 import MarkAllReadButton from "./MarkAllReadButton";
 import ViewDensityToggle from "./ViewDensityToggle";
 import CardSkeleton from "./CardSkeleton";
@@ -16,7 +15,7 @@ import { useMarkAllRead } from "@/lib/useMarkAllRead";
 import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
 import styles from "./TodayPage.module.scss";
 
-const GATED_DENSITIES = new Set(["list", "magazine"]);
+const GATED_DENSITIES = new Set(["list"]);
 
 // A relative path, not NEXT_PUBLIC_BASE_URL — this runs in the browser
 // (the component is "use client"), where a relative fetch already resolves
@@ -85,6 +84,31 @@ export default function LocalPage() {
       setIsLoadingMore(false);
     }
   };
+
+  // See the identical ref pattern/comment on CategoryPage.jsx — always the
+  // current render's closure, so the IntersectionObserver effect below
+  // (deliberately set up only once) never fetches against a stale
+  // page/totalPages/location captured at mount.
+  const loadMoreArticlesRef = useRef(loadMoreArticles);
+  useEffect(() => {
+    loadMoreArticlesRef.current = loadMoreArticles;
+  });
+
+  const loadMoreSentinelRef = useRef(null);
+  useEffect(() => {
+    if (!loadMoreSentinelRef.current) return;
+    // Deliberately not awaited — see the identical comment on
+    // CategoryPage.jsx's own observer effect for why.
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) loadMoreArticlesRef.current();
+      },
+      { rootMargin: "150px" }
+    );
+    const current = loadMoreSentinelRef.current;
+    observer.observe(current);
+    return () => observer.unobserve(current);
+  }, []);
 
   const didMount = useRef(false);
   useEffect(() => {
@@ -224,14 +248,7 @@ export default function LocalPage() {
 
               <div className={styles.loadMoreRow}>
                 {page < totalPages ? (
-                  <Button
-                    bgColor={"var(--theme-layout-background)"}
-                    clr={"var(--theme-dark-blue)"}
-                    onClick={loadMoreArticles}
-                    disabled={isLoadingMore}
-                  >
-                    {isLoadingMore ? "Loading…" : "Load More"}
-                  </Button>
+                  isLoadingMore && <p className={styles.caughtUpText}>Loading more…</p>
                 ) : (
                   <p className={styles.caughtUpText}>You&apos;re all caught up.</p>
                 )}
@@ -246,6 +263,15 @@ export default function LocalPage() {
           )}
         </>
       )}
+
+      {/* See CategoryPage.jsx's identical sentinel for why this renders
+          unconditionally at the top level rather than nested inside either
+          the !location or articles.length > 0 branches above — this
+          component's one-time mount effect needs a real node to attach to
+          immediately, before hydrated/location/articles are even known, or
+          the observer never gets created at all (that effect never re-runs
+          once a later render makes the sentinel appear). */}
+      <div ref={loadMoreSentinelRef} className={styles.loadMoreSentinel} />
     </div>
   );
 }

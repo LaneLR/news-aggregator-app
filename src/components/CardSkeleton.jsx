@@ -2,7 +2,6 @@ import styles from "./CardSkeleton.module.scss";
 
 const DENSITY_CLASS = {
   list: styles.densityList,
-  magazine: styles.densityMagazine,
 };
 
 // Mirrors NewsCardThree's real layout per density (see that component's

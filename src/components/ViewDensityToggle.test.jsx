@@ -16,7 +16,7 @@ describe("ViewDensityToggle", () => {
 
   it("renders a button per density option", () => {
     render(<ViewDensityToggle density="card" onChange={vi.fn()} isSubscribed={false} />);
-    expect(screen.getAllByRole("button")).toHaveLength(4);
+    expect(screen.getAllByRole("button")).toHaveLength(3);
   });
 
   it("marks the active density with aria-pressed", () => {

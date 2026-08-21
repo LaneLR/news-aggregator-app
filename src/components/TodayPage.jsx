@@ -5,7 +5,6 @@ import { CalendarDays } from "lucide-react";
 import NewsGridWrapper from "./NewsGridWrapper";
 import NewsCardThree from "./NewsCardThree";
 import ThreePaneLayout from "./ThreePaneLayout";
-import Button from "./Button";
 import MarkAllReadButton from "./MarkAllReadButton";
 import ViewDensityToggle from "./ViewDensityToggle";
 import CardSkeleton from "./CardSkeleton";
@@ -14,7 +13,7 @@ import { useMarkAllRead } from "@/lib/useMarkAllRead";
 import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
 import styles from "./TodayPage.module.scss";
 
-const GATED_DENSITIES = new Set(["list", "magazine"]);
+const GATED_DENSITIES = new Set(["list"]);
 
 // Local midnight, computed once per page load in the visitor's own browser —
 // the server has no reliable way to know a visitor's timezone on its own,
@@ -88,6 +87,31 @@ export default function TodayPage() {
       setIsLoadingMore(false);
     }
   };
+
+  // See the identical ref pattern/comment on CategoryPage.jsx — always the
+  // current render's closure, so the IntersectionObserver effect below
+  // (deliberately set up only once) never fetches against a stale
+  // page/totalPages captured at mount.
+  const loadMoreArticlesRef = useRef(loadMoreArticles);
+  useEffect(() => {
+    loadMoreArticlesRef.current = loadMoreArticles;
+  });
+
+  const loadMoreSentinelRef = useRef(null);
+  useEffect(() => {
+    if (!loadMoreSentinelRef.current) return;
+    // Deliberately not awaited — see the identical comment on
+    // CategoryPage.jsx's own observer effect for why.
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) loadMoreArticlesRef.current();
+      },
+      { rootMargin: "150px" }
+    );
+    const current = loadMoreSentinelRef.current;
+    observer.observe(current);
+    return () => observer.unobserve(current);
+  }, []);
 
   const didMount = useRef(false);
   useEffect(() => {
@@ -210,14 +234,7 @@ export default function TodayPage() {
 
           <div className={styles.loadMoreRow}>
             {page < totalPages ? (
-              <Button
-                bgColor={"var(--theme-layout-background)"}
-                clr={"var(--theme-dark-blue)"}
-                onClick={loadMoreArticles}
-                disabled={isLoadingMore}
-              >
-                {isLoadingMore ? "Loading…" : "Load More"}
-              </Button>
+              isLoadingMore && <p className={styles.caughtUpText}>Loading more…</p>
             ) : (
               <p className={styles.caughtUpText}>You&apos;re all caught up.</p>
             )}
@@ -230,6 +247,13 @@ export default function TodayPage() {
           <p className={styles.emptyStateHint}>Check back soon — new stories come in throughout the day.</p>
         </div>
       )}
+
+      {/* See CategoryPage.jsx's identical sentinel for why this renders
+          unconditionally rather than nested inside the branch above —
+          articles start empty before the first fetch resolves, so nesting
+          it there left it absent on mount and the observer never got
+          created at all (that effect only ever runs once). */}
+      <div ref={loadMoreSentinelRef} className={styles.loadMoreSentinel} />
     </div>
   );
 }

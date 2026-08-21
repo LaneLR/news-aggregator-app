@@ -21,9 +21,7 @@ export default function PremiumTeaserCard({ article, density = "card" }) {
   return (
     <Link
       href="/pricing"
-      className={`${styles.cardContainer} ${density === "list" ? styles.densityList : ""} ${
-        density === "magazine" ? styles.densityMagazine : ""
-      }`}
+      className={`${styles.cardContainer} ${density === "list" ? styles.densityList : ""}`}
       style={badgeCategory ? { borderTopColor: getCategoryColor(badgeCategory), borderTopWidth: "4px" } : undefined}
       aria-label={`${cleanTitle} — MochaReads Pro article, subscribe to read`}
     >

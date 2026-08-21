@@ -36,6 +36,16 @@
   max-width: 100%;
   margin: 0 1.5rem 3rem;
 
+  // Same fix as HeroCarousel.module.scss's identical rule — narrow/webview
+  // viewports have no margin to spare, and the flat 1.5rem side margin left
+  // a lot of dead space next to every carousel card on a phone screen.
+  // 0.5rem still clears CarouselRow's arrow buttons (inset 8px from their
+  // own edge) without the wasted gap.
+  @media (max-width: 768px) {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+
   @media (max-width: 440px) {
     margin-bottom: 2rem;
   }

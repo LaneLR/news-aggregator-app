@@ -3,7 +3,6 @@ import styles from "./NewsGridWrapper.module.scss";
 
 const DENSITY_CLASS = {
   list: "listWrapper",
-  magazine: "magazineWrapper",
 };
 
 export default function NewsGridWrapper({ children, density = "card" }) {

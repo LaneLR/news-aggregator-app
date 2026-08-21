@@ -155,9 +155,7 @@ export default function NewsCardThree({
         ref={setCardRef}
         className={`${styles.cardContainer} ${article.isRead || locallyRead ? styles.read : ""} ${
           isKeyboardFocused ? styles.keyboardFocused : ""
-        } ${density === "list" ? styles.densityList : ""} ${
-          density === "magazine" ? styles.densityMagazine : ""
-        }`}
+        } ${density === "list" ? styles.densityList : ""}`}
         style={{
           ...(badgeCategory ? { borderTopColor: getCategoryColor(badgeCategory), borderTopWidth: "4px" } : {}),
           transform: `translateX(${offsetX}px)`,

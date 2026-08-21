@@ -31,9 +31,16 @@
 }
 
 .filterBar {
-  position: sticky;
-  top: 0;
-  z-index: 5;
+  // Desktop only — see the identical rule/comment on CategoryPage.module.scss's
+  // .filterBar for why this can't just be unconditionally sticky: below
+  // 900px Header itself is sticky with its own hide-on-scroll behavior, and
+  // sticking this bar too (independently) kept it glued to the screen top
+  // through the whole scroll instead of scrolling away with the list.
+  @media (min-width: 901px) {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -83,7 +90,13 @@
 .loadMoreRow {
   display: flex;
   justify-content: center;
-  padding: 2rem 0;
+  padding: 1rem 0;
+}
+
+// Invisible trigger the IntersectionObserver watches for auto-loading the
+// next page — see the identical rule/comment on CategoryPage.module.scss.
+.loadMoreSentinel {
+  height: 20px;
 }
 
 .caughtUpText {

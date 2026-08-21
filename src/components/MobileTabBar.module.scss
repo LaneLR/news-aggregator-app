@@ -32,6 +32,7 @@
 
 .tab {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -40,9 +41,22 @@
   color: var(--theme-text-secondary);
   transition: color 0.15s ease-in-out;
 
+  // AppWrapper.module.scss reserves a fixed amount of space below the page
+  // content for this bar (64px + safe-area-bottom, matching its own
+  // min-height + padding-top exactly) — a label that wraps to two lines
+  // (a narrow device, or the OS text-size/Dynamic Type setting scaled up)
+  // would grow this bar taller than that reservation without either side
+  // knowing about the other, letting the bar's own top edge start
+  // overlapping the page's last bit of content instead of sitting cleanly
+  // below it. Clipping to one line keeps this bar's real height always
+  // matching what was actually reserved for it.
   span {
     font-size: 0.66rem;
     font-weight: 600;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   &.active {

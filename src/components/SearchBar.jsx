@@ -38,6 +38,7 @@ export default function SearchBar() {
   const router = useRouter();
   const containerRef = useRef(null);
   const debounceRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     const checkWidth = () => setIsNarrow(window.innerWidth <= 430);
@@ -111,6 +112,13 @@ export default function SearchBar() {
       saveRecent(next);
       return next;
     });
+    // The dropdown is conceptually part of the input, so removing a recent
+    // search shouldn't blur it — belt-and-suspenders alongside the
+    // onMouseDown preventDefault below, which is what actually stops the
+    // browser's default tap-to-focus-nearest-button behavior from stealing
+    // focus in the first place (this handler runs on click, which fires
+    // after that focus shift already happened).
+    inputRef.current?.focus();
   };
 
   const showingRecent = query.trim().length === 0;
@@ -155,6 +163,7 @@ export default function SearchBar() {
     <div className={styles.wrapper} ref={containerRef}>
       <Search className={styles.icon} size={18} strokeWidth={2} />
       <input
+        ref={inputRef}
         data-search-input
         className={styles.input}
         type="text"
@@ -194,6 +203,14 @@ export default function SearchBar() {
                   <span
                     className={styles.removeRecent}
                     onClick={(e) => removeRecent(term, e)}
+                    // Without this, the browser's default tap behavior
+                    // shifts focus to the nearest focusable ancestor (the
+                    // parent .suggestionRow button) the instant this is
+                    // pressed — before the click/removeRecent handler even
+                    // runs — blurring the search input and dismissing the
+                    // mobile keyboard. preventDefault on mousedown (not
+                    // click) is what actually stops that focus shift.
+                    onMouseDown={(e) => e.preventDefault()}
                     role="button"
                     aria-label={`Remove "${term}" from recent searches`}
                   >

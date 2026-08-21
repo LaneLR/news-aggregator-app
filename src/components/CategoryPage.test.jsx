@@ -1,7 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeArticle, makeFetchResponse } from "@/test/fixtures";
+
+// jsdom has no real IntersectionObserver — vitest.setup.js stubs a minimal
+// one globally, but it doesn't expose the registered callback. Overriding it
+// here (module scope runs after setup) lets pagination tests simulate the
+// load-more sentinel scrolling into view. Mirrors SearchFeed.test.jsx's
+// identical helper.
+let observerCallback;
+class CapturingObserver {
+  constructor(cb) {
+    observerCallback = cb;
+  }
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+globalThis.IntersectionObserver = CapturingObserver;
+async function triggerIntersection() {
+  await act(async () => {
+    observerCallback([{ isIntersecting: true }]);
+  });
+}
 
 const mockSession = { value: null };
 vi.mock("next-auth/react", () => ({
@@ -228,8 +249,7 @@ describe("CategoryPage", () => {
     expect(await screen.findByText("Card:Trending Story")).toBeInTheDocument();
   });
 
-  it("loads more articles and appends them, then shows 'caught up' at the last page, for a signed-in user", async () => {
-    const user = userEvent.setup();
+  it("auto-loads the next page when the load-more sentinel scrolls into view, then shows 'caught up' at the last page, for a signed-in user", async () => {
     mockSession.value = { user: { id: "user-1" } };
     mockFetchRoutes([
       [/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })],
@@ -243,9 +263,15 @@ describe("CategoryPage", () => {
         initialTotalPages={2}
       />
     );
-    await user.click(screen.getByRole("button", { name: "Load More" }));
+    await triggerIntersection();
 
-    expect(await screen.findByText("Card:Page Two Story")).toBeInTheDocument();
+    // Extended timeout matches SearchFeed.test.jsx's identical pagination
+    // test — the observer callback is deliberately fire-and-forget (see
+    // CategoryPage.jsx's own comment), so this relies on findByText's
+    // polling to catch the fetch/state-update cycle whenever it actually
+    // finishes, which under a heavily loaded full-suite run can take longer
+    // than the default 1000ms window even though nothing is actually broken.
+    expect(await screen.findByText("Card:Page Two Story", {}, { timeout: 8000 })).toBeInTheDocument();
     expect(screen.getByText("Card:Page One Story")).toBeInTheDocument();
     expect(await screen.findByText("You're all caught up.")).toBeInTheDocument();
   });
@@ -316,8 +342,16 @@ describe("CategoryPage", () => {
     expect(screen.queryByText("Card:Latest Story")).not.toBeInTheDocument();
   });
 
-  it("shows a sign-in prompt instead of a Load More button for a signed-out user", async () => {
-    mockFetchRoutes([[/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })]]);
+  it("shows a sign-in prompt instead of auto-loading more for a signed-out user", async () => {
+    mockFetchRoutes([
+      [/\/api\/archives\/default/, () => makeFetchResponse({ archiveId: null })],
+      [
+        /\/api\/articles\/business\?sort=latest&page=2/,
+        () => {
+          throw new Error("Should not fetch another page while signed out");
+        },
+      ],
+    ]);
 
     render(
       <CategoryPage
@@ -328,7 +362,13 @@ describe("CategoryPage", () => {
     );
 
     expect(await screen.findByText("Sign in to load more articles.")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Load More" })).not.toBeInTheDocument();
+
+    // The sentinel intersecting shouldn't fetch anything for a signed-out
+    // visitor — loadMoreArticles itself now guards on isLoggedIn, since the
+    // sentinel (unlike the old Load More button) is observed regardless of
+    // auth state.
+    await triggerIntersection();
+    expect(screen.getByText("Sign in to load more articles.")).toBeInTheDocument();
   });
 
   it("toggles select mode and enters bulk-selection for a signed-in user", async () => {
