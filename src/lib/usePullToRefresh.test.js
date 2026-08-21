@@ -12,8 +12,8 @@ function setScrollY(value) {
   Object.defineProperty(window, "scrollY", { value, configurable: true, writable: true });
 }
 
-function touchAt(clientY) {
-  return { touches: [{ clientY }] };
+function touchAt(clientY, clientX = 0) {
+  return { touches: [{ clientY, clientX }] };
 }
 
 describe("usePullToRefresh", () => {
@@ -45,6 +45,29 @@ describe("usePullToRefresh", () => {
     act(() => result.current.pullHandlers.onTouchMove(touchAt(50)));
 
     expect(result.current.pullDistance).toBe(0);
+  });
+
+  it("bails out once movement is more horizontal than vertical, so a carousel swipe at the top of the page isn't fought", () => {
+    const { result } = renderHook(() => usePullToRefresh(vi.fn()));
+
+    act(() => result.current.pullHandlers.onTouchStart(touchAt(100, 100)));
+    // Mostly horizontal (dx 60) with only slight vertical drift (dy 10).
+    act(() => result.current.pullHandlers.onTouchMove(touchAt(110, 160)));
+    expect(result.current.pullDistance).toBe(0);
+
+    // Once bailed, a later touchmove in the same gesture (even a vertical
+    // one) stays inert until the next touchstart.
+    act(() => result.current.pullHandlers.onTouchMove(touchAt(300, 160)));
+    expect(result.current.pullDistance).toBe(0);
+  });
+
+  it("still tracks a pull that starts with only slight horizontal drift", () => {
+    const { result } = renderHook(() => usePullToRefresh(vi.fn()));
+
+    act(() => result.current.pullHandlers.onTouchStart(touchAt(100, 100)));
+    // Mostly vertical (dy 60) with only slight horizontal drift (dx 10).
+    act(() => result.current.pullHandlers.onTouchMove(touchAt(160, 110)));
+    expect(result.current.pullDistance).toBe(30); // 60 * 0.5
   });
 
   it("does not start tracking when the page is already scrolled down", () => {

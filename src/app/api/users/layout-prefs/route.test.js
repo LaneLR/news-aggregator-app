@@ -45,12 +45,12 @@ describe("GET /api/users/layout-prefs", () => {
 
   it("returns the signed-in user's saved density", async () => {
     mockAuth.mockResolvedValue(makeSession());
-    db.User.findByPk.mockResolvedValue({ viewDensity: "magazine" });
+    db.User.findByPk.mockResolvedValue({ viewDensity: "list" });
 
     const res = await GET();
     const body = await res.json();
 
-    expect(body.viewDensity).toBe("magazine");
+    expect(body.viewDensity).toBe("list");
   });
 
   it("returns 500 on an unexpected error", async () => {

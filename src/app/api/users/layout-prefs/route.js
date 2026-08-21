@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import initializeDbAndModels from "@/lib/db";
 
-const ALLOWED_VIEW_DENSITIES = ["card", "list", "magazine", "reader"];
+const ALLOWED_VIEW_DENSITIES = ["card", "list", "reader"];
 
 // Not surfaced in the JWT/session (same reasoning as mutedKeywords/
 // preferredCategories/keyboardShortcuts) — fetched directly by whichever

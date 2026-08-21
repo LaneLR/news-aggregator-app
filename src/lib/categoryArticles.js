@@ -28,9 +28,8 @@ export async function getCategoryArticles({
   userId,
   page = 1,
   // 24, not 20 — divides evenly into a 2/3/4/6/8-column grid with no
-  // orphaned partial row at the end, in both card-grid and magazine
-  // density. 20 only divides evenly by 2/4/5/10, which is why a 3-column
-  // grid was landing on a lone 2-card final row.
+  // orphaned partial row at the end. 20 only divides evenly by 2/4/5/10,
+  // which is why a 3-column grid was landing on a lone 2-card final row.
   limit = 24,
   isSubscribed = false,
 }) {

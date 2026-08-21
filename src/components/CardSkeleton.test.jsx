@@ -15,10 +15,8 @@ describe("CardSkeleton", () => {
     expect(shimmers.length).toBeGreaterThan(0);
   });
 
-  it("accepts a 'list' or 'magazine' density without throwing", () => {
+  it("accepts a 'list' density without throwing", () => {
     const { container: listContainer } = render(<CardSkeleton density="list" />);
-    const { container: magContainer } = render(<CardSkeleton density="magazine" />);
     expect(listContainer.firstChild).toBeInTheDocument();
-    expect(magContainer.firstChild).toBeInTheDocument();
   });
 });

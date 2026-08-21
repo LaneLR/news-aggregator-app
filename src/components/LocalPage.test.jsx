@@ -1,7 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { makeArticle, makeFetchResponse } from "@/test/fixtures";
+
+// jsdom has no real IntersectionObserver — vitest.setup.js stubs a minimal
+// one globally, but it doesn't expose the registered callback. Overriding it
+// here (module scope runs after setup) lets pagination tests simulate the
+// load-more sentinel scrolling into view. Mirrors SearchFeed.test.jsx's
+// identical helper.
+let observerCallback;
+class CapturingObserver {
+  constructor(cb) {
+    observerCallback = cb;
+  }
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+globalThis.IntersectionObserver = CapturingObserver;
+async function triggerIntersection() {
+  await act(async () => {
+    observerCallback([{ isIntersecting: true }]);
+  });
+}
 
 const mockSession = { value: null };
 vi.mock("next-auth/react", () => ({
@@ -166,7 +187,7 @@ describe("LocalPage", () => {
     });
   });
 
-  it("loads the next page and appends results when Load More is clicked", async () => {
+  it("auto-loads the next page and appends results when the load-more sentinel scrolls into view", async () => {
     let call = 0;
     mockFetchRoutes([
       [
@@ -182,13 +203,18 @@ describe("LocalPage", () => {
       ],
       ARCHIVE_ROUTE,
     ]);
-    const user = userEvent.setup();
     render(<LocalPage />);
 
     expect(await screen.findByText("Card:Page one")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Load More" }));
+    await triggerIntersection();
 
-    expect(await screen.findByText("Card:Page two")).toBeInTheDocument();
+    // Extended timeout matches SearchFeed.test.jsx's identical pagination
+    // test — the observer callback is deliberately fire-and-forget (see
+    // LocalPage.jsx's own comment), so this relies on findByText's polling
+    // to catch the fetch/state-update cycle whenever it actually finishes,
+    // which under a heavily loaded full-suite run can take longer than the
+    // default 1000ms window even though nothing is actually broken.
+    expect(await screen.findByText("Card:Page two", {}, { timeout: 8000 })).toBeInTheDocument();
     expect(screen.getByText("Card:Page one")).toBeInTheDocument();
   });
 
@@ -232,20 +258,19 @@ describe("LocalPage", () => {
       }
       return Promise.resolve(makeFetchResponse({ archiveId: "archive-1" }));
     });
-    const user = userEvent.setup();
     render(<LocalPage />);
     await screen.findByText("Card:Page one");
 
-    await user.click(screen.getByRole("button", { name: "Load More" }));
+    await triggerIntersection();
 
     await waitFor(() =>
       expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to load more local news:", expect.any(Error))
     );
-    expect(screen.getByRole("button", { name: "Load More" })).not.toBeDisabled();
+    expect(screen.queryByText(/loading more/i)).not.toBeInTheDocument();
     consoleErrorSpy.mockRestore();
   });
 
-  it("ignores a second Load More click fired while the first is still in flight", async () => {
+  it("ignores a second intersection fired while the first fetch is still in flight", async () => {
     let resolveSecondPage;
     let call = 0;
     global.fetch.mockImplementation((url) => {
@@ -261,13 +286,13 @@ describe("LocalPage", () => {
       }
       return Promise.resolve(makeFetchResponse({ archiveId: "archive-1" }));
     });
-    const user = userEvent.setup();
     render(<LocalPage />);
     await screen.findByText("Card:Page one");
 
-    const loadMoreButton = screen.getByRole("button", { name: "Load More" });
-    await user.click(loadMoreButton);
-    expect(loadMoreButton).toBeDisabled();
+    await triggerIntersection();
+    // A second intersection while the first fetch is still in flight hits
+    // the same `isLoadingMore` guard a disabled button used to enforce.
+    await triggerIntersection();
 
     resolveSecondPage();
     await screen.findByText("Card:Page two");
@@ -344,7 +369,7 @@ describe("LocalPage", () => {
     expect(await screen.findByText("ThreePane:1")).toBeInTheDocument();
   });
 
-  it("falls back to card density for a Free-tier user even if reader/list/magazine was previously chosen", async () => {
+  it("falls back to card density for a Free-tier user even if reader/list was previously chosen", async () => {
     layoutPrefs.value = { loaded: true, viewDensity: "list", setViewDensity: vi.fn() };
     mockSession.value = { user: { id: "user-1", tier: "Free" } };
     mockFetchRoutes([

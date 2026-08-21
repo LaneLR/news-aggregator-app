@@ -1,16 +1,18 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { LayoutGrid, List, Newspaper, Columns3, Lock } from "lucide-react";
+import { LayoutGrid, List, Columns3, Lock } from "lucide-react";
 import styles from "./ViewDensityToggle.module.scss";
 
 // Card and Reader (3-pane) are core navigation, so they stay free — same
-// reasoning as ungating dark mode earlier this session. List/Magazine are
-// cosmetic density skins in the Feedly-Pro mold, so those stay gated.
+// reasoning as ungating dark mode earlier this session. List is a cosmetic
+// density skin in the Feedly-Pro mold, so it stays gated. Magazine (removed)
+// used to sit alongside it here but was just Card with fewer, larger
+// columns — no layout difference a reader could actually feel, so it was
+// dropped rather than kept as a redundant fourth option.
 const OPTIONS = [
   { value: "reader", label: "Reader (3-pane)", Icon: Columns3, subscriberOnly: false },
   { value: "card", label: "Card", Icon: LayoutGrid, subscriberOnly: false },
   { value: "list", label: "List", Icon: List, subscriberOnly: true },
-  { value: "magazine", label: "Magazine", Icon: Newspaper, subscriberOnly: true },
 ];
 
 export default function ViewDensityToggle({ density, onChange, isSubscribed }) {

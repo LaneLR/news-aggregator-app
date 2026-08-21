@@ -60,13 +60,6 @@ describe("PremiumTeaserCard", () => {
     expect(screen.getByRole("link").className).toMatch(/densityList/);
   });
 
-  it("applies the magazine-density layout class when density is 'magazine'", () => {
-    const article = makeArticle();
-    render(<PremiumTeaserCard article={article} density="magazine" />);
-
-    expect(screen.getByRole("link").className).toMatch(/densityMagazine/);
-  });
-
   it("renders without a category accent color when category isn't an array", () => {
     const article = makeArticle({ category: null });
     render(<PremiumTeaserCard article={article} />);

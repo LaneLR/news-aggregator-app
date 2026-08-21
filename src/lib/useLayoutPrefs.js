@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 
-// Account-synced reading preference (List/Card/Magazine/Reader density) —
+// Account-synced reading preference (List/Card/Reader density) —
 // intentionally the only field left here. Category-nav and header-icon
 // order live in useLocalOrder.js instead: per-device, not per-account (see
 // that file's comment for why).
@@ -16,7 +16,11 @@ export function useLayoutPrefs() {
     fetch("/api/users/layout-prefs")
       .then((res) => res.json())
       .then((data) => {
-        setViewDensityState(data.viewDensity || "reader");
+        // Magazine density was removed (it rendered identically to Card,
+        // just fewer/larger columns) — an account that saved it before the
+        // removal falls back to Card rather than matching no toggle option.
+        const density = data.viewDensity === "magazine" ? "card" : data.viewDensity;
+        setViewDensityState(density || "reader");
         setLoaded(true);
       })
       .catch((err) => console.error("Failed to load layout prefs:", err));

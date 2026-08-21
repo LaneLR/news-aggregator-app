@@ -13,7 +13,7 @@ import { useMarkAllRead } from "@/lib/useMarkAllRead";
 import { useLayoutPrefs } from "@/lib/useLayoutPrefs";
 import styles from "./SearchFeed.module.scss";
 
-const GATED_DENSITIES = new Set(["list", "magazine"]);
+const GATED_DENSITIES = new Set(["list"]);
 
 export default function SearchFeed({ initialQuery, archiveId, viewOnly }) {
   // Not local state — the parent (src/app/search/page.jsx) remounts this

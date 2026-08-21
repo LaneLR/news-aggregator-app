@@ -24,13 +24,23 @@ describe("useLayoutPrefs", () => {
 
   it("fetches and applies the saved density when logged in", async () => {
     mockSession = makeSession();
+    global.fetch.mockResolvedValueOnce(makeFetchResponse({ viewDensity: "list" }));
+
+    const { result } = renderHook(() => useLayoutPrefs());
+
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    expect(result.current.viewDensity).toBe("list");
+    expect(global.fetch).toHaveBeenCalledWith("/api/users/layout-prefs");
+  });
+
+  it("normalizes a legacy 'magazine' density (removed) to 'card'", async () => {
+    mockSession = makeSession();
     global.fetch.mockResolvedValueOnce(makeFetchResponse({ viewDensity: "magazine" }));
 
     const { result } = renderHook(() => useLayoutPrefs());
 
     await waitFor(() => expect(result.current.loaded).toBe(true));
-    expect(result.current.viewDensity).toBe("magazine");
-    expect(global.fetch).toHaveBeenCalledWith("/api/users/layout-prefs");
+    expect(result.current.viewDensity).toBe("card");
   });
 
   it("falls back to 'reader' when the server returns no viewDensity", async () => {

@@ -53,11 +53,20 @@
 }
 
 .filterBar {
-  // Header/HeaderNavBar scroll away normally (not fixed), so once this bar
-  // reaches the very top of the viewport it's the first thing pinned there.
-  position: sticky;
-  top: 0;
-  z-index: 5;
+  // Desktop only — Header.module.scss's own .wrapper is plain/in-flow above
+  // 900px (not sticky there), so once it scrolls away this bar is the first
+  // thing left to pin to the true viewport top. Below 900px Header itself
+  // goes position: sticky with its own hide-on-scroll-down/show-on-scroll-up
+  // behavior (see Header.module.scss's .wrapper/.headerHidden) — sticking
+  // this bar too, independently, meant it stayed glued to the top of the
+  // screen through the entire scroll regardless of Header's hidden state,
+  // instead of scrolling away with the rest of the article list the way a
+  // plain in-flow toolbar at the top of that list should.
+  @media (min-width: 901px) {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -145,7 +154,15 @@
 .loadMoreRow {
   display: flex;
   justify-content: center;
-  padding: 2rem 0;
+  padding: 1rem 0;
+}
+
+// Invisible trigger the IntersectionObserver watches for auto-loading the
+// next page — not the oversized, always-there Load More button this
+// replaced, which visually blocked freshly-loaded cards behind its own
+// large tap target.
+.loadMoreSentinel {
+  height: 20px;
 }
 
 .caughtUpText {

@@ -91,9 +91,7 @@
   }
 
   // Horizontal row for the 3-pane reader's list pane — wide thumbnail and a
-  // large title with plenty of line-wrap room so headlines stop truncating,
-  // with room to spare since this pane isn't fighting a 3-column card grid
-  // for width the way .densityMagazine/.densityCard are.
+  // large title with plenty of line-wrap room so headlines stop truncating.
   &.densityList {
     flex-direction: row;
     align-items: stretch;
@@ -109,18 +107,19 @@
       flex-shrink: 0;
     }
 
+    // Deliberately still a column, same as the base .contentArea — title
+    // block on top, actions row below, full-width. An earlier version put
+    // these side by side (row direction, actionsRow pinned right via
+    // margin-left: auto/flex-shrink: 0) to save vertical space, but the
+    // action icons' own width doesn't shrink, so on a phone-width card the
+    // 200px/108px thumbnail plus the icon group's fixed width left less
+    // room for the title than it needed, and the icons themselves got
+    // pushed past the card's right edge and clipped by its overflow:
+    // hidden — invisible, not just cramped. Stacking removes the width
+    // contest entirely: nothing here competes with anything else for the
+    // same horizontal space.
     .contentArea {
       padding: 1.1rem 1.5rem;
-      flex-direction: row;
-      align-items: center;
-      // The title block flexes/shrinks to fill whatever space is left;
-      // actionsRow is flex-shrink: 0 (below) — together that pins the
-      // icons to a consistent right edge on every card regardless of how
-      // long or short the title/source text is, instead of relying on
-      // space-between (which only holds that line if neither child ever
-      // overflows its share of the row).
-      justify-content: flex-start;
-      gap: 1.25rem;
     }
 
     .articleTitle {
@@ -130,25 +129,13 @@
       margin: 0 0 0.4rem 0;
     }
 
-    .sourceRow {
-      margin: 0;
-    }
-
     .actionsRow {
-      margin-top: 0;
-      margin-left: auto;
-      padding-top: 0;
-      border-top: none;
-      flex-shrink: 0;
+      margin-top: 0.6rem;
     }
 
-    // Below this, the 200px thumbnail plus the actions column's own
-    // non-shrinking width (neither one shrinks — see the comments on
-    // .titleBlock and .actionsRow above) add up to more than the
-    // available row width on a phone-size viewport, forcing the whole
-    // card wider than its container even though .titleBlock itself
-    // happily shrinks to fit. A narrower thumbnail and tighter padding
-    // buys back enough room for everything else to actually fit.
+    // Below this, the 200px thumbnail leaves too little room for a
+    // 3-line-clamped 1.3rem title to read comfortably next to it — a
+    // narrower thumbnail and tighter padding buys back that room.
     @media (max-width: 480px) {
       min-height: 128px;
 
@@ -158,23 +145,11 @@
 
       .contentArea {
         padding: 0.75rem 0.9rem;
-        gap: 0.35rem;
       }
     }
 
     .readMoreButton {
       display: none;
-    }
-  }
-
-  // Bigger visual emphasis for a skim-the-headlines magazine feel.
-  &.densityMagazine {
-    .imageLink {
-      height: 280px;
-    }
-
-    .articleTitle {
-      font-size: 1.4rem;
     }
   }
 }
@@ -233,10 +208,10 @@
   flex-grow: 1;
 }
 
-// Lets the title/source block shrink to fit instead of forcing the row
-// wider than its container (a flex child's default min-width is "auto",
-// i.e. its own content's width) — without this, a long title can push
-// .actionsRow out of its consistent right-aligned spot in .densityList.
+// A flex child's default min-width is "auto" (its own content's width) —
+// without this, an unbroken long word/URL in the title could force this
+// block, and the card around it, wider than its container instead of
+// wrapping/clamping in place.
 .titleBlock {
   min-width: 0;
 }

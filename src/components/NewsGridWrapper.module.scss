@@ -26,14 +26,3 @@
   gap: 12px;
   grid-template-columns: none;
 }
-
-// Fewer, larger cards for a magazine-style skim. minmax(0, 1fr), not a bare
-// 1fr, for the same reason as .wrapper above — keeps both columns pinned
-// to an even split regardless of which card's content is longer.
-.magazineWrapper {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  @media (max-width: 885px) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}

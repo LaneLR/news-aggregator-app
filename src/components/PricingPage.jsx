@@ -31,7 +31,7 @@ const SUBSCRIBED_FEATURES = [
   { included: true, text: "Full Market & Journal coverage" },
   { included: true, text: "Create and customize your own news feeds" },
   { included: true, text: '"For You" recommendations based on your reading habits' },
-  { included: true, text: "List & Magazine view layouts" },
+  { included: true, text: "List view layout" },
   { included: true, text: "Earn referral credit when friends subscribe" },
 ];
 
