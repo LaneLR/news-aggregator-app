@@ -143,8 +143,7 @@ export default function NewsCardFour({
       >
       <Link
         className={styles.imageLink}
-        href={article.url}
-        target={"_blank"}
+        href={`/article/${article.id}`}
         onClick={() => trackArticleClick(article)}
       >
         {showFallbackArt ? (
@@ -177,14 +176,13 @@ export default function NewsCardFour({
           </div>
         </div>
         <div className={styles.actionsRow}>
-          <a
+          <Link
             className={styles.readMoreButton}
-            href={article.url}
-            target="_blank"
+            href={`/article/${article.id}`}
             onClick={() => trackArticleClick(article)}
           >
-            Read article
-          </a>
+            Read
+          </Link>
 
           <div className={styles.actionsGroup}>
             {isPaywalled && (

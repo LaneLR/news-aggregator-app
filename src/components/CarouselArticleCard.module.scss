@@ -97,10 +97,12 @@
   font-size: 0.85rem;
 }
 
+// gap bumped from 4px — the source name and Follow button were landing
+// right up against each other.
 .sourceGroup {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
   min-width: 0;
 }
 

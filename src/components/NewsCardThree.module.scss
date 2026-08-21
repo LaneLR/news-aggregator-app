@@ -251,7 +251,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  // A fallback minimum, not the usual gap — space-between already pushes
+  // the source name and Follow button apart when there's room to spare, but
+  // on a narrow/tight row (mobile, list density) they were landing right up
+  // against each other at the old 6px.
+  gap: 14px;
   margin: 0 0 1rem 0;
 }
 

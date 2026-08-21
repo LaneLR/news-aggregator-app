@@ -195,13 +195,10 @@ describe("NewsCardFour", () => {
     expect(card.style.borderTopColor).toBeTruthy();
   });
 
-  it("links the read-more button to the article's own url", () => {
-    const article = makeArticle({ url: "https://example.com/story" });
+  it("links the Read button to the article's own page, not the original url", () => {
+    const article = makeArticle({ id: "42", url: "https://example.com/story" });
     render(<NewsCardFour article={article} viewOnly />);
-    expect(screen.getByRole("link", { name: /read article/i })).toHaveAttribute(
-      "href",
-      "https://example.com/story"
-    );
+    expect(screen.getByRole("link", { name: "Read" })).toHaveAttribute("href", "/article/42");
   });
 
   it("tracks a click when the thumbnail image link is clicked", async () => {
@@ -216,13 +213,13 @@ describe("NewsCardFour", () => {
     expect(screen.getByAltText("Tracked Story")).toBeInTheDocument();
   });
 
-  it("tracks a click when the read-more button is clicked", async () => {
+  it("tracks a click when the Read button is clicked", async () => {
     const user = userEvent.setup();
     const article = makeArticle({ title: "Tracked Story Two", url: "https://example.com/tracked" });
     render(<NewsCardFour article={article} viewOnly />);
 
-    await user.click(screen.getByRole("link", { name: /read article/i }));
-    expect(screen.getByRole("link", { name: /read article/i })).toBeInTheDocument();
+    await user.click(screen.getByRole("link", { name: "Read" }));
+    expect(screen.getByRole("link", { name: "Read" })).toBeInTheDocument();
   });
 
   it("marks the article as read on a left swipe past the threshold", async () => {
