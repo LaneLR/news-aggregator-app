@@ -129,7 +129,7 @@ describe("NewsCardThree", () => {
     );
 
     // The image link's onClick intercepts the click while selectionMode is on.
-    const link = document.querySelector('a[href="' + article.url + '"]');
+    const link = document.querySelector('a[href="/article/' + article.id + '"]');
     await user.click(link);
 
     expect(onToggleSelect).toHaveBeenCalledTimes(1);
@@ -334,7 +334,7 @@ describe("NewsCardThree", () => {
     expect(global.fetch).not.toHaveBeenCalledWith("/api/articles/mark-all-read", expect.anything());
   });
 
-  it("tracks a click on the 'Read article' link", async () => {
+  it("tracks a click on the 'Read' link, which points at the article's own page, not the original site", async () => {
     const user = userEvent.setup();
     const article = makeArticle();
     render(<NewsCardThree article={article} viewOnly />);
@@ -342,9 +342,20 @@ describe("NewsCardThree", () => {
     // trackArticleClick posts to /api/articles/click fire-and-forget; just
     // confirm the link is wired and clicking doesn't throw.
     mockRoutes([...ARCHIVE_ROUTES, ["/api/articles/click", () => makeFetchResponse({ success: true })]]);
-    await user.click(screen.getByRole("link", { name: "Read article" }));
+    await user.click(screen.getByRole("link", { name: "Read" }));
 
-    expect(screen.getByRole("link", { name: "Read article" })).toHaveAttribute("href", article.url);
+    expect(screen.getByRole("link", { name: "Read" })).toHaveAttribute("href", `/article/${article.id}`);
+  });
+
+  it("calls onSelect instead of navigating when the 'Read' link is clicked", async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    const article = makeArticle();
+    render(<NewsCardThree article={article} viewOnly onSelect={onSelect} />);
+
+    await user.click(screen.getByRole("link", { name: "Read" }));
+
+    expect(onSelect).toHaveBeenCalledTimes(1);
   });
 
   it("calls onSelect instead of navigating when the thumbnail image link is clicked", async () => {

@@ -135,7 +135,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  // See the identical fallback-minimum-gap comment on NewsCardThree.module.scss's
+  // .sourceRow — 6px let the source name and Follow button land right up
+  // against each other on a narrow row.
+  gap: 14px;
   margin: 0 0 1rem 0;
 }
 

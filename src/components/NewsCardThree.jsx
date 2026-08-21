@@ -164,8 +164,7 @@ export default function NewsCardThree({
       >
       <Link
         className={styles.imageLink}
-        href={article.url}
-        target={onSelect || selectionMode ? undefined : "_blank"}
+        href={`/article/${article.id}`}
         onClick={
           selectionMode
             ? (e) => {
@@ -237,14 +236,20 @@ export default function NewsCardThree({
           </div>
         </div>
         <div className={styles.actionsRow}>
-          <a
+          <Link
             className={styles.readMoreButton}
-            href={article.url}
-            target="_blank"
-            onClick={() => trackArticleClick(article)}
+            href={`/article/${article.id}`}
+            onClick={
+              onSelect
+                ? (e) => {
+                    e.preventDefault();
+                    onSelect();
+                  }
+                : () => trackArticleClick(article)
+            }
           >
-            Read article
-          </a>
+            Read
+          </Link>
 
           <div className={styles.actionsGroup}>
             {isPaywalled && (

@@ -107,14 +107,13 @@ export default function CarouselCard({ article, archiveId }) {
         </span>
       </div>
       <div className={styles.actionsRow}>
-        <a
+        <Link
           className={styles.readMoreButton}
-          href={article.url}
-          target="_blank"
+          href={`/article/${article.id}`}
           onClick={() => trackArticleClick(article)}
         >
-          Read article
-        </a>
+          Read
+        </Link>
 
         <div className={styles.actionsGroup}>
           <ArchiveToggleButton article={article} archiveId={archiveId} />
